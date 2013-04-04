@@ -71,6 +71,8 @@ static void __init carambola2_common_setup(void)
 	ath79_register_wmac(art + CARAMBOLA2_CALDATA_OFFSET,
 			    art + CARAMBOLA2_WMAC_MAC_OFFSET);
 
+	ath79_setup_ar933x_phy4_switch(true, true);
+
 	ath79_init_mac(ath79_eth0_data.mac_addr, art + CARAMBOLA2_MAC0_OFFSET, 0);
 	ath79_init_mac(ath79_eth1_data.mac_addr, art + CARAMBOLA2_MAC1_OFFSET, 0);
 
