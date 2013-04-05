@@ -88,6 +88,7 @@ platform_check_image() {
 	ap113 | \
 	ap121 | \
 	ap121-mini | \
+	carambola2 | \
 	ap136-010 | \
 	ap136-020 | \
 	ap135-020 | \
