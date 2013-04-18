@@ -1,0 +1,33 @@
+
+config system
+	option hostname 'OpenWrt'
+	option timezone 'UTC'
+
+config timeserver 'ntp'
+	list server '0.openwrt.pool.ntp.org'
+	list server '1.openwrt.pool.ntp.org'
+	list server '2.openwrt.pool.ntp.org'
+	list server '3.openwrt.pool.ntp.org'
+	option enable_server '0'
+
+config led
+	option sysfs 'carambola2:green:wlan'
+	option name 'wlan'
+	option trigger 'phy0radio'
+	option default '0'
+
+config led
+	option default	'0'
+	option name	'eth0'
+	option sysfs	'carambola2:orange:eth0'
+	option trigger	'netdev'
+	option mode	'link tx rx'
+	option dev	'eth0'
+
+config led
+        option default  '0'
+        option name     'eth1'
+        option sysfs    'carambola2:orange:eth1'
+        option trigger  'netdev'
+        option mode     'link tx rx'
+        option dev      'eth1'

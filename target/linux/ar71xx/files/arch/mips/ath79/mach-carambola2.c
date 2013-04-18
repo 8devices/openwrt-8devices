@@ -8,6 +8,9 @@
  *  by the Free Software Foundation.
  */
 
+#include <asm/mach-ath79/ath79.h>
+#include <asm/mach-ath79/ar71xx_regs.h>
+#include "common.h"
 #include "dev-eth.h"
 #include "dev-gpio-buttons.h"
 #include "dev-leds-gpio.h"
@@ -18,7 +21,8 @@
 #include "machtypes.h"
 
 #define CARAMBOLA2_GPIO_LED_WLAN		0
-#define CARAMBOLA2_GPIO_LED_USB			1
+#define CARAMBOLA2_GPIO_LED_ETH0		14
+#define CARAMBOLA2_GPIO_LED_ETH1		13
 
 #define CARAMBOLA2_GPIO_BTN_JUMPSTART		11
 #define CARAMBOLA2_GPIO_BTN_RESET		12
@@ -33,15 +37,18 @@
 
 static struct gpio_led carambola2_leds_gpio[] __initdata = {
 	{
-		.name		= "carambola2:green:usb",
-		.gpio		= CARAMBOLA2_GPIO_LED_USB,
-		.active_low	= 0,
-	},
-	{
 		.name		= "carambola2:green:wlan",
 		.gpio		= CARAMBOLA2_GPIO_LED_WLAN,
+		.active_low	= 1,
+	}, {
+		.name		= "carambola2:orange:eth0",
+		.gpio		= CARAMBOLA2_GPIO_LED_ETH0,
 		.active_low	= 0,
-	},
+	}, {
+		.name		= "carambola2:orange:eth1",
+		.gpio		= CARAMBOLA2_GPIO_LED_ETH1,
+		.active_low	= 0,
+	}
 };
 
 static struct gpio_keys_button carambola2_gpio_keys[] __initdata = {
@@ -88,6 +95,12 @@ static void __init carambola2_common_setup(void)
 static void __init carambola2_setup(void)
 {
 	carambola2_common_setup();
+
+	ath79_gpio_function_disable(AR724X_GPIO_FUNC_ETH_SWITCH_LED0_EN |
+				AR724X_GPIO_FUNC_ETH_SWITCH_LED1_EN |
+				AR724X_GPIO_FUNC_ETH_SWITCH_LED2_EN |
+				AR724X_GPIO_FUNC_ETH_SWITCH_LED3_EN |
+				AR724X_GPIO_FUNC_ETH_SWITCH_LED4_EN);
 
 	ath79_register_leds_gpio(-1, ARRAY_SIZE(carambola2_leds_gpio),
 				 carambola2_leds_gpio);
