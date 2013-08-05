@@ -1,0 +1,13 @@
+Index: compat-wireless-2013-02-22/drivers/net/wireless/ath/ath9k/ar9003_eeprom.c
+===================================================================
+--- compat-wireless-2013-02-22.orig/drivers/net/wireless/ath/ath9k/ar9003_eeprom.c
++++ compat-wireless-2013-02-22/drivers/net/wireless/ath/ath9k/ar9003_eeprom.c
+@@ -3897,7 +3897,7 @@ static void ar9003_hw_apply_tuning_caps(
+	struct ar9300_eeprom *eep = &ah->eeprom.ar9300_eep;
+	u8 tuning_caps_param = eep->baseEepHeader.params_for_tuning_caps[0];
+
+-	if (AR_SREV_9485(ah) || AR_SREV_9330(ah) || AR_SREV_9340(ah))
++	if (AR_SREV_9485(ah) || AR_SREV_9340(ah))
+		return;
+
+	if (eep->baseEepHeader.featureEnable & 0x40) {
