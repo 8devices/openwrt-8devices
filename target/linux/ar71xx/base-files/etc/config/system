@@ -1,6 +1,6 @@
 
 config system
-	option hostname 'OpenWrt'
+	option hostname 'carambola2'
 	option timezone 'UTC'
 
 config timeserver 'ntp'
