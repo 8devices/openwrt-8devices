@@ -1,0 +1,60 @@
+--- a/drivers/net/wireless/ath/ath9k/hw.c
++++ b/drivers/net/wireless/ath/ath9k/hw.c
+@@ -36,6 +36,16 @@ MODULE_DESCRIPTION("Support for Atheros
+ MODULE_SUPPORTED_DEVICE("Atheros 802.11n WLAN cards");
+ MODULE_LICENSE("Dual BSD/GPL");
+ 
++#define WAR_USB_DISABLE_PLL_LOCK_DETECT(_ah) \
++do { \
++	if (AR_SREV_9330(_ah) || AR_SREV_9340(_ah)) { \
++		volatile u_int32_t *usb_ctrl_r1 = (u_int32_t *) 0xb8116c84; \
++		volatile u_int32_t *usb_ctrl_r2 = (u_int32_t *) 0xb8116c88; \
++		*usb_ctrl_r1 = (*usb_ctrl_r1 & 0xffefffff); \
++		*usb_ctrl_r2 = (*usb_ctrl_r2 & 0xfc1fffff) | (1 << 21) | (3 << 22); \
++	} \
++} while (0)
++
+ static int __init ath9k_init(void)
+ {
+ 	return 0;
+@@ -1388,6 +1398,8 @@ static bool ath9k_hw_set_reset(struct at
+ 	if (AR_SREV_9100(ah))
+ 		udelay(50);
+ 
++	WAR_USB_DISABLE_PLL_LOCK_DETECT(ah);
++
+ 	return true;
+ }
+ 
+@@ -1488,6 +1500,8 @@ static bool ath9k_hw_chip_reset(struct a
+ 		ar9003_hw_internal_regulator_apply(ah);
+ 	ath9k_hw_init_pll(ah, chan);
+ 	ath9k_hw_set_rfmode(ah, chan);
++	
++	WAR_USB_DISABLE_PLL_LOCK_DETECT(ah);
+ 
+ 	return true;
+ }
+@@ -1741,9 +1755,12 @@ static int ath9k_hw_do_fastcc(struct ath
+ 
+ 	if (AR_SREV_9271(ah))
+ 		ar9002_hw_load_ani_reg(ah, chan);
+-
++
++	WAR_USB_DISABLE_PLL_LOCK_DETECT(ah);
++
+ 	return 0;
+ fail:
++	WAR_USB_DISABLE_PLL_LOCK_DETECT(ah);
+ 	return -EINVAL;
+ }
+ 
+@@ -2043,6 +2060,8 @@ int ath9k_hw_reset(struct ath_hw *ah, st
+ 	if (AR_SREV_9565(ah) && ah->shared_chain_lnadiv)
+ 		REG_SET_BIT(ah, AR_BTCOEX_WL_LNADIV, AR_BTCOEX_WL_LNADIV_FORCE_ON);
+ 
++	WAR_USB_DISABLE_PLL_LOCK_DETECT(ah);
++
+ 	return 0;
+ }
+ EXPORT_SYMBOL(ath9k_hw_reset);
