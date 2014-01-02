@@ -1,6 +1,9 @@
 src-git packages git://github.com/8devices/carambola2-packages.git
 src-git luci git://github.com/8devices/carambola2-luci.git
 
+#src-git telephony http://feeds.openwrt.nanl.de/openwrt/telephony.git
+#src-git routing git://github.com/openwrt-routing/packages.git
+
 #src-svn packages svn://svn.openwrt.org/openwrt/packages
 #src-svn xwrt http://x-wrt.googlecode.com/svn/trunk/package
 #src-svn luci http://svn.luci.subsignal.org/luci/trunk/contrib/package
