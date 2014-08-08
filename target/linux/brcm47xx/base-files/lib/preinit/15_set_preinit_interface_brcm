@@ -1,37 +1,16 @@
 #!/bin/sh
 
-port_net_echo() {
-	[ -n "$pi_ifname" ] && grep -q "$pi_ifname" /proc/net/dev && {
-		if [ "$pi_preinit_net_messages" = "y" ] || [ "$pi_failsafe_net_message" = "true" ] && [ "$pi_preinit_no_failsafe_netmsg" != "y" ]; then
-			netmsg $pi_broadcast "$1"
-		fi
-	}
-}
-
-preinit_ip_deconfig() {
+preinit_ip() {
+	# if the preinit interface isn't specified and ifname is set in
+	# preinit.arch use that interface
 	if [ -z "$pi_ifname" ]; then
-		ifconfig $ifname 0.0.0.0 down
-	else
-		grep -q "$pi_ifname" /proc/net/dev && {
-			ifconfig $pi_ifname 0.0.0.0 down
-		}
+		pi_ifname=$ifname
 	fi
-}
 
-preinit_net_echo() {
-	preinit_ip
+	[ -n "$pi_ifname" ] && grep -q "$pi_ifname" /proc/net/dev && {
+		ifconfig $pi_ifname $pi_ip netmask $pi_netmask broadcast $pi_broadcast up
 
-	[ -d /proc/switch/eth0 ] && [ "$pi_ifname" = "eth0" ] && {
-		echo 1 > /proc/switch/eth0/reset
-
-		# this would be easier if we blasted the message across all ports
-		# but we don't want packets leaking across interfaces
-		for port in $(seq 0 4); do {
-			echo "$port ${cpu_port:-5u*}" > /proc/switch/eth0/vlan/1/ports
-			port_net_echo $1
-		}; done
-
-		echo "0 1 2 3 4 ${cpu_port:-5u*}" > /proc/switch/eth0/vlan/1/ports
-
-	} || port_net_echo $1
+		local try=0;
+		while [ $((try++)) -le 5 ] && [ ! $(cat /sys/class/net/$pi_ifname/operstate) == "up" ]; do sleep 1; done
+	}
 }

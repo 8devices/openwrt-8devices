@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2006-2011 OpenWrt.org
+# Copyright (C) 2006-2013 OpenWrt.org
 #
 # This is free software, licensed under the GNU General Public License v2.
 # See /LICENSE for more information.
@@ -7,13 +7,13 @@
 include $(TOPDIR)/rules.mk
 
 PKG_NAME:=gdb
-PKG_REV:=7.5-2012.09
-PKG_VERSION_MAJOR:=7.5
+PKG_REV:=7.6-2013.05
+PKG_VERSION_MAJOR:=7.6
 PKG_VERSION:=linaro-$(PKG_REV)
 
 PKG_SOURCE:=$(PKG_NAME)-$(PKG_VERSION).tar.bz2
-PKG_MD5SUM:=758c2da97c27f7b50ca48cb803eaa9aa
-PKG_SOURCE_URL:=http://launchpad.net/gdb-linaro/$(PKG_VERSION_MAJOR)/$(PKG_REV)/+download/
+PKG_MD5SUM:=816290b91cff03912320089d353e8a12
+PKG_SOURCE_URL:=https://releases.linaro.org/13.05/components/toolchain/gdb-linaro/
 
 HOST_BUILD_PARALLEL:=1
 
@@ -29,7 +29,6 @@ define Host/Configure
 		--host=$(GNU_HOST_NAME) \
 		--target=$(REAL_GNU_TARGET_NAME) \
 		--disable-werror \
-		$(DISABLE_NLS) \
 		--without-uiout \
 		--disable-tui --disable-gdbtk --without-x \
 		--without-included-gettext \

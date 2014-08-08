@@ -1,11 +1,23 @@
-PART_NAME=linux
+. /lib/functions/lantiq.sh
+
+PART_NAME=firmware
 
 platform_check_image() {
-	[ "$ARGC" -gt 1 ] && return 1
+	[ "$#" -gt 1 ] && return 1
+	local board=$(lantiq_board_name)
+
+	case "$board" in
+		BTHOMEHUBV2B )
+			nand_do_platform_check $board $1
+			return $?;
+			;;
+	esac
 
 	case "$(get_magic_word "$1")" in
-		# .trx files
+		# uImage
 		2705) return 0;;
+		# tplink
+		0200) return 0;;
 		*)
 			echo "Invalid image type"
 			return 1

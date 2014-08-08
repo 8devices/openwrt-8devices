@@ -9,7 +9,7 @@
  *		  Anton Vorontsov <avorontsov@mvista.com>
  * Copyright 2011 Gateworks Corporation
  *		  Chris Lang <clang@gateworks.com>
- * Copyright 2012 Gateworks Corporation
+ * Copyright 2012-2013 Gateworks Corporation
  *		  Tim Harvey <tharvey@gateworks.com>
  *
  * This file is free software; you can redistribute it and/or modify
@@ -37,19 +37,21 @@
 #include <linux/spi/flash.h>
 #include <linux/if_ether.h>
 #include <linux/pps-gpio.h>
+#include <linux/usb/ehci_pdriver.h>
+#include <linux/usb/ohci_pdriver.h>
+#include <linux/clk-provider.h>
+#include <linux/clkdev.h>
+#include <linux/platform_data/cns3xxx.h>
 #include <asm/setup.h>
 #include <asm/mach-types.h>
 #include <asm/mach/arch.h>
 #include <asm/mach/map.h>
 #include <asm/mach/time.h>
-#include <mach/cns3xxx.h>
-#include <mach/irqs.h>
-#include <mach/platform.h>
-#include <mach/pm.h>
 #include <mach/gpio.h>
-#include <asm/hardware/gic.h>
 #include "core.h"
 #include "devices.h"
+#include "cns3xxx.h"
+#include "pm.h"
 
 #define ARRAY_AND_SIZE(x)       (x), ARRAY_SIZE(x)
 
@@ -190,8 +192,16 @@ static struct spi_board_info __initdata laguna_spi_devices[] = {
 	},
 };
 
+static struct resource laguna_spi_resource = {
+	.start    = CNS3XXX_SSP_BASE + 0x40,
+	.end      = CNS3XXX_SSP_BASE + 0x6f,
+	.flags    = IORESOURCE_MEM,
+};
+
 static struct platform_device laguna_spi_controller = {
 	.name = "cns3xxx_spi",
+	.resource = &laguna_spi_resource,
+	.num_resources = 1,
 };
 
 /*
@@ -312,9 +322,30 @@ static struct cns3xxx_plat_info laguna_net_data = {
 	},
 };
 
+static struct resource laguna_net_resource[] = {
+	{
+		.name = "eth0_mem",
+		.start = CNS3XXX_SWITCH_BASE,
+		.end = CNS3XXX_SWITCH_BASE + SZ_4K - 1,
+		.flags = IORESOURCE_MEM
+	}, {
+		.name = "eth_rx",
+		.start = IRQ_CNS3XXX_SW_R0RXC,
+		.end = IRQ_CNS3XXX_SW_R0RXC,
+		.flags = IORESOURCE_IRQ
+	}, {
+		.name = "eth_stat",
+		.start = IRQ_CNS3XXX_SW_STATUS,
+		.end = IRQ_CNS3XXX_SW_STATUS,
+		.flags = IORESOURCE_IRQ
+	}
+};
+
 static struct platform_device laguna_net_device = {
 	.name = "cns3xxx_eth",
 	.id = 0,
+	.resource = laguna_net_resource,
+	.num_resources = ARRAY_SIZE(laguna_net_resource),
 	.dev.platform_data = &laguna_net_data,
 };
 
@@ -359,29 +390,26 @@ static struct resource laguna_uart_resources[] = {
 
 static struct plat_serial8250_port laguna_uart_data[] = {
 	{
-		.membase        = (char*) (CNS3XXX_UART0_BASE_VIRT),
 		.mapbase        = (CNS3XXX_UART0_BASE),
 		.irq            = IRQ_CNS3XXX_UART0,
 		.iotype         = UPIO_MEM,
-		.flags          = UPF_BOOT_AUTOCONF | UPF_FIXED_TYPE | UPF_NO_TXEN_TEST,
+		.flags          = UPF_BOOT_AUTOCONF | UPF_FIXED_TYPE | UPF_NO_TXEN_TEST | UPF_IOREMAP,
 		.regshift       = 2,
 		.uartclk        = 24000000,
 		.type           = PORT_16550A,
 	},{
-		.membase        = (char*) (CNS3XXX_UART1_BASE_VIRT),
 		.mapbase        = (CNS3XXX_UART1_BASE),
 		.irq            = IRQ_CNS3XXX_UART1,
 		.iotype         = UPIO_MEM,
-		.flags          = UPF_BOOT_AUTOCONF | UPF_FIXED_TYPE | UPF_NO_TXEN_TEST,
+		.flags          = UPF_BOOT_AUTOCONF | UPF_FIXED_TYPE | UPF_NO_TXEN_TEST | UPF_IOREMAP,
 		.regshift       = 2,
 		.uartclk        = 24000000,
 		.type           = PORT_16550A,
 	},{
-		.membase        = (char*) (CNS3XXX_UART2_BASE_VIRT),
 		.mapbase        = (CNS3XXX_UART2_BASE),
 		.irq            = IRQ_CNS3XXX_UART2,
 		.iotype         = UPIO_MEM,
-		.flags          = UPF_BOOT_AUTOCONF | UPF_FIXED_TYPE | UPF_NO_TXEN_TEST,
+		.flags          = UPF_BOOT_AUTOCONF | UPF_FIXED_TYPE | UPF_NO_TXEN_TEST | UPF_IOREMAP,
 		.regshift       = 2,
 		.uartclk        = 24000000,
 		.type           = PORT_16550A,
@@ -414,13 +442,52 @@ static struct resource cns3xxx_usb_ehci_resources[] = {
 
 static u64 cns3xxx_usb_ehci_dma_mask = DMA_BIT_MASK(32);
 
+static int csn3xxx_usb_power_on(struct platform_device *pdev)
+{
+	/*
+	 * EHCI and OHCI share the same clock and power,
+	 * resetting twice would cause the 1st controller been reset.
+	 * Therefore only do power up  at the first up device, and
+	 * power down at the last down device.
+	 *
+	 * Set USB AHB INCR length to 16
+	 */
+	if (atomic_inc_return(&usb_pwr_ref) == 1) {
+		cns3xxx_pwr_power_up(1 << PM_PLL_HM_PD_CTRL_REG_OFFSET_PLL_USB);
+		cns3xxx_pwr_clk_en(1 << PM_CLK_GATE_REG_OFFSET_USB_HOST);
+		cns3xxx_pwr_soft_rst(1 << PM_SOFT_RST_REG_OFFST_USB_HOST);
+		__raw_writel((__raw_readl(MISC_CHIP_CONFIG_REG) | (0X2 << 24)),
+			MISC_CHIP_CONFIG_REG);
+	}
+
+	return 0;
+}
+
+static void csn3xxx_usb_power_off(struct platform_device *pdev)
+{
+	/*
+	 * EHCI and OHCI share the same clock and power,
+	 * resetting twice would cause the 1st controller been reset.
+	 * Therefore only do power up  at the first up device, and
+	 * power down at the last down device.
+	 */
+	if (atomic_dec_return(&usb_pwr_ref) == 0)
+		cns3xxx_pwr_clk_dis(1 << PM_CLK_GATE_REG_OFFSET_USB_HOST);
+}
+
+static struct usb_ehci_pdata cns3xxx_usb_ehci_pdata = {
+	.power_on	= csn3xxx_usb_power_on,
+	.power_off	= csn3xxx_usb_power_off,
+};
+
 static struct platform_device cns3xxx_usb_ehci_device = {
-	.name          = "cns3xxx-ehci",
+	.name          = "ehci-platform",
 	.num_resources = ARRAY_SIZE(cns3xxx_usb_ehci_resources),
 	.resource      = cns3xxx_usb_ehci_resources,
 	.dev           = {
 		.dma_mask          = &cns3xxx_usb_ehci_dma_mask,
 		.coherent_dma_mask = DMA_BIT_MASK(32),
+		.platform_data     = &cns3xxx_usb_ehci_pdata,
 	},
 };
 
@@ -438,13 +505,20 @@ static struct resource cns3xxx_usb_ohci_resources[] = {
 
 static u64 cns3xxx_usb_ohci_dma_mask = DMA_BIT_MASK(32);
 
+static struct usb_ohci_pdata cns3xxx_usb_ohci_pdata = {
+	.num_ports	= 1,
+	.power_on	= csn3xxx_usb_power_on,
+	.power_off	= csn3xxx_usb_power_off,
+};
+
 static struct platform_device cns3xxx_usb_ohci_device = {
-	.name          = "cns3xxx-ohci",
+	.name          = "ohci-platform",
 	.num_resources = ARRAY_SIZE(cns3xxx_usb_ohci_resources),
 	.resource      = cns3xxx_usb_ohci_resources,
 	.dev           = {
 		.dma_mask          = &cns3xxx_usb_ohci_dma_mask,
 		.coherent_dma_mask = DMA_BIT_MASK(32),
+		.platform_data	   = &cns3xxx_usb_ohci_pdata,
 	},
 };
 
@@ -478,7 +552,7 @@ static struct platform_device cns3xxx_usb_otg_device = {
 static struct resource laguna_i2c_resource[] = {
 	{
 		.start    = CNS3XXX_SSP_BASE + 0x20,
-		.end      = 0x7100003f,
+		.end      = CNS3XXX_SSP_BASE + 0x3f,
 		.flags    = IORESOURCE_MEM,
 	},{
 		.start    = IRQ_CNS3XXX_I2C,
@@ -567,11 +641,6 @@ static struct resource laguna_watchdog_resources[] = {
 		.end	= CNS3XXX_TC11MP_TWD_BASE + SZ_4K - 1,
 		.flags	= IORESOURCE_MEM,
 	},
-	[1] = {
-		.start	= IRQ_LOCALWDOG,
-		.end	= IRQ_LOCALWDOG,
-		.flags	= IORESOURCE_IRQ,
-	}
 };
 
 static struct platform_device laguna_watchdog = {
@@ -654,6 +723,21 @@ static struct gpio laguna_gpio_gw2387[] = {
 	{ 113, GPIOF_IN           , "DIO5" },
 };
 
+static struct gpio laguna_gpio_gw2385[] = {
+	{   0, GPIOF_IN           , "*GSC_IRQ#" },
+	{   1, GPIOF_OUT_INIT_HIGH, "*USB_HST_VBUS_EN" },
+	{   2, GPIOF_IN           , "*USB_HST_FAULT#" },
+	{   5, GPIOF_IN           , "*USB_OTG_FAULT#" },
+	{   6, GPIOF_OUT_INIT_LOW , "*USB_HST_PCI_SEL" },
+	{   7, GPIOF_OUT_INIT_LOW , "*GSM_SEL0" },
+	{   8, GPIOF_OUT_INIT_LOW , "*GSM_SEL1" },
+	{   9, GPIOF_OUT_INIT_LOW , "*SER_EN" },
+	{  10, GPIOF_IN,            "*USER_PB#" },
+	{  11, GPIOF_OUT_INIT_HIGH, "*PERST#" },
+	{ 100, GPIOF_IN           , "*USER_PB#" },
+	{ 103, GPIOF_OUT_INIT_HIGH, "V5_EN" },
+};
+
 static struct gpio laguna_gpio_gw2384[] = {
 	{   0, GPIOF_IN           , "*GSC_IRQ#" },
 	{   1, GPIOF_OUT_INIT_HIGH, "*USB_HST_VBUS_EN" },
@@ -680,6 +764,7 @@ static struct gpio laguna_gpio_gw2383[] = {
 	{   8, GPIOF_IN           , "GPIO1" },
 	{ 100, GPIOF_IN           , "DIO0" },
 	{ 101, GPIOF_IN           , "DIO1" },
+	{ 108, GPIOF_IN           , "*USER_PB#" },
 };
 
 static struct gpio laguna_gpio_gw2382[] = {
@@ -692,6 +777,7 @@ static struct gpio laguna_gpio_gw2382[] = {
 	{  10, GPIOF_OUT_INIT_HIGH, "*USB_PCI_SEL#" },
 	{ 100, GPIOF_IN           , "DIO0" },
 	{ 101, GPIOF_IN           , "DIO1" },
+	{ 108, GPIOF_IN           , "*USER_PB#" },
 };
 
 static struct gpio laguna_gpio_gw2380[] = {
@@ -703,6 +789,7 @@ static struct gpio laguna_gpio_gw2380[] = {
 	{ 101, GPIOF_IN           , "DIO1" },
 	{ 102, GPIOF_IN           , "DIO2" },
 	{ 103, GPIOF_IN           , "DIO3" },
+	{ 108, GPIOF_IN           , "*USER_PB#" },
 };
 
 /*
@@ -710,9 +797,36 @@ static struct gpio laguna_gpio_gw2380[] = {
  */
 static void __init laguna_init(void)
 {
+	struct clk *clk;
+	u32 __iomem *reg;
+
+	clk = clk_register_fixed_rate(NULL, "cpu", NULL,
+				      CLK_IS_ROOT | CLK_IGNORE_UNUSED,
+				      cns3xxx_cpu_clock() * (1000000 / 8));
+	clk_register_clkdev(clk, "cpu", NULL);
+
 	platform_device_register(&laguna_watchdog);
 
 	platform_device_register(&laguna_i2c_controller);
+
+	/* Set ext_int 0-3 drive strength to 21 mA */
+	reg = MISC_IO_PAD_DRIVE_STRENGTH_CTRL_B;
+	*reg |= 0x300;
+
+	/* Enable SCL/SDA for I2C */
+	reg = MISC_GPIOB_PIN_ENABLE_REG;
+	*reg |= BIT(12) | BIT(13);
+
+	/* Enable MMC/SD pins */
+	reg = MISC_GPIOA_PIN_ENABLE_REG;
+	*reg |= 0xf80;
+
+	cns3xxx_pwr_clk_en(1 << PM_CLK_GATE_REG_OFFSET_SPI_PCM_I2C);
+	cns3xxx_pwr_power_up(1 << PM_CLK_GATE_REG_OFFSET_SPI_PCM_I2C);
+	cns3xxx_pwr_soft_rst(1 << PM_CLK_GATE_REG_OFFSET_SPI_PCM_I2C);
+
+	cns3xxx_pwr_clk_en(CNS3XXX_PWR_CLK_EN(SPI_PCM_I2C));
+	cns3xxx_pwr_soft_rst(CNS3XXX_PWR_SOFTWARE_RST(SPI_PCM_I2C));
 
 	i2c_register_board_info(0, ARRAY_AND_SIZE(laguna_i2c_devices));
 
@@ -725,22 +839,12 @@ static struct map_desc laguna_io_desc[] __initdata = {
 		.pfn		= __phys_to_pfn(CNS3XXX_UART0_BASE),
 		.length		= SZ_4K,
 		.type		= MT_DEVICE,
-	},{
-		.virtual	= CNS3XXX_UART1_BASE_VIRT,
-		.pfn		= __phys_to_pfn(CNS3XXX_UART1_BASE),
-		.length		= SZ_4K,
-		.type		= MT_DEVICE,
-	},{
-		.virtual	= CNS3XXX_UART2_BASE_VIRT,
-		.pfn		= __phys_to_pfn(CNS3XXX_UART2_BASE),
-		.length		= SZ_4K,
-		.type		= MT_DEVICE,
 	},
 };
 
 static void __init laguna_map_io(void)
 {
-	cns3xxx_common_init();
+	cns3xxx_map_io();
 	cns3xxx_pcie_iotable_init();
 	iotable_init(ARRAY_AND_SIZE(laguna_io_desc));
 	laguna_early_serial_setup();
@@ -907,6 +1011,21 @@ static int __init laguna_model_setup(void)
 			laguna_register_gpio(ARRAY_AND_SIZE(laguna_gpio_gw2387));
 			// configure LED's
 			laguna_gpio_leds_data.num_leds = 2;
+		} else if (strncmp(laguna_info.model, "GW2385", 6) == 0) {
+			// configure GPIO's
+			laguna_register_gpio(ARRAY_AND_SIZE(laguna_gpio_gw2385));
+			// configure LED's
+			laguna_gpio_leds[0].gpio = 115;
+			laguna_gpio_leds[1].gpio = 12;
+			laguna_gpio_leds[1].name = "red";
+			laguna_gpio_leds[1].active_low = 0,
+			laguna_gpio_leds[2].gpio = 14;
+			laguna_gpio_leds[2].name = "green";
+			laguna_gpio_leds[2].active_low = 0,
+			laguna_gpio_leds[3].gpio = 15;
+			laguna_gpio_leds[3].name = "blue";
+			laguna_gpio_leds[3].active_low = 0,
+			laguna_gpio_leds_data.num_leds = 4;
 		} else if (strncmp(laguna_info.model, "GW2384", 6) == 0) {
 			// configure GPIO's
 			laguna_register_gpio(ARRAY_AND_SIZE(laguna_gpio_gw2384));
@@ -946,11 +1065,11 @@ static int __init laguna_model_setup(void)
 late_initcall(laguna_model_setup);
 
 MACHINE_START(GW2388, "Gateworks Corporation Laguna Platform")
+	.smp		= smp_ops(cns3xxx_smp_ops),
 	.atag_offset	= 0x100,
 	.map_io		= laguna_map_io,
 	.init_irq	= cns3xxx_init_irq,
-	.timer		= &cns3xxx_timer,
-	.handle_irq	= gic_handle_irq,
+	.init_time	= cns3xxx_timer_init,
 	.init_machine	= laguna_init,
 	.restart	= cns3xxx_restart,
 MACHINE_END

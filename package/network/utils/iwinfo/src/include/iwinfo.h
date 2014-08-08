@@ -27,6 +27,7 @@
 #define IWINFO_80211_B       (1 << 1)
 #define IWINFO_80211_G       (1 << 2)
 #define IWINFO_80211_N       (1 << 3)
+#define IWINFO_80211_AC      (1 << 4)
 
 #define IWINFO_CIPHER_NONE   (1 << 0)
 #define IWINFO_CIPHER_WEP40  (1 << 1)
@@ -132,8 +133,8 @@ struct iwinfo_hardware_id {
 };
 
 struct iwinfo_hardware_entry {
-	const char *vendor_name;
-	const char *device_name;
+	char vendor_name[64];
+	char device_name[64];
 	uint16_t vendor_id;
 	uint16_t device_id;
 	uint16_t subsystem_vendor_id;
@@ -143,10 +144,14 @@ struct iwinfo_hardware_entry {
 };
 
 extern const struct iwinfo_iso3166_label IWINFO_ISO3166_NAMES[];
-extern const struct iwinfo_hardware_entry IWINFO_HARDWARE_ENTRIES[];
+
+#define IWINFO_HARDWARE_FILE	"/usr/share/libiwinfo/hardware.txt"
 
 
 struct iwinfo_ops {
+	const char *name;
+
+	int (*probe)(const char *ifname);
 	int (*mode)(const char *, int *);
 	int (*channel)(const char *, int *);
 	int (*frequency)(const char *, int *);
@@ -166,6 +171,7 @@ struct iwinfo_ops {
 	int (*hardware_id)(const char *, char *);
 	int (*hardware_name)(const char *, char *);
 	int (*encryption)(const char *, char *);
+	int (*phyname)(const char *, char *);
 	int (*assoclist)(const char *, char *, int *);
 	int (*txpwrlist)(const char *, char *, int *);
 	int (*scanlist)(const char *, char *, int *);
@@ -178,18 +184,11 @@ const char * iwinfo_type(const char *ifname);
 const struct iwinfo_ops * iwinfo_backend(const char *ifname);
 void iwinfo_finish(void);
 
-#include "iwinfo/wext.h"
+extern const struct iwinfo_ops wext_ops;
+extern const struct iwinfo_ops madwifi_ops;
+extern const struct iwinfo_ops nl80211_ops;
+extern const struct iwinfo_ops wl_ops;
 
-#ifdef USE_WL
-#include "iwinfo/wl.h"
-#endif
-
-#ifdef USE_MADWIFI
-#include "iwinfo/madwifi.h"
-#endif
-
-#ifdef USE_NL80211
-#include "iwinfo/nl80211.h"
-#endif
+#include "iwinfo/utils.h"
 
 #endif

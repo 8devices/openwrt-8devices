@@ -9,8 +9,8 @@ include $(TOPDIR)/rules.mk
 ARCH:=arm
 BOARD:=mcs814x
 BOARDNAME:=Moschip MCS814x
-FEATURES:=usb squashfs jffs2
-CFLAGS=-Os -pipe -march=armv5te -mtune=arm926ej-s -fno-caller-saves
+FEATURES:=usb squashfs
+CPU_TYPE:=arm926ej-s
 MAINTAINER:=Florian Fainelli <florian@openwrt.org>
 
 LINUX_VERSION:=3.3.8

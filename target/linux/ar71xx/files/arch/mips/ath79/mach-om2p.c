@@ -162,8 +162,8 @@ static void __init om2p_lc_setup(void)
 					ARRAY_SIZE(om2p_gpio_keys),
 					om2p_gpio_keys);
 
-	ath79_init_mac(ath79_eth1_data.mac_addr, mac1, 0);
-	ath79_init_mac(ath79_eth0_data.mac_addr, mac2, 0);
+	ath79_init_mac(ath79_eth0_data.mac_addr, mac1, 0);
+	ath79_init_mac(ath79_eth1_data.mac_addr, mac2, 0);
 
 	ath79_register_mdio(0, 0x0);
 
@@ -174,6 +174,7 @@ static void __init om2p_lc_setup(void)
 }
 
 MIPS_MACHINE(ATH79_MACH_OM2P_LC, "OM2P-LC", "OpenMesh OM2P LC", om2p_lc_setup);
+MIPS_MACHINE(ATH79_MACH_OM2Pv2, "OM2Pv2", "OpenMesh OM2Pv2", om2p_lc_setup);
 
 static void __init om2p_hs_setup(void)
 {
@@ -187,7 +188,7 @@ static void __init om2p_hs_setup(void)
 
 	/* enable reset button */
 	ath79_gpio_output_select(OM2P_GPIO_BTN_RESET, AR934X_GPIO_OUT_GPIO);
-	ath79_gpio_function_enable(AR933X_GPIO_FUNC_JTAG_DISABLE);
+	ath79_gpio_function_enable(AR934X_GPIO_FUNC_JTAG_DISABLE);
 
 	om2p_leds_gpio[4].gpio = OM2P_GPIO_LED_WAN;
 	om2p_leds_gpio[5].gpio = OM2P_GPIO_LED_LAN;
@@ -221,3 +222,4 @@ static void __init om2p_hs_setup(void)
 }
 
 MIPS_MACHINE(ATH79_MACH_OM2P_HS, "OM2P-HS", "OpenMesh OM2P HS", om2p_hs_setup);
+MIPS_MACHINE(ATH79_MACH_OM2P_HSv2, "OM2P-HSv2", "OpenMesh OM2P HSv2", om2p_hs_setup);

@@ -11,6 +11,7 @@ use Cwd 'abs_path';
 chdir "$FindBin::Bin/..";
 $ENV{TOPDIR}=getcwd();
 $ENV{GIT_CONFIG_PARAMETERS}="'core.autocrlf=false'";
+$ENV{GREP_OPTIONS}="";
 
 my $mk=`which gmake 2>/dev/null`;	# select the right 'make' program
 chomp($mk);		# trim trailing newline
@@ -119,7 +120,8 @@ my %update_method = (
 	'src-git' => {
 		'init'          => "git clone --depth 1 '%s' '%s'",
 		'init_branch'   => "git clone --depth 1 --branch '%s' '%s' '%s'",
-		'update'	=> "git pull",
+		'init_commit'   => "git clone '%s' '%s' && cd '%s' && git checkout -b '%s' '%s' && cd -",
+		'update'	=> "git pull --ff",
 		'controldir'	=> ".git",
 		'revision'	=> "git show --abbrev-commit HEAD | head -n 1 | cut -d ' ' -f 2 | tr -d '\n'"},
 	'src-gitsvn' => {
@@ -154,15 +156,20 @@ sub update_feed_via($$$$) {
 	my $localpath = "./feeds/$name";
 	my $safepath = $localpath;
 	$safepath =~ s/'/'\\''/;
-	my ($base, $branch) = split(/;/, $src, 2);
+	my ($base_branch, $branch) = split(/;/, $src, 2);
+	my ($base_commit, $commit) = split(/\^/, $src, 2);
 
 	if( $relocate || !$m->{'update'} || !-d "$localpath/$m->{'controldir'}" ) {
 		system("rm -rf '$safepath'");
 		if ($m->{'init_branch'} and $branch) {
-			system(sprintf($m->{'init_branch'}, $branch, $base, $safepath)) == 0 or return 1;
+			system(sprintf($m->{'init_branch'}, $branch, $base_branch, $safepath)) == 0 or return 1;
+		} elsif ($m->{'init_commit'} and $commit) {
+			system(sprintf($m->{'init_commit'}, $base_commit, $safepath, $safepath, $commit, $commit)) == 0 or return 1;
 		} else {
 			system(sprintf($m->{'init'}, $src, $safepath)) == 0 or return 1;
 		}
+	} elsif ($m->{'init_commit'} and $commit) {
+		# in case git hash has been provided don't update the feed
 	} else {
 		system("cd '$safepath'; $m->{'update'}") == 0 or return 1;
 	}
@@ -255,9 +262,15 @@ sub list_feed {
 sub list {
 	my %opts;
 
-	getopts('r:d:sh', \%opts);
+	getopts('r:d:nsh', \%opts);
 	if ($opts{h}) {
 		usage();
+		return 0;
+	}
+	if ($opts{n}) {
+		foreach my $feed (@feeds) {
+			printf "%s\n", $feed->[1];
+		}
 		return 0;
 	}
 	if ($opts{s}) {
@@ -333,6 +346,15 @@ sub lookup_package($$) {
 	return;
 }
 
+sub is_core_package($) {
+	my $package = shift;
+	foreach my $file ("tmp/info/.packageinfo-$package", glob("tmp/info/.packageinfo-*_$package")) {
+		next unless index($file, "tmp/info/.packageinfo-feeds_");
+		return 1 if -s $file;
+	}
+	return 0;
+}
+
 sub install_package {
 	my $feed = shift;
 	my $name = shift;
@@ -342,7 +364,7 @@ sub install_package {
 	$feed or do {
 		$installed{$name} and return 0;
 		# TODO: check if it's already installed within ./package directory
-		$feed_src->{$name} or -d "./package/$name" or warn "WARNING: No feed for package '$name' found, maybe it's already part of the standard packages?\n";
+		$feed_src->{$name} or is_core_package($name) or warn "WARNING: No feed for package '$name' found, maybe it's already part of the standard packages?\n";
 		return 0;
 	};
 
@@ -582,6 +604,22 @@ sub update {
 	return 0;
 }
 
+sub feed_config() {
+	foreach my $feed (@feeds) {
+		my $installed = (-f "feeds/$feed->[1].index");
+
+		printf "\tconfig FEED_%s\n", $feed->[1];
+		printf "\t\tbool \"Enable feed %s\"\n", $feed->[1];
+		printf "\t\tdepends on PER_FEED_REPO\n";
+		printf "\t\tdefault y\n" if $installed;
+		printf "\t\thelp\n";
+		printf "\t\t Enable the \\\"%s\\\" feed at %s.\n", $feed->[1], $feed->[2][0];
+		printf "\n";
+	}
+
+	return 0;
+}
+
 sub usage() {
 	print <<EOF;
 Usage: $0 <command> [options]
@@ -589,6 +627,7 @@ Usage: $0 <command> [options]
 Commands:
 	list [options]: List feeds, their content and revisions (if installed)
 	Options:
+	    -n :            List of feed names.
 	    -s :            List of feed names and their URL.
 	    -r <feedname>:  List packages of specified feed.
 	    -d <delimiter>: Use specified delimiter to distinguish rows (default: spaces)
@@ -624,6 +663,7 @@ my %commands = (
 	'install' => \&install,
 	'search' => \&search,
 	'uninstall' => \&uninstall,
+	'feed_config' => \&feed_config,
 	'clean' => sub {
 		system("rm -rf feeds");
 	}

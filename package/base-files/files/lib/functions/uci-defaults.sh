@@ -150,6 +150,8 @@ set network.loopback.ifname='lo'
 set network.loopback.proto='static'
 set network.loopback.ipaddr='127.0.0.1'
 set network.loopback.netmask='255.0.0.0'
+set network.globals='globals'
+set network.globals.ula_prefix='auto'
 EOF
 }
 
@@ -170,10 +172,12 @@ ucidef_set_interface_lan() {
 	uci batch <<EOF
 set network.lan='interface'
 set network.lan.ifname='$ifname'
+set network.lan.force_link=1
 set network.lan.type='bridge'
 set network.lan.proto='static'
 set network.lan.ipaddr='192.168.1.1'
 set network.lan.netmask='255.255.255.0'
+set network.lan.ip6assign='60'
 EOF
 }
 
@@ -184,6 +188,9 @@ ucidef_set_interface_wan() {
 set network.wan='interface'
 set network.wan.ifname='$ifname'
 set network.wan.proto='dhcp'
+set network.wan6='interface'
+set network.wan6.ifname='@wan'
+set network.wan6.proto='dhcpv6'
 EOF
 }
 
@@ -225,6 +232,16 @@ add network switch_vlan
 set network.@switch_vlan[-1].device='$device'
 set network.@switch_vlan[-1].vlan='$vlan'
 set network.@switch_vlan[-1].ports='$ports'
+EOF
+}
+
+ucidef_add_switch_port() {
+	local device=$1
+	local port=$2
+	uci batch <<EOF
+add network switch_port
+set network.@switch_port[-1].device='$device'
+set network.@switch_port[-1].port='$port'
 EOF
 }
 

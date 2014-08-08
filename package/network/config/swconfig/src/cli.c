@@ -41,6 +41,7 @@ enum {
 	CMD_LOAD,
 	CMD_HELP,
 	CMD_SHOW,
+	CMD_PORTMAP,
 };
 
 static void
@@ -167,6 +168,7 @@ show_vlan(struct switch_dev *dev, int vlan, bool all)
 static void
 print_usage(void)
 {
+	printf("swconfig list\n");
 	printf("swconfig dev <dev> [port <port>|vlan <vlan>] (help|set <key> <value>|get <key>|load <config>|show)\n");
 	exit(1);
 }
@@ -176,7 +178,6 @@ swconfig_load_uci(struct switch_dev *dev, const char *name)
 {
 	struct uci_context *ctx;
 	struct uci_package *p = NULL;
-	struct uci_element *e;
 	int ret = -1;
 
 	ctx = uci_alloc_context();
@@ -204,7 +205,6 @@ int main(int argc, char **argv)
 	struct switch_dev *dev;
 	struct switch_attr *a;
 	struct switch_val val;
-	int err;
 	int i;
 
 	int cmd = CMD_NONE;
@@ -213,6 +213,12 @@ int main(int argc, char **argv)
 	int cvlan = -1;
 	char *ckey = NULL;
 	char *cvalue = NULL;
+	char *csegment = NULL;
+
+	if((argc == 2) && !strcmp(argv[1], "list")) {
+		swlib_list();
+		return 0;
+	}
 
 	if(argc < 4)
 		print_usage();
@@ -246,6 +252,10 @@ int main(int argc, char **argv)
 				print_usage();
 			cmd = CMD_LOAD;
 			ckey = argv[++i];
+		} else if (!strcmp(arg, "portmap")) {
+			if (i + 1 < argc)
+				csegment = argv[++i];
+			cmd = CMD_PORTMAP;
 		} else if (!strcmp(arg, "show")) {
 			cmd = CMD_SHOW;
 		} else {
@@ -260,7 +270,7 @@ int main(int argc, char **argv)
 
 	dev = swlib_connect(cdev);
 	if (!dev) {
-		fprintf(stderr, "Failed to connect to the switch\n");
+		fprintf(stderr, "Failed to connect to the switch. Use the \"list\" command to see which switches are available.\n");
 		return 1;
 	}
 
@@ -277,6 +287,7 @@ int main(int argc, char **argv)
 		if(!a)
 		{
 			fprintf(stderr, "Unknown attribute \"%s\"\n", ckey);
+			retval = -1;
 			goto out;
 		}
 	}
@@ -318,6 +329,9 @@ int main(int argc, char **argv)
 	case CMD_HELP:
 		list_attributes(dev);
 		break;
+	case CMD_PORTMAP:
+		swlib_print_portmap(dev, csegment);
+		break;
 	case CMD_SHOW:
 		if (cport >= 0 || cvlan >= 0) {
 			if (cport >= 0)
@@ -336,5 +350,5 @@ int main(int argc, char **argv)
 
 out:
 	swlib_free_all(dev);
-	return 0;
+	return retval;
 }

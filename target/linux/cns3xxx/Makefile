@@ -10,10 +10,11 @@ ARCH:=arm
 BOARD:=cns3xxx
 BOARDNAME:=Cavium Networks Econa CNS3xxx
 FEATURES:=squashfs fpu gpio pcie usb usbgadget
-CFLAGS:=-Os -pipe -march=armv6k -mtune=mpcore -mfloat-abi=softfp -mfpu=vfp -fno-caller-saves
-MAINTAINER:=Imre Kaloz <kaloz@openwrt.org>
+CPU_TYPE:=mpcore
+CPU_SUBTYPE:=vfp
+MAINTAINER:=Felix Fietkau <nbd@openwrt.org>
 
-LINUX_VERSION:=3.3.8
+LINUX_VERSION:=3.10.49
 
 include $(INCLUDE_DIR)/target.mk
 
@@ -22,7 +23,7 @@ define Target/Description
 	eg. the Gateworks Laguna family
 endef
 
-KERNELNAME:="uImage"
+KERNELNAME:="zImage"
 
 DEFAULT_PACKAGES += kmod-ath9k kmod-usb2 wpad-mini
 

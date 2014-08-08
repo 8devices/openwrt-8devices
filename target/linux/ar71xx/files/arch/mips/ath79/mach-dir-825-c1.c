@@ -29,10 +29,14 @@
 #include "machtypes.h"
 
 #define DIR825C1_GPIO_LED_BLUE_USB		11
-#define DIR825C1_GPIO_LED_ORANGE_POWER		15
-#define DIR825C1_GPIO_LED_BLUE_POWER		14
-#define DIR825C1_GPIO_LED_ORANGE_PLANET		19
+#define DIR825C1_GPIO_LED_AMBER_POWER		14
+#define DIR825C1_GPIO_LED_BLUE_POWER		22
+#define DIR825C1_GPIO_LED_BLUE_WPS		15
+#define DIR825C1_GPIO_LED_AMBER_PLANET		19
 #define DIR825C1_GPIO_LED_BLUE_PLANET		18
+#define DIR825C1_GPIO_LED_WLAN_2G		13
+
+#define DIR825C1_GPIO_WAN_LED_ENABLE		20
 
 #define DIR825C1_GPIO_BTN_RESET			17
 #define DIR825C1_GPIO_BTN_WPS			16
@@ -50,41 +54,79 @@ static struct gpio_led dir825c1_leds_gpio[] __initdata = {
 		.name		= "d-link:blue:usb",
 		.gpio		= DIR825C1_GPIO_LED_BLUE_USB,
 		.active_low	= 1,
-	}, {
-		.name		= "d-link:orange:power",
-		.gpio		= DIR825C1_GPIO_LED_ORANGE_POWER,
+	},
+	{
+		.name		= "d-link:amber:power",
+		.gpio		= DIR825C1_GPIO_LED_AMBER_POWER,
 		.active_low	= 1,
-	}, {
+	},
+	{
 		.name		= "d-link:blue:power",
 		.gpio		= DIR825C1_GPIO_LED_BLUE_POWER,
 		.active_low	= 1,
-	}, {
-		.name		= "d-link:orange:planet",
-		.gpio		= DIR825C1_GPIO_LED_ORANGE_PLANET,
+	},
+	{
+		.name		= "d-link:blue:wps",
+		.gpio		= DIR825C1_GPIO_LED_BLUE_WPS,
 		.active_low	= 1,
-	}, {
-		.name		= "d-link:blue:planet",
+	},
+	{
+		.name		= "d-link:amber:planet",
+		.gpio		= DIR825C1_GPIO_LED_AMBER_PLANET,
+		.active_low	= 1,
+	},
+	{
+		.name		= "d-link:blue:wlan2g",
+		.gpio		= DIR825C1_GPIO_LED_WLAN_2G,
+		.active_low	= 1,
+	},
+};
+
+static struct gpio_led dir835a1_leds_gpio[] __initdata = {
+	{
+		.name		= "d-link:amber:power",
+		.gpio		= DIR825C1_GPIO_LED_AMBER_POWER,
+		.active_low	= 1,
+	},
+	{
+		.name		= "d-link:green:power",
+		.gpio		= DIR825C1_GPIO_LED_BLUE_POWER,
+		.active_low	= 1,
+	},
+	{
+		.name		= "d-link:blue:wps",
+		.gpio		= DIR825C1_GPIO_LED_BLUE_WPS,
+		.active_low	= 1,
+	},
+	{
+		.name		= "d-link:amber:planet",
+		.gpio		= DIR825C1_GPIO_LED_AMBER_PLANET,
+		.active_low	= 1,
+	},
+	{
+		.name		= "d-link:green:planet",
 		.gpio		= DIR825C1_GPIO_LED_BLUE_PLANET,
 		.active_low	= 1,
-	}
+	},
 };
 
 static struct gpio_keys_button dir825c1_gpio_keys[] __initdata = {
 	{
-		.desc		= "reset",
+		.desc		= "Soft reset",
 		.type		= EV_KEY,
 		.code		= KEY_RESTART,
 		.debounce_interval = DIR825C1_KEYS_DEBOUNCE_INTERVAL,
 		.gpio		= DIR825C1_GPIO_BTN_RESET,
 		.active_low	= 1,
-	}, {
-		.desc		= "wps",
+	},
+	{
+		.desc		= "WPS button",
 		.type		= EV_KEY,
 		.code		= KEY_WPS_BUTTON,
 		.debounce_interval = DIR825C1_KEYS_DEBOUNCE_INTERVAL,
 		.gpio		= DIR825C1_GPIO_BTN_WPS,
 		.active_low	= 1,
-	}
+	},
 };
 
 static struct ar8327_pad_cfg dir825c1_ar8327_pad0_cfg = {
@@ -96,11 +138,11 @@ static struct ar8327_pad_cfg dir825c1_ar8327_pad0_cfg = {
 };
 
 static struct ar8327_led_cfg dir825c1_ar8327_led_cfg = {
-	.led_ctrl0 = 0xc737c737,
-	.led_ctrl1 = 0x00000000,
+	.led_ctrl0 = 0x00000000,
+	.led_ctrl1 = 0xc737c737,
 	.led_ctrl2 = 0x00000000,
-	.led_ctrl3 = 0x0030c300,
-	.open_drain = false,
+	.led_ctrl3 = 0x00c30c00,
+	.open_drain = true,
 };
 
 static struct ar8327_platform_data dir825c1_ar8327_data = {
@@ -123,46 +165,27 @@ static struct mdio_board_info dir825c1_mdio0_info[] = {
 	},
 };
 
-static void dir825c1_read_ascii_mac(u8 *dest, u8 *src)
-{
-	int ret;
-
-	ret = sscanf(src, "%02hhx:%02hhx:%02hhx:%02hhx:%02hhx:%02hhx",
-	             &dest[0], &dest[1], &dest[2],
-	             &dest[3], &dest[4], &dest[5]);
-
-	if (ret != ETH_ALEN)
-		memset(dest, 0, ETH_ALEN);
-}
-
-static void __init dir825c1_setup(void)
+static void __init dir825c1_generic_setup(void)
 {
 	u8 *mac = (u8 *) KSEG1ADDR(0x1ffe0000);
 	u8 *art = (u8 *) KSEG1ADDR(0x1fff0000);
-	u8 tmpmac[ETH_ALEN];
-	u8 mac1[ETH_ALEN], mac2[ETH_ALEN];
+	u8 mac0[ETH_ALEN], mac1[ETH_ALEN];
+	u8 wmac0[ETH_ALEN], wmac1[ETH_ALEN];
 
-	dir825c1_read_ascii_mac(mac1, mac + DIR825C1_MAC0_OFFSET);
-	dir825c1_read_ascii_mac(mac2, mac + DIR825C1_MAC1_OFFSET);
-
-	ath79_gpio_output_select(DIR825C1_GPIO_LED_BLUE_USB, AR934X_GPIO_OUT_GPIO);
+	ath79_parse_ascii_mac(mac + DIR825C1_MAC0_OFFSET, mac0);
+	ath79_parse_ascii_mac(mac + DIR825C1_MAC1_OFFSET, mac1);
 
 	ath79_register_m25p80(NULL);
 
-	ath79_register_leds_gpio(-1, ARRAY_SIZE(dir825c1_leds_gpio),
-				 dir825c1_leds_gpio);
 	ath79_register_gpio_keys_polled(-1, DIR825C1_KEYS_POLL_INTERVAL,
 					ARRAY_SIZE(dir825c1_gpio_keys),
 					dir825c1_gpio_keys);
 
-	ap9x_pci_setup_wmac_led_pin(0, 13);
-	ap9x_pci_setup_wmac_led_pin(1, 32);
+	ath79_init_mac(wmac0, mac0, 0);
+	ath79_register_wmac(art + DIR825C1_WMAC_CALDATA_OFFSET, wmac0);
 
-	ath79_init_mac(tmpmac, mac1, 0);
-	ath79_register_wmac(art + DIR825C1_WMAC_CALDATA_OFFSET, tmpmac);
-
-	ath79_init_mac(tmpmac, mac2, 0);
-	ap91_pci_init(art + DIR825C1_PCIE_CALDATA_OFFSET, tmpmac);
+	ath79_init_mac(wmac1, mac1, 1);
+	ap91_pci_init(art + DIR825C1_PCIE_CALDATA_OFFSET, wmac1);
 
 	ath79_setup_ar934x_eth_cfg(AR934X_ETH_CFG_RGMII_GMAC0);
 
@@ -171,7 +194,7 @@ static void __init dir825c1_setup(void)
 
 	ath79_register_mdio(0, 0x0);
 
-	ath79_init_mac(ath79_eth0_data.mac_addr, mac1, 0);
+	ath79_init_mac(ath79_eth0_data.mac_addr, mac0, 0);
 
 	/* GMAC0 is connected to an AR8327N switch */
 	ath79_eth0_data.phy_if_mode = PHY_INTERFACE_MODE_RGMII;
@@ -183,6 +206,36 @@ static void __init dir825c1_setup(void)
 	ath79_register_usb();
 }
 
+static void __init dir825c1_setup(void)
+{
+	ath79_gpio_output_select(DIR825C1_GPIO_LED_BLUE_USB,
+				 AR934X_GPIO_OUT_GPIO);
+
+	gpio_request_one(DIR825C1_GPIO_WAN_LED_ENABLE,
+			 GPIOF_OUT_INIT_LOW, "WAN LED enable");
+
+	ath79_register_leds_gpio(-1, ARRAY_SIZE(dir825c1_leds_gpio),
+				 dir825c1_leds_gpio);
+
+	ap9x_pci_setup_wmac_led_pin(0, 0);
+
+	dir825c1_generic_setup();
+}
+
+static void __init dir835a1_setup(void)
+{
+	dir825c1_ar8327_data.led_cfg = NULL;
+
+	ath79_register_leds_gpio(-1, ARRAY_SIZE(dir835a1_leds_gpio),
+				 dir835a1_leds_gpio);
+
+	dir825c1_generic_setup();
+}
+
 MIPS_MACHINE(ATH79_MACH_DIR_825_C1, "DIR-825-C1",
 	     "D-Link DIR-825 rev. C1",
 	     dir825c1_setup);
+
+MIPS_MACHINE(ATH79_MACH_DIR_835_A1, "DIR-835-A1",
+	     "D-Link DIR-835 rev. A1",
+	     dir835a1_setup);

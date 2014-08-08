@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2006-2011 OpenWrt.org
+# Copyright (C) 2006-2013 OpenWrt.org
 #
 # This is free software, licensed under the GNU General Public License v2.
 # See /LICENSE for more information.
@@ -8,12 +8,12 @@
 include $(TOPDIR)/rules.mk
 
 PKG_NAME:=libpcap
-PKG_VERSION:=1.1.1
-PKG_RELEASE:=2
+PKG_VERSION:=1.5.3
+PKG_RELEASE:=1
 
 PKG_SOURCE:=$(PKG_NAME)-$(PKG_VERSION).tar.gz
 PKG_SOURCE_URL:=http://www.tcpdump.org/release/
-PKG_MD5SUM:=1bca27d206970badae248cfa471bbb47
+PKG_MD5SUM:=7e7321fb3aff2f2bb05c8229f3795d4a
 
 PKG_MAINTAINER:=Felix Fietkau <nbd@openwrt.org>
 
@@ -45,18 +45,30 @@ TARGET_CFLAGS += \
 	-fdata-sections
 
 CONFIGURE_VARS += \
-	ac_cv_linux_vers=$(LINUX_VERSION)
+	ac_cv_linux_vers=$(LINUX_VERSION) \
+	ac_cv_header_libusb_1_0_libusb_h=no \
+	ac_cv_netfilter_can_compile=no
+
 
 CONFIGURE_ARGS += \
 	--enable-shared \
 	--enable-static \
 	--disable-yydebug \
-	--enable-ipv6 \
 	--with-build-cc="$(HOSTCC)" \
 	--with-pcap=linux \
 	--without-septel \
 	--without-dag \
-	--without-libnl
+	--without-libnl \
+	--without-snf \
+	--disable-can \
+	--disable-canusb \
+	--disable-dbus \
+	--disable-bluetooth
+
+ifeq ($(CONFIG_IPV6),y)
+CONFIGURE_ARGS += \
+	--enable-ipv6
+endif
 
 MAKE_FLAGS += \
 	CCOPT="$(TARGET_CFLAGS) -I$(BUILD_DIR)/linux/include"

@@ -1,6 +1,6 @@
---- a/ip6tables-restore.c
-+++ b/ip6tables-restore.c
-@@ -16,6 +16,8 @@
+--- a/iptables/ip6tables-restore.c
++++ b/iptables/ip6tables-restore.c
+@@ -14,6 +14,8 @@
  #include <string.h>
  #include <stdio.h>
  #include <stdlib.h>
@@ -9,7 +9,7 @@
  #include "ip6tables.h"
  #include "xtables.h"
  #include "libiptc/libip6tc.h"
-@@ -27,6 +29,7 @@
+@@ -25,6 +27,7 @@
  #define DEBUGP(x, args...)
  #endif
  
@@ -17,15 +17,15 @@
  static int binary = 0, counters = 0, verbose = 0, noflush = 0;
  
  /* Keeping track of external matches and targets.  */
-@@ -37,6 +40,7 @@ static const struct option options[] = {
+@@ -35,6 +38,7 @@ static const struct option options[] = {
  	{.name = "test",     .has_arg = false, .val = 't'},
  	{.name = "help",     .has_arg = false, .val = 'h'},
  	{.name = "noflush",  .has_arg = false, .val = 'n'},
 +	{.name = "lenient",  .has_arg = false, .val = 'l'},
  	{.name = "modprobe", .has_arg = true,  .val = 'M'},
+ 	{.name = "table",    .has_arg = true,  .val = 'T'},
  	{NULL},
- };
-@@ -52,6 +56,7 @@ static void print_usage(const char *name
+@@ -51,6 +55,7 @@ static void print_usage(const char *name
  			"	   [ --test ]\n"
  			"	   [ --help ]\n"
  			"	   [ --noflush ]\n"
@@ -48,19 +48,19 @@
 +	longjmp(jmp, status);
 +}
 +
- #ifdef IPTABLES_MULTI
- int ip6tables_restore_main(int argc, char *argv[])
- #else
-@@ -141,7 +157,7 @@ int main(int argc, char *argv[])
- 	init_extensions();
+ static void add_param_to_argv(char *parsestart)
+ {
+ 	int quote_open = 0, escaped = 0, param_len = 0;
+@@ -204,7 +220,7 @@ int ip6tables_restore_main(int argc, cha
+ 	init_extensions6();
  #endif
  
--	while ((c = getopt_long(argc, argv, "bcvthnM:", options, NULL)) != -1) {
-+	while ((c = getopt_long(argc, argv, "bcvthnlM:", options, NULL)) != -1) {
+-	while ((c = getopt_long(argc, argv, "bcvthnM:T:", options, NULL)) != -1) {
++	while ((c = getopt_long(argc, argv, "bcvthnlM:T:", options, NULL)) != -1) {
  		switch (c) {
  			case 'b':
  				binary = 1;
-@@ -162,6 +178,9 @@ int main(int argc, char *argv[])
+@@ -225,6 +241,9 @@ int ip6tables_restore_main(int argc, cha
  			case 'n':
  				noflush = 1;
  				break;
@@ -70,23 +70,23 @@
  			case 'M':
  				xtables_modprobe_program = optarg;
  				break;
-@@ -440,8 +459,11 @@ int main(int argc, char *argv[])
+@@ -437,8 +456,11 @@ int ip6tables_restore_main(int argc, cha
  			for (a = 0; a < newargc; a++)
  				DEBUGP("argv[%u]: %s\n", a, newargv[a]);
  
 -			ret = do_command6(newargc, newargv,
--					 &newargv[2], &handle);
+-					 &newargv[2], &handle, true);
 +			if (!setjmp(jmp))
 +				ret = do_command6(newargc, newargv,
-+						 &newargv[2], &handle);
++						 &newargv[2], &handle, true);
 +			else
 +				ret = 1;
  
  			free_argv();
  			fflush(stdout);
---- a/iptables-restore.c
-+++ b/iptables-restore.c
-@@ -13,6 +13,8 @@
+--- a/iptables/iptables-restore.c
++++ b/iptables/iptables-restore.c
+@@ -11,6 +11,8 @@
  #include <string.h>
  #include <stdio.h>
  #include <stdlib.h>
@@ -95,7 +95,7 @@
  #include "iptables.h"
  #include "xtables.h"
  #include "libiptc/libiptc.h"
-@@ -24,6 +26,7 @@
+@@ -22,6 +24,7 @@
  #define DEBUGP(x, args...)
  #endif
  
@@ -103,7 +103,7 @@
  static int binary = 0, counters = 0, verbose = 0, noflush = 0;
  
  /* Keeping track of external matches and targets.  */
-@@ -34,6 +37,7 @@ static const struct option options[] = {
+@@ -32,6 +35,7 @@ static const struct option options[] = {
  	{.name = "test",     .has_arg = false, .val = 't'},
  	{.name = "help",     .has_arg = false, .val = 'h'},
  	{.name = "noflush",  .has_arg = false, .val = 'n'},
@@ -111,7 +111,7 @@
  	{.name = "modprobe", .has_arg = true,  .val = 'M'},
  	{.name = "table",    .has_arg = true,  .val = 'T'},
  	{NULL},
-@@ -52,6 +56,7 @@ static void print_usage(const char *name
+@@ -50,6 +54,7 @@ static void print_usage(const char *name
  			"	   [ --test ]\n"
  			"	   [ --help ]\n"
  			"	   [ --noflush ]\n"
@@ -119,7 +119,7 @@
  			"	   [ --table=<TABLE> ]\n"
  			"          [ --modprobe=<command>]\n", name);
  
-@@ -114,6 +119,17 @@ static void free_argv(void) {
+@@ -113,6 +118,17 @@ static void free_argv(void) {
  		free(newargv[i]);
  }
  
@@ -134,11 +134,11 @@
 +	longjmp(jmp, status);
 +}
 +
- #ifdef IPTABLES_MULTI
- int
- iptables_restore_main(int argc, char *argv[])
-@@ -144,7 +160,7 @@ main(int argc, char *argv[])
- 	init_extensions();
+ static void add_param_to_argv(char *parsestart)
+ {
+ 	int quote_open = 0, escaped = 0, param_len = 0;
+@@ -204,7 +220,7 @@ iptables_restore_main(int argc, char *ar
+ 	init_extensions4();
  #endif
  
 -	while ((c = getopt_long(argc, argv, "bcvthnM:T:", options, NULL)) != -1) {
@@ -146,7 +146,7 @@
  		switch (c) {
  			case 'b':
  				binary = 1;
-@@ -165,6 +181,9 @@ main(int argc, char *argv[])
+@@ -225,6 +241,9 @@ iptables_restore_main(int argc, char *ar
  			case 'n':
  				noflush = 1;
  				break;
@@ -156,15 +156,15 @@
  			case 'M':
  				xtables_modprobe_program = optarg;
  				break;
-@@ -445,8 +464,11 @@ main(int argc, char *argv[])
+@@ -437,8 +456,11 @@ iptables_restore_main(int argc, char *ar
  			for (a = 0; a < newargc; a++)
  				DEBUGP("argv[%u]: %s\n", a, newargv[a]);
  
--			ret = do_command(newargc, newargv,
--					 &newargv[2], &handle);
+-			ret = do_command4(newargc, newargv,
+-					 &newargv[2], &handle, true);
 +			if (!setjmp(jmp))
-+				ret = do_command(newargc, newargv,
-+						 &newargv[2], &handle);
++				ret = do_command4(newargc, newargv,
++						 &newargv[2], &handle, true);
 +			else
 +				ret = 1;
  

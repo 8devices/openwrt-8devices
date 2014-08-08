@@ -10,10 +10,10 @@ ARCH:=powerpc
 BOARD:=ppc44x
 BOARDNAME:=AMCC/IBM PPC44x
 FEATURES:=squashfs broken
-CFLAGS:=-Os -pipe -fno-caller-saves -mcpu=440
+CPU_TYPE:=440
 MAINTAINER:=Imre Kaloz <kaloz@openwrt.org>
 
-LINUX_VERSION:=3.7.9
+LINUX_VERSION:=3.10.49
 
 include $(INCLUDE_DIR)/target.mk
 
@@ -22,5 +22,7 @@ DEFAULT_PACKAGES := $(filter-out ppp%,$(DEFAULT_PACKAGES))
 define Target/Description
 	Build firmware images for AMCC/IBM PPC44x based boards.
 endef
+
+KERNELNAME:="uImage cuImage.taishan"
 
 $(eval $(call BuildTarget))

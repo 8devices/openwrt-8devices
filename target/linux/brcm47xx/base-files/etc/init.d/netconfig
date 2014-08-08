@@ -43,28 +43,20 @@ start() {
 
 	mkdir -p /etc/config
 
-	(
+	local cpuport=5
+	[ -e /sbin/swconfig ] && cpuport=$(swconfig dev switch0 help 2>/dev/null | sed -ne "s|.*cpu @ \([0-9]*\).*|\1|p")
+	local switchname=eth0
+	[ -e /sbin/swconfig ] && switchname=$(swconfig dev switch0 help 2>/dev/null | sed -ne "s|switch0: \([^\\\\(]*\).*|\1|p")
+	local model=$(awk 'BEGIN{FS="[ \t]+:[ \t]"} /machine/ {print $2}' /proc/cpuinfo)
+
+	local network_defs=`(
 		if grep -E 'mtd0: 000(6|a)0000' /proc/mtd 2>&- >&-; then
 			# WGT634u
 			echo boardtype=wgt634u
 		else
 			strings "$(find_mtd_part nvram)"
 		fi
-	) | awk '
-	function p(cfgname, name) {
-		if (c[name] != "") print "	option " cfgname "	\"" c[name] "\""
-	}
-
-	function vlan(id, name) {
-		if (c[name] != "") {
-			print "config switch_vlan eth0_" id
-			print "	option device   \"eth0\""
-			print "	option vlan     " id
-			print "	option ports    \"" c[name] "\""
-			print ""
-		}
-	}
-
+	) | awk -v cpuport="$cpuport" -v model="$model" '
 	function macinc(mac, maca, i, result) {
 		split(mac, maca, ":")
 		for (i = 1; i <= 6; i++) maca[i] = "0x" maca[i]
@@ -83,21 +75,15 @@ start() {
 		FS="="
 		c["lan_ifname"]="eth0.1"
 		c["wan_ifname"]="eth0.2"
-		c["vlan1ports"]="1 2 3 4 5"
-		c["vlan2ports"]="0 5"
-		getline < "/proc/diag/model"
-		model=$0
+		c["vlan1ports"]="1 2 3 4 5t"
+		c["vlan2ports"]="0 5t"
 		for (i = 0; i < 6; i++) {
 			if (mac_check != "") mac_check = mac_check ":"
 			mac_check = mac_check "[0-9a-fA-F][0-9a-fA-F]"
 		}
-		if (system("[ -d /proc/switch/eth0 ] ") == 0) {
-			getline < "/proc/switch/eth0/cpuport"
-			cpuport=$0
-			if (cpuport == "8") {
-				c["vlan1ports"]="1 2 3 4 8"
-				c["vlan2ports"]="0 8"
-			}
+		if (cpuport == "8") {
+			c["vlan1ports"]="1 2 3 4 8t"
+			c["vlan2ports"]="0 8t"
 		}
 	}
 
@@ -108,37 +94,39 @@ start() {
 
 	END {
 		if (((nvram["vlan0ports"] ~ /^0 1 2 3 8/ ) && (nvram["vlan1ports"] ~ /^4 8/ && (cpuport == "8"))) || \
-		    ((nvram["vlan1ports"] ~ /^0 1 2 3 8/ ) && (nvram["vlan2ports"] ~ /^4 8/ && (cpuport == "8")))) {
-			c["vlan1ports"] = "0 1 2 3 8"
-			c["vlan2ports"] = "4 8"
+		    ((nvram["vlan1ports"] ~ /^0 1 2 3 8/ ) && (nvram["vlan2ports"] ~ /^4 8/ && (cpuport == "8"))) || \
+		    ((nvram["vlan2ports"] ~ /^0 1 2 3 8/ ) && (nvram["vlan1ports"] ~ /^4 8/ && (cpuport == "8")))) {
+			c["vlan1ports"] = "0 1 2 3 8t"
+			c["vlan2ports"] = "4 8t"
 		}
 		if (((nvram["vlan0ports"] ~ /^0 1 2 3 5/ ) && (nvram["vlan1ports"] ~ /^4 5/ && (cpuport == "5"))) || \
-		    ((nvram["vlan1ports"] ~ /^0 1 2 3 5/ ) && (nvram["vlan2ports"] ~ /^4 5/ && (cpuport == "5")))) {
-			c["vlan1ports"] = "0 1 2 3 5"
-			c["vlan2ports"] = "4 5"
+		    ((nvram["vlan1ports"] ~ /^0 1 2 3 5/ ) && (nvram["vlan2ports"] ~ /^4 5/ && (cpuport == "5"))) || \
+		    ((nvram["vlan2ports"] ~ /^0 1 2 3 5/ ) && (nvram["vlan1ports"] ~ /^4 5/ && (cpuport == "5")))) {
+			c["vlan1ports"] = "0 1 2 3 5t"
+			c["vlan2ports"] = "4 5t"
 		}
-		if ((model == "ASUS WL-HDD") || (model == "ASUS WL-300g") || (model == "Linksys WAP54G V1")) {
+		if ((model == "Asus WLHDD") || (model == "Asus WL300G")) {
 			c["wan_ifname"] = ""
 			c["lan_ifname"] = "eth1"
 		}
-		if (model == "ASUS WL-330gE") {
+		if (model == "Asus WL330GE") {
 			c["wan_ifname"] = ""
 			c["lan_ifname"] = "eth0.1"
-			c["vlan1ports"] = "4 5"
+			c["vlan1ports"] = "4 5t"
 			c["vlan2ports"] = ""
 		}
-		if ((model == "ASUS WL-500g") || (model == "Microsoft MN-700")) {
+		if ((model == "Asus WL500G") || (model == "Microsoft MN-700")) {
 			c["wan_ifname"] = "eth1"
 			c["lan_ifname"] = "eth0"
 		}
-		if ((model == "ASUS WL-500g Premium V2") || (model == "Dell TrueMobile 2300 v2") || (model == "Buffalo WHR-G125")) {
-			c["vlan1ports"] = "0 1 2 3 5"
-			c["vlan2ports"] = "4 5"
+		if ((model == "Asus WL500GP V2") || (model == "Buffalo WHR-G125")) {
+			c["vlan1ports"] = "0 1 2 3 5t"
+			c["vlan2ports"] = "4 5t"
 		}
 		if (model == "Dell TrueMobile 2300") {
 			c["lan_ifname"] = "eth0"
 			c["wan_ifname"] = "eth1"
-			c["vlan1ports"] = "0 1 2 3 4 5u"
+			c["vlan1ports"] = "0 1 2 3 4 5"
 			c["vlan2ports"] = ""
 		}
 		if (nvram["boardtype"] == "bcm94710r4") {
@@ -147,17 +135,17 @@ start() {
 			c["wan_ifname"] = "eth1"
 		}
 		if ((nvram["boardtype"] == "wgt634u") || (nvram["boardtype"] == "0x0467")) {
-			c["vlan1ports"] = "0 1 2 3 5"
-			c["vlan2ports"] = "4 5"
+			c["vlan1ports"] = "0 1 2 3 5t"
+			c["vlan2ports"] = "4 5t"
 		}
 		if ((nvram["boardtype"] == "0x042f") || (nvram["boardtype"] == "0x0472")) {
 			if (nvram["boardnum"] == "45") {
 				# WL-500gP
-				c["vlan1ports"] = "1 2 3 4 5"
-				c["vlan2ports"] = "0 5"
+				c["vlan1ports"] = "1 2 3 4 5t"
+				c["vlan2ports"] = "0 5t"
 			} else {
 				# Generic BCM94704
-				c["vlan1ports"] = "0 1 2 3 4 5u"
+				c["vlan1ports"] = "0 1 2 3 4 5"
 				c["vlan2ports"] = ""
 				c["lan_ifname"] = "eth0"
 				c["wan_ifname"] = "eth1"
@@ -171,7 +159,7 @@ start() {
 		}
 		# Buffalo WBR-B11 and Buffalo WBR-G54
 		if (nvram["boardtype"] == "bcm94710ap") {
-			c["vlan1ports"] = "0 1 2 3 4 5u"
+			c["vlan1ports"] = "0 1 2 3 4 5"
 			c["vlan2ports"] = ""
 			c["lan_ifname"] = "eth0"
 			c["wan_ifname"] = "eth1"
@@ -195,71 +183,56 @@ start() {
 		# These are actually same as defaults above. For some reason this script applies
 		# Generic BCM94704 settings instead so we revert to proper settings here.
 		# Hopefully someone will fix this properly soon.
-		if (model == "ASUS WL-700gE") {
+		if (model == "Asus WL700") {
 			c["lan_ifname"]="eth0.1"
 			c["wan_ifname"]="eth0.2"
-			c["vlan1ports"]="1 2 3 4 5"
-			c["vlan2ports"]="0 5"
+			c["vlan1ports"]="1 2 3 4 5t"
+			c["vlan2ports"]="0 5t"
 		}
-		if ((model == "Motorola WR850G V2/V3") || (model == "Siemens SE505 V2")) {
-			c["vlan1ports"]="0 1 2 3 5"
-			c["vlan2ports"]="4 5"
+		if ((model == "Motorola WR850G") || (model == "Siemens SE505 V2")) {
+			c["vlan1ports"]="0 1 2 3 5t"
+			c["vlan2ports"]="4 5t"
 		}
-		if (model == "ASUS WL-500W") {
+		if (model == "Asus WL500W") {
 			c["lan_ifname"] = "eth0"
 			c["wan_ifname"] = "eth1"
-			c["vlan1ports"] = "0 1 2 3 4 5u"
+			c["vlan1ports"] = "0 1 2 3 4 5"
 			c["vlan2ports"] = ""
 		}
-		if (model == "OvisLink WL-1600GL") {
-			c["lan_ifname"] = "eth0.1"
-			c["wan_ifname"] = "eth0.2"
-			c["vlan1ports"] = "0 1 2 3 5"
-			c["vlan2ports"] = "4 5"
-		}
-		if (model == "SimpleTech SimpleShare NAS") {
-			c["lan_ifname"] = "eth0"
-			c["wan_ifname"] = ""
-			c["vlan1ports"] = ""
-			c["vlan2ports"] = ""
-		}
+		print "local vlan1ports=\"" c["vlan1ports"] "\";"
+		print "local vlan2ports=\"" c["vlan2ports"] "\";"
+		print "local lan_ifname=\"" c["lan_ifname"] "\";"
+		print "local lan_macaddr=\"" c["lan_macaddr"] "\";"
+		print "local wan_ifname=\"" c["wan_ifname"] "\";"
+		print "local wan_macaddr=\"" c["wan_macaddr"] "\";"
+	}'`
 
-		if (c["vlan1ports"] || c["vlan2ports"]) {
-			print "#### VLAN configuration "
-			print "config switch eth0"
-			print "	option enable   1"
-			print ""
-			vlan(1, "vlan1ports")
-			vlan(2, "vlan2ports")
+	. /lib/functions/uci-defaults.sh
+
+	touch /etc/config/network
+
+	eval "$network_defs"
+
+	[ -n "$vlan1ports" -o -n "$vlan2ports" ] && {
+		local cfg=`ucidef_add_switch "$switchname" 1 1`
+		[ -n "$cfg" ] && uci rename network.$cfg=eth0
+		[ -n "$vlan1ports" ] && {
+			cfg=`ucidef_add_switch_vlan "$switchname" 1 "$vlan1ports"`
 		}
-		print "#### Loopback configuration"
-		print "config interface loopback"
-		print "	option ifname	\"lo\""
-		print "	option proto	static"
-		print "	option ipaddr	127.0.0.1"
-		print "	option netmask	255.0.0.0"
-		print ""
-		print ""
-		print "#### LAN configuration"
-		print "config interface lan"
-		print "	option type 	bridge"
-		p("ifname", "lan_ifname")
-		p("macaddr", "lan_macaddr")
-		print "	option proto	static"
-		print "	option ipaddr	192.168.1.1"
-		print "	option netmask	255.255.255.0"
-		print ""
-		print ""
-		if (c["wan_ifname"]) {
-			print "#### WAN configuration"
-			print "config interface	wan"
-			p("ifname", "wan_ifname")
-			p("macaddr", "wan_macaddr")
-			print "	option proto	dhcp"
-		} else {
-			print "#### WAN configuration (disabled)"
-			print "#config interface wan"
-			print "#	option proto	dhcp"
+		[ -n "$vlan2ports" ] && {
+			cfg=`ucidef_add_switch_vlan "$switchname" 2 "$vlan2ports"`
 		}
-	}' > /etc/config/network
+	}
+
+	ucidef_set_interface_loopback
+
+	ucidef_set_interface_lan "$lan_ifname"
+	[ -n "$lan_macaddr" ] && ucidef_set_interface_macaddr lan "$lan_macaddr"
+
+	[ -n "$wan_ifname" ] && {
+		ucidef_set_interface_wan "$wan_ifname"
+		[ -n "$wan_macaddr" ] && ucidef_set_interface_macaddr wan "$wan_macaddr"
+	}
+
+	uci commit network
 }

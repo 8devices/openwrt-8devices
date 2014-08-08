@@ -8,21 +8,23 @@
 include $(TOPDIR)/rules.mk
 
 PKG_NAME:=kexec-tools
-PKG_VERSION:=2.0.3
+PKG_VERSION:=2.0.4
 PKG_RELEASE:=1
 
 PKG_SOURCE:=$(PKG_NAME)-$(PKG_VERSION).tar.bz2
 PKG_SOURCE_URL:=@KERNEL/linux/utils/kernel/kexec
-PKG_MD5SUM:=b3ced2097ce3981abba38ceedc84f939
+PKG_MD5SUM:=05992bc8c0673fc55be7b6d27e48a8db
 
 PKG_FIXUP:=autoreconf
+
+PKG_CONFIG_DEPENDS := CONFIG_KEXEC_ZLIB
 
 include $(INCLUDE_DIR)/package.mk
 
 define Package/kexec-tools
   SECTION:=utils
   CATEGORY:=Utilities
-  DEPENDS:=@armeb||@arm||@i386||@powerpc64||@mipsel||@mips +zlib
+  DEPENDS:=@armeb||@arm||@i386||@powerpc64||@mipsel||@mips +KEXEC_ZLIB:zlib
   TITLE:=Kernel boots kernel
   URL:=http://kernel.org/pub/linux/kernel/people/horms/kexec-tools/
   MAINTAINER:=Florian Fainelli <florian@openwrt.org>
@@ -51,7 +53,12 @@ CONFIGURE_ARGS = \
 		--bindir=/usr/bin \
 		--sbindir=/usr/sbin \
 		--libexecdir=/usr/lib \
-		--sysconfdir=/etc
+		--sysconfdir=/etc \
+		$(if $(CONFIG_KEXEC_ZLIB),--with,--without)-zlib \
+		--without-lzma
+
+TARGET_CFLAGS += -ffunction-sections -fdata-sections
+TARGET_LDFLAGS += -Wl,--gc-sections
 
 CONFIGURE_VARS += \
 	BUILD_CC="$(HOSTCC)" \

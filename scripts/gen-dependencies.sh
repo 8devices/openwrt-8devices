@@ -8,6 +8,7 @@
 SELF=${0##*/}
 
 READELF="${READELF:-readelf}"
+OBJCOPY="${OBJCOPY:-objcopy}"
 TARGETS=$*
 XARGS="${XARGS:-xargs -r}"
 
@@ -19,6 +20,16 @@ XARGS="${XARGS:-xargs -r}"
 
 find $TARGETS -type f -a -exec file {} \; | \
   sed -n -e 's/^\(.*\):.*ELF.*\(executable\|shared object\).*,.* stripped/\1/p' | \
-  $XARGS -n1 readelf -d | \
+  $XARGS -n1 $READELF -d | \
   awk '$2 ~ /NEEDED/ && $NF !~ /interpreter/ && $NF ~ /^\[?lib.*\.so/ { gsub(/[\[\]]/, "", $NF); print $NF }' | \
   sort -u
+
+tmp=`mktemp $TMP_DIR/dep.XXXXXXXX`
+for kmod in `find $TARGETS -type f -name \*.ko`; do
+	$OBJCOPY -O binary -j .modinfo $kmod $tmp
+	sed -e 's,\x00,\n,g' $tmp | \
+		egrep -a '^depends=' | \
+		sed -e 's,^depends=,,' -e 's/,/\n/g' | \
+		awk '{ print $1 ".ko" }'
+done | sort -u
+rm -f $tmp

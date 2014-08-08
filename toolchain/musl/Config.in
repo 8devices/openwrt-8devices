@@ -1,18 +1,3 @@
-# Choose musl version.
-
-choice
-	prompt "musl Version"
-	depends on TOOLCHAINOPTS && USE_MUSL
-	default MUSL_VERSION_0_9_8
-	help
-	  Select the version of musl you wish to use.
-
-	config MUSL_VERSION_0_9_8
-		bool "musl 0.9.8"
-
-endchoice
-
-
 # Debug version.
 
 config MUSL_ENABLE_DEBUG

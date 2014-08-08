@@ -1,5 +1,5 @@
 BOARDNAME:=Soekris net5501
-FEATURES:=squashfs jffs2 ext4 pci usb gpio
+FEATURES:=squashfs ext4 pci usb gpio
 DEFAULT_PACKAGES += kmod-crypto-hw-geode kmod-crypto-ocf \
 			kmod-gpio-cs5535-new kmod-gpio-nsc \
 			kmod-wdt-geode kmod-cs5535-clockevt kmod-cs5535-mfgpt \
@@ -22,8 +22,7 @@ DEFAULT_PACKAGES += kmod-crypto-hw-geode kmod-crypto-ocf \
 
 CS5535_MASK:=0x01000040
 
-CFLAGS += -march=geode -Os -mmmx -m3dnow -fno-align-jumps -fno-align-functions \
-	  -fno-align-labels -fno-align-loops -pipe -fomit-frame-pointer
+CPU_TYPE := geode
 
 define Target/Description
 	Build firmware images for Soekris net5501 board

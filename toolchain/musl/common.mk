@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2012 OpenWrt.org
+# Copyright (C) 2012-2013 OpenWrt.org
 #
 # This is free software, licensed under the GNU General Public License v2.
 # See /LICENSE for more information.
@@ -9,16 +9,14 @@ include $(INCLUDE_DIR)/target.mk
 
 PKG_NAME:=musl
 PKG_VERSION:=$(call qstrip,$(CONFIG_MUSL_VERSION))
-PKG_RELEASE=$(PKG_SOURCE_VERSION)
+PKG_RELEASE=1
 
-PKG_SOURCE_PROTO:=git
-PKG_SOURCE_URL:=git://git.musl-libc.org/musl
-PKG_SOURCE_SUBDIR=$(PKG_NAME)-$(PKG_VERSION)
-PKG_SOURCE_VERSION:=e6dcebd5efa2d390f0a24dc11444024e9fd1990c
-PKG_SOURCE:=$(PKG_NAME)-$(PKG_VERSION)-$(PKG_SOURCE_VERSION).tar.gz
+PKG_SOURCE_MD5SUM:=f18f3bdbe088438cd64a5313c19a7312
+
+PKG_SOURCE_URL:=http://www.musl-libc.org/releases
+PKG_SOURCE:=$(PKG_NAME)-$(PKG_VERSION).tar.gz
 LIBC_SO_VERSION:=$(PKG_VERSION)
-PATCH_DIR:=$(PATH_PREFIX)/patches-$(PKG_VERSION)
-CONFIG_DIR:=$(PATH_PREFIX)/config-$(PKG_VERSION)
+PATCH_DIR:=$(PATH_PREFIX)/patches
 
 HOST_BUILD_DIR:=$(BUILD_DIR_TOOLCHAIN)/$(PKG_NAME)-$(PKG_VERSION)
 
@@ -55,7 +53,6 @@ define Host/Configure
 		$(MUSL_CONFIGURE) \
 	);
 endef
-
 
 define Host/Clean
 	rm -rf \

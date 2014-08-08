@@ -6,7 +6,6 @@
  
 +config ARCH_MCS814X
 +	bool "Moschip MCS814x"
-+	select MIGHT_HAVE_PCI
 +	select FIQ
 +	select GENERIC_IRQ_CHIP
 +	select GENERIC_GPIO
@@ -16,6 +15,7 @@
 +	select NEED_MACH_MEMORY_H
 +	select USB_ARCH_HAS_OHCI
 +	select USB_ARCH_HAS_EHCI
++	select MULTI_IRQ_HANDLER
 +	help
 +	  Support for Moschip MCS814x SoCs (MCS8140).
 +

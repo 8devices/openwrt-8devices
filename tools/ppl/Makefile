@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2009 OpenWrt.org
+# Copyright (C) 2009-2013 OpenWrt.org
 #
 # This is free software, licensed under the GNU General Public License v2.
 # See /LICENSE for more information.
@@ -7,13 +7,16 @@
 include $(TOPDIR)/rules.mk
 
 PKG_NAME:=ppl
-PKG_VERSION:=0.10.2
+PKG_VERSION:=1.1
 
-PKG_SOURCE_URL:=ftp://gcc.gnu.org/pub/gcc/infrastructure
-PKG_SOURCE:=$(PKG_NAME)-$(PKG_VERSION).tar.gz
-PKG_MD5SUM:=e7dd265afdeaea81f7e87a72b182d875
+PKG_SOURCE_URL:=http://bugseng.com/products/ppl/download/ftp/releases/$(PKG_VERSION)/
+PKG_SOURCE:=$(PKG_NAME)-$(PKG_VERSION).tar.xz
+PKG_MD5SUM:=82617a9c4e08606111ed9d2dc37ececa
 
 HOST_FIXUP:=autoreconf
+
+HOST_BUILD_PARALLEL:=1
+HOST_CONFIGURE_PARALLEL:=1
 
 include $(INCLUDE_DIR)/host-build.mk
 
@@ -30,6 +33,5 @@ define Host/Configure
 		$(HOST_CONFIGURE_ARGS); \
 	)
 endef
-
 
 $(eval $(call HostBuild))

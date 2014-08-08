@@ -22,12 +22,33 @@
  * Parts of this code are derived from the Linux iw utility.
  */
 
-#include "iwinfo/nl80211.h"
-#include "iwinfo/wext.h"
+#include <limits.h>
+#include "iwinfo_nl80211.h"
 
 #define min(x, y) ((x) < (y)) ? (x) : (y)
 
 static struct nl80211_state *nls = NULL;
+
+static void nl80211_close(void)
+{
+	if (nls)
+	{
+		if (nls->nlctrl)
+			genl_family_put(nls->nlctrl);
+
+		if (nls->nl80211)
+			genl_family_put(nls->nl80211);
+
+		if (nls->nl_sock)
+			nl_socket_free(nls->nl_sock);
+
+		if (nls->nl_cache)
+			nl_cache_free(nls->nl_cache);
+
+		free(nls);
+		nls = NULL;
+	}
+}
 
 static int nl80211_init(void)
 {
@@ -84,6 +105,23 @@ static int nl80211_init(void)
 err:
 	nl80211_close();
 	return err;
+}
+
+static int nl80211_readint(const char *path)
+{
+	int fd;
+	int rv = -1;
+	char buffer[16];
+
+	if ((fd = open(path, O_RDONLY)) > -1)
+	{
+		if (read(fd, buffer, sizeof(buffer)) > 0)
+			rv = atoi(buffer);
+
+		close(fd);
+	}
+
+	return rv;
 }
 
 
@@ -346,23 +384,30 @@ static int nl80211_freq2channel(int freq)
 {
 	if (freq == 2484)
 		return 14;
-
-	if (freq < 2484)
+	else if (freq < 2484)
 		return (freq - 2407) / 5;
-
-	return (freq / 5) - 1000;
+	else if (freq >= 4910 && freq <= 4980)
+		return (freq - 4000) / 5;
+	else
+		return (freq - 5000) / 5;
 }
 
 static int nl80211_channel2freq(int channel, const char *band)
 {
-	if (channel == 14)
-		return 2484;
-
-	if ((channel < 14) && (!band || band[0] != 'a'))
-		return (channel * 5) + 2407;
-
-	if (channel > 0)
-		return (1000 + channel) * 5;
+	if (!band || band[0] != 'a')
+	{
+		if (channel == 14)
+			return 2484;
+		else if (channel < 14)
+			return (channel * 5) + 2407;
+	}
+	else
+	{
+		if (channel >= 182 && channel <= 196)
+			return (channel * 5) + 4000;
+		else
+			return (channel * 5) + 5000;
+	}
 
 	return 0;
 }
@@ -446,6 +491,96 @@ static char * nl80211_ifname2phy(const char *ifname)
 	return phy[0] ? phy : NULL;
 }
 
+static char * nl80211_phy2ifname(const char *ifname)
+{
+	int fd, ifidx = -1, cifidx = -1, phyidx = -1;
+	char buffer[64];
+	static char nif[IFNAMSIZ] = { 0 };
+
+	DIR *d;
+	struct dirent *e;
+
+	if (!ifname)
+		return NULL;
+	else if (!strncmp(ifname, "phy", 3))
+		phyidx = atoi(&ifname[3]);
+	else if (!strncmp(ifname, "radio", 5))
+		phyidx = atoi(&ifname[5]);
+
+	memset(nif, 0, sizeof(nif));
+
+	if (phyidx > -1)
+	{
+		if ((d = opendir("/sys/class/net")) != NULL)
+		{
+			while ((e = readdir(d)) != NULL)
+			{
+				snprintf(buffer, sizeof(buffer),
+				         "/sys/class/net/%s/phy80211/index", e->d_name);
+
+				if (nl80211_readint(buffer) == phyidx)
+				{
+					snprintf(buffer, sizeof(buffer),
+					         "/sys/class/net/%s/ifindex", e->d_name);
+
+					if ((cifidx = nl80211_readint(buffer)) >= 0 &&
+					    ((ifidx < 0) || (cifidx < ifidx)))
+					{
+						ifidx = cifidx;
+						strncpy(nif, e->d_name, sizeof(nif));
+					}
+				}
+			}
+
+			closedir(d);
+		}
+	}
+
+	return nif[0] ? nif : NULL;
+}
+
+static int nl80211_get_mode_cb(struct nl_msg *msg, void *arg)
+{
+	int *mode = arg;
+	struct nlattr **tb = nl80211_parse(msg);
+	const int ifmodes[NL80211_IFTYPE_MAX + 1] = {
+		IWINFO_OPMODE_UNKNOWN,		/* unspecified */
+		IWINFO_OPMODE_ADHOC,		/* IBSS */
+		IWINFO_OPMODE_CLIENT,		/* managed */
+		IWINFO_OPMODE_MASTER,		/* AP */
+		IWINFO_OPMODE_AP_VLAN,		/* AP/VLAN */
+		IWINFO_OPMODE_WDS,			/* WDS */
+		IWINFO_OPMODE_MONITOR,		/* monitor */
+		IWINFO_OPMODE_MESHPOINT,	/* mesh point */
+		IWINFO_OPMODE_P2P_CLIENT,	/* P2P-client */
+		IWINFO_OPMODE_P2P_GO,		/* P2P-GO */
+	};
+
+	if (tb[NL80211_ATTR_IFTYPE])
+		*mode = ifmodes[nla_get_u32(tb[NL80211_ATTR_IFTYPE])];
+
+	return NL_SKIP;
+}
+
+
+static int nl80211_get_mode(const char *ifname, int *buf)
+{
+	char *res;
+	struct nl80211_msg_conveyor *req;
+
+	res = nl80211_phy2ifname(ifname);
+	req = nl80211_msg(res ? res : ifname, NL80211_CMD_GET_INTERFACE, 0);
+	*buf = IWINFO_OPMODE_UNKNOWN;
+
+	if (req)
+	{
+		nl80211_send(req, nl80211_get_mode_cb, buf);
+		nl80211_free(req);
+	}
+
+	return (*buf == IWINFO_OPMODE_UNKNOWN) ? -1 : 0;
+}
+
 static char * nl80211_hostapd_info(const char *ifname)
 {
 	int mode;
@@ -519,7 +654,13 @@ static char * nl80211_wpactl_info(const char *ifname, const char *cmd,
 		goto out;
 
 	if (connect(sock, (struct sockaddr *) &remote, remote_length))
-		goto out;
+	{
+		remote_length = sizeof(remote.sun_family) + sprintf(remote.sun_path,
+			"/var/run/wpa_supplicant/%s", ifname);
+
+		if (connect(sock, (struct sockaddr *) &remote, remote_length))
+			goto out;
+	}
 
 	local.sun_family = AF_UNIX;
 	local_length = sizeof(local.sun_family) +
@@ -533,16 +674,21 @@ static char * nl80211_wpactl_info(const char *ifname, const char *cmd,
 	{
 		send(sock, "ATTACH", 6, 0);
 
-		if (nl80211_wpactl_recv(sock, buffer, sizeof(buffer)) <= 0)
+		if (nl80211_wpactl_recv(sock, buffer, sizeof(buffer)-1) <= 0)
 			goto out;
 	}
 
 
 	send(sock, cmd, strlen(cmd), 0);
 
-	while( numtry++ < 5 )
+	/* we might have to scan up to 72 channels / 256ms per channel */
+	/* this makes up to 18.5s hence 10 tries */
+	while( numtry++ < 10 )
 	{
-		if (nl80211_wpactl_recv(sock, buffer, sizeof(buffer)) <= 0)
+		char *bracket;
+
+		/* make sure there is a terminating nul byte */
+		if (nl80211_wpactl_recv(sock, buffer, sizeof(buffer)-1) <= 0)
 		{
 			if (event)
 				continue;
@@ -552,6 +698,13 @@ static char * nl80211_wpactl_info(const char *ifname, const char *cmd,
 
 		if ((!event && buffer[0] != '<') || (event && strstr(buffer, event)))
 			break;
+
+		/* there may be more than max(numtry) BSS-ADDED events */
+		/* ignore them similar to wpa_cli */
+		if (buffer[0] == '<' &&
+				(bracket=strchr(buffer,'>')) != NULL &&
+				strncmp(bracket+1,"CTRL-EVENT-BSS-ADDED",20) == 0)
+			numtry--;
 	}
 
 	rv = buffer;
@@ -565,77 +718,13 @@ out:
 	return rv;
 }
 
-static inline int nl80211_readint(const char *path)
-{
-	int fd;
-	int rv = -1;
-	char buffer[16];
-
-	if ((fd = open(path, O_RDONLY)) > -1)
-	{
-		if (read(fd, buffer, sizeof(buffer)) > 0)
-			rv = atoi(buffer);
-
-		close(fd);
-	}
-
-	return rv;
-}
-
-static char * nl80211_phy2ifname(const char *ifname)
-{
-	int fd, ifidx = -1, cifidx = -1, phyidx = -1;
-	char buffer[64];
-	static char nif[IFNAMSIZ] = { 0 };
-
-	DIR *d;
-	struct dirent *e;
-
-	if (!ifname)
-		return NULL;
-	else if (!strncmp(ifname, "phy", 3))
-		phyidx = atoi(&ifname[3]);
-	else if (!strncmp(ifname, "radio", 5))
-		phyidx = atoi(&ifname[5]);
-
-	memset(nif, 0, sizeof(nif));
-
-	if (phyidx > -1)
-	{
-		if ((d = opendir("/sys/class/net")) != NULL)
-		{
-			while ((e = readdir(d)) != NULL)
-			{
-				snprintf(buffer, sizeof(buffer),
-				         "/sys/class/net/%s/phy80211/index", e->d_name);
-
-				if (nl80211_readint(buffer) == phyidx)
-				{
-					snprintf(buffer, sizeof(buffer),
-					         "/sys/class/net/%s/ifindex", e->d_name);
-
-					if ((cifidx = nl80211_readint(buffer)) >= 0 &&
-					    ((ifidx < 0) || (cifidx < ifidx)))
-					{
-						ifidx = cifidx;
-						strncpy(nif, e->d_name, sizeof(nif));
-					}
-				}
-			}
-
-			closedir(d);
-		}
-	}
-
-	return nif[0] ? nif : NULL;
-}
-
 static char * nl80211_ifadd(const char *ifname)
 {
 	int phyidx;
-	char *rv = NULL;
+	char *rv = NULL, path[PATH_MAX];
 	static char nif[IFNAMSIZ] = { 0 };
 	struct nl80211_msg_conveyor *req, *res;
+	FILE *sysfs;
 
 	req = nl80211_msg(ifname, NL80211_CMD_NEW_INTERFACE, 0);
 	if (req)
@@ -646,6 +735,15 @@ static char * nl80211_ifadd(const char *ifname)
 		NLA_PUT_U32(req->msg, NL80211_ATTR_IFTYPE, NL80211_IFTYPE_STATION);
 
 		nl80211_send(req, NULL, NULL);
+
+		snprintf(path, sizeof(path) - 1,
+		         "/proc/sys/net/ipv6/conf/%s/disable_ipv6", nif);
+
+		if ((sysfs = fopen(path, "w")) != NULL)
+		{
+			fwrite("0\n", 1, 2, sysfs);
+			fclose(sysfs);
+		}
 
 		rv = nif;
 
@@ -695,74 +793,10 @@ static void nl80211_hostapd_hup(const char *ifname)
 }
 
 
-int nl80211_probe(const char *ifname)
+static int nl80211_probe(const char *ifname)
 {
 	return !!nl80211_ifname2phy(ifname);
 }
-
-void nl80211_close(void)
-{
-	if (nls)
-	{
-		if (nls->nlctrl)
-			genl_family_put(nls->nlctrl);
-
-		if (nls->nl80211)
-			genl_family_put(nls->nl80211);
-
-		if (nls->nl_sock)
-			nl_socket_free(nls->nl_sock);
-
-		if (nls->nl_cache)
-			nl_cache_free(nls->nl_cache);
-
-		free(nls);
-		nls = NULL;
-	}
-}
-
-
-static int nl80211_get_mode_cb(struct nl_msg *msg, void *arg)
-{
-	int *mode = arg;
-	struct nlattr **tb = nl80211_parse(msg);
-	const int ifmodes[NL80211_IFTYPE_MAX + 1] = {
-		IWINFO_OPMODE_UNKNOWN,		/* unspecified */
-		IWINFO_OPMODE_ADHOC,		/* IBSS */
-		IWINFO_OPMODE_CLIENT,		/* managed */
-		IWINFO_OPMODE_MASTER,		/* AP */
-		IWINFO_OPMODE_AP_VLAN,		/* AP/VLAN */
-		IWINFO_OPMODE_WDS,			/* WDS */
-		IWINFO_OPMODE_MONITOR,		/* monitor */
-		IWINFO_OPMODE_MESHPOINT,	/* mesh point */
-		IWINFO_OPMODE_P2P_CLIENT,	/* P2P-client */
-		IWINFO_OPMODE_P2P_GO,		/* P2P-GO */
-	};
-
-	if (tb[NL80211_ATTR_IFTYPE])
-		*mode = ifmodes[nla_get_u32(tb[NL80211_ATTR_IFTYPE])];
-
-	return NL_SKIP;
-}
-
-int nl80211_get_mode(const char *ifname, int *buf)
-{
-	char *res;
-	struct nl80211_msg_conveyor *req;
-
-	res = nl80211_phy2ifname(ifname);
-	req = nl80211_msg(res ? res : ifname, NL80211_CMD_GET_INTERFACE, 0);
-	*buf = IWINFO_OPMODE_UNKNOWN;
-
-	if (req)
-	{
-		nl80211_send(req, nl80211_get_mode_cb, buf);
-		nl80211_free(req);
-	}
-
-	return (*buf == IWINFO_OPMODE_UNKNOWN) ? -1 : 0;
-}
-
 
 struct nl80211_ssid_bssid {
 	unsigned char *ssid;
@@ -827,7 +861,7 @@ static int nl80211_get_ssid_bssid_cb(struct nl_msg *msg, void *arg)
 	}
 }
 
-int nl80211_get_ssid(const char *ifname, char *buf)
+static int nl80211_get_ssid(const char *ifname, char *buf)
 {
 	char *res;
 	struct nl80211_msg_conveyor *req;
@@ -857,7 +891,7 @@ int nl80211_get_ssid(const char *ifname, char *buf)
 	return (*buf == 0) ? -1 : 0;
 }
 
-int nl80211_get_bssid(const char *ifname, char *buf)
+static int nl80211_get_bssid(const char *ifname, char *buf)
 {
 	char *res;
 	struct nl80211_msg_conveyor *req;
@@ -911,13 +945,14 @@ static int nl80211_get_frequency_scan_cb(struct nl_msg *msg, void *arg)
 
 	static struct nla_policy bss_policy[NL80211_BSS_MAX + 1] = {
 		[NL80211_BSS_FREQUENCY] = { .type = NLA_U32 },
+		[NL80211_BSS_STATUS]    = { .type = NLA_U32 },
 	};
 
 	if (attr[NL80211_ATTR_BSS] &&
 	    !nla_parse_nested(binfo, NL80211_BSS_MAX,
 	                      attr[NL80211_ATTR_BSS], bss_policy))
 	{
-		if (binfo[NL80211_BSS_FREQUENCY])
+		if (binfo[NL80211_BSS_STATUS] && binfo[NL80211_BSS_FREQUENCY])
 			*freq = nla_get_u32(binfo[NL80211_BSS_FREQUENCY]);
 	}
 
@@ -935,8 +970,9 @@ static int nl80211_get_frequency_info_cb(struct nl_msg *msg, void *arg)
 	return NL_SKIP;
 }
 
-int nl80211_get_frequency(const char *ifname, int *buf)
+static int nl80211_get_frequency(const char *ifname, int *buf)
 {
+	int chn;
 	char *res, *channel;
 	struct nl80211_msg_conveyor *req;
 
@@ -956,8 +992,8 @@ int nl80211_get_frequency(const char *ifname, int *buf)
 	    (res = nl80211_hostapd_info(ifname)) &&
 	    (channel = nl80211_getval(NULL, res, "channel")))
 	{
-		*buf = nl80211_channel2freq(atoi(channel),
-		                            nl80211_getval(NULL, res, "hw_mode"));
+		chn = atoi(channel);
+		*buf = nl80211_channel2freq(chn, nl80211_getval(NULL, res, "hw_mode"));
 	}
 	else
 	{
@@ -979,7 +1015,7 @@ int nl80211_get_frequency(const char *ifname, int *buf)
 	return (*buf == 0) ? -1 : 0;
 }
 
-int nl80211_get_channel(const char *ifname, int *buf)
+static int nl80211_get_channel(const char *ifname, int *buf)
 {
 	if (!nl80211_get_frequency(ifname, buf))
 	{
@@ -991,7 +1027,7 @@ int nl80211_get_channel(const char *ifname, int *buf)
 }
 
 
-int nl80211_get_txpower(const char *ifname, int *buf)
+static int nl80211_get_txpower(const char *ifname, int *buf)
 {
 #if 0
 	char *res;
@@ -1005,7 +1041,7 @@ int nl80211_get_txpower(const char *ifname, int *buf)
 		return 0;
 #endif
 
-	return wext_get_txpower(ifname, buf);
+	return wext_ops.txpower(ifname, buf);
 }
 
 
@@ -1101,7 +1137,7 @@ static void nl80211_fill_signal(const char *ifname, struct nl80211_rssi_rate *r)
 	}
 }
 
-int nl80211_get_bitrate(const char *ifname, int *buf)
+static int nl80211_get_bitrate(const char *ifname, int *buf)
 {
 	struct nl80211_rssi_rate rr;
 
@@ -1116,7 +1152,7 @@ int nl80211_get_bitrate(const char *ifname, int *buf)
 	return -1;
 }
 
-int nl80211_get_signal(const char *ifname, int *buf)
+static int nl80211_get_signal(const char *ifname, int *buf)
 {
 	struct nl80211_rssi_rate rr;
 
@@ -1159,7 +1195,7 @@ static int nl80211_get_noise_cb(struct nl_msg *msg, void *arg)
 }
 
 
-int nl80211_get_noise(const char *ifname, int *buf)
+static int nl80211_get_noise(const char *ifname, int *buf)
 {
 	int8_t noise;
 	struct nl80211_msg_conveyor *req;
@@ -1182,7 +1218,7 @@ int nl80211_get_noise(const char *ifname, int *buf)
 	return -1;
 }
 
-int nl80211_get_quality(const char *ifname, int *buf)
+static int nl80211_get_quality(const char *ifname, int *buf)
 {
 	int signal;
 
@@ -1214,7 +1250,7 @@ int nl80211_get_quality(const char *ifname, int *buf)
 	return -1;
 }
 
-int nl80211_get_quality_max(const char *ifname, int *buf)
+static int nl80211_get_quality_max(const char *ifname, int *buf)
 {
 	/* The cfg80211 wext compat layer assumes a maximum
 	 * quality of 70 */
@@ -1223,7 +1259,7 @@ int nl80211_get_quality_max(const char *ifname, int *buf)
 	return 0;
 }
 
-int nl80211_get_encryption(const char *ifname, char *buf)
+static int nl80211_get_encryption(const char *ifname, char *buf)
 {
 	int i;
 	char k[9];
@@ -1386,6 +1422,31 @@ int nl80211_get_encryption(const char *ifname, char *buf)
 	return -1;
 }
 
+static int nl80211_get_phyname(const char *ifname, char *buf)
+{
+	const char *name;
+
+	name = nl80211_ifname2phy(ifname);
+
+	if (name)
+	{
+		strcpy(buf, name);
+		return 0;
+	}
+	else if ((name = nl80211_phy2ifname(ifname)) != NULL)
+	{
+		name = nl80211_ifname2phy(name);
+
+		if (name)
+		{
+			strcpy(buf, ifname);
+			return 0;
+		}
+	}
+
+	return -1;
+}
+
 
 static int nl80211_get_assoclist_cb(struct nl_msg *msg, void *arg)
 {
@@ -1477,7 +1538,7 @@ static int nl80211_get_assoclist_cb(struct nl_msg *msg, void *arg)
 	return NL_SKIP;
 }
 
-int nl80211_get_assoclist(const char *ifname, char *buf, int *len)
+static int nl80211_get_assoclist(const char *ifname, char *buf, int *len)
 {
 	DIR *d;
 	int i, noise = 0;
@@ -1567,7 +1628,7 @@ static int nl80211_get_txpwrlist_cb(struct nl_msg *msg, void *arg)
 	return NL_SKIP;
 }
 
-int nl80211_get_txpwrlist(const char *ifname, char *buf, int *len)
+static int nl80211_get_txpwrlist(const char *ifname, char *buf, int *len)
 {
 	int ch_cur;
 	int dbm_max = -1, dbm_cur, dbm_cnt;
@@ -1675,13 +1736,16 @@ static void nl80211_get_scanlist_ie(struct nlattr **bss,
 	int ielen = nla_len(bss[NL80211_BSS_INFORMATION_ELEMENTS]);
 	unsigned char *ie = nla_data(bss[NL80211_BSS_INFORMATION_ELEMENTS]);
 	static unsigned char ms_oui[3] = { 0x00, 0x50, 0xf2 };
+	int len;
 
 	while (ielen >= 2 && ielen >= ie[1])
 	{
 		switch (ie[0])
 		{
 		case 0: /* SSID */
-			memcpy(e->ssid, ie + 2, min(ie[1], IWINFO_ESSID_MAX_SIZE));
+			len = min(ie[1], IWINFO_ESSID_MAX_SIZE);
+			memcpy(e->ssid, ie + 2, len);
+			e->ssid[len] = 0;
 			break;
 
 		case 48: /* RSN */
@@ -1742,8 +1806,10 @@ static int nl80211_get_scanlist_cb(struct nl_msg *msg, void *arg)
 
 	if (caps & (1<<1))
 		sl->e->mode = IWINFO_OPMODE_ADHOC;
-	else
+	else if (caps & (1<<0))
 		sl->e->mode = IWINFO_OPMODE_MASTER;
+	else
+		sl->e->mode = IWINFO_OPMODE_MESHPOINT;
 
 	if (caps & (1<<4))
 		sl->e->crypto.enabled = 1;
@@ -1808,9 +1874,9 @@ static int nl80211_get_scanlist_nl(const char *ifname, char *buf, int *len)
 	return *len ? 0 : -1;
 }
 
-int nl80211_get_scanlist(const char *ifname, char *buf, int *len)
+static int nl80211_get_scanlist(const char *ifname, char *buf, int *len)
 {
-	int freq, rssi, qmax, count;
+	int freq, rssi, qmax, count, mode;
 	char *res;
 	char ssid[128] = { 0 };
 	char bssid[18] = { 0 };
@@ -1843,14 +1909,26 @@ int nl80211_get_scanlist(const char *ifname, char *buf, int *len)
 		{
 			nl80211_get_quality_max(ifname, &qmax);
 
-			/* skip header line */
-			while (*res++ != '\n');
+			count = -1;
 
-			count = 0;
-
-			while (sscanf(res, "%17s %d %d %255s%*[ \t]%127[^\n]\n",
-			              bssid, &freq, &rssi, cipher, ssid) > 0)
-			{
+			do {
+				if (res[0] == '<')
+				{
+					/* skip log lines */
+					goto nextline;
+				}
+				if (count < 0)
+				{
+					/* skip header line */
+					count++;
+					goto nextline;
+				}
+				if (sscanf(res, "%17s %d %d %255s%*[ \t]%127[^\n]\n",
+					      bssid, &freq, &rssi, cipher, ssid) < 5)
+				{
+					/* skip malformed lines */
+					goto nextline;
+				}
 				/* BSSID */
 				e->mac[0] = strtol(&bssid[0],  NULL, 16);
 				e->mac[1] = strtol(&bssid[3],  NULL, 16);
@@ -1863,7 +1941,10 @@ int nl80211_get_scanlist(const char *ifname, char *buf, int *len)
 				memcpy(e->ssid, ssid, min(strlen(ssid), sizeof(e->ssid) - 1));
 
 				/* Mode (assume master) */
-				e->mode = IWINFO_OPMODE_MASTER;
+				if (strstr(cipher,"[MESH]"))
+					e->mode = IWINFO_OPMODE_MESHPOINT;
+				else
+					e->mode = IWINFO_OPMODE_MASTER;
 
 				/* Channel */
 				e->channel = nl80211_freq2channel(freq);
@@ -1895,20 +1976,33 @@ int nl80211_get_scanlist(const char *ifname, char *buf, int *len)
 				/* Crypto */
 				nl80211_get_scancrypto(cipher, &e->crypto);
 
-				/* advance to next line */
-				while (*res && *res++ != '\n');
-
 				count++;
 				e++;
 
 				memset(ssid, 0, sizeof(ssid));
 				memset(bssid, 0, sizeof(bssid));
 				memset(cipher, 0, sizeof(cipher));
-			}
+
+			nextline:
+				/* advance to next line */
+				while( *res && *res++ != '\n' );
+ 			}
+			while( *res );
 
 			*len = count * sizeof(struct iwinfo_scanlist_entry);
 			return 0;
 		}
+	}
+
+	/* station / ad-hoc / monitor scan */
+	else if (!nl80211_get_mode(ifname, &mode) &&
+	         (mode == IWINFO_OPMODE_ADHOC ||
+	          mode == IWINFO_OPMODE_MASTER ||
+	          mode == IWINFO_OPMODE_CLIENT ||
+	          mode == IWINFO_OPMODE_MONITOR) &&
+	         iwinfo_ifup(ifname))
+	{
+		return nl80211_get_scanlist_nl(ifname, buf, len);
 	}
 
 	/* AP scan */
@@ -1931,8 +2025,7 @@ int nl80211_get_scanlist(const char *ifname, char *buf, int *len)
 			if (!(res = nl80211_ifadd(ifname)))
 				goto out;
 
-			if (!iwinfo_ifmac(res))
-				goto out;
+			iwinfo_ifmac(res);
 
 			/* if we can take the new interface up, the driver supports an
 			 * additional interface and there's no need to tear down the ap */
@@ -2013,7 +2106,7 @@ static int nl80211_get_freqlist_cb(struct nl_msg *msg, void *arg)
 	return NL_SKIP;
 }
 
-int nl80211_get_freqlist(const char *ifname, char *buf, int *len)
+static int nl80211_get_freqlist(const char *ifname, char *buf, int *len)
 {
 	struct nl80211_msg_conveyor *req;
 	struct nl80211_array_buf arr = { .buf = buf, .count = 0 };
@@ -2047,7 +2140,7 @@ static int nl80211_get_country_cb(struct nl_msg *msg, void *arg)
 	return NL_SKIP;
 }
 
-int nl80211_get_country(const char *ifname, char *buf)
+static int nl80211_get_country(const char *ifname, char *buf)
 {
 	int rv = -1;
 	struct nl80211_msg_conveyor *req;
@@ -2065,7 +2158,7 @@ int nl80211_get_country(const char *ifname, char *buf)
 	return rv;
 }
 
-int nl80211_get_countrylist(const char *ifname, char *buf, int *len)
+static int nl80211_get_countrylist(const char *ifname, char *buf, int *len)
 {
 	int i, count;
 	struct iwinfo_country_entry *e = (struct iwinfo_country_entry *)buf;
@@ -2087,6 +2180,7 @@ static int nl80211_get_hwmodelist_cb(struct nl_msg *msg, void *arg)
 	int *modes = arg;
 	int bands_remain, freqs_remain;
 	uint16_t caps = 0;
+	uint32_t vht_caps = 0;
 	struct nlattr **attr = nl80211_parse(msg);
 	struct nlattr *bands[NL80211_BAND_ATTR_MAX + 1];
 	struct nlattr *freqs[NL80211_FREQUENCY_ATTR_MAX + 1];
@@ -2108,6 +2202,13 @@ static int nl80211_get_hwmodelist_cb(struct nl_msg *msg, void *arg)
 			if (caps > 0)
 				*modes |= IWINFO_80211_N;
 
+			if (bands[NL80211_BAND_ATTR_VHT_CAPA])
+				vht_caps = nla_get_u32(bands[NL80211_BAND_ATTR_VHT_CAPA]);
+
+			/* Treat any nonzero capability as 11ac */
+			if (vht_caps > 0)
+				*modes |= IWINFO_80211_AC;
+
 			nla_for_each_nested(freq, bands[NL80211_BAND_ATTR_FREQS],
 			                    freqs_remain)
 			{
@@ -2122,7 +2223,7 @@ static int nl80211_get_hwmodelist_cb(struct nl_msg *msg, void *arg)
 					*modes |= IWINFO_80211_B;
 					*modes |= IWINFO_80211_G;
 				}
-				else
+				else if (!(*modes & IWINFO_80211_AC))
 				{
 					*modes |= IWINFO_80211_A;
 				}
@@ -2133,7 +2234,7 @@ static int nl80211_get_hwmodelist_cb(struct nl_msg *msg, void *arg)
 	return NL_SKIP;
 }
 
-int nl80211_get_hwmodelist(const char *ifname, int *buf)
+static int nl80211_get_hwmodelist(const char *ifname, int *buf)
 {
 	struct nl80211_msg_conveyor *req;
 
@@ -2147,25 +2248,73 @@ int nl80211_get_hwmodelist(const char *ifname, int *buf)
 	return *buf ? 0 : -1;
 }
 
-int nl80211_get_mbssid_support(const char *ifname, int *buf)
+static int nl80211_get_ifcomb_cb(struct nl_msg *msg, void *arg)
 {
-	/* Test whether we can create another interface */
-	char *nif = nl80211_ifadd(ifname);
+	struct nlattr **attr = nl80211_parse(msg);
+	struct nlattr *comb;
+	int *ret = arg;
+	int comb_rem, limit_rem, mode_rem;
 
-	if (nif)
+	*ret = 0;
+	if (!attr[NL80211_ATTR_INTERFACE_COMBINATIONS])
+		return NL_SKIP;
+
+	nla_for_each_nested(comb, attr[NL80211_ATTR_INTERFACE_COMBINATIONS], comb_rem)
 	{
-		*buf = (iwinfo_ifmac(nif) && iwinfo_ifup(nif));
+		static struct nla_policy iface_combination_policy[NUM_NL80211_IFACE_COMB] = {
+			[NL80211_IFACE_COMB_LIMITS] = { .type = NLA_NESTED },
+			[NL80211_IFACE_COMB_MAXNUM] = { .type = NLA_U32 },
+		};
+		struct nlattr *tb_comb[NUM_NL80211_IFACE_COMB];
+		static struct nla_policy iface_limit_policy[NUM_NL80211_IFACE_LIMIT] = {
+			[NL80211_IFACE_LIMIT_TYPES] = { .type = NLA_NESTED },
+			[NL80211_IFACE_LIMIT_MAX] = { .type = NLA_U32 },
+		};
+		struct nlattr *tb_limit[NUM_NL80211_IFACE_LIMIT];
+		struct nlattr *limit;
 
-		iwinfo_ifdown(nif);
-		nl80211_ifdel(nif);
+		nla_parse_nested(tb_comb, NL80211_BAND_ATTR_MAX, comb, iface_combination_policy);
 
-		return 0;
+		if (!tb_comb[NL80211_IFACE_COMB_LIMITS])
+			continue;
+
+		nla_for_each_nested(limit, tb_comb[NL80211_IFACE_COMB_LIMITS], limit_rem)
+		{
+			struct nlattr *mode;
+
+			nla_parse_nested(tb_limit, NUM_NL80211_IFACE_LIMIT, limit, iface_limit_policy);
+
+			if (!tb_limit[NL80211_IFACE_LIMIT_TYPES] ||
+			    !tb_limit[NL80211_IFACE_LIMIT_MAX])
+				continue;
+
+			if (nla_get_u32(tb_limit[NL80211_IFACE_LIMIT_MAX]) < 2)
+				continue;
+
+			nla_for_each_nested(mode, tb_limit[NL80211_IFACE_LIMIT_TYPES], mode_rem) {
+				if (nla_type(mode) == NL80211_IFTYPE_AP)
+					*ret = 1;
+			}
+		}
 	}
 
-	return -1;
+	return NL_SKIP;
 }
 
-int nl80211_get_hardware_id(const char *ifname, char *buf)
+static int nl80211_get_mbssid_support(const char *ifname, int *buf)
+{
+	struct nl80211_msg_conveyor *req;
+
+	req = nl80211_msg(ifname, NL80211_CMD_GET_WIPHY, 0);
+	if (!req)
+		return -1;
+
+	nl80211_send(req, nl80211_get_ifcomb_cb, buf);
+	nl80211_free(req);
+	return 0;
+}
+
+static int nl80211_get_hardware_id(const char *ifname, char *buf)
 {
 	int rv;
 	char *res;
@@ -2176,19 +2325,19 @@ int nl80211_get_hardware_id(const char *ifname, char *buf)
 		/* Reuse existing interface */
 		if ((res = nl80211_phy2ifname(ifname)) != NULL)
 		{
-			rv = wext_get_hardware_id(res, buf);
+			rv = wext_ops.hardware_id(res, buf);
 		}
 
 		/* Need to spawn a temporary iface for finding IDs */
 		else if ((res = nl80211_ifadd(ifname)) != NULL)
 		{
-			rv = wext_get_hardware_id(res, buf);
+			rv = wext_ops.hardware_id(res, buf);
 			nl80211_ifdel(res);
 		}
 	}
 	else
 	{
-		rv = wext_get_hardware_id(ifname, buf);
+		rv = wext_ops.hardware_id(ifname, buf);
 	}
 
 	/* Failed to obtain hardware IDs, search board config */
@@ -2211,7 +2360,7 @@ nl80211_get_hardware_entry(const char *ifname)
 	return iwinfo_hardware(&id);
 }
 
-int nl80211_get_hardware_name(const char *ifname, char *buf)
+static int nl80211_get_hardware_name(const char *ifname, char *buf)
 {
 	const struct iwinfo_hardware_entry *hw;
 
@@ -2223,7 +2372,7 @@ int nl80211_get_hardware_name(const char *ifname, char *buf)
 	return 0;
 }
 
-int nl80211_get_txpower_offset(const char *ifname, int *buf)
+static int nl80211_get_txpower_offset(const char *ifname, int *buf)
 {
 	const struct iwinfo_hardware_entry *hw;
 
@@ -2234,7 +2383,7 @@ int nl80211_get_txpower_offset(const char *ifname, int *buf)
 	return 0;
 }
 
-int nl80211_get_frequency_offset(const char *ifname, int *buf)
+static int nl80211_get_frequency_offset(const char *ifname, int *buf)
 {
 	const struct iwinfo_hardware_entry *hw;
 
@@ -2244,3 +2393,34 @@ int nl80211_get_frequency_offset(const char *ifname, int *buf)
 	*buf = hw->frequency_offset;
 	return 0;
 }
+
+const struct iwinfo_ops nl80211_ops = {
+	.name             = "nl80211",
+	.probe            = nl80211_probe,
+	.channel          = nl80211_get_channel,
+	.frequency        = nl80211_get_frequency,
+	.frequency_offset = nl80211_get_frequency_offset,
+	.txpower          = nl80211_get_txpower,
+	.txpower_offset   = nl80211_get_txpower_offset,
+	.bitrate          = nl80211_get_bitrate,
+	.signal           = nl80211_get_signal,
+	.noise            = nl80211_get_noise,
+	.quality          = nl80211_get_quality,
+	.quality_max      = nl80211_get_quality_max,
+	.mbssid_support   = nl80211_get_mbssid_support,
+	.hwmodelist       = nl80211_get_hwmodelist,
+	.mode             = nl80211_get_mode,
+	.ssid             = nl80211_get_ssid,
+	.bssid            = nl80211_get_bssid,
+	.country          = nl80211_get_country,
+	.hardware_id      = nl80211_get_hardware_id,
+	.hardware_name    = nl80211_get_hardware_name,
+	.encryption       = nl80211_get_encryption,
+	.phyname          = nl80211_get_phyname,
+	.assoclist        = nl80211_get_assoclist,
+	.txpwrlist        = nl80211_get_txpwrlist,
+	.scanlist         = nl80211_get_scanlist,
+	.freqlist         = nl80211_get_freqlist,
+	.countrylist      = nl80211_get_countrylist,
+	.close            = nl80211_close
+};

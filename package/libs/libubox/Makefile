@@ -1,15 +1,15 @@
 include $(TOPDIR)/rules.mk
 
 PKG_NAME:=libubox
-PKG_VERSION:=2013-01-29
+PKG_VERSION:=2014-07-16
 PKG_RELEASE=$(PKG_SOURCE_VERSION)
 
 PKG_SOURCE_PROTO:=git
-PKG_SOURCE_URL:=git://nbd.name/luci2/libubox.git
+PKG_SOURCE_URL:=http://git.openwrt.org/project/libubox.git
 PKG_SOURCE_SUBDIR:=$(PKG_NAME)-$(PKG_VERSION)
-PKG_SOURCE_VERSION:=0bc317aa4d9af44806c28ca286d79a8b5a92b2b8
+PKG_SOURCE_VERSION:=bd388d2b6c2c151bf513c1e449417d18ce02d10b
 PKG_SOURCE:=$(PKG_NAME)-$(PKG_VERSION)-$(PKG_SOURCE_VERSION).tar.gz
-PKG_MIRROR_MD5SUM:=c79ef80b71127e114d73701fbdc895c3
+PKG_MIRROR_MD5SUM:=
 CMAKE_INSTALL:=1
 
 PKG_LICENSE:=ISC BSD-3c
@@ -26,6 +26,7 @@ define Package/libubox
   SECTION:=libs
   CATEGORY:=Libraries
   TITLE:=Basic utility library
+  ABI_VERSION:=$(PKG_VERSION)
   DEPENDS:=
 endef
 
@@ -33,18 +34,32 @@ define Package/libblobmsg-json
   SECTION:=libs
   CATEGORY:=Libraries
   TITLE:=blobmsg <-> json conversion library
-  DEPENDS:=+libjson +libubox
+  DEPENDS:=+libjson-c +libubox
 endef
 
 define Package/jshn
   SECTION:=utils
   CATEGORY:=Utilities
-  DEPENDS:=+libjson
+  DEPENDS:=+libjson-c
   TITLE:=JSON SHell Notation
 endef
 
 define Package/jshn/description
   Library for parsing and generating JSON from shell scripts
+endef
+
+define Package/libjson-script
+  SECTION:=utils
+  CATEGORY:=Utilities
+  DEPENDS:=+libubox
+  TITLE:=Minimalistic JSON based scripting engine
+endef
+
+define Package/libubox-lua
+  SECTION:=libs
+  CATEGORY:=Libraries
+  DEPENDS:=+libubox +liblua
+  TITLE:=Lua binding for the OpenWrt Basic utility library
 endef
 
 TARGET_CFLAGS += -I$(STAGING_DIR)/usr/include
@@ -67,7 +82,18 @@ define Package/jshn/install
 	$(INSTALL_DATA) $(PKG_INSTALL_DIR)/usr/share/libubox/jshn.sh $(1)/usr/share/libubox
 endef
 
+define Package/libjson-script/install
+	$(INSTALL_DIR) $(1)/lib/
+	$(INSTALL_DATA) $(PKG_INSTALL_DIR)/usr/lib/libjson_script.so $(1)/lib/
+endef
+
+define Package/libubox-lua/install
+	$(INSTALL_DIR) $(1)/usr/lib/lua
+	$(CP) $(PKG_BUILD_DIR)/lua/uloop.so $(1)/usr/lib/lua/
+endef
+
 $(eval $(call BuildPackage,libubox))
 $(eval $(call BuildPackage,libblobmsg-json))
 $(eval $(call BuildPackage,jshn))
-
+$(eval $(call BuildPackage,libjson-script))
+$(eval $(call BuildPackage,libubox-lua))

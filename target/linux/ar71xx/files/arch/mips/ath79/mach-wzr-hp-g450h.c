@@ -13,6 +13,7 @@
 #include <linux/gpio.h>
 #include <linux/mtd/mtd.h>
 #include <linux/mtd/partitions.h>
+#include <linux/ath9k_platform.h>
 
 #include <asm/mach-ath79/ath79.h>
 
@@ -43,21 +44,13 @@ static struct mtd_partition wzrhpg450h_partitions[] = {
 		.size		= 0x0010000,
 		.mask_flags	= MTD_WRITEABLE,
 	}, {
-		.name		= "uImage",
+		.name		= "firmware",
 		.offset		= 0x0060000,
-		.size		= 0x0100000,
-	}, {
-		.name		= "rootfs",
-		.offset		= 0x0160000,
-		.size		= 0x1e80000,
+		.size		= 0x1f80000,
 	}, {
 		.name		= "user_property",
 		.offset		= 0x1fe0000,
 		.size		= 0x0020000,
-	}, {
-		.name		= "firmware",
-		.offset		= 0x0060000,
-		.size		= 0x1f80000,
 	}
 };
 
@@ -161,6 +154,8 @@ static void __init wzrhpg450h_init(void)
 	ath79_register_usb();
 
 	ap91_pci_init(ee, NULL);
+	ap9x_pci_get_wmac_data(0)->tx_gain_buffalo = true;
+	ap9x_pci_get_wmac_data(1)->tx_gain_buffalo = true;
 	ap9x_pci_setup_wmac_led_pin(0, 15);
 	ap9x_pci_setup_wmac_leds(0, wzrhpg450h_wmac_leds_gpio,
 				 ARRAY_SIZE(wzrhpg450h_wmac_leds_gpio));

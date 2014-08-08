@@ -1,5 +1,5 @@
 BOARDNAME:=Traverse Geos
-FEATURES:=squashfs jffs2 ext4 pci usb gpio
+FEATURES:=squashfs ext4 pci usb gpio broken
 DEFAULT_PACKAGES += \
             kmod-crypto-hw-geode kmod-crypto-ocf \
             kmod-gpio-cs5535-new kmod-gpio-nsc \
@@ -21,11 +21,9 @@ DEFAULT_PACKAGES += \
             kmod-cpu-msr \
             soloscli linux-atm br2684ctl ppp-mod-pppoa pppdump pppstats \
             hwclock wpad flashrom tc
-LINUX_VERSION:=3.7.9
 CS5535_MASK:=0x0E000048
 
-CFLAGS += -march=geode -Os -mmmx -m3dnow -fno-align-jumps -fno-align-functions \
-        -fno-align-labels -fno-align-loops -pipe -fomit-frame-pointer
+CPU_TYPE := geode
 
 define Target/Description
     Build firmware images for Traverse Geos board

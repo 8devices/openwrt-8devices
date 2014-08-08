@@ -1,12 +1,11 @@
 BOARDNAME:=RDC R-321x
-FEATURES:=squashfs jffs2 pci usb gpio pcmcia
-CFLAGS:=-Os -pipe -march=i486 -mtune=i486 -fno-caller-saves
+FEATURES:=squashfs pci usb gpio pcmcia
 MAINTAINER:=Florian Fainelli <florian@openwrt.org>
+FEATURES += broken
 
 DEFAULT_PACKAGES += kmod-llc kmod-stp kmod-bridge kmod-8021q \
 		    wpad-mini kmod-libphy kmod-r6040 kmod-input-core \
-		    kmod-input-polldev kmod-input-gpio-buttons kmod-button-hotplug \
-		    kmod-rdc321x-wdt
+		    kmod-input-polldev kmod-button-hotplug kmod-rdc321x-wdt
 
 define Target/Description
         Build firmware images for RDC321x based routers

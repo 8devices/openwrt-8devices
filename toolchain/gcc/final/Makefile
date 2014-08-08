@@ -15,14 +15,6 @@ ifneq ($(CONFIG_GCC_VERSION_4_5)$(CONFIG_GCC_VERSION_4_6),)
 	--with-libelf=$(TOPDIR)/staging_dir/host
 endif
 
-ifneq ($(CONFIG_TLS_SUPPORT),)
-  GCC_CONFIGURE += \
-	--enable-tls
-else
-  GCC_CONFIGURE += \
-	--disable-tls
-endif
-
 ifneq ($(CONFIG_SJLJ_EXCEPTIONS),)
   GCC_CONFIGURE += \
 	--enable-sjlj-exceptions
@@ -35,7 +27,7 @@ define CleanupToolchain
 	ln -sf ../include $(TOOLCHAIN_DIR)/$(REAL_GNU_TARGET_NAME)/sys-include
 	rm -rf $(TOOLCHAIN_DIR)/$(REAL_GNU_TARGET_NAME)/lib
 	ln -sf ../lib $(TOOLCHAIN_DIR)/$(REAL_GNU_TARGET_NAME)/lib
-	$(if $(CONFIG_mips64)$(CONFIG_mips64el)$(CONFIG_x86_64),ln -sf ../lib64 $(TOOLCHAIN_DIR)/$(REAL_GNU_TARGET_NAME)/lib64)
+	$(if $(CONFIG_ARCH_64BIT),ln -sf ../lib64 $(TOOLCHAIN_DIR)/$(REAL_GNU_TARGET_NAME)/lib64)
 endef
 
 define Host/Configure

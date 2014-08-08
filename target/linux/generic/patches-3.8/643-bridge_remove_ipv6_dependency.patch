@@ -5,9 +5,9 @@
  					const struct in6_addr *addr);
  
 +extern int			(*ipv6_dev_get_saddr_hook)(struct net *net,
-+						struct net_device *dev,
++						const struct net_device *dev,
 +						const struct in6_addr *daddr,
-+						unsigned int srcprefs,
++						unsigned int prefs,
 +						struct in6_addr *saddr);
 +
  static inline unsigned long addrconf_timeout_fixup(u32 timeout,
@@ -49,7 +49,7 @@
  
  int ipv6_get_lladdr(struct net_device *dev, struct in6_addr *addr,
  		    unsigned char banned_flags)
-@@ -4947,6 +4946,9 @@ int __init addrconf_init(void)
+@@ -4968,6 +4967,9 @@ int __init addrconf_init(void)
  
  	ipv6_addr_label_rtnl_register();
  
@@ -59,7 +59,7 @@
  	return 0;
  errout:
  	rtnl_af_unregister(&inet6_ops);
-@@ -4965,6 +4967,9 @@ void addrconf_cleanup(void)
+@@ -4986,6 +4988,9 @@ void addrconf_cleanup(void)
  	struct net_device *dev;
  	int i;
  
@@ -81,13 +81,13 @@
 +#include <linux/export.h>
 +#include <net/ipv6.h>
 +
-+int (*ipv6_dev_get_saddr_hook)(struct net *net, struct net_device *dev,
-+			const struct in6_addr *daddr, unsigned int srcprefs,
++int (*ipv6_dev_get_saddr_hook)(struct net *net, const struct net_device *dev,
++			const struct in6_addr *daddr, unsigned int prefs,
 +			struct in6_addr *saddr);
 +
 +EXPORT_SYMBOL(ipv6_dev_get_saddr_hook);
 +
-+int ipv6_dev_get_saddr(struct net *net, struct net_device *dst_dev,
++int ipv6_dev_get_saddr(struct net *net, const struct net_device *dst_dev,
 +			const struct in6_addr *daddr, unsigned int prefs,
 +			struct in6_addr *saddr)
 +{

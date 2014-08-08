@@ -2,6 +2,7 @@
 # Copyright (C) 2011 OpenWrt.org
 #
 
+. /lib/functions/system.sh
 . /lib/ar71xx.sh
 
 PART_NAME=firmware
@@ -49,7 +50,7 @@ platform_do_upgrade_combined() {
 
 	if [ -n "$partitions" ] && [ -n "$kernelpart" ] && \
 	   [ ${kern_blocks:-0} -gt 0 ] && \
-	   [ ${root_blocks:-0} -gt ${kern_blocks:-0} ] && \
+	   [ ${root_blocks:-0} -gt 0 ] && \
 	   [ ${erase_size:-0} -gt 0 ];
 	then
 		local append=""
@@ -69,12 +70,72 @@ tplink_get_image_boot_size() {
 	get_image "$@" | dd bs=4 count=1 skip=37 2>/dev/null | hexdump -v -n 4 -e '1/1 "%02x"'
 }
 
+seama_get_type_magic() {
+	get_image "$@" | dd bs=1 count=4 skip=53 2>/dev/null | hexdump -v -n 4 -e '1/1 "%02x"'
+}
+
+cybertan_get_image_magic() {
+	get_image "$@" | dd bs=8 count=1 skip=0  2>/dev/null | hexdump -v -n 8 -e '1/1 "%02x"'
+}
+
+cybertan_check_image() {
+	local magic="$(cybertan_get_image_magic "$1")"
+	local fw_magic="$(cybertan_get_hw_magic)"
+
+	[ "$fw_magic" != "$magic" ] && {
+		echo "Invalid image, ID mismatch, got:$magic, but need:$fw_magic"
+		return 1
+	}
+
+	return 0
+}
+
+platform_do_upgrade_compex() {
+	local fw_file=$1
+	local fw_part=$PART_NAME
+	local fw_mtd=$(find_mtd_part $fw_part)
+	local fw_length=0x$(dd if="$fw_file" bs=2 skip=1 count=4 2>/dev/null)
+	local fw_blocks=$(($fw_length / 65536))
+
+	if [ -n "$fw_mtd" ] &&  [ ${fw_blocks:-0} -gt 0 ]; then
+		local append=""
+		[ -f "$CONF_TAR" -a "$SAVE_CONFIG" -eq 1 ] && append="-j $CONF_TAR"
+
+		sync
+		dd if="$fw_file" bs=64k skip=1 count=$fw_blocks 2>/dev/null | \
+			mtd $append write - "$fw_part"
+	fi
+}
+
+alfa_check_image() {
+	local magic_long="$(get_magic_long "$1")"
+	local fw_part_size=$(mtd_get_part_size firmware)
+
+	case "$magic_long" in
+	"27051956")
+		[ "$fw_part_size" != "16318464" ] && {
+			echo "Invalid image magic \"$magic_long\" for $fw_part_size bytes"
+			return 1
+		}
+		;;
+
+	"68737173")
+		[ "$fw_part_size" != "7929856" ] && {
+			echo "Invalid image magic \"$magic_long\" for $fw_part_size bytes"
+			return 1
+		}
+		;;
+	esac
+
+	return 0
+}
+
 platform_check_image() {
 	local board=$(ar71xx_board_name)
 	local magic="$(get_magic_word "$1")"
 	local magic_long="$(get_magic_long "$1")"
 
-	[ "$ARGC" -gt 1 ] && return 1
+	[ "$#" -gt 1 ] && return 1
 
 	case "$board" in
 	all0315n | \
@@ -94,6 +155,7 @@ platform_check_image() {
 	ap96 | \
 	db120 | \
 	hornet-ub | \
+	bxu2000n-2-a1 | \
 	zcn-1523h-2 | \
 	zcn-1523h-5)
 		[ "$magic_long" != "68737173" -a "$magic_long" != "19852003" ] && {
@@ -105,22 +167,33 @@ platform_check_image() {
 	ap81 | \
 	ap83 | \
 	ap132 | \
+	dir-505-a1 | \
 	dir-600-a1 | \
 	dir-615-c1 | \
+	dir-615-e1 | \
 	dir-615-e4 | \
 	dir-825-c1 | \
+	dir-835-a1 | \
+	dragino2 | \
+	esr1750 | \
 	ew-dorin | \
 	ew-dorin-router | \
+	hiwifi-hc6361 | \
+	hornet-ub-x2 | \
 	mzk-w04nu | \
 	mzk-w300nh | \
 	tew-632brp | \
 	tew-712br | \
+	tew-732br | \
 	wrt400n | \
+	airgateway | \
 	airrouter | \
 	bullet-m | \
 	nanostation-m | \
 	rocket-m | \
+	nanostation-m-xw | \
 	rw2458n | \
+	wndap360 | \
 	wzr-hp-g300nh2 | \
 	wzr-hp-g300nh | \
 	wzr-hp-g450h | \
@@ -145,34 +218,81 @@ platform_check_image() {
 		dir825b_check_image "$1" && return 0
 		;;
 
+	mynet-rext|\
+	wrt160nl)
+		cybertan_check_image "$1" && return 0
+		return 1
+		;;
+
+	mynet-n600 | \
+	mynet-n750)
+		[ "$magic_long" != "5ea3a417" ] && {
+			echo "Invalid image, bad magic: $magic_long"
+			return 1
+		}
+
+		local typemagic=$(seama_get_type_magic "$1")
+		[ "$typemagic" != "6669726d" ] && {
+			echo "Invalid image, bad type: $typemagic"
+			return 1
+		}
+
+		return 0;
+		;;
 	mr600 | \
 	mr600v2 | \
 	om2p | \
+	om2pv2 | \
 	om2p-hs | \
-	om2p-lc)
+	om2p-hsv2 | \
+	om2p-lc | \
+	om5p)
 		platform_check_image_openmesh "$magic_long" "$1" && return 0
 		return 1
 		;;
+
+	archer-c5 | \
+	archer-c7 | \
+	el-m150 | \
+	el-mini | \
+	gl-inet | \
+	oolite | \
+	tl-mr10u | \
 	tl-mr11u | \
+	tl-mr13u | \
 	tl-mr3020 | \
 	tl-mr3040 | \
+	tl-mr3040-v2 | \
 	tl-mr3220 | \
 	tl-mr3220-v2 | \
 	tl-mr3420 | \
+	tl-mr3420-v2 | \
 	tl-wa7510n | \
+	tl-wa750re | \
+	tl-wa850re | \
+	tl-wa860re | \
+	tl-wa801nd-v2 | \
 	tl-wa901nd | \
 	tl-wa901nd-v2 | \
+	tl-wa901nd-v3 | \
 	tl-wdr3500 | \
 	tl-wdr4300 | \
+	tl-wdr4900-v2 | \
 	tl-wr703n | \
+	tl-wr710n | \
+	tl-wr720n-v3 | \
 	tl-wr741nd | \
 	tl-wr741nd-v4 | \
 	tl-wr841n-v1 | \
+	tl-wa830re-v2 | \
 	tl-wr841n-v7 | \
 	tl-wr841n-v8 | \
+	tl-wr841n-v9 | \
+	tl-wr842n-v2 | \
 	tl-wr941nd | \
 	tl-wr1041n-v2 | \
 	tl-wr1043nd | \
+	tl-wr1043nd-v2 | \
 	tl-wr2543n)
 		[ "$magic" != "0100" ] && {
 			echo "Invalid image type."
@@ -200,6 +320,12 @@ platform_check_image() {
 
 		return 0
 		;;
+
+	tube2h)
+		alfa_check_image "$1" && return 0
+		return 1
+		;;
+
 	uap-pro)
 		[ "$magic_long" != "19852003" ] && {
 			echo "Invalid image type."
@@ -207,7 +333,9 @@ platform_check_image() {
 		}
 		return 0
 		;;
-	wndr3700)
+	wndr3700 | \
+	wnr2000-v3 | \
+	wnr612-v2)
 		local hw_magic
 
 		hw_magic="$(ar71xx_get_mtd_part_magic firmware)"
@@ -217,12 +345,11 @@ platform_check_image() {
 		}
 		return 0
 		;;
-	wrt160nl)
-		[ "$magic" != "4e4c" ] && {
-			echo "Invalid image type."
-			return 1
-		}
-		return 0
+	nbg6716 | \
+	wndr3700v4 | \
+	wndr4300 )
+		nand_do_platform_check $board $1
+		return $?;
 		;;
 	routerstation | \
 	routerstation-pro | \
@@ -230,10 +357,13 @@ platform_check_image() {
 	pb42 | \
 	pb44 | \
 	all0305 | \
+	eap300v2 | \
 	eap7660d | \
 	ja76pf | \
 	ja76pf2 | \
-	jwap003)
+	jwap003 | \
+	wp543 | \
+	wpe72)
 		[ "$magic" != "4349" ] && {
 			echo "Invalid image. Use *-sysupgrade.bin files on this board"
 			return 1
@@ -272,12 +402,17 @@ platform_do_upgrade() {
 	jwap003)
 		platform_do_upgrade_combined "$ARGV"
 		;;
+	wp543|\
+	wpe72)
+		platform_do_upgrade_compex "$ARGV"
+		;;
 	all0258n )
 		platform_do_upgrade_allnet "0x9f050000" "$ARGV"
 		;;
 	all0315n )
 		platform_do_upgrade_allnet "0x9f080000" "$ARGV"
 		;;
+	eap300v2 |\
 	cap4200ag)
 		platform_do_upgrade_allnet "0xbf0a0000" "$ARGV"
 		;;
@@ -288,9 +423,16 @@ platform_do_upgrade() {
 	mr600 | \
 	mr600v2 | \
 	om2p | \
+	om2pv2 | \
 	om2p-hs | \
-	om2p-lc)
+	om2p-hsv2 | \
+	om2p-lc | \
+	om5p)
 		platform_do_upgrade_openmesh "$ARGV"
+		;;
+	uap-pro)
+		MTD_CONFIG_ARGS="-s 0x180000"
+		default_do_upgrade "$ARGV"
 		;;
 	*)
 		default_do_upgrade "$ARGV"

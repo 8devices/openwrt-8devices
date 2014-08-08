@@ -19,8 +19,6 @@
 #include "dev-usb.h"
 #include "dev-wmac.h"
 #include "machtypes.h"
-#include "linux/i2c-gpio.h"
-#include "linux/platform_device.h"
 
 #define CARAMBOLA2_GPIO_LED_WLAN		0
 #define CARAMBOLA2_GPIO_LED_ETH0		14
@@ -60,24 +58,7 @@ static struct gpio_keys_button carambola2_gpio_keys[] __initdata = {
 		.debounce_interval = CARAMBOLA2_KEYS_DEBOUNCE_INTERVAL,
 		.gpio		= CARAMBOLA2_GPIO_BTN_JUMPSTART,
 		.active_low	= 1,
-	}
-};
-
-static struct i2c_gpio_platform_data carambola2_i2c_gpio_data = {
-	.sda_pin        = 18,
-	.scl_pin        = 19,
-};
-
-static struct platform_device carambola2_i2c_gpio = {
-	.name           = "i2c-gpio",
-	.id             = 0,
-	.dev     = {
-		.platform_data  = &carambola2_i2c_gpio_data,
 	},
-};
-
-static struct platform_device *carambola2_devices[] __initdata = {
-        &carambola2_i2c_gpio
 };
 
 static void __init carambola2_common_setup(void)
@@ -111,8 +92,6 @@ static void __init carambola2_setup(void)
 				AR724X_GPIO_FUNC_ETH_SWITCH_LED2_EN |
 				AR724X_GPIO_FUNC_ETH_SWITCH_LED3_EN |
 				AR724X_GPIO_FUNC_ETH_SWITCH_LED4_EN);
-
-    platform_add_devices(carambola2_devices, ARRAY_SIZE(carambola2_devices));
 
 	ath79_register_leds_gpio(-1, ARRAY_SIZE(carambola2_leds_gpio),
 				 carambola2_leds_gpio);

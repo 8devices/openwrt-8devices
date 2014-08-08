@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2010-2012 Jo-Philipp Wich <jow@openwrt.org>
+# Copyright (C) 2010-2013 Jo-Philipp Wich <jow@openwrt.org>
 #
 # This is free software, licensed under the GNU General Public License v2.
 # See /LICENSE for more information.
@@ -8,13 +8,13 @@
 include $(TOPDIR)/rules.mk
 
 PKG_NAME:=uhttpd
-PKG_VERSION:=2013-01-22
+PKG_VERSION:=2014-06-11
 PKG_RELEASE=$(PKG_SOURCE_VERSION)
 
 PKG_SOURCE_PROTO:=git
 PKG_SOURCE_URL:=git://nbd.name/uhttpd2.git
 PKG_SOURCE_SUBDIR:=$(PKG_NAME)-$(PKG_VERSION)
-PKG_SOURCE_VERSION:=14e3971c37e6feb0ec5eda0988e07d8a786ba9f9
+PKG_SOURCE_VERSION:=dabd7dea6445aaa0e5b8d9add1872fa7393b3a85
 PKG_SOURCE:=$(PKG_NAME)-$(PKG_VERSION)-$(PKG_SOURCE_VERSION).tar.gz
 PKG_MAINTAINER:=Felix Fietkau <nbd@openwrt.org>
 
@@ -51,7 +51,10 @@ endef
 define Package/uhttpd-mod-tls
   $(Package/uhttpd/default)
   TITLE+= (TLS plugin)
-  DEPENDS:=uhttpd +PACKAGE_uhttpd-mod-tls_cyassl:libustream-cyassl +PACKAGE_uhttpd-mod-tls_openssl:libustream-openssl
+  DEPENDS:=uhttpd \
+	+PACKAGE_uhttpd-mod-tls_polarssl:libustream-polarssl \
+	+PACKAGE_uhttpd-mod-tls_cyassl:libustream-cyassl \
+	+PACKAGE_uhttpd-mod-tls_openssl:libustream-openssl
 endef
 
 define Package/uhttpd-mod-tls/description
@@ -62,7 +65,10 @@ define Package/uhttpd-mod-tls/config
   choice
     depends on PACKAGE_uhttpd-mod-tls
     prompt "TLS Provider"
-    default PACKAGE_uhttpd-mod-tls_cyassl
+    default PACKAGE_uhttpd-mod-tls_polarssl
+
+    config PACKAGE_uhttpd-mod-tls_polarssl
+      bool "PolarSSL"
 
     config PACKAGE_uhttpd-mod-tls_cyassl
       bool "CyaSSL"
@@ -123,8 +129,9 @@ define Package/uhttpd-mod-lua/install
 endef
 
 define Package/uhttpd-mod-ubus/install
-	$(INSTALL_DIR) $(1)/usr/lib
+	$(INSTALL_DIR) $(1)/usr/lib $(1)/etc/uci-defaults
 	$(INSTALL_BIN) $(PKG_BUILD_DIR)/uhttpd_ubus.so $(1)/usr/lib/
+	$(INSTALL_DATA) ./files/ubus.default $(1)/etc/uci-defaults/00_uhttpd_ubus
 endef
 
 

@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2006-2012 OpenWrt.org
+# Copyright (C) 2006-2013 OpenWrt.org
 #
 # This is free software, licensed under the GNU General Public License v2.
 # See /LICENSE for more information.
@@ -8,12 +8,12 @@
 include $(TOPDIR)/rules.mk
 
 PKG_NAME:=gettext-full
-PKG_VERSION:=0.18.1.1
-PKG_RELEASE:=2
+PKG_VERSION:=0.18.2.1
+PKG_RELEASE:=1
 
 PKG_SOURCE:=gettext-$(PKG_VERSION).tar.gz
 PKG_SOURCE_URL:=@GNU/gettext
-PKG_MD5SUM:=3dd55b952826d2b32f51308f2f91aa89
+PKG_MD5SUM:=034c8103b14654ebd300fadac44d6f14
 PKG_BUILD_DIR:=$(BUILD_DIR)/gettext-$(PKG_VERSION)
 HOST_BUILD_DIR:=$(BUILD_DIR_HOST)/gettext-$(PKG_VERSION)
 
@@ -23,6 +23,7 @@ PKG_FIXUP:=autoreconf
 PKG_INSTALL:=1
 PKG_BUILD_PARALLEL:=0
 PKG_BUILD_DEPENDS:=gettext-full/host
+PKG_CHECK_FORMAT_SECURITY:=0
 
 include $(INCLUDE_DIR)/package.mk
 include $(INCLUDE_DIR)/host-build.mk
@@ -35,6 +36,12 @@ define Package/libintl-full
 endef
 
 TARGET_CFLAGS += $(FPIC)
+ifneq ($(HOST_OS),Linux)
+  TARGET_CFLAGS += -I$(STAGING_DIR_HOST)/include
+endif
+ifdef CONFIG_USE_MUSL
+  TARGET_CFLAGS += -D__UCLIBC__
+endif
 
 CONFIGURE_ARGS += \
 	--enable-shared \
@@ -50,7 +57,7 @@ CONFIGURE_ARGS += \
 	--without-emacs
 
 HOST_CONFIGURE_ARGS += \
-	--with-included-libxml
+	--with-included-libxml --without-libxml2-prefix --with-included-libcroco
 
 define Build/InstallDev
 	$(INSTALL_DIR) $(1)/usr/lib/libintl-full/include

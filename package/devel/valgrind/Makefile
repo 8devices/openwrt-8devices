@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2006-2012 OpenWrt.org
+# Copyright (C) 2006-2013 OpenWrt.org
 #
 # This is free software, licensed under the GNU General Public License v2.
 # See /LICENSE for more information.
@@ -8,17 +8,19 @@
 include $(TOPDIR)/rules.mk
 
 PKG_NAME:=valgrind
-PKG_VERSION:=3.8.0
+PKG_VERSION:=3.8.1
 PKG_RELEASE:=1
 
 PKG_SOURCE:=$(PKG_NAME)-$(PKG_VERSION).tar.bz2
 PKG_SOURCE_URL:=http://valgrind.org/downloads/
-PKG_MD5SUM:=ec04dfd1256307432b2a7b520398c526
+PKG_MD5SUM:=288758010b271119a0ffc0183f1d6e38
 
 PKG_MAINTAINER:=Felix Fietkau <nbd@openwrt.org>
 
 PKG_FIXUP = autoreconf
 PKG_INSTALL := 1
+PKG_BUILD_PARALLEL := 1
+PKG_USE_MIPS16:=0
 
 include $(INCLUDE_DIR)/package.mk
 include $(INCLUDE_DIR)/kernel.mk
@@ -26,7 +28,7 @@ include $(INCLUDE_DIR)/kernel.mk
 define Package/valgrind
   SECTION:=devel
   CATEGORY:=Development
-  DEPENDS:=@mips||mipsel||i386||powerpc||TARGET_omap4 +libpthread +librt
+  DEPENDS:=@mips||mipsel||i386||x86_64||powerpc||arm_v7 +libpthread +librt
   TITLE:=debugging and profiling tools for Linux
   URL:=http://www.valgrind.org
 endef
@@ -75,13 +77,20 @@ define Package/valgrind/description
 	to speed up and reduce memory use of your programs.
 endef
 
-CPU := $(patsubst x86,i386,$(LINUX_KARCH))
+CPU := $(patsubst x86_64,amd64,$(patsubst x86,i386,$(LINUX_KARCH)))
 
 CONFIGURE_VARS += \
 	UNAME_R=$(LINUX_VERSION)
 
+ifeq ($(ARCH),x86_64)
+	BITS := 64bit
+else
+	CONFIGURE_ARGS += \
+		--enable-only32bit
+	BITS := 32bit
+endif
+
 CONFIGURE_ARGS += \
-	--enable-only32bit \
 	--enable-tls \
 	--without-x \
 	--without-uiout \
@@ -99,8 +108,8 @@ define Package/valgrind/install
 		$(PKG_INSTALL_DIR)/usr/lib/valgrind/none-* \
 		$(PKG_INSTALL_DIR)/usr/lib/valgrind/vgpreload_core*.so \
 		$(PKG_INSTALL_DIR)/usr/lib/valgrind/$(CPU)-*.xml \
-		$(PKG_INSTALL_DIR)/usr/lib/valgrind/32bit-core*.xml \
-		$(PKG_INSTALL_DIR)/usr/lib/valgrind/32bit-linux*.xml \
+		$(PKG_INSTALL_DIR)/usr/lib/valgrind/$(BITS)-core*.xml \
+		$(PKG_INSTALL_DIR)/usr/lib/valgrind/$(BITS)-linux*.xml \
 		$(PKG_INSTALL_DIR)/usr/lib/valgrind/memcheck-* \
 		$(PKG_INSTALL_DIR)/usr/lib/valgrind/vgpreload_memcheck*.so \
 		$(1)/usr/lib/valgrind/

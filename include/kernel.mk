@@ -79,6 +79,24 @@ endef
 define ModuleAutoLoad
 	$(SH_FUNC) \
 	export modules=; \
+	probe_module() { \
+		mods="$$$$$$$$1"; \
+		boot="$$$$$$$$2"; \
+		shift 2; \
+		for mod in $$$$$$$$mods; do \
+			if [ -e $(2)/$(MODULES_SUBDIR)/$$$$$$$$mod.ko ]; then \
+				mkdir -p $(2)/etc/modules.d; \
+				echo "$$$$$$$$mod" >> $(2)/etc/modules.d/$(1); \
+			fi; \
+		done; \
+		if [ -e $(2)/etc/modules.d/$(1) ]; then \
+			if [ "$$$$$$$$boot" = "1" ]; then \
+				mkdir -p $(2)/etc/modules-boot.d; \
+				ln -s ../modules.d/$(1) $(2)/etc/modules-boot.d/; \
+			fi; \
+			modules="$$$$$$$${modules:+$$$$$$$$modules}"; \
+		fi; \
+	}; \
 	add_module() { \
 		priority="$$$$$$$$1"; \
 		mods="$$$$$$$$2"; \
@@ -105,7 +123,7 @@ define ModuleAutoLoad
 		echo "#!/bin/sh" > $(2)/CONTROL/postinst; \
 		echo "[ -z \"\$$$$$$$$IPKG_INSTROOT\" ] || exit 0" >> $(2)/CONTROL/postinst; \
 		echo ". /lib/functions.sh" >> $(2)/CONTROL/postinst; \
-		echo "load_modules $$$$$$$$modules" >> $(2)/CONTROL/postinst; \
+		echo "insert_modules $$$$$$$$modules" >> $(2)/CONTROL/postinst; \
 		chmod 0755 $(2)/CONTROL/postinst; \
 	fi
 endef
@@ -176,9 +194,13 @@ $(call KernelPackage/$(1)/config)
     endif
   $(if $(CONFIG_PACKAGE_kmod-$(1)),
     else
-      compile: kmod-$(1)-unavailable
-      kmod-$(1)-unavailable:
-		@echo "WARNING: kmod-$(1) is not available in the kernel config" >&2
+      compile: $(1)-disabled
+      $(1)-disabled:
+		@echo "WARNING: kmod-$(1) is not available in the kernel config - generating empty package" >&2
+
+      define Package/kmod-$(1)/install
+		true
+      endef
   )
   endif
   $$(eval $$(call BuildPackage,kmod-$(1)))
@@ -188,6 +210,10 @@ endef
 
 define AutoLoad
   add_module "$(1)" "$(2)" "$(3)";
+endef
+
+define AutoProbe
+  probe_module "$(1)" "$(2)";
 endef
 
 version_field=$(if $(word $(1),$(2)),$(word $(1),$(2)),0)

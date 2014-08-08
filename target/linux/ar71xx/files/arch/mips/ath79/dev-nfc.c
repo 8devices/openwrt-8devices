@@ -43,7 +43,7 @@ static void __init ath79_nfc_init_resource(struct resource res[2],
 					   unsigned long size,
 					   int irq)
 {
-	memset(res, 0, sizeof(res));
+	memset(res, 0, sizeof(struct resource) * 2);
 
 	res[0].flags = IORESOURCE_MEM;
 	res[0].start = base;
@@ -117,6 +117,11 @@ void __init ath79_nfc_set_scan_fixup(int (*f)(struct mtd_info *mtd))
 void __init ath79_nfc_set_swap_dma(bool enable)
 {
 	ath79_nfc_data.swap_dma = enable;
+}
+
+void __init ath79_nfc_set_ecc_mode(enum ar934x_nfc_ecc_mode mode)
+{
+	ath79_nfc_data.ecc_mode = mode;
 }
 
 void __init ath79_nfc_set_parts(struct mtd_partition *parts, int nr_parts)

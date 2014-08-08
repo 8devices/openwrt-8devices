@@ -1,16 +1,17 @@
 include $(TOPDIR)/rules.mk
 
 PKG_NAME:=trace-cmd
-PKG_VERSION:=v2.0.1
+PKG_VERSION:=v2.2.1
 PKG_RELEASE=1
 
 PKG_SOURCE_PROTO:=git
 PKG_SOURCE_URL:=git://git.kernel.org/pub/scm/linux/kernel/git/rostedt/trace-cmd.git
 PKG_SOURCE_SUBDIR:=$(PKG_NAME)-$(PKG_VERSION)
-PKG_SOURCE_VERSION:=1776cf9a24f95b2623fe7ee380d708bb8c6d8a73
+PKG_SOURCE_VERSION:=8c10a774f1f8586cd8b0e3ce8666a376cb1d98e3
 PKG_SOURCE:=$(PKG_NAME)-$(PKG_VERSION).tar.gz
 # PKG_MIRROR_MD5SUM:=6a08dfa2519a969d184e7bb5bb390620
 PKG_INSTALL:=1
+PKG_USE_MIPS16:=0
 
 PKG_BUILD_PARALLEL:=1
 
@@ -37,7 +38,7 @@ MAKE_FLAGS += \
 PLUGINS_DIR := $(PKG_INSTALL_DIR)/usr/lib/trace-cmd/plugins
 PLUGINS_MAIN := function hrtimer mac80211 sched_switch
 
-TARGET_CFLAGS += --std=gnu99
+TARGET_CFLAGS += --std=gnu99 -D_GNU_SOURCE
 
 define Package/trace-cmd/install
 	$(INSTALL_DIR) $(1)/usr/bin $(1)/usr/lib/trace-cmd/plugins

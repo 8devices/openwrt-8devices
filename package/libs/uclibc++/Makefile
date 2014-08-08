@@ -17,6 +17,7 @@ PKG_MD5SUM:=394c119363dd8b469fb898442a6764b8
 
 PKG_BUILD_DIR:=$(BUILD_DIR)/uClibc++-$(PKG_VERSION)
 PKG_BUILD_PARALLEL:=1
+PKG_USE_MIPS16:=0
 
 PKG_INSTALL:=1
 
@@ -26,7 +27,6 @@ define Package/uclibcxx
   NAME:=uclibc++
   SECTION:=libs
   CATEGORY:=Libraries
-  DEPENDS:=@INSTALL_LIBSTDCPP
   TITLE:=C++ library for embedded systems
   URL:=http://cxx.uclibc.org/src/
 endef

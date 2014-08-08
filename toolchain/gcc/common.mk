@@ -2,7 +2,7 @@
 # Copyright (C) 2002-2003 Erik Andersen <andersen@uclibc.org>
 # Copyright (C) 2004 Manuel Novoa III <mjn3@uclibc.org>
 # Copyright (C) 2005-2006 Felix Fietkau <nbd@openwrt.org>
-# Copyright (C) 2006-2012 OpenWrt.org
+# Copyright (C) 2006-2014 OpenWrt.org
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -25,38 +25,23 @@ GCC_VERSION:=$(call qstrip,$(CONFIG_GCC_VERSION))
 PKG_VERSION:=$(firstword $(subst +, ,$(GCC_VERSION)))
 GCC_DIR:=$(PKG_NAME)-$(PKG_VERSION)
 
-ifdef CONFIG_GCC_VERSION_LLVM
-  PKG_SOURCE_VERSION:=c98c494b72ff875884c0c7286be67f16f9f6d7ab
-  PKG_REV:=83504
-  GCC_DIR:=llvm-gcc-4.2-r$(PKG_REV)
-  PKG_VERSION:=4.2.1
-  PKG_SOURCE:=$(GCC_DIR).tar.gz
-  PKG_SOURCE_PROTO:=git
-  PKG_SOURCE_URL:=git://repo.or.cz/llvm-gcc-4.2.git
-  PKG_SOURCE_SUBDIR:=$(GCC_DIR)
-  HOST_BUILD_DIR:=$(BUILD_DIR_TOOLCHAIN)/$(GCC_DIR)
-else
 ifeq ($(findstring linaro, $(CONFIG_GCC_VERSION)),linaro)
-    ifeq ($(CONFIG_GCC_VERSION),"4.5-linaro")
-      PKG_REV:=4.5-2012.03
-      PKG_VERSION:=4.5.4
-      PKG_VERSION_MAJOR:=4.5
-      PKG_MD5SUM:=0c25f93e15e362e352c933e4649a7fc6
-    endif
     ifeq ($(CONFIG_GCC_VERSION),"4.6-linaro")
-      PKG_REV:=4.6-2012.12
+      PKG_REV:=4.6-2013.05
       PKG_VERSION:=4.6.4
       PKG_VERSION_MAJOR:=4.6
-      PKG_MD5SUM:=6b6c6a4faa026edd1193cf6426309039
+      PKG_MD5SUM:=26b48802ae1203cd99415026fbf56ed7
+      PKG_COMP:=bz2
     endif
-    ifeq ($(CONFIG_GCC_VERSION),"4.7-linaro")
-      PKG_REV:=4.7-2012.12
-      PKG_VERSION:=4.7.3
-      PKG_VERSION_MAJOR:=4.7
-      PKG_MD5SUM:=247b15687358bc7958eeb91ab22637d1
+    ifeq ($(CONFIG_GCC_VERSION),"4.8-linaro")
+      PKG_REV:=4.8-2014.04
+      PKG_VERSION:=4.8.3
+      PKG_VERSION_MAJOR:=4.8
+      PKG_MD5SUM:=5ba2f3a449b1658ccc09d27cc7ab3c03
+      PKG_COMP:=xz
     endif
     PKG_SOURCE_URL:=http://launchpad.net/gcc-linaro/$(PKG_VERSION_MAJOR)/$(PKG_REV)/+download/
-    PKG_SOURCE:=$(PKG_NAME)-linaro-$(PKG_REV).tar.bz2
+    PKG_SOURCE:=$(PKG_NAME)-linaro-$(PKG_REV).tar.$(PKG_COMP)
     GCC_DIR:=gcc-linaro-$(PKG_REV)
     HOST_BUILD_DIR:=$(BUILD_DIR_TOOLCHAIN)/$(GCC_DIR)
 else
@@ -66,21 +51,22 @@ else
   ifeq ($(PKG_VERSION),4.4.7)
     PKG_MD5SUM:=295709feb4441b04e87dea3f1bab4281
   endif
-  ifeq ($(PKG_VERSION),4.6.2)
-    PKG_MD5SUM:=028115c4fbfb6cfd75d6369f4a90d87e
-  endif
   ifeq ($(PKG_VERSION),4.6.3)
     PKG_MD5SUM:=773092fe5194353b02bb0110052a972e
   endif
-  ifeq ($(PKG_VERSION),4.7.2)
-    PKG_MD5SUM:=cc308a0891e778cfda7a151ab8a6e762
+  ifeq ($(PKG_VERSION),4.8.0)
+    PKG_MD5SUM:=e6040024eb9e761c3bea348d1fa5abb0
   endif
-endif
 endif
 
 PATCH_DIR=../patches/$(GCC_VERSION)
 
 BUGURL=https://dev.openwrt.org/
+ifeq ($(findstring linaro, $(CONFIG_GCC_VERSION)),linaro)
+  PKGVERSION=OpenWrt/Linaro GCC $(PKG_REV) $(REVISION)
+else
+  PKGVERSION=OpenWrt GCC $(PKG_VERSION) $(REVISION)
+endif
 
 HOST_BUILD_PARALLEL:=1
 
@@ -100,7 +86,7 @@ HOST_STAMP_CONFIGURED:=$(GCC_BUILD_DIR)/.configured
 HOST_STAMP_INSTALLED:=$(STAGING_DIR_HOST)/stamp/.gcc_$(GCC_VARIANT)_installed
 
 SEP:=,
-TARGET_LANGUAGES:="c$(if $(CONFIG_INSTALL_LIBSTDCPP),$(SEP)c++)$(if $(CONFIG_INSTALL_LIBGCJ),$(SEP)java)$(if $(CONFIG_INSTALL_GFORTRAN),$(SEP)fortran)"
+TARGET_LANGUAGES:="c,c++$(if $(CONFIG_INSTALL_LIBGCJ),$(SEP)java)$(if $(CONFIG_INSTALL_GFORTRAN),$(SEP)fortran)"
 
 export libgcc_cv_fixed_point=no
 ifdef CONFIG_USE_UCLIBC
@@ -109,7 +95,13 @@ endif
 
 GCC_CONFIGURE:= \
 	SHELL="$(BASH)" \
+	$(if $(shell gcc --version 2>&1 | grep LLVM), \
+		CFLAGS="-O2 -fbracket-depth=512 -pipe" \
+		CXXFLAGS="-O2 -fbracket-depth=512 -pipe" \
+	) \
 	$(HOST_SOURCE_DIR)/configure \
+		--with-bugurl=$(BUGURL) \
+		--with-pkgversion="$(PKGVERSION)" \
 		--prefix=$(TOOLCHAIN_DIR) \
 		--build=$(GNU_HOST_NAME) \
 		--host=$(GNU_HOST_NAME) \
@@ -124,22 +116,16 @@ GCC_CONFIGURE:= \
 		--with-host-libstdcxx=-lstdc++ \
 		$(SOFT_FLOAT_CONFIG_OPTION) \
 		$(call qstrip,$(CONFIG_EXTRA_GCC_CONFIG_OPTIONS)) \
-		$(if $(CONFIG_mips64)$(CONFIG_mips64el),--with-arch=mips64 --with-abi=64) \
-		$(if $(CONFIG_GCC_VERSION_LLVM),--enable-llvm=$(BUILD_DIR_BASE)/host/llvm) \
-		$(if $(CONFIG_sparc),--with-long-double-128) \
-
-ifeq ($(CONFIG_GCC_LLVM),)
-  GCC_BUILD_TARGET_LIBGCC:=y
-  GCC_CONFIGURE+= \
+		$(if $(CONFIG_mips64)$(CONFIG_mips64el),--with-arch=mips64 \
+			--with-abi=$(subst ",,$(CONFIG_MIPS64_ABI))) \
 		--with-gmp=$(TOPDIR)/staging_dir/host \
 		--with-mpfr=$(TOPDIR)/staging_dir/host \
 		--disable-decimal-float
-  ifneq ($(CONFIG_mips)$(CONFIG_mipsel),)
-    GCC_CONFIGURE += --with-mips-plt
-  endif
+ifneq ($(CONFIG_mips)$(CONFIG_mipsel),)
+  GCC_CONFIGURE += --with-mips-plt
 endif
 
-ifneq ($(CONFIG_GCC_VERSION_4_5)$(CONFIG_GCC_VERSION_4_6),)
+ifeq ($(CONFIG_GCC_VERSION_4_4),)
   GCC_CONFIGURE+= \
 		--with-mpc=$(TOPDIR)/staging_dir/host
 endif
@@ -159,7 +145,9 @@ ifneq ($(CONFIG_EXTRA_TARGET_ARCH),)
 endif
 
 ifdef CONFIG_sparc
-  GCC_CONFIGURE+= --enable-targets=all
+  GCC_CONFIGURE+= \
+		--enable-targets=all \
+		--with-long-double-128
 endif
 
 ifeq ($(LIBC),uClibc)
@@ -172,6 +160,13 @@ endif
 
 ifneq ($(GCC_ARCH),)
   GCC_CONFIGURE+= --with-arch=$(GCC_ARCH)
+endif
+
+ifneq ($(CONFIG_SOFT_FLOAT),y)
+  ifeq ($(CONFIG_arm),y)
+    GCC_CONFIGURE+= \
+		--with-float=hard
+  endif
 endif
 
 GCC_MAKE:= \

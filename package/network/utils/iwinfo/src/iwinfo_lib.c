@@ -313,146 +313,49 @@ const struct iwinfo_iso3166_label IWINFO_ISO3166_NAMES[] = {
 	{ 0,               "" }
 };
 
-/*
- * hardware database
- */
-
-const char VENDOR_UBNT[] = "Ubiquiti";
-const char VENDOR_ATH[]  = "Atheros";
-const char VENDOR_RALINK[]  = "RaLink";
-
-const struct iwinfo_hardware_entry IWINFO_HARDWARE_ENTRIES[] = {
-/*	{ vendor, model, vendorid, deviceid, subsys vendorid, subsys deviceid, poweroff, freqoff } */
-#if defined(USE_MADWIFI) || defined(USE_NL80211)
-	{ VENDOR_UBNT, "PowerStation2 (18V)", 	0xffff, 0xffff, 0xffff, 0xb102,  0,     0 },
-	{ VENDOR_UBNT, "PowerStation2 (16D)", 	0xffff, 0xffff, 0xffff, 0xb202,  0,     0 },
-	{ VENDOR_UBNT, "PowerStation2 (EXT)", 	0xffff, 0xffff, 0xffff, 0xb302,  0,     0 },
-	{ VENDOR_UBNT, "PowerStation5 (22V)", 	0xffff, 0xffff, 0xffff, 0xb105,  0,     0 },
-	{ VENDOR_UBNT, "PowerStation5 (EXT)", 	0xffff, 0xffff, 0xffff, 0xb305,  0,     0 },
-	{ VENDOR_UBNT, "PicoStation2",        	0xffff, 0xffff, 0xffff, 0xc302,  0,     0 },
-	{ VENDOR_UBNT, "PicoStation2 HP",     	0xffff, 0xffff, 0xffff, 0xc3a2, 10,     0 },
-	{ VENDOR_UBNT, "WispStation5",        	0xffff, 0xffff, 0xffff, 0xa105,  0,     0 },
-	{ VENDOR_UBNT, "LiteStation2",        	0xffff, 0xffff, 0xffff, 0xa002, 10,     0 },
-	{ VENDOR_UBNT, "LiteStation5",        	0xffff, 0xffff, 0xffff, 0xa005,  5,     0 },
-	{ VENDOR_UBNT, "NanoStation2",        	0xffff, 0xffff, 0xffff, 0xc002, 10,     0 },
-	{ VENDOR_UBNT, "NanoStation5",        	0xffff, 0xffff, 0xffff, 0xc005,  5,     0 },
-	{ VENDOR_UBNT, "NanoStation Loco2",   	0xffff, 0xffff, 0xffff, 0xc102, 10,     0 },
-	{ VENDOR_UBNT, "NanoStation Loco5",   	0xffff, 0xffff, 0xffff, 0xc105,  5,     0 },
-	{ VENDOR_UBNT, "Bullet2",             	0xffff, 0xffff, 0xffff, 0xc202, 10,     0 },
-	{ VENDOR_UBNT, "Bullet5",             	0xffff, 0xffff, 0xffff, 0xc205,  5,     0 },
-	{ VENDOR_UBNT, "XR2",                   0x168c, 0x001b, 0x0777, 0x3002, 10,     0 },
-	{ VENDOR_UBNT, "XR2",                   0x168c, 0x001b, 0x7777, 0x3002, 10,     0 },
-	{ VENDOR_UBNT, "XR2.3",                 0x168c, 0x001b, 0x0777, 0x3b02, 10,     0 },
-	{ VENDOR_UBNT, "XR2.6",                 0x168c, 0x001b, 0x0777, 0x3c02, 10,     0 },
-	{ VENDOR_UBNT, "XR3-2.8",               0x168c, 0x001b, 0x0777, 0x3b03, 10,     0 },
-	{ VENDOR_UBNT, "XR3-3.6",               0x168c, 0x001b, 0x0777, 0x3c03, 10,     0 },
-	{ VENDOR_UBNT, "XR3",                   0x168c, 0x001b, 0x0777, 0x3003, 10,     0 },
-	{ VENDOR_UBNT, "XR4",                   0x168c, 0x001b, 0x0777, 0x3004, 10,     0 },
-	{ VENDOR_UBNT, "XR5",                   0x168c, 0x001b, 0x0777, 0x3005, 10,     0 },
-	{ VENDOR_UBNT, "XR5",                   0x168c, 0x001b, 0x7777, 0x3005, 10,     0 },
-	{ VENDOR_UBNT, "XR7",                   0x168c, 0x001b, 0x0777, 0x3007, 10,     0 },
-	{ VENDOR_UBNT, "XR9",                   0x168c, 0x001b, 0x0777, 0x3009, 10, -1520 },
-	{ VENDOR_ATH,  "AR5413",                0x168c, 0x001b, 0x168c, 0x2063,  0,     0 },
-	{ VENDOR_UBNT, "SRC",                   0x168c, 0x0013, 0x168c, 0x1042,  1,     0 },
-	{ VENDOR_UBNT, "SR2",                   0x168c, 0x0013, 0x0777, 0x2041, 10,     0 },
-	{ VENDOR_UBNT, "SR4",                   0x168c, 0x0013, 0x0777, 0x2004,  6,     0 },
-	{ VENDOR_UBNT, "SR4",                   0x168c, 0x0013, 0x7777, 0x2004,  6,     0 },
-	{ VENDOR_UBNT, "SR4C",                  0x168c, 0x0013, 0x0777, 0x1004,  6,     0 },
-	{ VENDOR_UBNT, "SR4C",                  0x168c, 0x0013, 0x7777, 0x1004,  6,     0 },
-	{ VENDOR_UBNT, "SR5",                   0x168c, 0x0013, 0x168c, 0x2042,  7,     0 },
-	{ VENDOR_UBNT, "SR9",                   0x168c, 0x0013, 0x7777, 0x2009, 12, -1500 },
-	{ VENDOR_UBNT, "SR71A",                 0x168c, 0x0027, 0x168c, 0x2082, 10,     0 },
-	{ VENDOR_UBNT, "SR71",                  0x168c, 0x0027, 0x0777, 0x4082, 10,     0 },
+#ifndef ARRAY_SIZE
+#define ARRAY_SIZE(arr) (sizeof(arr) / sizeof((arr)[0]))
 #endif
+
+static const struct iwinfo_ops *backends[] = {
 #ifdef USE_NL80211
-	{ VENDOR_UBNT, "PicoStation M2",        0x168c, 0x002a, 0x0777, 0xe302, 12,     0 }, /* ToDo: confirm offset */
-	{ VENDOR_UBNT, "NanoStation M2",        0x168c, 0x002a, 0x0777, 0xe012, 12,     0 }, /* ToDo: confirm offset */
-	{ VENDOR_UBNT, "NanoStation M5",        0x168c, 0x002a, 0x0777, 0xe005,  5,     0 }, /* ToDo: confirm offset */
-	{ VENDOR_UBNT, "Bullet M2",             0x168c, 0x002a, 0x0777, 0xe202, 12,     0 },
-	{ VENDOR_UBNT, "Bullet M5",             0x168c, 0x002a, 0x0777, 0xe805,  5,     0 },
-
-	{ VENDOR_ATH,  "AR9220",                0x168c, 0x0029, 0x168c, 0xa094,  0,     0 },
-	{ VENDOR_ATH,  "AR9223",                0x168c, 0x0029, 0x168c, 0xa095,  0,     0 },
-	{ VENDOR_ATH,  "AR9280",                0x168c, 0x002a, 0x168c, 0xa093,  0,     0 },
-	{ VENDOR_ATH,  "AR9285",                0x168c, 0x002b, 0x168c, 0xa091,  0,     0 },
-	{ VENDOR_RALINK,  "Rt3050",             0x1814, 0x3050, 0x1814, 0x0005,  0,     0 },
-	{ VENDOR_RALINK,  "Rt3052",             0x1814, 0x3052, 0x1814, 0x0008,  0,     0 },
-	{ VENDOR_RALINK,  "Rt3352",             0x1814, 0x3352, 0x1814, 0x000c,  0,     0 },
+	&nl80211_ops,
 #endif
-	{ NULL }
+#ifdef USE_MADWIFI
+	&madwifi_ops,
+#endif
+#ifdef USE_WL
+	&wl_ops,
+#endif
+	&wext_ops,
 };
-
 
 const char * iwinfo_type(const char *ifname)
 {
-#ifdef USE_NL80211
-	if (nl80211_probe(ifname))
-		return "nl80211";
-	else
-#endif
+	const struct iwinfo_ops *ops = iwinfo_backend(ifname);
+	if (!ops)
+		return NULL;
 
-#ifdef USE_MADWIFI
-	if (madwifi_probe(ifname))
-		return "madwifi";
-	else
-#endif
-
-#ifdef USE_WL
-	if (wl_probe(ifname))
-		return "wl";
-	else
-#endif
-
-	if (wext_probe(ifname))
-		return "wext";
-
-	return NULL;
+	return ops->name;
 }
 
 const struct iwinfo_ops * iwinfo_backend(const char *ifname)
 {
-	const char *type;
-	struct iwinfo_ops *ops;
+	int i;
 
-	type = iwinfo_type(ifname);
-	if (!type)
-		return NULL;
-
-#ifdef USE_NL80211
-	if (!strcmp(type, "nl80211"))
-		return &nl80211_ops;
-	else
-#endif
-
-#ifdef USE_MADWIFI
-	if (!strcmp(type, "madwifi"))
-		return &madwifi_ops;
-	else
-#endif
-
-#ifdef USE_WL
-	if (!strcmp(type, "wl"))
-		return &wl_ops;
-	else
-#endif
-
-	if (!strcmp(type, "wext"))
-		return &wext_ops;
+	for (i = 0; i < ARRAY_SIZE(backends); i++)
+		if (backends[i]->probe(ifname))
+			return backends[i];
 
 	return NULL;
 }
 
 void iwinfo_finish(void)
 {
-#ifdef USE_WL
-	wl_close();
-#endif
-#ifdef USE_MADWIFI
-	madwifi_close();
-#endif
-#ifdef USE_NL80211
-	nl80211_close();
-#endif
-	wext_close();
+	int i;
+
+	for (i = 0; i < ARRAY_SIZE(backends); i++)
+		backends[i]->close();
+
 	iwinfo_close();
 }

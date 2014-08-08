@@ -3,7 +3,8 @@
 
 START=60
 
-SERVICE_USE_PID=1
+USE_PROCD=1
+PROG=/usr/sbin/dnsmasq
 
 DNS_SERVERS=""
 DOMAIN=""
@@ -12,6 +13,8 @@ ADD_LOCAL_DOMAIN=1
 ADD_LOCAL_HOSTNAME=1
 
 CONFIGFILE="/var/etc/dnsmasq.conf"
+HOSTFILE="/tmp/hosts/dhcp"
+TRUSTANCHORSFILE="/usr/share/dnsmasq/trust-anchors.conf"
 
 xappend() {
 	local value="$1"
@@ -30,6 +33,29 @@ dhcp_calc() {
 		[ "${ip%.*}" != "$ip" ] && ip="${ip#*.}" || ip=
 	done
 	echo "$res"
+}
+
+dhcp_check() {
+	local ifname="$1"
+	local stamp="/var/run/dnsmasq.$ifname.dhcp"
+	local rv=0
+
+	[ -s "$stamp" ] && return $(cat "$stamp")
+
+	udhcpc -n -q -s /bin/true -t 1 -i "$ifname" >&- && rv=1 || rv=0
+
+	[ $rv -eq 1 ] && \
+		logger -t dnsmasq \
+			"found already running DHCP-server on interface '$ifname'" \
+			"refusing to start, use 'option force 1' to override"
+
+	echo $rv > "$stamp"
+	return $rv
+}
+
+log_once() {
+	pidof dnsmasq >/dev/null || \
+		logger -t dnsmasq "$@"
 }
 
 append_bool() {
@@ -74,7 +100,7 @@ append_addnhosts() {
 }
 
 append_bogusnxdomain() {
-       xappend "--bogus-nxdomain=$1"
+	xappend "--bogus-nxdomain=$1"
 }
 
 dnsmasq() {
@@ -96,6 +122,7 @@ dnsmasq() {
 	append_bool "$cfg" enable_tftp "--enable-tftp"
 	append_bool "$cfg" nonwildcard "--bind-interfaces"
 	append_bool "$cfg" fqdn "--dhcp-fqdn"
+	append_bool "$cfg" proxydnssec "--proxy-dnssec"
 
 	append_parm "$cfg" dhcpscript "--dhcp-script"
 	append_parm "$cfg" cachesize "--cache-size"
@@ -133,10 +160,14 @@ dnsmasq() {
 	config_get hostsfile "$cfg" dhcphostsfile
 	[ -e "$hostsfile" ] && xappend "--dhcp-hostsfile=$hostsfile"
 
+	mkdir -p /tmp/hosts /tmp/dnsmasq.d
+	xappend "--addn-hosts=/tmp/hosts"
+	xappend "--conf-dir=/tmp/dnsmasq.d"
+
 	local rebind
 	config_get_bool rebind "$cfg" rebind_protection 1
 	[ $rebind -gt 0 ] && {
-		logger -t dnsmasq \
+		log_once \
 			"DNS rebinding protection is active," \
 			"will discard upstream RFC1918 responses!"
 		xappend "--stop-dns-rebind"
@@ -144,19 +175,28 @@ dnsmasq() {
 		local rebind_localhost
 		config_get_bool rebind_localhost "$cfg" rebind_localhost 0
 		[ $rebind_localhost -gt 0 ] && {
-			logger -t dnsmasq "Allowing 127.0.0.0/8 responses"
+			log_once "Allowing 127.0.0.0/8 responses"
 			xappend "--rebind-localhost-ok"
 		}
 
 		append_rebind_domain() {
-			logger -t dnsmasq "Allowing RFC1918 responses for domain $1"
+			log_once "Allowing RFC1918 responses for domain $1"
 			xappend "--rebind-domain-ok=$1"
 		}
 
 		config_list_foreach "$cfg" rebind_domain append_rebind_domain
 	}
 
+	config_get_bool dnssec "$cfg" dnssec 0
+	[ "$dnssec" -gt 0 ] && {
+		xappend "--conf-file=$TRUSTANCHORSFILE"
+		xappend "--dnssec"
+		append_bool "$cfg" dnsseccheckunsigned "--dnssec-check-unsigned"
+	}
+
 	dhcp_option_add "$cfg" "" 0
+
+	xappend "--dhcp-broadcast=tag:needs-broadcast"
 
 	echo >> $CONFIGFILE
 }
@@ -265,7 +305,15 @@ dhcp_host_add() {
 
 	config_get tag "$cfg" tag
 
-	xappend "--dhcp-host=$macs${networkid:+,net:$networkid}${tag:+,set:$tag}${ip:+,$ip}${name:+,$name}"
+	config_get_bool broadcast "$cfg" broadcast 0
+	[ "$broadcast" = "0" ] && broadcast=
+
+	xappend "--dhcp-host=$macs${networkid:+,net:$networkid}${broadcast:+,set:needs-broadcast}${tag:+,set:$tag}${ip:+,$ip}${name:+,$name}"
+
+	config_get_bool dns "$cfg" dns 0
+	[ "$dns" = "1" ] && {
+		echo "$ip $name${DOMAIN:+.$DOMAIN}" >> $HOSTFILE
+	}
 }
 
 dhcp_tag_add() {
@@ -328,33 +376,25 @@ dhcp_add() {
 	config_get networkid "$cfg" networkid
 	[ -n "$networkid" ] || networkid="$net"
 
-	config_get ifname "$net" ifname
-	[ -n "$ifname" ] || return 0
+	network_get_subnet subnet "$net" || return 0
+	network_get_device ifname "$net" || return 0
+	network_get_protocol proto "$net" || return 0
 
-	config_get dnsserver "$net" dns
-	[ "$cachelocal" = "0" -a -n "$dnsserver" ] && {
+	[ "$cachelocal" = "0" ] && network_get_dnsserver dnsserver "$net" && {
 		DNS_SERVERS="$DNS_SERVERS $dnsserver"
 	}
 
 	append_bool "$cfg" ignore "--no-dhcp-interface=$ifname" && return 0
 
-	config_get proto "$net" proto
+	# Do not support non-static interfaces for now
 	[ static = "$proto" ] || return 0
 
-	config_get ipaddr "$net" ipaddr
-	config_get netmask "$cfg" netmask
-	[ -n "$netmask" ] || config_get netmask "$net" netmask
+	# Override interface netmask with dhcp config if applicable
+	config_get netmask "$cfg" netmask "${subnet##*/}"
 
 	#check for an already active dhcp server on the interface, unless 'force' is set
 	config_get_bool force "$cfg" force 0
-	[ $force -gt 0 ] || {
-		udhcpc -n -q -s /bin/true -t 1 -i $ifname >&- && {
-			logger -t dnsmasq \
-				"found already running DHCP-server on interface '$ifname'" \
-				"refusing to start, use 'option force 1' to override"
-			return 0
-		}
-	}
+	[ $force -gt 0 ] || dhcp_check "$ifname" || return 0
 
 	config_get start "$cfg" start
 	config_get limit "$cfg" limit
@@ -366,7 +406,7 @@ dhcp_add() {
 	start="$(dhcp_calc "${start:-100}")"
 	limit="${limit:-150}"
 	[ "$limit" -gt 0 ] && limit=$((limit-1))
-	eval "$(ipcalc.sh $ipaddr $netmask $start $limit)"
+	eval "$(ipcalc.sh "${subnet%%/*}" $netmask $start $limit)"
 	if [ "$dynamicdhcp" = "0" ]; then END="static"; fi
 	xappend "--dhcp-range=$networkid,$START,$END,$NETMASK,$leasetime${options:+ $options}"
 
@@ -389,7 +429,7 @@ dhcp_option_add() {
 
 dhcp_domain_add() {
 	local cfg="$1"
-	local ip name names
+	local ip name names record
 
 	config_get names "$cfg" name "$2"
 	[ -n "$names" ] || return 0
@@ -397,22 +437,14 @@ dhcp_domain_add() {
 	config_get ip "$cfg" ip "$3"
 	[ -n "$ip" ] || return 0
 
-	local oIFS="$IFS"; IFS="."; set -- $ip; IFS="$oIFS"
-	local raddr="${4:+$4.$3.$2.$1.in-addr.arpa}"
-
 	for name in $names; do
-		local fqdn="$name"
+		[ "${name%.*}" == "$name" ] && \
+			name="$name${DOMAIN:+.$DOMAIN}"
 
-		[ "${fqdn%.*}" == "$fqdn" ] && \
-			fqdn="$fqdn${DOMAIN:+.$DOMAIN}"
-
-		xappend "--address=/$fqdn/$ip"
-
-		[ -n "$raddr" ] && {
-			xappend "--ptr-record=$raddr,$fqdn"
-			raddr=""
-		}
+		record="${record:+$record/}$name"
 	done
+
+	xappend "--address=/$record/$ip"
 }
 
 dhcp_srv_add() {
@@ -465,19 +497,53 @@ dhcp_cname_add() {
 	xappend "--cname=${cname},${target}"
 }
 
-start() {
-	include /lib/network
-	scan_interfaces
+dhcp_hostrecord_add() {
+	local cfg="$1"
+	local names addresses record val
 
-	local lanaddr
-	config_get lanaddr "lan" ipaddr
+	config_get names "$cfg" name "$2"
+	if [ -z "$names" ]; then
+		return 0
+	fi
+
+	config_get addresses "$cfg" ip "$3"
+	if [ -z "$addresses" ]; then
+		return 0
+	fi
+
+	for val in $names $addresses; do
+		record="${record:+$record,}$val"
+	done
+
+	xappend "--host-record=$record"
+}
+
+service_triggers()
+{
+	procd_add_reload_trigger "dhcp"
+}
+
+boot() {
+	# Will be launched through hotplug
+	return 0
+}
+
+start_service() {
+	include /lib/functions
 
 	config_load dhcp
+
+	procd_open_instance
+	procd_set_param command $PROG -C $CONFIGFILE -k
+	procd_set_param file $CONFIGFILE
+	procd_set_param respawn
+	procd_close_instance
 
 	# before we can call xappend
 	mkdir -p $(dirname $CONFIGFILE)
 
 	echo "# auto-generated config file from /etc/config/dhcp" > $CONFIGFILE
+	echo "# auto-generated config file from /etc/config/dhcp" > $HOSTFILE
 
 	# if we did this last, we could override auto-generated config
 	[ -f /etc/dnsmasq.conf ] && {
@@ -497,38 +563,48 @@ start() {
 	config_foreach dhcp_remoteid_add remoteid
 	config_foreach dhcp_subscrid_add subscrid
 	config_foreach dhcp_domain_add domain
+	config_foreach dhcp_hostrecord_add hostrecord
+
+	# add own hostname
+	local lanaddr
+	[ $ADD_LOCAL_HOSTNAME -eq 1 ] && network_get_ipaddr lanaddr "lan" && {
+		local hostname="$(uci_get system @system[0] hostname OpenWrt)"
+		dhcp_hostrecord_add "" "${hostname%.$DOMAIN}${DOMAIN:+.$DOMAIN ${hostname%.$DOMAIN}}" "$lanaddr"
+	}
+
 	echo >> $CONFIGFILE
 	config_foreach dhcp_srv_add srvhost
 	config_foreach dhcp_mx_add mxhost
 	echo >> $CONFIGFILE
-	config_foreach dhcp_add dhcp
+
+	config_get odhcpd_is_active odhcpd maindhcp
+	if [ "$odhcpd_is_active" != "1" ]; then
+		config_foreach dhcp_add dhcp
+	fi
+
 	echo >> $CONFIGFILE
 	config_foreach dhcp_cname_add cname
 	echo >> $CONFIGFILE
 
-	# add own hostname
-	[ $ADD_LOCAL_HOSTNAME -eq 1 ] && [ -n "$lanaddr" ] && {
-		local hostname="$(uci_get system.@system[0].hostname)"
-		dhcp_domain_add "" "${hostname:-OpenWrt}" "$lanaddr"
+	rm -f /tmp/resolv.conf
+	[ $ADD_LOCAL_DOMAIN -eq 1 ] && [ -n "$DOMAIN" ] && {
+		echo "search $DOMAIN" >> /tmp/resolv.conf
 	}
-
-	service_start /usr/sbin/dnsmasq -C $CONFIGFILE && {
-		rm -f /tmp/resolv.conf
-		[ $ADD_LOCAL_DOMAIN -eq 1 ] && [ -n "$DOMAIN" ] && {
-			echo "search $DOMAIN" >> /tmp/resolv.conf
-		}
-		DNS_SERVERS="$DNS_SERVERS 127.0.0.1"
-		for DNS_SERVER in $DNS_SERVERS ; do
-			echo "nameserver $DNS_SERVER" >> /tmp/resolv.conf
-		done
-	}
+	DNS_SERVERS="$DNS_SERVERS 127.0.0.1"
+	for DNS_SERVER in $DNS_SERVERS ; do
+		echo "nameserver $DNS_SERVER" >> /tmp/resolv.conf
+	done
 }
 
-stop() {
-	service_stop /usr/sbin/dnsmasq && {
-		[ -f /tmp/resolv.conf ] && {
-			rm -f /tmp/resolv.conf
-			ln -s /tmp/resolv.conf.auto /tmp/resolv.conf
-		}
+reload_service() {
+	rc_procd start_service "$@"
+	return 0
+}
+
+stop_service() {
+	[ -f /tmp/resolv.conf ] && {
+		rm -f /tmp/resolv.conf
+		ln -s /tmp/resolv.conf.auto /tmp/resolv.conf
 	}
+	rm -f /var/run/dnsmasq.*.dhcp
 }

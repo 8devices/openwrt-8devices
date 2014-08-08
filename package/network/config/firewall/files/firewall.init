@@ -1,27 +1,65 @@
 #!/bin/sh /etc/rc.common
-# Copyright (C) 2008-2010 OpenWrt.org
 
-START=45
+START=19
+USE_PROCD=1
+QUIET=""
 
-FW_LIBDIR=/lib/firewall
-
-fw() {
-	. $FW_LIBDIR/core.sh
-	fw_$1
+validate_firewall_redirect()
+{
+	uci_validate_section firewall redirect "${1}" \
+		'proto:or(uinteger, string)' \
+		'src:string' \
+		'src_ip:cidr' \
+		'src_dport:or(port, portrange)' \
+		'dest:string' \
+		'dest_ip:cidr' \
+		'dest_port:or(port, portrange)' \
+		'target:or("SNAT", "DNAT")'
+	
+	return $?
 }
 
-start() {
-	fw start
+validate_firewall_rule()
+{
+	uci_validate_section firewall rule "${1}" \
+		'proto:or(uinteger, string)' \
+		'src:string' \
+		'dest:string' \
+		'src_port:or(port, portrange)' \
+		'dest_port:or(port, portrange)' \
+		'target:string'
+	
+	return $?
 }
 
-stop() {
-	fw stop
+service_triggers() {
+	procd_add_reload_trigger firewall	
+
+	procd_open_validate
+	validate_firewall_redirect
+	validate_firewall_rule
+	procd_close_validate
 }
 
 restart() {
-	fw restart
+	fw3 restart
 }
 
-reload() {
-	fw reload
+start_service() {
+	fw3 ${QUIET} start
+}
+
+stop_service() {
+	fw3 flush
+}
+
+reload_service() {
+	fw3 reload
+}
+
+boot() {
+	# Be silent on boot, firewall might be started by hotplug already,
+	# so don't complain in syslog.
+	QUIET=1
+	start
 }

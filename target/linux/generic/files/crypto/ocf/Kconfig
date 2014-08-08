@@ -27,6 +27,9 @@ config OCF_CRYPTODEV
 config OCF_CRYPTOSOFT
 	tristate "cryptosoft (software crypto engine)"
 	depends on OCF_OCF
+	select CRYPTO
+	select CRYPTO_HASH
+	select CRYPTO_BLKCIPHER
 	help
 	  A software driver for the OCF framework that uses
 	  the kernel CryptoAPI.
@@ -54,7 +57,7 @@ config OCF_IXP4XX_SHA1_MD5
 
 config OCF_HIFN
 	tristate "hifn (HW crypto engine)"
-	depends on OCF_OCF
+	depends on OCF_OCF && PCI
 	help
 	  OCF driver for various HIFN based crypto accelerators.
 	  (7951, 7955, 7956, 7751, 7811)

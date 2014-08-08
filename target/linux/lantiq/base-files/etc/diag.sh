@@ -1,25 +1,24 @@
 #!/bin/sh
-# Copyright (C) 2012 OpenWrt.org
+# Copyright (C) 2012-2013 OpenWrt.org
 
-[ -d /sys/class/leds/power/ ] || return
+. /lib/functions/leds.sh
+
+status_led="power"
 
 set_state() {
-	[ -d /sys/class/leds/power1/ ] && {
+	[ -d /sys/class/leds/power2/ ] && {
 
 		case "$1" in
 		preinit)
-			echo heartbeat >/sys/class/leds/power/trigger
+			led_set_attr "power2" "trigger" "heartbeat"
+			status_led_on
 			;;
 		failsafe)
-			echo none >/sys/class/leds/power/trigger
-			echo timer >/sys/class/leds/power1/trigger
-			echo 100 >/sys/class/leds/power1/delay_on
-			echo 100 >/sys/class/leds/power1/delay_off
+			led_off "power2"
+			status_led_set_timer 100 100
 			;;
 		done)
-			echo none >/sys/class/leds/power/trigger
-			echo none >/sys/class/leds/power1/trigger
-			echo 1 >/sys/class/leds/power/brightness
+			led_off "power2"
 			;;
 		esac
 		return
@@ -27,16 +26,17 @@ set_state() {
 
 	case "$1" in
 	preinit)
-		echo heartbeat >/sys/class/leds/power/trigger
+		status_led_set_heartbeat
 		;;
 	failsafe)
-		echo timer >/sys/class/leds/power/trigger
-		echo 100 >/sys/class/leds/power/delay_on
-		echo 100 >/sys/class/leds/power/delay_off
+		[ -d /sys/class/leds/power1 ] && {
+			status_led_off
+			led_timer "power1" 100 100
+		} || status_led_set_timer 100 100
 		;;
 	done)
-		echo none >/sys/class/leds/power/trigger
-		echo 1 >/sys/class/leds/power/brightness
+		status_led_on
+		led_off "power1"
 		;;
 	esac
 }
