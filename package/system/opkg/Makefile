@@ -105,18 +105,18 @@ define Package/opkg/Default/install
 	$(INSTALL_DIR) $(1)/bin
 	$(INSTALL_DIR) $(1)/etc
 	$(INSTALL_DATA) ./files/opkg$(2).conf $(1)/etc/opkg.conf
-  ifeq ($(CONFIG_PER_FEED_REPO),)
-	echo "src/gz %n %U" >> $(1)/etc/opkg.conf
-  else
-	for d in base $(FEEDS_ENABLED); do \
-		echo "src/gz %n_$$$$d %U/$$$$d" >> $(1)/etc/opkg.conf; \
-	done
-    ifneq ($(CONFIG_PER_FEED_REPO_ADD_DISABLED),)
-	for d in $(FEEDS_DISABLED); do \
-		echo "# src/gz %n_$$$$d %U/$$$$d" >> $(1)/etc/opkg.conf; \
-	done
-    endif
-  endif
+#  ifeq ($(CONFIG_PER_FEED_REPO),)
+#	echo "src/gz %n %U" >> $(1)/etc/opkg.conf
+#  else
+#	for d in base $(FEEDS_ENABLED); do \
+#		echo "src/gz %n_$$$$d %U/$$$$d" >> $(1)/etc/opkg.conf; \
+#	done
+#    ifneq ($(CONFIG_PER_FEED_REPO_ADD_DISABLED),)
+#	for d in $(FEEDS_DISABLED); do \
+#		echo "# src/gz %n_$$$$d %U/$$$$d" >> $(1)/etc/opkg.conf; \
+#	done
+#    endif
+#  endif
 	$(VERSION_SED) $(1)/etc/opkg.conf
 	$(INSTALL_BIN) $(PKG_INSTALL_DIR)/usr/bin/opkg-cl $(1)/bin/opkg
 endef
