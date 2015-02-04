@@ -46,7 +46,8 @@ ap136-010)
 
 ap136-020 |\
 ap135-020 |\
-tl-wr1043nd-v2)
+tl-wr1043nd-v2 |\
+wzr-450hp2)
 	ucidef_set_interfaces_lan_wan "eth1" "eth0"
 	ucidef_add_switch "switch0" "1" "1"
 	ucidef_add_switch_vlan "switch0" "1" "0 1 2 3 4"
@@ -62,11 +63,19 @@ tl-wdr4900-v2)
 	ucidef_add_switch_vlan "switch0" "2" "1 6"
 	;;
 
+cpe510)
+	ucidef_set_interfaces_lan_wan "eth0.1" "eth0.2"
+	ucidef_add_switch "switch0" "1" "1"
+	ucidef_add_switch_vlan "switch0" "1" "0t 5"
+	ucidef_add_switch_vlan "switch0" "2" "0t 4"
+	;;
+
 db120 |\
 rb-2011l | \
 rb-2011uas |\
 rb-2011uias |\
-rb-2011uas-2hnd)
+rb-2011uas-2hnd|\
+rb-2011uias-2hnd)
 	ucidef_set_interfaces_lan_wan "eth0.1 eth1" "eth0.2"
 	ucidef_add_switch "switch0" "1" "1"
 	ucidef_add_switch_vlan "switch0" "1" "0t 2 3 4 5"
@@ -75,7 +84,7 @@ rb-2011uas-2hnd)
 	ucidef_add_switch_vlan "switch1" "1" "0 1 2 3 4 5"
 
 	case "$board" in
-	rb-2011uas* | rb-2011uias)
+	rb-2011uas* | rb-2011uias | rb-2011uias-2hnd)
 		ucidef_set_interface_raw "sfp" "eth0.3"
 		ucidef_add_switch_vlan "switch0" "3" "0t 6"
 		;;
@@ -87,6 +96,13 @@ tew-673gru)
 	ucidef_set_interfaces_lan_wan "eth0.1" "eth1"
 	ucidef_add_switch "switch0" "1" "1"
 	ucidef_add_switch_vlan "switch0" "1" "0 1 2 3 5t"
+	;;
+
+f9k1115v2)
+	ucidef_set_interfaces_lan_wan "eth1" "eth0"
+	ucidef_add_switch "switch0" "1" "1"
+	ucidef_add_switch_vlan "switch0" "1" "2 3 4 5 6"
+	ucidef_add_switch_vlan "switch0" "2" "0 1"
 	;;
 
 nbg460n_550n_550nh)
@@ -199,21 +215,27 @@ tl-wr941nd)
 	ucidef_set_interfaces_lan_wan "lan1 lan2 lan3 lan4" "wan"
 	;;
 
+r6100 |\
+smart-300 |\
 tl-mr3420-v2 |\
 tl-wr841n-v8 |\
 tl-wr842n-v2 |\
+tl-wr941nd-v5 |\
 wnr2000-v3 |\
+wnr2000-v4 |\
 wnr2200 |\
-wnr612-v2)
+wnr612-v2 |\
+wnr1000-v2)
 	ucidef_set_interfaces_lan_wan "eth1" "eth0"
 	ucidef_add_switch "switch0" "1" "1"
 	ucidef_add_switch_vlan "switch0" "1" "0 1 2 3 4"
 	;;
 
 uap-pro)
-	ucidef_set_interface_lan "eth0"
+	ucidef_set_interfaces_lan_wan "eth0.1" "eth0.2"
 	ucidef_add_switch "switch0" "1" "1"
-	ucidef_add_switch_vlan "switch0" "1" "0 1 2"
+	ucidef_add_switch_vlan "switch0" "1" "0t 1"
+	ucidef_add_switch_vlan "switch0" "2" "0t 2"
 	;;
 
 nanostation-m-xw)
@@ -235,6 +257,7 @@ wzr-hp-g300nh)
 	ucidef_add_switch_vlan "switch0" "1" "0 1 2 3 5t"
 	;;
 
+dgl-5500-a1 |\
 dir-825-c1)
 	local mac
 	ucidef_set_interfaces_lan_wan "eth0.1" "eth0.2"
@@ -255,6 +278,7 @@ mynet-n750)
 	[ -n "$mac" ] && ucidef_set_interface_macaddr "wan" "$mac"
 	;;
 
+dhp-1565-a1 |\
 dir-835-a1 |\
 wndr3700v4 | \
 wndr4300)
@@ -284,8 +308,11 @@ bullet-m |\
 cap4200ag |\
 eap300v2 |\
 eap7660d |\
+loco-m-xw |\
 mr600 |\
 mr600v2 |\
+mr900 |\
+mr900v2 |\
 rb-411 |\
 rb-911g-2hpnd |\
 rb-911g-5hpnd |\
@@ -299,6 +326,7 @@ tl-mr13u |\
 tl-mr3020 |\
 tl-mr3040 |\
 tl-mr3040-v2 |\
+tl-wa701nd-v2 |\
 tl-wa750re |\
 tl-wa850re |\
 tl-wa830re-v2 |\
@@ -344,6 +372,7 @@ hiwifi-hc6361 |\
 ja76pf |\
 mynet-n600 |\
 oolite |\
+qihoo-c301 |\
 rb-750 |\
 rb-751 |\
 tew-632brp |\

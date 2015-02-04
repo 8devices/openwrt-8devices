@@ -1,5 +1,5 @@
 # 
-# Copyright (C) 2006-2011 OpenWrt.org
+# Copyright (C) 2006-2015 OpenWrt.org
 #
 # This is free software, licensed under the GNU General Public License v2.
 # See /LICENSE for more information.
@@ -35,9 +35,7 @@ else
   endif
   KERNEL_BUILD_DIR ?= $(BUILD_DIR)/linux-$(BOARD)$(if $(SUBTARGET),_$(SUBTARGET))
   LINUX_DIR ?= $(KERNEL_BUILD_DIR)/linux-$(LINUX_VERSION)
-  ifeq ($(strip $(call CompareKernelPatchVer,$(KERNEL_PATCHVER),ge,3.7.0)),1)
-    LINUX_UAPI_DIR=uapi/
-  endif
+  LINUX_UAPI_DIR=uapi/
   LINUX_VERMAGIC:=$(strip $(shell cat $(LINUX_DIR)/.vermagic 2>/dev/null))
   LINUX_VERMAGIC:=$(if $(LINUX_VERMAGIC),$(LINUX_VERMAGIC),unknown)
 
@@ -64,12 +62,19 @@ endif
 
 ifneq (,$(findstring uml,$(BOARD)))
   LINUX_KARCH=um
+else ifneq (,$(findstring $(ARCH), aarch64 aarch64_be))
+  LINUX_KARCH := arm64
+else ifneq (,$(findstring $(ARCH), armeb))
+  LINUX_KARCH := arm
+else ifneq (,$(findstring $(ARCH), mipsel mips64 mips64el))
+  LINUX_KARCH := mips
+else ifneq (,$(findstring $(ARCH), sh2 sh3 sh4))
+  LINUX_KARCH := sh
+else ifneq (,$(findstring $(ARCH), i386 x86_64))
+  LINUX_KARCH := x86
 else
-  ifeq (,$(LINUX_KARCH))
-    LINUX_KARCH=$(strip $(subst i386,x86,$(subst armeb,arm,$(subst mipsel,mips,$(subst mips64,mips,$(subst mips64el,mips,$(subst sh2,sh,$(subst sh3,sh,$(subst sh4,sh,$(ARCH))))))))))
-  endif
+  LINUX_KARCH := $(ARCH)
 endif
-
 
 define KernelPackage/Defaults
   FILES:=
@@ -83,11 +88,9 @@ define ModuleAutoLoad
 		mods="$$$$$$$$1"; \
 		boot="$$$$$$$$2"; \
 		shift 2; \
-		for mod in $$$$$$$$mods; do \
-			if [ -e $(2)/$(MODULES_SUBDIR)/$$$$$$$$mod.ko ]; then \
-				mkdir -p $(2)/etc/modules.d; \
-				echo "$$$$$$$$mod" >> $(2)/etc/modules.d/$(1); \
-			fi; \
+		for mod in $$$$$$$$($(SCRIPT_DIR)/metadata.pl version_filter $(KERNEL_PATCHVER) $$$$$$$$mods); do \
+			mkdir -p $(2)/etc/modules.d; \
+			echo "$$$$$$$$mod" >> $(2)/etc/modules.d/$(1); \
 		done; \
 		if [ -e $(2)/etc/modules.d/$(1) ]; then \
 			if [ "$$$$$$$$boot" = "1" ]; then \
@@ -102,11 +105,9 @@ define ModuleAutoLoad
 		mods="$$$$$$$$2"; \
 		boot="$$$$$$$$3"; \
 		shift 3; \
-		for mod in $$$$$$$$mods; do \
-			if [ -e $(2)/$(MODULES_SUBDIR)/$$$$$$$$mod.ko ]; then \
-				mkdir -p $(2)/etc/modules.d; \
-				echo "$$$$$$$$mod" >> $(2)/etc/modules.d/$$$$$$$$priority-$(1); \
-			fi; \
+		for mod in $$$$$$$$($(SCRIPT_DIR)/metadata.pl version_filter $(KERNEL_PATCHVER) $$$$$$$$mods); do \
+			mkdir -p $(2)/etc/modules.d; \
+			echo "$$$$$$$$mod" >> $(2)/etc/modules.d/$$$$$$$$priority-$(1); \
 		done; \
 		if [ -e $(2)/etc/modules.d/$$$$$$$$priority-$(1) ]; then \
 			if [ "$$$$$$$$boot" = "1" ]; then \
@@ -171,9 +172,9 @@ $(call KernelPackage/$(1)/config)
   $(call KernelPackage/depends)
 
   ifneq ($(if $(filter-out %=y %=n %=m,$(KCONFIG)),$(filter m y,$(foreach c,$(filter-out %=y %=n %=m,$(KCONFIG)),$($(c)))),.),)
-    ifneq ($(strip $(FILES)),)
+    ifneq ($(if $(SDK),$(filter-out $(LINUX_DIR)/%.ko,$(FILES)),$(strip $(FILES))),)
       define Package/kmod-$(1)/install
-		  @for mod in $$(FILES); do \
+		  @for mod in $$$$$$$$($(SCRIPT_DIR)/metadata.pl version_filter $(KERNEL_PATCHVER) $$(FILES)); do \
 			if [ -e $$$$$$$$mod ]; then \
 				mkdir -p $$(1)/$(MODULES_SUBDIR) ; \
 				$(CP) -L $$$$$$$$mod $$(1)/$(MODULES_SUBDIR)/ ; \

@@ -13,7 +13,7 @@ CPU_TYPE:=603e
 FEATURES:=squashfs targz
 MAINTAINER:=Imre Kaloz <kaloz@openwrt.org>
 
-LINUX_VERSION:=3.8.13
+KERNEL_PATCHVER:=3.8
 
 include $(INCLUDE_DIR)/target.mk
 
@@ -23,6 +23,6 @@ define Target/Description
 	Build firmware images for Freescale MPC83xx based boards (eg. RouterBoard 600).
 endef
 
-KERNELNAME:="uImage dtbImage.rb600 dtbImage.rb333"
+KERNELNAME:=uImage dtbImage.rb600 dtbImage.rb333
 
 $(eval $(call BuildTarget))

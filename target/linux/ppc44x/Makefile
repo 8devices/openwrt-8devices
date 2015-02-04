@@ -13,7 +13,7 @@ FEATURES:=squashfs broken
 CPU_TYPE:=440
 MAINTAINER:=Imre Kaloz <kaloz@openwrt.org>
 
-LINUX_VERSION:=3.10.49
+KERNEL_PATCHVER:=3.10
 
 include $(INCLUDE_DIR)/target.mk
 
@@ -23,6 +23,6 @@ define Target/Description
 	Build firmware images for AMCC/IBM PPC44x based boards.
 endef
 
-KERNELNAME:="uImage cuImage.taishan"
+KERNELNAME:=uImage cuImage.taishan
 
 $(eval $(call BuildTarget))

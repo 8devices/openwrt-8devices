@@ -79,7 +79,7 @@
  	help
 --- a/net/core/dev.c
 +++ b/net/core/dev.c
-@@ -2614,10 +2614,20 @@ int dev_hard_start_xmit(struct sk_buff *
+@@ -2618,10 +2618,20 @@ int dev_hard_start_xmit(struct sk_buff *
  		if (!list_empty(&ptype_all))
  			dev_queue_xmit_nit(skb, dev);
  
@@ -106,15 +106,15 @@
  		return rc;
 --- a/net/core/skbuff.c
 +++ b/net/core/skbuff.c
-@@ -62,6 +62,7 @@
- #include <linux/scatterlist.h>
+@@ -63,6 +63,7 @@
  #include <linux/errqueue.h>
  #include <linux/prefetch.h>
+ #include <linux/if_vlan.h>
 +#include <linux/if.h>
  
  #include <net/protocol.h>
  #include <net/dst.h>
-@@ -439,6 +440,22 @@ struct sk_buff *__netdev_alloc_skb(struc
+@@ -440,6 +441,22 @@ struct sk_buff *__netdev_alloc_skb(struc
  }
  EXPORT_SYMBOL(__netdev_alloc_skb);
  

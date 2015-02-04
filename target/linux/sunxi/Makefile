@@ -15,8 +15,8 @@ CPU_TYPE:=cortex-a8
 CPU_SUBTYPE:=vfpv3
 MAINTAINER:=Zoltan HERPAI <wigyori@uid0.hu>
 
-LINUX_VERSION:=3.13.7
-KERNELNAME:="zImage dtbs"
+KERNEL_PATCHVER:=3.18
+KERNELNAME:=zImage dtbs
 DEFAULT_PACKAGES += uboot-envtools uboot-sunxi kmod-eeprom-sunxi kmod-wdt-sunxi
 
 # A10: Cortex-A8

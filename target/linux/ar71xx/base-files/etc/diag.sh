@@ -34,7 +34,7 @@ get_status_led() {
 	aw-nr580)
 		status_led="aw-nr580:green:ready"
 		;;
-	bullet-m | rocket-m | nano-m | nanostation-m | nanostation-m-xw)
+	bullet-m | rocket-m | nano-m | nanostation-m | nanostation-m-xw | loco-m-xw)
 		status_led="ubnt:green:link4"
 		;;
 	bxu2000n-2-a1)
@@ -43,9 +43,14 @@ get_status_led() {
 	cap4200ag)
 		status_led="senao:green:pwr"
 		;;
+	cpe510)
+		status_led="tp-link:green:link4"
+		;;
 	db120)
 		status_led="db120:green:status"
 		;;
+	dgl-5500-a1 |\
+	dhp-1565-a1|\
 	dir-505-a1 |\
 	dir-600-a1 |\
 	dir-615-e1 |\
@@ -62,6 +67,9 @@ get_status_led() {
 	dir-835-a1)
 		status_led="d-link:amber:power"
 		;;
+	dragino2)
+		status_led="dragino2:red:system"
+		;;
 	eap300v2)
 		status_led="engenius:blue:power"
 		;;
@@ -70,7 +78,10 @@ get_status_led() {
 		;;
 	el-mini | \
 	el-m150)
-		status_led="EasyLink:green:system"
+		status_led="easylink:green:system"
+		;;
+	f9k1115v2)
+		status_led="belkin:blue:status"
 		;;
 	gl-inet)
 		status_led="gl-connect:green:lan"
@@ -99,6 +110,10 @@ get_status_led() {
 		;;
 	mr600v2)
 		status_led="mr600:blue:power"
+		;;
+	mr900 | \
+	mr900v2)
+		status_led="mr900:blue:power"
 		;;
 	mynet-n600 | \
 	mynet-n750)
@@ -160,8 +175,14 @@ get_status_led() {
 	rw2458n)
 		status_led="rw2458n:green:d3"
 		;;
+	smart-300)
+		status_led="nc-link:green:system"
+		;;
 	oolite)
 		status_led="oolite:red:system"
+		;;
+	qihoo-c301)
+		status_led="qihoo:green:status"
 		;;
 	tew-632brp)
 		status_led="tew-632brp:green:status"
@@ -189,6 +210,7 @@ get_status_led() {
 	tl-mr3220-v2 | \
 	tl-mr3420 | \
 	tl-mr3420-v2 | \
+	tl-wa701nd-v2 | \
 	tl-wa801nd-v2 | \
 	tl-wa901nd | \
 	tl-wa901nd-v2 | \
@@ -204,7 +226,8 @@ get_status_led() {
 	tl-wr841n-v8 | \
 	tl-wa830re-v2 | \
 	tl-wr842n-v2 | \
-	tl-wr941nd)
+	tl-wr941nd | \
+	tl-wr941nd-v5)
 		status_led="tp-link:green:system"
 		;;
 	archer-c5 | \
@@ -233,6 +256,9 @@ get_status_led() {
 	uap-pro)
 		status_led="ubnt:white:dome"
 		;;
+	unifi-outdoor-plus)
+		status_led="ubnt:white:front"
+		;;
 	airgateway)
 		status_led="ubnt:white:status"
 		;;
@@ -249,13 +275,15 @@ get_status_led() {
 	wzr-hp-g300nh2)
 		status_led="buffalo:red:diag"
 		;;
+	r6100 | \
 	wndap360 | \
 	wndr3700 | \
 	wndr3700v4 | \
 	wndr4300 | \
 	wnr2000 | \
 	wnr2200 |\
-	wnr612-v2)
+	wnr612-v2 |\
+	wnr1000-v2)
 		status_led="netgear:green:power"
 		;;
 	wp543)
@@ -286,8 +314,17 @@ set_state() {
 	failsafe)
 		status_led_blink_failsafe
 		;;
+	preinit_regular)
+		status_led_blink_preinit_regular
+		;;
 	done)
 		status_led_on
+		case $(ar71xx_board_name) in
+		qihoo-c301)
+			local n=$(fw_printenv activeregion | cut -d = -f 2)
+			fw_setenv "image${n}trynum" 0
+			;;
+		esac
 		;;
 	esac
 }

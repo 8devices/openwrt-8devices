@@ -9,7 +9,7 @@ include $(TOPDIR)/rules.mk
 
 PKG_NAME:=busybox
 PKG_VERSION:=1.22.1
-PKG_RELEASE:=2
+PKG_RELEASE:=5
 PKG_FLAGS:=essential
 
 PKG_SOURCE:=$(PKG_NAME)-$(PKG_VERSION).tar.bz2
@@ -17,11 +17,11 @@ PKG_SOURCE_URL:=http://www.busybox.net/downloads \
 		http://distfiles.gentoo.org/distfiles/
 PKG_MD5SUM:=337d1a15ab1cb1d4ed423168b1eb7d7e
 
-PKG_BUILD_DEPENDS:=BUSYBOX_USE_LIBRPC:librpc
+PKG_BUILD_DEPENDS:=BUSYBOX_USE_LIBRPC:librpc BUSYBOX_CONFIG_PAM:libpam
 PKG_BUILD_PARALLEL:=1
 PKG_CHECK_FORMAT_SECURITY:=0
 
-PKG_LICENSE:=GPLv2 BSD-4c
+PKG_LICENSE:=GPL-2.0
 PKG_LICENSE_FILES:=LICENSE archival/libarchive/bz/LICENSE
 
 include $(INCLUDE_DIR)/package.mk
@@ -42,7 +42,7 @@ define Package/busybox
   MAINTAINER:=Felix Fietkau <nbd@openwrt.org>
   TITLE:=Core utilities for embedded Linux
   URL:=http://busybox.net/
-  DEPENDS:=+BUSYBOX_USE_LIBRPC:librpc
+  DEPENDS:=+BUSYBOX_USE_LIBRPC:librpc +BUSYBOX_CONFIG_PAM:libpam
   MENU:=1
 endef
 
@@ -80,6 +80,12 @@ ifdef CONFIG_BUSYBOX_USE_LIBRPC
   LDLIBS += rpc
 endif
 
+ifdef CONFIG_BUSYBOX_CONFIG_PAM
+  TARGET_CFLAGS += -I$(STAGING_DIR)/usr/include
+  export LDFLAGS=$(TARGET_LDFLAGS)
+  LDLIBS += pam pam_misc pthread
+endif
+
 define Build/Compile
 	+$(MAKE) $(PKG_JOBS) -C $(PKG_BUILD_DIR) \
 		CC="$(TARGET_CC)" \
@@ -110,6 +116,7 @@ define Package/busybox/install
 	$(INSTALL_BIN) ./files/cron $(1)/etc/init.d/cron
 	$(INSTALL_BIN) ./files/telnet $(1)/etc/init.d/telnet
 	$(INSTALL_BIN) ./files/sysntpd $(1)/etc/init.d/sysntpd
+	$(INSTALL_BIN) ./files/ntpd-hotplug $(1)/usr/sbin/ntpd-hotplug
 	-rm -rf $(1)/lib64
 endef
 

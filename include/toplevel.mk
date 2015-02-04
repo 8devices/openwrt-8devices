@@ -43,6 +43,8 @@ unexport LPATH
 # make sure that a predefined CFLAGS variable does not disturb packages
 export CFLAGS=
 
+unexport TAR_OPTIONS
+
 ifneq ($(shell $(HOSTCC) 2>&1 | grep clang),)
   export HOSTCC_REAL?=$(HOSTCC)
   export HOSTCC_WRAPPER:=$(TOPDIR)/scripts/clang-gcc-wrapper
@@ -133,7 +135,7 @@ kernel_menuconfig: prepare_kernel_conf
 kernel_nconfig: prepare_kernel_conf
 	$(_SINGLE)$(NO_TRACE_MAKE) -C target/linux nconfig
 
-tmp/.prereq-build: include/prereq-build.mk
+tmp/.prereq-build: $(if $(SDK),.git/config) include/prereq-build.mk
 	mkdir -p tmp
 	rm -f tmp/.host.mk
 	@$(_SINGLE)$(NO_TRACE_MAKE) -j1 -r -s -f $(TOPDIR)/include/prereq-build.mk prereq 2>/dev/null || { \

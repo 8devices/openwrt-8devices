@@ -200,30 +200,6 @@
  #endif /* __UAPI_DEF_IN6_ADDR */
  
  #if __UAPI_DEF_SOCKADDR_IN6
---- a/net/ipv6/af_inet6.c
-+++ b/net/ipv6/af_inet6.c
-@@ -62,6 +62,7 @@
- #endif
- 
- #include <asm/uaccess.h>
-+#include <asm/unaligned.h>
- #include <linux/mroute6.h>
- 
- MODULE_AUTHOR("Cast of dozens");
-@@ -679,11 +680,12 @@ bool ipv6_opt_accepted(const struct sock
- {
- 	const struct ipv6_pinfo *np = inet6_sk(sk);
- 	const struct inet6_skb_parm *opt = IP6CB(skb);
-+	unsigned char *header = skb_network_header(skb);
- 
- 	if (np->rxopt.all) {
- 		if ((opt->hop && (np->rxopt.bits.hopopts ||
- 				  np->rxopt.bits.ohopopts)) ||
--		    (ip6_flowinfo((struct ipv6hdr *) skb_network_header(skb)) &&
-+		    (ip6_flowinfo((struct ipv6hdr *)net_hdr_word(header)) &&
- 		     np->rxopt.bits.rxflow) ||
- 		    (opt->srcrt && (np->rxopt.bits.srcrt ||
- 		     np->rxopt.bits.osrcrt)) ||
 --- a/net/ipv6/tcp_ipv6.c
 +++ b/net/ipv6/tcp_ipv6.c
 @@ -65,6 +65,7 @@
@@ -319,32 +295,26 @@
  			ptr--;
  		}
  		if (tunnel->parms.o_flags&GRE_KEY) {
-@@ -841,9 +841,9 @@ static inline int ip6gre_xmit_ipv6(struc
+@@ -841,7 +841,7 @@ static inline int ip6gre_xmit_ipv6(struc
  
  	dsfield = ipv6_get_dsfield(ipv6h);
  	if (t->parms.flags & IP6_TNL_F_USE_ORIG_TCLASS)
 -		fl6.flowlabel |= (*(__be32 *) ipv6h & IPV6_TCLASS_MASK);
 +		fl6.flowlabel |= net_hdr_word(ipv6h) & IPV6_TCLASS_MASK;
  	if (t->parms.flags & IP6_TNL_F_USE_ORIG_FLOWLABEL)
--		fl6.flowlabel |= ip6_flowlabel(ipv6h);
-+		fl6.flowlabel |= ip6_flowlabel((const struct ipv6hdr *)net_hdr_word(ipv6h));
+ 		fl6.flowlabel |= ip6_flowlabel(ipv6h);
  	if (t->parms.flags & IP6_TNL_F_USE_ORIG_FWMARK)
- 		fl6.flowi6_mark = skb->mark;
- 
 --- a/net/ipv6/ip6_tunnel.c
 +++ b/net/ipv6/ip6_tunnel.c
-@@ -1288,9 +1288,9 @@ ip6ip6_tnl_xmit(struct sk_buff *skb, str
+@@ -1285,7 +1285,7 @@ ip6ip6_tnl_xmit(struct sk_buff *skb, str
  
  	dsfield = ipv6_get_dsfield(ipv6h);
  	if (t->parms.flags & IP6_TNL_F_USE_ORIG_TCLASS)
 -		fl6.flowlabel |= (*(__be32 *) ipv6h & IPV6_TCLASS_MASK);
 +		fl6.flowlabel |= net_hdr_word(ipv6h) & IPV6_TCLASS_MASK;
  	if (t->parms.flags & IP6_TNL_F_USE_ORIG_FLOWLABEL)
--		fl6.flowlabel |= ip6_flowlabel(ipv6h);
-+		fl6.flowlabel |= ip6_flowlabel((const struct ipv6hdr *)net_hdr_word(ipv6h));
+ 		fl6.flowlabel |= ip6_flowlabel(ipv6h);
  	if (t->parms.flags & IP6_TNL_F_USE_ORIG_FWMARK)
- 		fl6.flowi6_mark = skb->mark;
- 
 --- a/net/ipv6/exthdrs.c
 +++ b/net/ipv6/exthdrs.c
 @@ -573,7 +573,7 @@ static bool ipv6_hop_jumbo(struct sk_buf
@@ -385,7 +355,7 @@
  	for (p = *head; p; p = p->next) {
 --- a/net/ipv4/route.c
 +++ b/net/ipv4/route.c
-@@ -459,7 +459,7 @@ static struct neighbour *ipv4_neigh_look
+@@ -460,7 +460,7 @@ static struct neighbour *ipv4_neigh_look
  	else if (skb)
  		pkey = &ip_hdr(skb)->daddr;
  
@@ -741,7 +711,7 @@
  		if (xb)
  			return i * 32 + 31 - __fls(ntohl(xb));
  	}
-@@ -670,12 +674,13 @@ int ip6_dst_hoplimit(struct dst_entry *d
+@@ -670,17 +674,18 @@ int ip6_dst_hoplimit(struct dst_entry *d
  static inline void ip6_flow_hdr(struct ipv6hdr *hdr, unsigned int tclass,
  				__be32 flowlabel)
  {
@@ -757,6 +727,12 @@
  }
  
  static inline __be32 ip6_flowlabel(const struct ipv6hdr *hdr)
+ {
+-	return *(__be32 *)hdr & IPV6_FLOWLABEL_MASK;
++	return net_hdr_word((__be32 *)hdr) & IPV6_FLOWLABEL_MASK;
+ }
+ 
+ static inline u8 ip6_tclass(__be32 flowinfo)
 --- a/include/net/secure_seq.h
 +++ b/include/net/secure_seq.h
 @@ -2,6 +2,7 @@
@@ -765,8 +741,8 @@
  #include <linux/types.h>
 +#include <linux/in6.h>
  
- __u32 secure_ip_id(__be32 daddr);
- __u32 secure_ipv6_id(const __be32 daddr[4]);
+ u32 secure_ipv4_port_ephemeral(__be32 saddr, __be32 daddr, __be16 dport);
+ u32 secure_ipv6_port_ephemeral(const __be32 *saddr, const __be32 *daddr,
 --- a/include/uapi/linux/in.h
 +++ b/include/uapi/linux/in.h
 @@ -78,7 +78,7 @@ enum {
@@ -808,7 +784,7 @@
  	secret[4] = net_secret[4] + (__force u32)dport;
  	for (i = 5; i < MD5_MESSAGE_BYTES / 4; i++)
  		secret[i] = net_secret[i];
-@@ -175,11 +177,12 @@ u64 secure_dccpv6_sequence_number(__be32
+@@ -150,11 +152,12 @@ u64 secure_dccpv6_sequence_number(__be32
  	u32 hash[MD5_DIGEST_WORDS];
  	u64 seq;
  	u32 i;
@@ -873,7 +849,7 @@
  
 --- a/net/ipv4/tcp_input.c
 +++ b/net/ipv4/tcp_input.c
-@@ -3631,14 +3631,16 @@ static bool tcp_parse_aligned_timestamp(
+@@ -3629,14 +3629,16 @@ static bool tcp_parse_aligned_timestamp(
  {
  	const __be32 *ptr = (const __be32 *)(th + 1);
  

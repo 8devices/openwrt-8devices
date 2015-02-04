@@ -42,6 +42,7 @@ drv_mac80211_init_device_config() {
 		greenfield \
 		short_gi_20 \
 		short_gi_40 \
+		max_amsdu \
 		dsss_cck_40
 }
 
@@ -88,7 +89,7 @@ mac80211_hostapd_setup_base() {
 
 	[ "$auto_channel" -gt 0 ] && channel=acs_survey
 
-	json_get_vars noscan htmode
+	json_get_vars noscan
 	json_get_values ht_capab_list ht_capab
 
 	ieee80211n=1
@@ -132,6 +133,7 @@ mac80211_hostapd_setup_base() {
 			short_gi_40:1 \
 			tx_stbc:1 \
 			rx_stbc:3 \
+			max_amsdu:1 \
 			dsss_cck_40:1
 
 		ht_cap_mask=0
@@ -152,6 +154,7 @@ mac80211_hostapd_setup_base() {
 			RX-STBC1:0x300:0x100:1 \
 			RX-STBC12:0x300:0x200:1 \
 			RX-STBC123:0x300:0x300:1 \
+			MAX-AMSDU-7935:0x800::$max_amsdu \
 			DSSS_CCK-40:0x1000::$dsss_cck_40
 
 		ht_capab="$ht_capab$ht_capab_flags"
@@ -326,6 +329,13 @@ ${max_listen_int:+max_listen_interval=$max_listen_int}
 EOF
 }
 
+mac80211_get_addr() {
+	local phy="$1"
+	local idx="$(($2 + 1))"
+
+	head -n $(($macidx + 1)) /sys/class/ieee80211/${phy}/addresses | tail -n1
+}
+
 mac80211_generate_mac() {
 	local phy="$1"
 	local id="${macidx:-0}"
@@ -333,7 +343,18 @@ mac80211_generate_mac() {
 	local ref="$(cat /sys/class/ieee80211/${phy}/macaddress)"
 	local mask="$(cat /sys/class/ieee80211/${phy}/address_mask)"
 
-	[ "$mask" = "00:00:00:00:00:00" ] && mask="ff:ff:ff:ff:ff:ff";
+	[ "$mask" = "00:00:00:00:00:00" ] && {
+		mask="ff:ff:ff:ff:ff:ff";
+
+		[ "$(wc -l < /sys/class/ieee80211/${phy}/addresses)" -gt 1 ] && {
+			addr="$(mac80211_get_addr "$phy" "$id")"
+			[ -n "$addr" ] && {
+				echo "$addr"
+				return
+			}
+		}
+	}
+
 	local oIFS="$IFS"; IFS=":"; set -- $mask; IFS="$oIFS"
 
 	local mask1=$1
@@ -472,11 +493,43 @@ mac80211_setup_supplicant() {
 	wpa_supplicant_run "$ifname" ${hostapd_ctrl:+-H $hostapd_ctrl}
 }
 
+mac80211_setup_adhoc_htmode() {
+	case "$htmode" in
+		VHT20|HT20) ibss_htmode=HT20;;
+		HT40*|VHT40|VHT80|VHT160)
+			case "$hwmode" in
+				a)
+					case "$(( ($channel / 4) % 2 ))" in
+						1) ibss_htmode="HT40+" ;;
+						0) ibss_htmode="HT40-";;
+					esac
+				;;
+				*)
+					case "$htmode" in
+						HT40+) ibss_htmode="HT40+";;
+						HT40-) ibss_htmode="HT40-";;
+						*)
+							if [ "$channel" -lt 7 ]; then
+								ibss_htmode="HT40+"
+							else
+								ibss_htmode="HT40-"
+							fi
+						;;
+					esac
+				;;
+			esac
+			[ "$auto_channel" -gt 0 ] && ibss_htmode="HT40+"
+		;;
+		*) ibss_htmode="" ;;
+	esac
+
+}
+
 mac80211_setup_adhoc() {
 	json_get_vars bssid ssid key mcast_rate
 
 	keyspec=
-	[ "$auth_type" == "wep" ] && {
+	[ "$auth_type" = "wep" ] && {
 		set_default key 1
 		case "$key" in
 			[1234])
@@ -499,13 +552,13 @@ mac80211_setup_adhoc() {
 
 	brstr=
 	for br in $basic_rate_list; do
-		hostapd_add_rate brstr "$br"
+		wpa_supplicant_add_rate brstr "$br"
 	done
 
 	mcval=
-	[ -n "$mcast_rate" ] && hostapd_add_rate mcval "$mcast_rate"
+	[ -n "$mcast_rate" ] && wpa_supplicant_add_rate mcval "$mcast_rate"
 
-	iw dev "$ifname" ibss join "$ssid" $freq $htmode fixed-freq $bssid \
+	iw dev "$ifname" ibss join "$ssid" $freq $ibss_htmode fixed-freq $bssid \
 		${beacon_int:+beacon-interval $beacon_int} \
 		${brstr:+basic-rates $brstr} \
 		${mcval:+mcast-rate $mcval} \
@@ -555,6 +608,7 @@ mac80211_setup_vif() {
 		;;
 		adhoc)
 			wireless_vif_parse_encryption
+			mac80211_setup_adhoc_htmode
 			if [ "$wpa" -gt 0 -o "$auto_channel" -gt 0 ]; then
 				mac80211_setup_supplicant || failed=1
 			else
@@ -596,7 +650,7 @@ drv_mac80211_setup() {
 		country chanbw distance \
 		txpower antenna_gain \
 		rxantenna txantenna \
-		frag rts beacon_int
+		frag rts beacon_int htmode
 	json_get_values basic_rate_list basic_rate
 	json_select ..
 

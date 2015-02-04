@@ -14,10 +14,10 @@ CPU_TYPE:=cortex-a9
 CPU_SUBTYPE:=neon
 MAINTAINER:=Luka Perkov <luka@openwrt.org>
 
-LINUX_VERSION:=3.10.49
+KERNEL_PATCHVER:=3.14
 
 include $(INCLUDE_DIR)/target.mk
 
-KERNELNAME:="zImage dtbs"
+KERNELNAME:=zImage dtbs
 
 $(eval $(call BuildTarget))

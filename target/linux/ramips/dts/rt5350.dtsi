@@ -151,7 +151,7 @@
 		};
 
 		spi@b00 {
-			compatible = "ralink,rt5350-spi", "ralink,rt2880-spi";
+			compatible = "ralink,rt5350-spi";
 			reg = <0xb00 0x100>;
 
 			resets = <&rstctrl 18>;
@@ -161,7 +161,7 @@
 			#size-cells = <1>;
 
 			pinctrl-names = "default";
-			pinctrl-0 = <&spi_pins>;
+			pinctrl-0 = <&spi_pins &spi_cs1>;
 
 			status = "disabled";
 		};
@@ -254,6 +254,9 @@
 		compatible = "ralink,rt5350-eth";
 		reg = <0x10100000 10000>;
 
+		resets = <&rstctrl 21 &rstctrl 23>;
+		reset-names = "fe", "esw";
+
 		interrupt-parent = <&cpuintc>;
 		interrupts = <5>;
 	};
@@ -261,6 +264,9 @@
 	esw@10110000 {
 		compatible = "ralink,rt3050-esw";
 		reg = <0x10110000 8000>;
+
+		resets = <&rstctrl 23>;
+		reset-names = "esw";
 
 		interrupt-parent = <&intc>;
 		interrupts = <17>;

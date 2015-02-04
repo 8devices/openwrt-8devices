@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2014 OpenWrt.org
+# Copyright (C) 2014-2015 OpenWrt.org
 #
 # This is free software, licensed under the GNU General Public License v2.
 # See /LICENSE for more information.
@@ -8,20 +8,22 @@
 include $(TOPDIR)/rules.mk
 
 PKG_NAME:=fstools
-PKG_VERSION:=2014-06-22
+PKG_VERSION:=2015-01-28
 
 PKG_RELEASE=$(PKG_SOURCE_VERSION)
 
 PKG_SOURCE_PROTO:=git
 PKG_SOURCE_URL:=git://nbd.name/fstools.git
 PKG_SOURCE_SUBDIR:=$(PKG_NAME)-$(PKG_VERSION)
-PKG_SOURCE_VERSION:=e0430f5c62f367e5a8e02755412977b02c3fc45e
+PKG_SOURCE_VERSION:=6a448a100c7ce8b8b85f262ba1258e54363da9cc
 PKG_SOURCE:=$(PKG_NAME)-$(PKG_VERSION)-$(PKG_SOURCE_VERSION).tar.gz
 CMAKE_INSTALL:=1
 PKG_CHECK_FORMAT_SECURITY:=0
 
-PKG_LICENSE:=GPLv2
+PKG_LICENSE:=GPL-2.0
 PKG_LICENSE_FILES:=
+
+PKG_USE_MIPS16:=0
 
 PKG_MAINTAINER:=John Crispin <blogic@openwrt.org>
 
@@ -29,12 +31,24 @@ include $(INCLUDE_DIR)/package.mk
 include $(INCLUDE_DIR)/cmake.mk
 
 TARGET_LDFLAGS += $(if $(CONFIG_USE_EGLIBC),-lrt)
+CMAKE_OPTIONS += $(if $(CONFIG_FSTOOLS_UBIFS_EXTROOT),-DCMAKE_UBIFS_EXTROOT=y)
 
 define Package/fstools
   SECTION:=base
   CATEGORY:=Base system
   DEPENDS:=+ubox +USE_EGLIBC:librt +NAND_SUPPORT:ubi-utils
   TITLE:=OpenWrt filesystem tools
+  MENU:=1
+endef
+
+define Package/fstools/config
+	config FSTOOLS_UBIFS_EXTROOT
+		depends on PACKAGE_fstools
+		depends on NAND_SUPPORT
+		bool "Support extroot functionality with UBIFS"
+		default y
+		help
+			This option makes it possible to use extroot functionality if the root filesystem resides on an UBIFS partition
 endef
 
 define Package/block-mount

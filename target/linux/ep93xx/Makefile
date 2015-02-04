@@ -13,12 +13,12 @@ FEATURES:=squashfs ext4 targz usb display sound
 CPU_TYPE:=arm920t
 MAINTAINER:=Florian Fainelli <florian@openwrt.org>
 
-LINUX_VERSION:=3.8.13
+KERNEL_PATCHVER:=3.8
 
 DEVICE_TYPE:=developerboard
 
 include $(INCLUDE_DIR)/target.mk
 
-KERNELNAME:="uImage"
+KERNELNAME:=uImage
 
 $(eval $(call BuildTarget))

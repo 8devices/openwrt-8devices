@@ -12,11 +12,12 @@ ppp_generic_init_config() {
 	proto_config_add_string username
 	proto_config_add_string password
 	proto_config_add_string keepalive
+	proto_config_add_boolean keepalive_adaptive
 	proto_config_add_int demand
 	proto_config_add_string pppd_options
 	proto_config_add_string 'connect:file'
 	proto_config_add_string 'disconnect:file'
-	proto_config_add_boolean ipv6
+	proto_config_add_string ipv6
 	proto_config_add_boolean authfail
 	proto_config_add_int mtu
 	proto_config_add_string pppname
@@ -25,26 +26,35 @@ ppp_generic_init_config() {
 ppp_generic_setup() {
 	local config="$1"; shift
 
-	json_get_vars ipv6 demand keepalive username password pppd_options pppname
-	[ "$ipv6" = 1 ] || ipv6=""
+	json_get_vars ipv6 demand keepalive keepalive_adaptive username password pppd_options pppname
+	if [ "$ipv6" = 0 ]; then
+		ipv6=""
+	elif [ -z "$ipv6" -o "$ipv6" = auto ]; then
+		ipv6=1
+		proto_export "AUTOIPV6=1"
+	fi
+
 	if [ "${demand:-0}" -gt 0 ]; then
 		demand="precompiled-active-filter /etc/ppp/filter demand idle $demand"
 	else
 		demand="persist"
 	fi
-	[ "${keepalive:-0}" -lt 1 ] && keepalive=""
 	[ -n "$mtu" ] || json_get_var mtu mtu
 	[ -n "$pppname" ] || pppname="${proto:-ppp}-$config"
 
-	local interval="${keepalive##*[, ]}"
-	[ "$interval" != "$keepalive" ] || interval=5
+	local lcp_failure="${keepalive%%[, ]*}"
+	local lcp_interval="${keepalive##*[, ]}"
+	local lcp_adaptive="lcp-echo-adaptive"
+	[ "${lcp_failure:-0}" -lt 1 ] && lcp_failure=""
+	[ "$lcp_interval" != "$keepalive" ] || lcp_interval=5
+	[ "${keepalive_adaptive:-1}" -lt 1 ] && lcp_adaptive=""
 	[ -n "$connect" ] || json_get_var connect connect
 	[ -n "$disconnect" ] || json_get_var disconnect disconnect
 
 	proto_run_command "$config" /usr/sbin/pppd \
 		nodetach ipparam "$config" \
 		ifname "$pppname" \
-		${keepalive:+lcp-echo-interval $interval lcp-echo-failure ${keepalive%%[, ]*}} \
+		${lcp_failure:+lcp-echo-interval $lcp_interval lcp-echo-failure $lcp_failure $lcp_adaptive} \
 		${ipv6:++ipv6} \
 		nodefaultroute \
 		usepeerdns \
@@ -103,6 +113,7 @@ proto_pppoe_init_config() {
 	ppp_generic_init_config
 	proto_config_add_string "ac"
 	proto_config_add_string "service"
+	proto_config_add_string "host_uniq"
 }
 
 proto_pppoe_setup() {
@@ -118,11 +129,13 @@ proto_pppoe_setup() {
 
 	json_get_var ac ac
 	json_get_var service service
+	json_get_var host_uniq host_uniq
 
 	ppp_generic_setup "$config" \
 		plugin rp-pppoe.so \
 		${ac:+rp_pppoe_ac "$ac"} \
 		${service:+rp_pppoe_service "$service"} \
+		${host_uniq:+host-uniq "$host_uniq"} \
 		"nic-$iface"
 }
 

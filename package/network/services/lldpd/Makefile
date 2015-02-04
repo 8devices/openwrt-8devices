@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2008-2013 OpenWrt.org
+# Copyright (C) 2008-2015 OpenWrt.org
 #
 # This is free software, licensed under the GNU General Public License v2.
 # See /LICENSE for more information.
@@ -8,14 +8,15 @@
 include $(TOPDIR)/rules.mk
 
 PKG_NAME:=lldpd
-PKG_VERSION:=0.7.7
+PKG_VERSION:=0.7.13
 PKG_RELEASE:=1
 
 PKG_SOURCE:=$(PKG_NAME)-$(PKG_VERSION).tar.gz
 PKG_SOURCE_URL:=http://media.luffy.cx/files/lldpd
-PKG_MD5SUM:=9031734c69940dd79a0a175123275f83
+PKG_MD5SUM:=13e8be761753eac9a8e12128acba40b4
 
 PKG_MAINTAINER:=Jo-Philipp Wich <jow@openwrt.org>
+PKG_LICENSE:=ISC
 
 PKG_FIXUP:=autoreconf
 PKG_INSTALL:=1
@@ -30,7 +31,13 @@ define Package/lldpd
   SUBMENU:=Routing and Redirection
   TITLE:=Link Layer Discovery Protocol daemon
   URL:=https://github.com/vincentbernat/lldpd/wiki
-  DEPENDS:=+libevent2 +USE_EGLIBC:libbsd
+  DEPENDS:=+libevent2 +USE_EGLIBC:libbsd +LLDPD_WITH_JSON:libjson-c
+  USERID:=lldp=121:lldp=129
+  MENU:=1
+endef
+
+define Package/lldpd/config
+source "$(SOURCE)/Config.in"
 endef
 
 define Package/lldpd/description
@@ -44,12 +51,25 @@ endef
 
 define Package/lldpd/install
 	$(INSTALL_DIR) $(1)/etc/init.d
+	$(INSTALL_DIR) $(1)/etc/lldpd.d
 	$(INSTALL_DIR) $(1)/etc/config
 	$(INSTALL_DIR) $(1)/usr/lib $(1)/usr/sbin
 	$(CP) $(PKG_INSTALL_DIR)/usr/sbin/lldp{cli,ctl,d} $(1)/usr/sbin/
 	$(CP) $(PKG_INSTALL_DIR)/usr/lib/liblldpctl.so* $(1)/usr/lib/
 	$(INSTALL_BIN) ./files/lldpd.init $(1)/etc/init.d/lldpd
 	$(INSTALL_DATA) ./files/lldpd.config $(1)/etc/config/lldpd
+ifneq ($(CONFIG_LLDPD_WITH_CDP),y)
+	sed -i -e '/cdp/d' $(1)/etc/init.d/lldpd $(1)/etc/config/lldpd
+endif
+ifneq ($(CONFIG_LLDPD_WITH_FDP),y)
+	sed -i -e '/fdp/d' $(1)/etc/init.d/lldpd $(1)/etc/config/lldpd
+endif
+ifneq ($(CONFIG_LLDPD_WITH_EDP),y)
+	sed -i -e '/edp/d' $(1)/etc/init.d/lldpd $(1)/etc/config/lldpd
+endif
+ifneq ($(CONFIG_LLDPD_WITH_SONMP),y)
+	sed -i -e '/sonmp/d' $(1)/etc/init.d/lldpd $(1)/etc/config/lldpd
+endif
 endef
 
 define Package/lldpd/conffiles
@@ -60,6 +80,13 @@ CONFIGURE_ARGS += \
 	--with-privsep-user=lldp \
 	--with-privsep-group=lldp \
 	--with-privsep-chroot=/var/run/lldp \
-	--with-readline=no
+	--with-readline=no \
+	--with-embedded-libevent=no \
+	$(if $(CONFIG_LLDPD_WITH_CDP),,--disable-cdp) \
+	$(if $(CONFIG_LLDPD_WITH_FDP),,--disable-fdp) \
+	$(if $(CONFIG_LLDPD_WITH_EDP),,--disable-edp) \
+	$(if $(CONFIG_LLDPD_WITH_SONMP),,--disable-sonmp) \
+	$(if $(CONFIG_LLDPD_WITH_JSON),--with-json=json-c)
+
 
 $(eval $(call BuildPackage,lldpd))

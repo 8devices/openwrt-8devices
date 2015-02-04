@@ -14,8 +14,8 @@ proto_6in4_setup() {
 	local iface="$2"
 	local link="6in4-$cfg"
 
-	local mtu ttl ipaddr peeraddr ip6addr ip6prefix tunnelid username password updatekey sourcerouting
-	json_get_vars mtu ttl ipaddr peeraddr ip6addr ip6prefix tunnelid username password updatekey sourcerouting
+	local mtu ttl tos ipaddr peeraddr ip6addr ip6prefix tunnelid username password updatekey sourcerouting
+	json_get_vars mtu ttl tos ipaddr peeraddr ip6addr ip6prefix tunnelid username password updatekey sourcerouting
 
 	[ -z "$peeraddr" ] && {
 		proto_notify_error "$cfg" "MISSING_ADDRESS"
@@ -56,6 +56,7 @@ proto_6in4_setup() {
 	json_add_string mode sit
 	json_add_int mtu "${mtu:-1280}"
 	json_add_int ttl "${ttl:-64}"
+	[ -n "$tos" ] && json_add_string tos "$tos"
 	json_add_string local "$ipaddr"
 	json_add_string remote "$peeraddr"
 	proto_close_tunnel
@@ -65,15 +66,43 @@ proto_6in4_setup() {
 	[ -n "$tunnelid" -a -n "$username" -a \( -n "$password" -o -n "$updatekey" \) ] && {
 		[ -n "$updatekey" ] && password="$updatekey"
 
-		local url="http://ipv4.tunnelbroker.net/nic/update?username=$username&password=$password&hostname=$tunnelid"
+		local http="http"
+		local urlget="wget"
+		local urlget_opts="-qO/dev/stdout"
+		local ca_path="${SSL_CERT_DIR-/etc/ssl/certs}"
+
+		if [ -n "$(which curl)" ]; then
+			urlget="curl"
+			urlget_opts="-s -S"
+			if curl -V | grep "Protocols:" | grep -qF "https"; then
+				http="https"
+				urlget_opts="$urlget_opts --capath $ca_path"
+			fi
+		fi
+		if [ "$http" = "http" ] &&
+			wget --version 2>&1 | grep -qF "+https"; then
+			urlget="wget"
+			urlget_opts="-qO/dev/stdout --ca-directory=$ca_path"
+			http="https"
+		fi
+		[ "$http" = "https" -a -z "$(find $ca_path -name "*.0" 2>/dev/null)" ] && {
+			if [ "$urlget" = "curl" ]; then
+				urlget_opts="$urlget_opts -k"
+			else
+				urlget_opts="$urlget_opts --no-check-certificate"
+			fi
+		}
+
+		local url="$http://ipv4.tunnelbroker.net/nic/update?username=$username&password=$password&hostname=$tunnelid"
 		local try=0
 		local max=3
 
 		while [ $((++try)) -le $max ]; do
-			( exec wget -qO/dev/null "$url" 2>/dev/null ) &
+			( exec $urlget $urlget_opts "$url" | logger -t "$link" ) &
 			local pid=$!
-			( sleep 5; kill $pid 2>/dev/null ) &
+			( sleep 20; kill $pid 2>/dev/null ) &
 			wait $pid && break
+			sleep 20;
 		done
 	}
 }
@@ -83,7 +112,7 @@ proto_6in4_teardown() {
 }
 
 proto_6in4_init_config() {
-	no_device=1             
+	no_device=1
 	available=1
 
 	proto_config_add_string "ipaddr"
@@ -96,6 +125,7 @@ proto_6in4_init_config() {
 	proto_config_add_string "updatekey"
 	proto_config_add_int "mtu"
 	proto_config_add_int "ttl"
+	proto_config_add_string "tos"
 	proto_config_add_boolean "sourcerouting"
 }
 

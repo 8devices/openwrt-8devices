@@ -12,10 +12,10 @@
  #include "dev-ap9x-pci.h"
  #include "dev-eth.h"
  #include "dev-gpio-buttons.h"
-@@ -389,3 +391,65 @@ static void __init ubnt_nano_m_xw_setup(
+@@ -407,3 +409,65 @@ MIPS_MACHINE(ATH79_MACH_UBNT_NANO_M_XW, 
  
- MIPS_MACHINE(ATH79_MACH_UBNT_NANO_M_XW, "UBNT-NM-XW", "Ubiquiti Nanostation M XW",
- 	     ubnt_nano_m_xw_setup);
+ MIPS_MACHINE(ATH79_MACH_UBNT_LOCO_M_XW, "UBNT-LOCO-XW", "Ubiquiti Loco M XW",
+ 	     ubnt_loco_m_xw_setup);
 +
 +static struct gpio_led ubnt_airgateway_gpio_leds[] __initdata = {
 +	{
@@ -80,11 +80,11 @@
 +
 --- a/arch/mips/ath79/machtypes.h
 +++ b/arch/mips/ath79/machtypes.h
-@@ -143,6 +143,7 @@ enum ath79_mach_type {
+@@ -144,6 +144,7 @@ enum ath79_mach_type {
  	ATH79_MACH_TL_WR842N_V2,	/* TP-LINK TL-WR842N/ND v2 */
  	ATH79_MACH_TL_WR941ND,		/* TP-LINK TL-WR941ND */
  	ATH79_MACH_TUBE2H,		/* Alfa Network Tube2H */
 +	ATH79_MACH_UBNT_AIRGW,		/* Ubiquiti AirGateway */
  	ATH79_MACH_UBNT_AIRROUTER,	/* Ubiquiti AirRouter */
  	ATH79_MACH_UBNT_BULLET_M,	/* Ubiquiti Bullet M */
- 	ATH79_MACH_UBNT_LSSR71,		/* Ubiquiti LS-SR71 */
+ 	ATH79_MACH_UBNT_LOCO_M_XW, 	/* Ubiquiti Loco M XW */

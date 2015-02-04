@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2013-2014 OpenWrt.org
+# Copyright (C) 2013-2015 OpenWrt.org
 #
 # This is free software, licensed under the GNU General Public License v2.
 # See /LICENSE for more information.
@@ -13,8 +13,9 @@ define Profile/Generic
 	kmod-ata-core kmod-ata-marvell-sata \
 	kmod-rtc-marvell kmod-thermal-armada \
 	kmod-gpio-button-hotplug kmod-hwmon-tmp421 \
-	kmod-hwmon-gpiofan kmod-leds-tlc59116 \
-	kmod-ledtrig-usbdev
+	kmod-hwmon-pwmfan kmod-leds-tlc59116 \
+	kmod-ledtrig-usbdev kmod-mwlwifi wpad-mini \
+	swconfig
 endef
 
 define Profile/Generic/Description

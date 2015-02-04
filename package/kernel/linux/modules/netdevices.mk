@@ -114,7 +114,9 @@ define KernelPackage/et131x
   SUBMENU:=$(NETWORK_DEVICES_MENU)
   TITLE:=Agere ET131x Gigabit Ethernet driver
   URL:=http://sourceforge.net/projects/et131x
-  FILES:=$(LINUX_DIR)/drivers/staging/et131x/et131x.$(LINUX_KMOD_SUFFIX)
+  FILES:= \
+	$(LINUX_DIR)/drivers/staging/et131x/et131x.ko@lt3.18 \
+	$(LINUX_DIR)/drivers/net/ethernet/agere/et131x.ko@ge3.18
   KCONFIG:= \
 	CONFIG_ET131X \
 	CONFIG_ET131X_DEBUG=n
@@ -127,6 +129,24 @@ define KernelPackage/et131x/description
 endef
 
 $(eval $(call KernelPackage,et131x))
+
+
+define KernelPackage/gw16083
+  SUBMENU:=$(NETWORK_DEVICES_MENU)
+  TITLE:=Gateworks Ventana Ethernet Expansion Mezzanine driver
+  URL:=http://www.gateworks.com
+  FILES:=$(LINUX_DIR)/drivers/net/phy/gw16083.ko
+  KCONFIG:=CONFIG_GATEWORKS_GW16083
+  DEPENDS:=@TARGET_imx6 @PCI_SUPPORT +kmod-libphy +kmod-igb
+  AUTOLOAD:=$(call AutoLoad,36,gw16083)
+endef
+
+define KernelPackage/gw16083/description
+ This package contains the gw16083 kernel module for supporting the Gateworks
+ Ventana Ethernet Expansion Mezzanine.
+endef
+
+$(eval $(call KernelPackage,gw16083))
 
 
 define KernelPackage/swconfig
@@ -430,7 +450,7 @@ $(eval $(call KernelPackage,e1000))
 define KernelPackage/e1000e
   SUBMENU:=$(NETWORK_DEVICES_MENU)
   TITLE:=Intel(R) PRO/1000 PCIe cards kernel support
-  DEPENDS:=@PCIE_SUPPORT +(!LINUX_3_3&&!LINUX_3_6):kmod-ptp
+  DEPENDS:=@PCIE_SUPPORT +kmod-ptp
   KCONFIG:=CONFIG_E1000E
   FILES:=$(LINUX_DIR)/drivers/net/ethernet/intel/e1000e/e1000e.ko
   AUTOLOAD:=$(call AutoProbe,e1000e)
@@ -464,7 +484,7 @@ $(eval $(call KernelPackage,igb))
 define KernelPackage/b44
   TITLE:=Broadcom 44xx driver
   KCONFIG:=CONFIG_B44
-  DEPENDS:=@PCI_SUPPORT @!TARGET_brcm47xx_mips74k +!TARGET_brcm47xx:kmod-ssb +kmod-mii +LINUX_3_14:kmod-libphy
+  DEPENDS:=@PCI_SUPPORT @!TARGET_brcm47xx_mips74k +!TARGET_brcm47xx:kmod-ssb +kmod-mii +(!LINUX_3_10&&!LINUX_3_13):kmod-libphy
   SUBMENU:=$(NETWORK_DEVICES_MENU)
   FILES:=$(LINUX_DIR)/drivers/net/ethernet/broadcom/b44.ko
   AUTOLOAD:=$(call AutoLoad,19,b44,1)
@@ -518,7 +538,7 @@ $(eval $(call KernelPackage,pcnet32))
 define KernelPackage/tg3
   TITLE:=Broadcom Tigon3 Gigabit Ethernet
   KCONFIG:=CONFIG_TIGON3
-  DEPENDS:=+!TARGET_brcm47xx:kmod-libphy +!LINUX_3_3:kmod-hwmon-core +(!LINUX_3_3&&!LINUX_3_6):kmod-ptp
+  DEPENDS:=+!TARGET_brcm47xx:kmod-libphy +kmod-hwmon-core +kmod-ptp
   SUBMENU:=$(NETWORK_DEVICES_MENU)
   FILES:=$(LINUX_DIR)/drivers/net/ethernet/broadcom/tg3.ko
   AUTOLOAD:=$(call AutoLoad,19,tg3,1)

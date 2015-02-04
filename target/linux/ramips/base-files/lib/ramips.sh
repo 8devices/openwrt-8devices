@@ -25,6 +25,15 @@ ramips_board_detect() {
 	*"Edimax 3g-6200nl")
 		name="3g-6200nl"
 		;;
+	*"A5-V11")
+		name="a5-v11"
+		;;
+	*"Aigale Ai-BR100")
+		name="ai-br100"
+		;;
+	*"Airlink101 AR670W")
+		name="ar670w"
+		;;
 	*"Airlink101 AR725W")
 		name="ar725w"
 		;;
@@ -49,6 +58,9 @@ ramips_board_detect() {
 	*"ARC FreeStation5")
 		name="freestation5"
 		;;
+	*"Archer C20i")
+		name="c20i"
+		;;
 	*"Argus ATP-52B")
 		name="argus-atp52b"
 		;;
@@ -72,6 +84,15 @@ ramips_board_detect() {
 		;;
 	*"Aztech HW550-3G")
 		name="hw550-3g"
+		;;
+	*"Buffalo WSR-600DHP")
+		name="wsr-600"
+		;;
+	*"Buffalo WSR-1166DHP")
+		name="wsr-1166"
+		;;
+	*"Firefly FireWRT")
+		name="firewrt"
 		;;
 	*"CY-SWR1100")
 		name="cy-swr1100"
@@ -115,6 +136,9 @@ ramips_board_detect() {
 	*"DIR-810L")
 		name="dir-810l"
 		;;
+	*"DIR-860L B1")
+		name="dir-860l-b1"
+		;;
 	*"DAP-1350")
 		name="dap-1350"
 		;;
@@ -157,6 +181,9 @@ ramips_board_detect() {
 	*"HILINK HLK-RM04")
 		name="hlk-rm04"
 		;;
+	*"HooToo HT-TM02")
+		name="ht-tm02"
+		;;
 	*"HAME MPR-A1")
  		name="mpr-a1"
  		;;
@@ -165,6 +192,12 @@ ramips_board_detect() {
  		;;
 	*"Kingston MLW221")
 		name="mlw221"
+		;;
+	*"Kingston MLWG2")
+		name="mlwg2"
+		;;
+	*"Linksys E1700")
+		name="e1700"
 		;;
 	*"Planex MZK-750DHP")
 		name="mzk-750dhp"
@@ -178,14 +211,26 @@ ramips_board_detect() {
 	*"NexAira BC2")
 		name="bc2"
 		;;
+	*"Nexx WT1520")
+		name="wt1520"
+		;;
+	*"Nexx WT3020")
+		name="wt3020"
+		;;
 	*"NW718")
 		name="nw718"
+		;;
+	*"Intenso Memory 2 Move")
+		name="m2m"
 		;;
 	*"Omnima EMB HPM")
 		name="omni-emb-hpm"
 		;;
 	*"Omnima MiniEMBWiFi")
 		name="omni-emb"
+		;;
+	*"Omnima MiniPlug")
+		name="omni-plug"
 		;;
 	*"Petatel PSR-680W"*)
 		name="psr-680w"
@@ -213,6 +258,9 @@ ramips_board_detect() {
 		;;
 	*"Asus RP-N53")
 		name="rp-n53"
+		;;
+	*"Ralink MT7620a + MT7530 evaluation board")
+		name="mt7620a_mt7530"
 		;;
 	*"RT-G32 B1")
 		name="rt-g32-b1"
@@ -268,6 +316,9 @@ ramips_board_detect() {
 	*"Tenda 3G300M")
 		name="3g300m"
 		;;
+	*"Tenda 3G150B")
+		name="3g150b"
+		;;
 	*"Tenda W306R V2.0")
 		name="w306r-v20"
 		;;
@@ -316,6 +367,9 @@ ramips_board_detect() {
 	*"Wansview NCS601W")
 		name="ncs601w"
 		;;
+	*"Xiaomi MiWiFi Mini")
+		name="xiaomi-miwifi-mini"
+		;;
 	*"Sercomm NA930")
 		name="na930"
 		;;
@@ -330,6 +384,12 @@ ramips_board_detect() {
 		;;
 	*"Lenovo Y1S")
 		name="y1s"
+		;;
+	*"Mediatek MT7621 evaluation board")
+		name="mt7621"
+		;;
+	*"Mediatek MT7628AN evaluation board")
+		name="mt7628"
 		;;
 	*)
 		name="generic"

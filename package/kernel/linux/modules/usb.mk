@@ -18,7 +18,8 @@ define KernelPackage/usb-core
   KCONFIG:=CONFIG_USB CONFIG_XPS_USB_HCD_XILINX=n CONFIG_USB_FHCI_HCD=n
   FILES:= \
 	$(LINUX_DIR)/drivers/usb/core/usbcore.ko \
-	$(LINUX_DIR)/drivers/usb/usb-common.ko
+	$(LINUX_DIR)/drivers/usb/usb-common.ko@lt3.16 \
+	$(LINUX_DIR)/drivers/usb/common/usb-common.ko@ge3.16
   AUTOLOAD:=$(call AutoLoad,20,usb-common usbcore,1)
   $(call AddDepends/nls)
 endef
@@ -216,7 +217,9 @@ $(eval $(call KernelPackage,usb-phy-twl6030))
 define KernelPackage/usb-gadget
   TITLE:=USB Gadget support
   KCONFIG:=CONFIG_USB_GADGET
-  FILES:=$(LINUX_DIR)/drivers/usb/gadget/udc-core.ko
+  FILES:=\
+	$(LINUX_DIR)/drivers/usb/gadget/udc-core.ko@lt3.18 \
+	$(LINUX_DIR)/drivers/usb/gadget/udc/udc-core.ko@ge3.18
   AUTOLOAD:=$(call AutoLoad,45,udc-core)
   DEPENDS:=@USB_GADGET_SUPPORT
   $(call AddDepends/usb)
@@ -231,7 +234,7 @@ $(eval $(call KernelPackage,usb-gadget))
 define KernelPackage/usb-lib-composite
   TITLE:=USB lib composite
   KCONFIG:=CONFIG_USB_LIBCOMPOSITE
-  DEPENDS:=+kmod-usb-gadget +kmod-fs-configfs @!LINUX_3_3 @!LINUX_3_6
+  DEPENDS:=+kmod-usb-gadget +kmod-fs-configfs
   FILES:=$(LINUX_DIR)/drivers/usb/gadget/libcomposite.ko
   AUTOLOAD:=$(call AutoLoad,50,libcomposite)
   $(call AddDepends/usb)
@@ -250,7 +253,7 @@ define KernelPackage/usb-eth-gadget
 	CONFIG_USB_ETH \
 	CONFIG_USB_ETH_RNDIS=y \
 	CONFIG_USB_ETH_EEM=n
-  DEPENDS:=+kmod-usb-gadget +(!LINUX_3_3&&!LINUX_3_6):kmod-usb-lib-composite
+  DEPENDS:=+kmod-usb-gadget +kmod-usb-lib-composite
 ifneq ($(wildcard $(LINUX_DIR)/drivers/usb/gadget/u_ether.ko),)
   FILES:= \
 	$(LINUX_DIR)/drivers/usb/gadget/u_ether.ko \
@@ -279,7 +282,7 @@ $(eval $(call KernelPackage,usb-eth-gadget))
 define KernelPackage/usb-serial-gadget
   TITLE:=USB Serial Gadget support
   KCONFIG:=CONFIG_USB_G_SERIAL
-  DEPENDS:=+kmod-usb-gadget +(!LINUX_3_3&&!LINUX_3_6):kmod-usb-lib-composite
+  DEPENDS:=+kmod-usb-gadget +kmod-usb-lib-composite
 ifneq ($(wildcard $(LINUX_DIR)/drivers/usb/gadget/u_serial.ko),)
   FILES:= \
 	$(LINUX_DIR)/drivers/usb/gadget/u_serial.ko \
@@ -326,12 +329,16 @@ define KernelPackage/usb-ohci
 	CONFIG_USB_OHCI \
 	CONFIG_USB_OHCI_HCD \
 	CONFIG_USB_OHCI_ATH79=y \
+	CONFIG_USB_OHCI_HCD_AT91=y \
 	CONFIG_USB_OHCI_BCM63XX=y \
 	CONFIG_USB_OCTEON_OHCI=y \
 	CONFIG_USB_OHCI_HCD_OMAP3=y \
 	CONFIG_USB_OHCI_HCD_PLATFORM=y
   FILES:=$(LINUX_DIR)/drivers/usb/host/ohci-hcd.ko
-  AUTOLOAD:=$(call AutoLoad,50,ohci-hcd,1)
+ifeq ($(CONFIG_LINUX_3_8)$(CONFIG_LINUX_3_10),)
+  FILES+=$(LINUX_DIR)/drivers/usb/host/ohci-platform.ko
+endif
+  AUTOLOAD:=$(call AutoLoad,50,ohci-hcd ohci-platform,1)
   $(call AddDepends/usb)
 endef
 
@@ -390,7 +397,6 @@ define KernelPackage/usb2
 	CONFIG_USB_OCTEON_EHCI=y \
 	CONFIG_USB_EHCI_HCD_ORION=y \
 	CONFIG_USB_EHCI_HCD_PLATFORM=y
-ifeq ($(strip $(call CompareKernelPatchVer,$(KERNEL_PATCHVER),ge,3.8.0)),1)
   FILES:= \
 	$(LINUX_DIR)/drivers/usb/host/ehci-hcd.ko \
 	$(LINUX_DIR)/drivers/usb/host/ehci-platform.ko
@@ -398,10 +404,6 @@ ifeq ($(strip $(call CompareKernelPatchVer,$(KERNEL_PATCHVER),ge,3.8.0)),1)
     FILES+=$(LINUX_DIR)/drivers/usb/host/ehci-orion.ko
   endif
   AUTOLOAD:=$(call AutoLoad,40,ehci-hcd ehci-platform ehci-orion,1)
-else
-  FILES:=$(LINUX_DIR)/drivers/usb/host/ehci-hcd.ko
-  AUTOLOAD:=$(call AutoLoad,40,ehci-hcd,1)
-endif
   $(call AddDepends/usb)
 endef
 
@@ -414,7 +416,7 @@ $(eval $(call KernelPackage,usb2))
 
 define KernelPackage/usb2-pci
   TITLE:=Support for PCI USB2 controllers
-  DEPENDS:=@PCI_SUPPORT @(!LINUX_3_3&&!LINUX_3_6) +kmod-usb2
+  DEPENDS:=@PCI_SUPPORT +kmod-usb2
   KCONFIG:=CONFIG_USB_EHCI_PCI
   FILES:=$(LINUX_DIR)/drivers/usb/host/ehci-pci.ko
   AUTOLOAD:=$(call AutoLoad,42,ehci-pci,1)
@@ -430,21 +432,17 @@ $(eval $(call KernelPackage,usb2-pci))
 
 define KernelPackage/usb-dwc2
   TITLE:=DWC2 USB controller driver
-  DEPENDS:=@(!LINUX_3_3&&!LINUX_3_6&&!LINUX_3_8&&!LINUX_3_9)
+  DEPENDS:=@!LINUX_3_8 @!LINUX_3_10
   KCONFIG:= \
 	CONFIG_USB_DWC2 \
+	CONFIG_USB_DWC2_PCI \
+	CONFIG_USB_DWC2_PLATFORM \
 	CONFIG_USB_DWC2_DEBUG=n \
 	CONFIG_USB_DWC2_VERBOSE=n \
 	CONFIG_USB_DWC2_TRACK_MISSED_SOFS=n
-ifeq ($(strip $(call CompareKernelPatchVer,$(KERNEL_PATCHVER),ge,3.14.0)),1)
   FILES:= \
 	$(LINUX_DIR)/drivers/usb/dwc2/dwc2.ko \
 	$(LINUX_DIR)/drivers/usb/dwc2/dwc2_platform.ko
-else
-  FILES:= \
-	$(LINUX_DIR)/drivers/staging/dwc2/dwc2.ko \
-	$(LINUX_DIR)/drivers/staging/dwc2/dwc2_platform.ko
-endif
   AUTOLOAD:=$(call AutoLoad,54,dwc2 dwc2_platform,1)
   $(call AddDepends/usb)
 endef
@@ -455,6 +453,23 @@ define KernelPackage/usb-dwc2/description
 endef
 
 $(eval $(call KernelPackage,usb-dwc2))
+
+
+define KernelPackage/usb2-oxnas
+  TITLE:=OXNAS USB controller driver
+  DEPENDS:=@TARGET_oxnas +kmod-usb2
+  KCONFIG:=CONFIG_USB_EHCI_OXNAS
+  FILES:=$(LINUX_DIR)/drivers/usb/host/ehci-oxnas.ko
+  AUTOLOAD:=$(call AutoLoad,55,ehci-oxnas,1)
+  $(call AddDepends/usb)
+endef
+
+define KernelPackage/usb2-oxnas/description
+ This driver provides USB Device Controller support for the
+ EHCI USB host built-in to the PLXTECH NAS782x SoC
+endef
+
+$(eval $(call KernelPackage,usb2-oxnas))
 
 
 define KernelPackage/usb-acm
@@ -998,7 +1013,7 @@ endef
 
 define KernelPackage/usb-net-asix
   TITLE:=Kernel module for USB-to-Ethernet Asix convertors
-  DEPENDS:=+!LINUX_3_3:kmod-libphy
+  DEPENDS:=+kmod-libphy
   KCONFIG:=CONFIG_USB_NET_AX8817X
   FILES:=$(LINUX_DIR)/drivers/$(USBNET_DIR)/asix.ko
   AUTOLOAD:=$(call AutoProbe,asix)
@@ -1010,6 +1025,23 @@ define KernelPackage/usb-net-asix/description
 endef
 
 $(eval $(call KernelPackage,usb-net-asix))
+
+
+define KernelPackage/usb-net-asix-ax88179
+  TITLE:=Kernel module for USB-to-Gigabit-Ethernet Asix convertors
+  DEPENDS:=+kmod-libphy
+  KCONFIG:=CONFIG_USB_NET_AX88179_178A
+  FILES:=$(LINUX_DIR)/drivers/$(USBNET_DIR)/ax88179_178a.ko
+  AUTOLOAD:=$(call AutoProbe,ax88179_178a)
+  $(call AddDepends/usb-net)
+endef
+
+define KernelPackage/usb-net-asix-ax88179/description
+ Kernel module for USB-to-Ethernet ASIX AX88179 based USB 3.0/2.0
+ to Gigabit Ethernet adapters.
+endef
+
+$(eval $(call KernelPackage,usb-net-asix-ax88179))
 
 
 define KernelPackage/usb-net-hso
@@ -1079,7 +1111,7 @@ define KernelPackage/usb-net-smsc95xx
   KCONFIG:=CONFIG_USB_NET_SMSC95XX
   FILES:=$(LINUX_DIR)/drivers/$(USBNET_DIR)/smsc95xx.ko
   AUTOLOAD:=$(call AutoProbe,smsc95xx)
-  $(call AddDepends/usb-net, +(!LINUX_3_3&&!LINUX_3_6):kmod-lib-crc16)
+  $(call AddDepends/usb-net, +kmod-lib-crc16)
 endef
 
 define KernelPackage/usb-net-smsc95xx/description
@@ -1212,6 +1244,21 @@ endef
 $(eval $(call KernelPackage,usb-net-cdc-ncm))
 
 
+define KernelPackage/usb-net-huawei-cdc-ncm
+  TITLE:=Support for Huawei CDC NCM connections
+  KCONFIG:=CONFIG_USB_NET_HUAWEI_CDC_NCM
+  FILES:= $(LINUX_DIR)/drivers/$(USBNET_DIR)/huawei_cdc_ncm.ko
+  AUTOLOAD:=$(call AutoProbe,huawei_cdc_ncm)
+  $(call AddDepends/usb-net,+kmod-usb-net-cdc-ncm +kmod-usb-wdm @!LINUX_3_8 @!LINUX_3_10)
+endef
+
+define KernelPackage/usb-net-huawei-cdc-ncm/description
+ Kernel support for Huawei CDC NCM connections
+endef
+
+$(eval $(call KernelPackage,usb-net-huawei-cdc-ncm))
+
+
 define KernelPackage/usb-net-sierrawireless
   TITLE:=Support for Sierra Wireless devices
   KCONFIG:=CONFIG_USB_SIERRA_NET
@@ -1326,7 +1373,9 @@ define KernelPackage/usbip
   KCONFIG:= \
 	CONFIG_USBIP_CORE \
 	CONFIG_USBIP_DEBUG=n
-  FILES:=$(LINUX_DIR)/drivers/staging/usbip/usbip-core.ko
+  FILES:= \
+	$(LINUX_DIR)/drivers/staging/usbip/usbip-core.ko@lt3.17 \
+	$(LINUX_DIR)/drivers/usb/usbip/usbip-core.ko@ge3.17
   AUTOLOAD:=$(call AutoProbe,usbip-core)
   $(call AddDepends/usb)
 endef
@@ -1338,7 +1387,9 @@ define KernelPackage/usbip-client
   TITLE := USB-over-IP client driver
   DEPENDS := +kmod-usbip
   KCONFIG := CONFIG_USBIP_VHCI_HCD
-  FILES := $(LINUX_DIR)/drivers/staging/usbip/vhci-hcd.$(LINUX_KMOD_SUFFIX)
+  FILES := \
+	$(LINUX_DIR)/drivers/staging/usbip/vhci-hcd.ko@lt3.17 \
+	$(LINUX_DIR)/drivers/usb/usbip/vhci-hcd.ko@ge3.17
   AUTOLOAD := $(call AutoProbe,vhci-hcd)
   $(call AddDepends/usb)
 endef
@@ -1351,7 +1402,9 @@ $(call KernelPackage/usbip/Default)
   TITLE := USB-over-IP host driver
   DEPENDS := +kmod-usbip
   KCONFIG := CONFIG_USBIP_HOST
-  FILES := $(LINUX_DIR)/drivers/staging/usbip/usbip-host.ko
+  FILES := \
+	$(LINUX_DIR)/drivers/staging/usbip/usbip-host.ko@lt3.17 \
+	$(LINUX_DIR)/drivers/usb/usbip/usbip-host.ko@ge3.17
   AUTOLOAD := $(call AutoProbe,usbip-host)
   $(call AddDepends/usb)
 endef
@@ -1359,35 +1412,27 @@ endef
 $(eval $(call KernelPackage,usbip-server))
 
 
-define KernelPackage/usb-chipidea
+define KernelPackage/usb-chipidea-imx
   TITLE:=Support for ChipIdea controllers
-  DEPENDS:=+kmod-usb2 +USB_GADGET_SUPPORT:kmod-usb-gadget
+  DEPENDS:=@TARGET_imx6||TARGET_mxs +kmod-usb2 +USB_GADGET_SUPPORT:kmod-usb-gadget
   KCONFIG:=\
 	CONFIG_USB_CHIPIDEA \
 	CONFIG_USB_CHIPIDEA_HOST=y \
 	CONFIG_USB_CHIPIDEA_UDC=y \
 	CONFIG_USB_CHIPIDEA_DEBUG=y
-ifeq ($(strip $(call CompareKernelPatchVer,$(KERNEL_PATCHVER),lt,3.11.0)),1)
-  FILES:=\
-	$(LINUX_DIR)/drivers/usb/chipidea/ci_hdrc.ko \
-	$(if $(CONFIG_OF_DEVICE),$(LINUX_DIR)/drivers/usb/chipidea/ci13xxx_imx.ko) \
-	$(if $(CONFIG_OF_DEVICE),$(LINUX_DIR)/drivers/usb/chipidea/usbmisc_imx$(if $(call kernel_patchver_le,3.9),6q).ko)
-  AUTOLOAD:=$(call AutoLoad,51,ci_hdrc $(if $(CONFIG_OF_DEVICE),ci13xxx_imx usbmisc_imx$(if $(call kernel_patchver_le,3.9),6q)),1)
-else
   FILES:=\
 	$(LINUX_DIR)/drivers/usb/chipidea/ci_hdrc.ko \
 	$(if $(CONFIG_OF),$(LINUX_DIR)/drivers/usb/chipidea/ci_hdrc_imx.ko) \
 	$(if $(CONFIG_OF),$(LINUX_DIR)/drivers/usb/chipidea/usbmisc_imx.ko)
   AUTOLOAD:=$(call AutoLoad,51,ci_hdrc $(if $(CONFIG_OF),ci_hdrc_imx usbmisc_imx),1)
-endif
   $(call AddDepends/usb)
 endef
-  
-define KernelPackage/usb-chipidea/description
+
+define KernelPackage/usb-chipidea-imx/description
  Kernel support for USB ChipIdea controllers
 endef
 
-$(eval $(call KernelPackage,usb-chipidea,1))
+$(eval $(call KernelPackage,usb-chipidea-imx,1))
 
 
 define KernelPackage/usb-mxs-phy
@@ -1421,16 +1466,20 @@ endef
 
 $(eval $(call KernelPackage,usbmon))
 
+XHCI_FILES := $(wildcard $(patsubst %,$(LINUX_DIR)/drivers/usb/host/%.ko,xhci-hcd xhci-pci xhci-plat))
+XHCI_AUTOLOAD := $(patsubst $(LINUX_DIR)/drivers/usb/host/%.ko,%,$(XHCI_FILES))
 
 define KernelPackage/usb3
   TITLE:=Support for USB3 controllers
   DEPENDS:=+TARGET_omap:kmod-usb-phy-omap-usb3
   KCONFIG:= \
 	CONFIG_USB_XHCI_HCD \
+	CONFIG_USB_XHCI_PCI \
+	CONFIG_USB_XHCI_PLATFORM \
 	CONFIG_USB_XHCI_HCD_DEBUGGING=n
   FILES:= \
-	$(LINUX_DIR)/drivers/usb/host/xhci-hcd.ko
-  AUTOLOAD:=$(call AutoLoad,54,xhci-hcd,1)
+	$(XHCI_FILES)
+  AUTOLOAD:=$(call AutoLoad,54,$(XHCI_AUTOLOAD),1)
   $(call AddDepends/usb)
 endef
 

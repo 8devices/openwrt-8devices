@@ -22,8 +22,6 @@ Signed-off-by: John Crispin <blogic@openwrt.org>
  create mode 100644 arch/mips/ralink/malta-amon.c
  create mode 100644 arch/mips/ralink/mt7621.c
 
-diff --git a/arch/mips/include/asm/gic.h b/arch/mips/include/asm/gic.h
-index b2e3e93..29fba50 100644
 --- a/arch/mips/include/asm/gic.h
 +++ b/arch/mips/include/asm/gic.h
 @@ -19,7 +19,11 @@
@@ -38,9 +36,6 @@ index b2e3e93..29fba50 100644
  
  #define MSK(n) ((1 << (n)) - 1)
  #define REG32(addr)		(*(volatile unsigned int *) (addr))
-diff --git a/arch/mips/include/asm/mach-ralink/irq.h b/arch/mips/include/asm/mach-ralink/irq.h
-new file mode 100644
-index 0000000..4321865
 --- /dev/null
 +++ b/arch/mips/include/asm/mach-ralink/irq.h
 @@ -0,0 +1,9 @@
@@ -53,9 +48,6 @@ index 0000000..4321865
 +#include_next <irq.h>
 +
 +#endif
-diff --git a/arch/mips/include/asm/mach-ralink/mt7621.h b/arch/mips/include/asm/mach-ralink/mt7621.h
-new file mode 100644
-index 0000000..21c8dc2
 --- /dev/null
 +++ b/arch/mips/include/asm/mach-ralink/mt7621.h
 @@ -0,0 +1,39 @@
@@ -98,8 +90,6 @@ index 0000000..21c8dc2
 +#define MIPS_GIC_IRQ_BASE           (MIPS_CPU_IRQ_BASE + 8)
 +
 +#endif
-diff --git a/arch/mips/kernel/vmlinux.lds.S b/arch/mips/kernel/vmlinux.lds.S
-index 3b46f7c..fa925b7 100644
 --- a/arch/mips/kernel/vmlinux.lds.S
 +++ b/arch/mips/kernel/vmlinux.lds.S
 @@ -51,6 +51,7 @@ SECTIONS
@@ -110,8 +100,6 @@ index 3b46f7c..fa925b7 100644
  		TEXT_TEXT
  		SCHED_TEXT
  		LOCK_TEXT
-diff --git a/arch/mips/ralink/Kconfig b/arch/mips/ralink/Kconfig
-index 1bfd1c1..6a04360 100644
 --- a/arch/mips/ralink/Kconfig
 +++ b/arch/mips/ralink/Kconfig
 @@ -7,6 +7,11 @@ config CLKEVT_RT3352
@@ -153,8 +141,6 @@ index 1bfd1c1..6a04360 100644
  endchoice
  
  endif
-diff --git a/arch/mips/ralink/Makefile b/arch/mips/ralink/Makefile
-index fc57c16..ad18cdf 100644
 --- a/arch/mips/ralink/Makefile
 +++ b/arch/mips/ralink/Makefile
 @@ -6,16 +6,21 @@
@@ -180,11 +166,9 @@ index fc57c16..ad18cdf 100644
  
  obj-$(CONFIG_EARLY_PRINTK) += early_printk.o
  
-diff --git a/arch/mips/ralink/Platform b/arch/mips/ralink/Platform
-index 6d9c8c4..6095fcc 100644
 --- a/arch/mips/ralink/Platform
 +++ b/arch/mips/ralink/Platform
-@@ -27,3 +27,8 @@ cflags-$(CONFIG_SOC_RT3883)	+= -I$(srctree)/arch/mips/include/asm/mach-ralink/rt
+@@ -27,3 +27,8 @@ cflags-$(CONFIG_SOC_RT3883)	+= -I$(srctr
  #
  load-$(CONFIG_SOC_MT7620)	+= 0xffffffff80000000
  cflags-$(CONFIG_SOC_MT7620)	+= -I$(srctree)/arch/mips/include/asm/mach-ralink/mt7620
@@ -193,9 +177,6 @@ index 6d9c8c4..6095fcc 100644
 +#
 +load-$(CONFIG_SOC_MT7621)	+= 0xffffffff80001000
 +cflags-$(CONFIG_SOC_MT7621)	+= -I$(srctree)/arch/mips/include/asm/mach-ralink/mt7621
-diff --git a/arch/mips/ralink/irq-gic.c b/arch/mips/ralink/irq-gic.c
-new file mode 100644
-index 0000000..0122d42
 --- /dev/null
 +++ b/arch/mips/ralink/irq-gic.c
 @@ -0,0 +1,271 @@
@@ -330,7 +311,7 @@ index 0000000..0122d42
 +	if (likely(irq < GIC_NUM_INTRS))
 +		do_IRQ(MIPS_GIC_IRQ_BASE + irq);
 +	else {
-+		pr_err("Spurious GIC Interrupt!\n");
++		pr_debug("Spurious GIC Interrupt!\n");
 +		spurious_interrupt();
 +	}
 +
@@ -470,9 +451,6 @@ index 0000000..0122d42
 +{
 +	of_irq_init(of_irq_ids);
 +}
-diff --git a/arch/mips/ralink/malta-amon.c b/arch/mips/ralink/malta-amon.c
-new file mode 100644
-index 0000000..1e47844
 --- /dev/null
 +++ b/arch/mips/ralink/malta-amon.c
 @@ -0,0 +1,81 @@
@@ -557,9 +535,6 @@ index 0000000..1e47844
 +	smp_rmb();	/* Target will be updating flags soon */
 +	pr_debug("launch: cpu%d gone!\n", cpu);
 +}
-diff --git a/arch/mips/ralink/mt7621.c b/arch/mips/ralink/mt7621.c
-new file mode 100644
-index 0000000..2aac87c
 --- /dev/null
 +++ b/arch/mips/ralink/mt7621.c
 @@ -0,0 +1,183 @@
@@ -617,10 +592,10 @@ index 0000000..2aac87c
 +#define MT7621_GPIO_MODE_SDHCI_SHIFT	18
 +#define MT7621_GPIO_MODE_SDHCI_GPIO	1
 +
-+static struct rt2880_pmx_func uart1_grp[] =  { FUNC("uart1", 0, 1, 2) };
++static struct rt2880_pmx_func uart1_grp[] =  { FUNC("uart", 0, 1, 2) };
 +static struct rt2880_pmx_func i2c_grp[] =  { FUNC("i2c", 0, 3, 2) };
-+static struct rt2880_pmx_func uart3_grp[] = { FUNC("uart3", 0, 5, 4) };
-+static struct rt2880_pmx_func uart2_grp[] = { FUNC("uart2", 0, 9, 4) };
++static struct rt2880_pmx_func uart3_grp[] = { FUNC("uart", 0, 5, 4) };
++static struct rt2880_pmx_func uart2_grp[] = { FUNC("uart", 0, 9, 4) };
 +static struct rt2880_pmx_func jtag_grp[] = { FUNC("jtag", 0, 13, 5) };
 +static struct rt2880_pmx_func wdt_grp[] = {
 +	FUNC("wdt rst", 0, 18, 1),
@@ -631,7 +606,7 @@ index 0000000..2aac87c
 +	FUNC("pcie refclk", MT7621_GPIO_MODE_PCIE_REF, 19, 1)
 +};
 +static struct rt2880_pmx_func mdio_grp[] = { FUNC("mdio", 0, 20, 2) };
-+static struct rt2880_pmx_func rgmii2_grp[] = { FUNC("rgmii2", 0, 22, 12) };
++static struct rt2880_pmx_func rgmii2_grp[] = { FUNC("rgmii", 0, 22, 12) };
 +static struct rt2880_pmx_func spi_grp[] = {
 +	FUNC("spi", 0, 34, 7),
 +	FUNC("nand", 2, 34, 8),
@@ -640,7 +615,7 @@ index 0000000..2aac87c
 +	FUNC("sdhci", 0, 41, 8),
 +	FUNC("nand", 2, 41, 8),
 +};
-+static struct rt2880_pmx_func rgmii1_grp[] = { FUNC("rgmii1", 0, 49, 12) };
++static struct rt2880_pmx_func rgmii1_grp[] = { FUNC("rgmii", 0, 49, 12) };
 +
 +static struct rt2880_pmx_group mt7621_pinmux_data[] = {
 +	GRP("uart1", uart1_grp, 1, MT7621_GPIO_MODE_UART1),
@@ -746,6 +721,3 @@ index 0000000..2aac87c
 +	if (register_cmp_smp_ops())
 +		panic("failed to register_vsmp_smp_ops()");
 +}
--- 
-1.7.10.4
-

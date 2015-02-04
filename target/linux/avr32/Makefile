@@ -12,7 +12,7 @@ BOARDNAME:=Atmel AVR32
 FEATURES:=squashfs
 MAINTAINER:=Imre Kaloz <kaloz@openwrt.org>
 
-LINUX_VERSION:=3.10.49
+KERNEL_PATCHVER:=3.10
 
 include $(INCLUDE_DIR)/target.mk
 
@@ -20,6 +20,6 @@ define Target/Description
   Build firmware images for ATNGW100 board
 endef
 
-KERNELNAME:="uImage"
+KERNELNAME:=uImage
 
 $(eval $(call BuildTarget))

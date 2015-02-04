@@ -1,6 +1,6 @@
 --- a/arch/mips/ath79/machtypes.h
 +++ b/arch/mips/ath79/machtypes.h
-@@ -109,6 +109,7 @@ enum ath79_mach_type {
+@@ -110,6 +110,7 @@ enum ath79_mach_type {
  	ATH79_MACH_TL_WA901ND_V3,	/* TP-LINK TL-WA901ND v3 */
  	ATH79_MACH_TL_WDR3500,		/* TP-LINK TL-WDR3500 */
  	ATH79_MACH_TL_WDR4300,		/* TP-LINK TL-WDR4300 */
@@ -10,7 +10,7 @@
  	ATH79_MACH_TL_WR1043ND_V2,	/* TP-LINK TL-WR1043ND v2 */
 --- a/arch/mips/ath79/Kconfig
 +++ b/arch/mips/ath79/Kconfig
-@@ -549,8 +549,9 @@ config ATH79_MACH_EAP7660D
+@@ -559,8 +559,9 @@ config ATH79_MACH_EAP7660D
  	select ATH79_DEV_M25P80
  
  config ATH79_MACH_ARCHER_C7

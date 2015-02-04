@@ -17,18 +17,14 @@ PKG_SOURCE_URL:=http://ipset.netfilter.org
 PKG_MD5SUM:=8af741492752fbf24d3a28a9d1473d40
 
 PKG_MAINTAINER:=Jo-Philipp Wich <jow@openwrt.org>
+PKG_LICENSE:=GPL-2.0
 
 PKG_FIXUP:=autoreconf
 PKG_INSTALL:=1
 
 include $(INCLUDE_DIR)/package.mk
 
-define Package/ipset/Default
-  DEPENDS:= @(!(TARGET_ps3||TARGET_pxcab)||BROKEN)
-endef
-
 define Package/ipset
-$(call Package/ipset/Default)
   SECTION:=net
   CATEGORY:=Network
   DEPENDS+= +kmod-ipt-ipset +libmnl
@@ -71,7 +67,6 @@ define Package/ipset/install
 endef
 
 define KernelPackage/ipt-ipset
-$(call Package/ipset/Default)
   SUBMENU:=Netfilter Extensions
   TITLE:=IPset netfilter modules
   DEPENDS+= +kmod-ipt-core +kmod-nfnetlink

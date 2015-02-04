@@ -367,6 +367,9 @@ Image/Build/Profile/GIGASX76X=$(call Image/Build/$(1),$(1),GIGASX76X)
 
 
 # AR9
+Image/BuildKernel/Profile/BTHOMEHUBV3A=$(call Image/BuildKernel/Template,BTHOMEHUBV3A)
+Image/Build/Profile/BTHOMEHUBV3A=$(call Image/BuildNAND/$(1),$(1),BTHOMEHUBV3A)
+
 Image/BuildKernel/Profile/DGN3500=$(call Image/BuildKernel/Template,DGN3500)
 Image/Build/Profile/DGN3500=$(call Image/BuildDGN3500/$(1),$(1),DGN3500)
 
@@ -397,15 +400,14 @@ endif
 ifeq ($(CONFIG_TARGET_lantiq_xrx200),y)
 
 # VR9
-Image/BuildKernel/Profile/P2812HNUFX=$(call Image/BuildKernel/Template,P2812HNUFX)
-Image/InstallKernel/Template/P2812HNUFX=$(call Image/InstallKernel/Template,P2812HNUFX)
-Image/Build/Profile/P2812HNUFX=$(call Image/Build/$(1),$(1),P2812HNUFX)
+Image/BuildKernel/Profile/P2812HNUF1=$(call Image/BuildKernel/Template,P2812HNUF1)
+Image/Build/Profile/P2812HNUF1=$(call Image/BuildNAND/$(1),$(1),P2812HNUF1)
 
-Image/BuildKernel/Profile/ARV7519RWV11=$(call Image/BuildKernel/Template,ARV7519RWV11,$(1))
-Image/Build/Profile/ARV7519RWV11=$(call Image/Build/$(1),$(1),ARV7519RWV11)
+Image/BuildKernel/Profile/P2812HNUF3=$(call Image/BuildKernel/Template,P2812HNUF3)
+Image/Build/Profile/P2812HNUF3=$(call Image/BuildNAND/$(1),$(1),P2812HNUF3)
 
-Image/BuildKernel/Profile/ARV7519RWV12=$(call Image/BuildKernel/Template,ARV7519RWV12,$(1))
-Image/Build/Profile/ARV7519RWV12=$(call Image/Build/$(1),$(1),ARV7519RWV12)
+Image/BuildKernel/Profile/ARV7519RW22=$(call Image/BuildKernel/Template,ARV7519RW22,$(1))
+Image/Build/Profile/ARV7519RW22=$(call Image/Build/$(1),$(1),ARV7519RW22)
 
 Image/BuildKernel/Profile/EASY80920NAND=$(call Image/BuildKernel/Template,EASY80920NAND)
 Image/Build/Profile/EASY80920NAND=$(call Image/Build/$(1),$(1),EASY80920NAND)

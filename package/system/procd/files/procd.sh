@@ -18,6 +18,7 @@
 #     file: configuration files (array)
 #     netdev: bound network device (detects ifindex changes)
 #     limits: resource limits (passed to the process)
+#     user info: array with 1 values $username
 #
 #   No space separation is done for arrays/tables - use one function argument per command line argument
 #
@@ -75,7 +76,7 @@ _procd_close_service() {
 }
 
 _procd_add_array_data() {
-	while [ -n "$1" ]; do
+	while [ "$#" -gt 0 ]; do
 		json_add_string "" "$1"
 		shift
 	done
@@ -92,7 +93,7 @@ _procd_add_table_data() {
 	while [ -n "$1" ]; do
 		local var="${1%%=*}"
 		local val="${1#*=}"
-		[[ "$1" == "$val" ]] && val=
+		[ "$1" = "$val" ] && val=
 		json_add_string "$var" "$val"
 		shift
 	done
@@ -138,6 +139,9 @@ _procd_set_param() {
 		;;
 		nice)
 			json_add_int "$type" "$1"
+		;;
+		user)
+			json_add_string "$type" "$1"
 		;;
 	esac
 }
@@ -191,6 +195,24 @@ _procd_add_config_trigger() {
 	json_close_array
 
 	json_close_array
+
+	json_close_array
+}
+
+_procd_add_raw_trigger() {
+	json_add_array
+	_procd_add_array_data "$1"
+	shift
+	local timeout=$1
+	shift
+
+	json_add_array
+	json_add_array
+	_procd_add_array_data "run_script" "$@"
+	json_close_array
+	json_close_array
+
+	json_add_int "" "$timeout"
 
 	json_close_array
 }
@@ -287,6 +309,30 @@ _procd_set_config_changed() {
 	ubus call service event "$(json_dump)"
 }
 
+procd_add_mdns_service() {
+	local service proto port
+	service=$1; shift
+	proto=$1; shift
+	port=$1; shift
+	json_add_object "${service}_$port"
+	json_add_string "service" "_$service._$proto.local"
+	json_add_int port "$port"
+	[ -n "$1" ] && {
+		json_add_array txt
+		for txt in $@; do json_add_string "" $txt; done
+		json_select ..
+	}
+	json_select ..
+}
+
+procd_add_mdns() {
+	procd_open_data
+	json_add_object "mdns"
+	procd_add_mdns_service $@
+	json_close_object
+	procd_close_data
+}
+
 uci_validate_section()
 {
 	local _package="$1"
@@ -306,6 +352,7 @@ _procd_wrapper \
 	procd_open_service \
 	procd_close_service \
 	procd_add_instance \
+	procd_add_raw_trigger \
 	procd_add_config_trigger \
 	procd_add_interface_trigger \
 	procd_add_reload_trigger \

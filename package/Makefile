@@ -59,6 +59,7 @@ endif
 
 # where to build (and put) .ipk packages
 OPKG:= \
+  IPKG_NO_SCRIPT=1 \
   IPKG_TMP=$(TMP_DIR)/ipkg \
   IPKG_INSTROOT=$(TARGET_DIR) \
   IPKG_CONF_DIR=$(STAGING_DIR)/etc \
@@ -108,15 +109,15 @@ $(curdir)/install: $(TMP_DIR)/.build
 	@mkdir -p $(TARGET_DIR)/etc/rc.d
 	@( \
 		cd $(TARGET_DIR); \
-		for script in ./etc/init.d/*; do \
-			grep '#!/bin/sh /etc/rc.common' $$script >/dev/null || continue; \
-			IPKG_INSTROOT=$(TARGET_DIR) $$(which bash) ./etc/rc.common $$script enable; \
+		for script in ./usr/lib/opkg/info/*.postinst; do \
+			IPKG_INSTROOT=$(TARGET_DIR) $$(which bash) $$script; \
 		done || true \
 	)
 	@-find $(TARGET_DIR) -name CVS   | $(XARGS) rm -rf
 	@-find $(TARGET_DIR) -name .svn  | $(XARGS) rm -rf
 	@-find $(TARGET_DIR) -name '.#*' | $(XARGS) rm -f
-	rm -f $(TARGET_DIR)/usr/lib/opkg/info/*.postinst
+	rm -f $(TARGET_DIR)/usr/lib/opkg/info/*.postinst*
+	rm -f $(TARGET_DIR)/usr/lib/opkg/info/*.prerm*
 	$(if $(CONFIG_CLEAN_IPKG),rm -rf $(TARGET_DIR)/usr/lib/opkg)
 	$(call mklibs)
 

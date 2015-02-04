@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2006-2014 OpenWrt.org
+# Copyright (C) 2006-2015 OpenWrt.org
 #
 # This is free software, licensed under the GNU General Public License v2.
 # See /LICENSE for more information.
@@ -8,13 +8,14 @@
 include $(TOPDIR)/rules.mk
 
 PKG_NAME:=iproute2
-PKG_VERSION:=3.15.0
+PKG_VERSION:=3.18.0
 PKG_RELEASE:=1
 
 PKG_SOURCE:=$(PKG_NAME)-$(PKG_VERSION).tar.xz
 PKG_SOURCE_URL:=http://kernel.org/pub/linux/utils/net/iproute2/
-PKG_MD5SUM:=5b1711c9d16071959052e369a2682d77
+PKG_MD5SUM:=6f6ad51a00007880460e103367b16057
 PKG_BUILD_PARALLEL:=1
+PKG_LICENSE:=GPL-2.0
 
 PKG_BUILD_DIR:=$(BUILD_DIR)/$(PKG_NAME)-$(BUILD_VARIANT)/$(PKG_NAME)-$(PKG_VERSION)
 
@@ -31,7 +32,11 @@ define Package/iproute2/Default
   VARIANT:=$(1)
 endef
 
-Package/ip=$(call Package/iproute2/Default,tiny,Minimal)
+define Package/ip
+$(call Package/iproute2/Default,tiny,Minimal)
+  CONFLICTS:=ip-full
+endef
+
 Package/ip-full=$(call Package/iproute2/Default,full,Full)
 
 define Package/ip/conffiles
@@ -51,6 +56,11 @@ endef
 define Package/genl
 $(call Package/iproute2/Default)
   TITLE:=General netlink utility frontend
+endef
+
+define Package/ip-bridge
+$(call Package/iproute2/Default)
+  TITLE:=Bridge configuration utility from iproute2
 endef
 
 define Package/ss
@@ -76,6 +86,9 @@ ifdef CONFIG_USE_EGLIBC
   ifndef CONFIG_EGLIBC_VERSION_2_13
     TARGET_CFLAGS += -DHAVE_SETNS
   endif
+endif
+ifdef CONFIG_USE_MUSL
+  TARGET_CFLAGS += -DHAVE_SETNS
 endif
 
 TARGET_CFLAGS += -ffunction-sections -fdata-sections
@@ -122,6 +135,11 @@ define Package/genl/install
 	$(INSTALL_BIN) $(PKG_BUILD_DIR)/genl/genl $(1)/usr/sbin/
 endef
 
+define Package/ip-bridge/install
+	$(INSTALL_DIR) $(1)/usr/sbin
+	$(INSTALL_BIN) $(PKG_BUILD_DIR)/bridge/bridge $(1)/usr/sbin/
+endef
+
 define Package/ss/install
 	$(INSTALL_DIR) $(1)/usr/sbin
 	$(INSTALL_BIN) $(PKG_BUILD_DIR)/misc/ss $(1)/usr/sbin/
@@ -131,4 +149,5 @@ $(eval $(call BuildPackage,ip))
 $(eval $(call BuildPackage,ip-full))
 $(eval $(call BuildPackage,tc))
 $(eval $(call BuildPackage,genl))
+$(eval $(call BuildPackage,ip-bridge))
 $(eval $(call BuildPackage,ss))

@@ -29,8 +29,24 @@ kirkwood_board_detect() {
 		name="pogo_e02"
 		;;
 
+	"Linksys EA3500")
+		name="ea3500"
+		;;
+
 	"Linksys EA4500")
 		name="ea4500"
+		;;
+
+	"Globalscale Technologies Guruplug Server Plus")
+		name="guruplug-server-plus"
+		;;
+
+	"Globalscale Technologies SheevaPlug")
+		name="sheevaplug"
+		;;
+
+	"Globalscale Technologies eSATA SheevaPlug")
+		name="sheevaplug-esata"
 		;;
 
 	*)

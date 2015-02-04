@@ -54,6 +54,7 @@ help: FORCE
 # override variables from rules.mk
 PACKAGE_DIR:=$(TOPDIR)/packages
 OPKG:= \
+  IPKG_NO_SCRIPT=1 \
   IPKG_TMP="$(TOPDIR)/tmp/ipkgtmp" \
   IPKG_INSTROOT="$(TARGET_DIR)" \
   IPKG_CONF_DIR="$(TOPDIR)/tmp" \
@@ -77,6 +78,7 @@ define Profile
   endif
   $(1)_NAME:=$(NAME)
   $(1)_PACKAGES:=$(PACKAGES)
+  PROFILE_NAMES += $(1)
   PROFILE_LIST += \
   	echo '$(1):'; [ -z '$(NAME)' ] || echo '	$(NAME)'; echo '	Packages: $(PACKAGES)';
 endef
@@ -142,13 +144,14 @@ package_postinst: FORCE
 	@rm -f $(TARGET_DIR)/tmp/opkg.lock
 	@echo
 	@echo Activating init scripts
+	@mkdir -p $(TARGET_DIR)/etc/rc.d
 	@( \
 		cd $(TARGET_DIR); \
-		for script in ./etc/init.d/*; do \
-			grep '#!/bin/sh /etc/rc.common' $$script >/dev/null || continue; \
-			IPKG_INSTROOT=$(TARGET_DIR) $(which bash) ./etc/rc.common $$script enable; \
-		done || true; \
+		for script in ./usr/lib/opkg/info/*.postinst; do \
+			IPKG_INSTROOT=$(TARGET_DIR) $$(which bash) $$script; \
+		done || true \
 	)
+	rm -f $(TARGET_DIR)/usr/lib/opkg/info/*.postinst
 	$(if $(CONFIG_CLEAN_IPKG),rm -rf $(TARGET_DIR)/usr/lib/opkg)
 
 build_image: FORCE
@@ -165,6 +168,13 @@ info:
 	(unset PROFILE FILES PACKAGES MAKEFLAGS; $(MAKE) -s _call_info)
 
 image:
+ifneq ($(PROFILE),)
+  ifeq ($(filter $(PROFILE),$(PROFILE_NAMES)),)
+	@echo 'Profile "$(PROFILE)" does not exist!'
+	@echo 'Use "make info" to get a list of available profile names.'
+	@exit 1
+  endif
+endif
 	(unset PROFILE FILES PACKAGES MAKEFLAGS; \
 	$(MAKE) _call_image \
 		$(if $(PROFILE),USER_PROFILE="$(PROFILE)") \

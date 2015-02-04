@@ -1,6 +1,6 @@
 --- a/arch/mips/ath79/machtypes.h
 +++ b/arch/mips/ath79/machtypes.h
-@@ -16,22 +16,144 @@
+@@ -16,22 +16,147 @@
  
  enum ath79_mach_type {
  	ATH79_MACH_GENERIC = 0,
@@ -24,6 +24,7 @@
 +	ATH79_MACH_BHU_BXU2000N2_A1,	/* BHU BXU2000n-2 A1 */
 +	ATH79_MACH_CAP4200AG,		/* Senao CAP4200AG */
 +	ATH79_MACH_CARAMBOLA2,		/* 8devices Carambola2 */
++	ATH79_MACH_CPE510,		/* TP-LINK CPE510 */
  	ATH79_MACH_DB120,		/* Atheros DB120 reference board */
  	ATH79_MACH_PB44,		/* Atheros PB44 reference board */
 +	ATH79_MACH_DIR_505_A1,		/* D-Link DIR-505 rev. A1 */
@@ -107,6 +108,7 @@
 +	ATH79_MACH_TL_WR841N_V8,	/* TP-LINK TL-WR841N/ND v8 */
 +	ATH79_MACH_TL_WR842N_V2,	/* TP-LINK TL-WR842N/ND v2 */
 +	ATH79_MACH_TL_WR941ND,		/* TP-LINK TL-WR941ND */
++	ATH79_MACH_TL_WR941ND_V5,	/* TP-LINK TL-WR941ND v5 */
  	ATH79_MACH_UBNT_AIRROUTER,	/* Ubiquiti AirRouter */
  	ATH79_MACH_UBNT_BULLET_M,	/* Ubiquiti Bullet M */
 +	ATH79_MACH_UBNT_LSSR71,		/* Ubiquiti LS-SR71 */
@@ -118,6 +120,7 @@
  	ATH79_MACH_UBNT_UAP_PRO,	/* Ubiquiti UniFi AP Pro */
  	ATH79_MACH_UBNT_UNIFI, 		/* Ubiquiti Unifi */
  	ATH79_MACH_UBNT_UNIFI_OUTDOOR,	/* Ubiquiti UnifiAP Outdoor */
++	ATH79_MACH_UBNT_UNIFI_OUTDOOR_PLUS, /* Ubiquiti UnifiAP Outdoor+ */
  	ATH79_MACH_UBNT_XM,		/* Ubiquiti Networks XM board rev 1.0 */
 +	ATH79_MACH_WHR_G301N,		/* Buffalo WHR-G301N */
 +	ATH79_MACH_WHR_HP_G300N,	/* Buffalo WHR-HP-G300N */
@@ -156,7 +159,7 @@
 +	select SOC_AR71XX
 +	select ATH79_DEV_ETH
 +	select ATH79_DEV_GPIO_BUTTONS
-+	select ATH79_DEV_SPI
++	select ATH79_DEV_M25P80
 +	select ATH79_DEV_USB
 +
 +config ATH79_MACH_HORNET_UB
@@ -209,13 +212,13 @@
  config ATH79_MACH_AP121
  	bool "Atheros AP121 reference board"
  	select SOC_AR933X
-@@ -9,64 +64,736 @@ config ATH79_MACH_AP121
- 	select ATH79_DEV_GPIO_BUTTONS
- 	select ATH79_DEV_LEDS_GPIO
+@@ -11,62 +66,743 @@ config ATH79_MACH_AP121
  	select ATH79_DEV_M25P80
--	select ATH79_DEV_USB
-+	select ATH79_DEV_USB
-+	select ATH79_DEV_WMAC
+ 	select ATH79_DEV_USB
+ 	select ATH79_DEV_WMAC
+-	help
+-	  Say 'Y' here if you want your kernel to support the
+-	  Atheros AP121 reference board.
 +	help
 +	  Say 'Y' here if you want your kernel to support the
 +	  Atheros AP121 reference board.
@@ -225,7 +228,7 @@
 +	select SOC_QCA955X
 +	select ATH79_DEV_GPIO_BUTTONS
 +	select ATH79_DEV_LEDS_GPIO
-+	select ATH79_DEV_SPI
++	select ATH79_DEV_M25P80
 +	select ATH79_DEV_USB
 +	select ATH79_DEV_WMAC
 +	help
@@ -238,7 +241,7 @@
 +	select ATH79_DEV_GPIO_BUTTONS
 +	select ATH79_DEV_LEDS_GPIO
 +	select ATH79_DEV_NFC
-+	select ATH79_DEV_SPI
++	select ATH79_DEV_M25P80
 +	select ATH79_DEV_USB
 +	select ATH79_DEV_WMAC
 +	help
@@ -350,7 +353,7 @@
 +	select ATH79_DEV_ETH
 +	select ATH79_DEV_GPIO_BUTTONS
 +	select ATH79_DEV_LEDS_GPIO
-+	select ATH79_DEV_SPI
++	select ATH79_DEV_M25P80
 +	select ATH79_DEV_USB
 +	select ATH79_DEV_WMAC
 +
@@ -678,13 +681,8 @@
 +	select ATH79_DEV_GPIO_BUTTONS
 +	select ATH79_DEV_LEDS_GPIO
 +	select ATH79_DEV_M25P80
- 	select ATH79_DEV_WMAC
--	help
--	  Say 'Y' here if you want your kernel to support the
--	  Atheros AP121 reference board.
- 
--config ATH79_MACH_AP136
--	bool "Atheros AP136/AP135 reference board"
++	select ATH79_DEV_WMAC
++
 +config ATH79_MACH_EAP7660D
 +	bool "Senao EAP7660D support"
 +	select SOC_AR71XX
@@ -695,20 +693,23 @@
 +
 +config ATH79_MACH_ARCHER_C7
 +	bool "TP-LINK Archer C7 board support"
- 	select SOC_QCA955X
++	select SOC_QCA955X
 +	select ATH79_DEV_ETH
- 	select ATH79_DEV_GPIO_BUTTONS
- 	select ATH79_DEV_LEDS_GPIO
--	select ATH79_DEV_NFC
- 	select ATH79_DEV_SPI
- 	select ATH79_DEV_USB
- 	select ATH79_DEV_WMAC
--	help
--	  Say 'Y' here if you want your kernel to support the
--	  Atheros AP136 or AP135 reference boards.
- 
--config ATH79_MACH_AP81
--	bool "Atheros AP81 reference board"
++	select ATH79_DEV_GPIO_BUTTONS
++	select ATH79_DEV_LEDS_GPIO
++	select ATH79_DEV_M25P80
++	select ATH79_DEV_USB
++	select ATH79_DEV_WMAC
++
++config ATH79_MACH_CPE510
++	bool "TP-LINK CPE510 support"
++	select SOC_AR934X
++	select ATH79_DEV_ETH
++	select ATH79_DEV_GPIO_BUTTONS
++	select ATH79_DEV_LEDS_GPIO
++	select ATH79_DEV_M25P80
++	select ATH79_DEV_WMAC
++
 +config ATH79_MACH_TL_MR11U
 +	bool "TP-LINK TL-MR11U/TL-MR3040 support"
 +	select SOC_AR933X
@@ -718,17 +719,27 @@
 +	select ATH79_DEV_M25P80
 +	select ATH79_DEV_USB
 +	select ATH79_DEV_WMAC
-+
+ 
+-config ATH79_MACH_AP136
+-	bool "Atheros AP136/AP135 reference board"
+-	select SOC_QCA955X
 +config ATH79_MACH_TL_MR13U
 +	bool "TP-LINK TL-MR13U support"
 +	select SOC_AR933X
 +	select ATH79_DEV_ETH
-+	select ATH79_DEV_GPIO_BUTTONS
-+	select ATH79_DEV_LEDS_GPIO
+ 	select ATH79_DEV_GPIO_BUTTONS
+ 	select ATH79_DEV_LEDS_GPIO
+-	select ATH79_DEV_NFC
+-	select ATH79_DEV_SPI
 +	select ATH79_DEV_M25P80
-+	select ATH79_DEV_USB
-+	select ATH79_DEV_WMAC
-+
+ 	select ATH79_DEV_USB
+ 	select ATH79_DEV_WMAC
+-	help
+-	  Say 'Y' here if you want your kernel to support the
+-	  Atheros AP136 or AP135 reference boards.
+ 
+-config ATH79_MACH_AP81
+-	bool "Atheros AP81 reference board"
 +config ATH79_MACH_TL_MR3020
 +	bool "TP-LINK TL-MR3020 support"
 +	select SOC_AR933X
@@ -852,9 +863,10 @@
 +	bool "TP-LINK TL-WR841N v1 support"
  	select SOC_AR71XX
 +	select ATH79_DEV_DSA
-+	select ATH79_DEV_ETH
-+	select ATH79_DEV_GPIO_BUTTONS
-+	select ATH79_DEV_LEDS_GPIO
+ 	select ATH79_DEV_ETH
+ 	select ATH79_DEV_GPIO_BUTTONS
+ 	select ATH79_DEV_LEDS_GPIO
+-	select ATH79_DEV_SPI
 +	select ATH79_DEV_M25P80
 +
 +config ATH79_MACH_TL_WR841N_V8
@@ -901,14 +913,11 @@
 +config ATH79_MACH_TL_WR1043ND_V2
 +	bool "TP-LINK TL-WR1043ND v2 support"
 +	select SOC_QCA955X
- 	select ATH79_DEV_ETH
- 	select ATH79_DEV_GPIO_BUTTONS
- 	select ATH79_DEV_LEDS_GPIO
- 	select ATH79_DEV_SPI
- 	select ATH79_DEV_USB
--	help
--	  Say 'Y' here if you want your kernel to support the
--	  Atheros PB44 reference board.
++	select ATH79_DEV_ETH
++	select ATH79_DEV_GPIO_BUTTONS
++	select ATH79_DEV_LEDS_GPIO
++	select ATH79_DEV_M25P80
++	select ATH79_DEV_USB
 +	select ATH79_DEV_WMAC
 +
 +config ATH79_MACH_TL_WR2543N
@@ -968,11 +977,14 @@
 +	select ATH79_DEV_GPIO_BUTTONS
 +	select ATH79_DEV_LEDS_GPIO
 +	select ATH79_DEV_M25P80
-+	select ATH79_DEV_USB
+ 	select ATH79_DEV_USB
+-	help
+-	  Say 'Y' here if you want your kernel to support the
+-	  Atheros PB44 reference board.
  
  config ATH79_MACH_UBNT_XM
  	bool "Ubiquiti Networks XM/UniFi boards"
-@@ -83,6 +810,65 @@ config ATH79_MACH_UBNT_XM
+@@ -83,6 +819,65 @@ config ATH79_MACH_UBNT_XM
  	  Say 'Y' here if you want your kernel to support the
  	  Ubiquiti Networks XM (rev 1.0) board.
  
@@ -1038,7 +1050,7 @@
  endmenu
  
  config SOC_AR71XX
-@@ -132,7 +918,10 @@ config ATH79_DEV_DSA
+@@ -132,7 +927,10 @@ config ATH79_DEV_DSA
  config ATH79_DEV_ETH
  	def_bool n
  
@@ -1050,7 +1062,7 @@
  	def_bool n
  
  config ATH79_DEV_GPIO_BUTTONS
-@@ -164,4 +953,7 @@ config ATH79_PCI_ATH9K_FIXUP
+@@ -164,4 +962,7 @@ config ATH79_PCI_ATH9K_FIXUP
  config ATH79_ROUTERBOOT
  	def_bool n
  
@@ -1060,7 +1072,7 @@
  endif
 --- a/arch/mips/ath79/Makefile
 +++ b/arch/mips/ath79/Makefile
-@@ -38,9 +38,90 @@ obj-$(CONFIG_ATH79_ROUTERBOOT)		+= route
+@@ -38,9 +38,91 @@ obj-$(CONFIG_ATH79_ROUTERBOOT)		+= route
  #
  # Machines
  #
@@ -1079,6 +1091,7 @@
 +obj-$(CONFIG_ATH79_MACH_AW_NR580)	+= mach-aw-nr580.o
 +obj-$(CONFIG_ATH79_MACH_BHU_BXU2000N2_A)+= mach-bhu-bxu2000n2-a.o
 +obj-$(CONFIG_ATH79_MACH_CAP4200AG)	+= mach-cap4200ag.o
++obj-$(CONFIG_ATH79_MACH_CPE510)		+= mach-cpe510.o
  obj-$(CONFIG_ATH79_MACH_DB120)		+= mach-db120.o
 +obj-$(CONFIG_ATH79_MACH_DIR_505_A1)	+= mach-dir-505-a1.o
 +obj-$(CONFIG_ATH79_MACH_DIR_600_A1)	+= mach-dir-600-a1.o
