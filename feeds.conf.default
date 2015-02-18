@@ -1,9 +1,9 @@
-src-git packages git://github.com/8devices/carambola2-new-packages.git
-src-git luci git://github.com/8devices/carambola2-luci.git
-src-git routing https://github.com/openwrt-routing/packages.git
-src-git telephony https://github.com/openwrt/telephony.git
-src-git management https://github.com/openwrt-management/packages.git
-src-git oldpackages git://github.com/8devices/carambola2-packages.git
+src-git packages git://github.com/8devices/carambola2-new-packages.git^d1d4e75e4fc19af718b0734393e087ce60ac1a2b
+src-git luci https://github.com/openwrt/luci.git^f1e2a26f4d315aaa7db5ac88e529a4854911f387
+src-git routing https://github.com/openwrt-routing/packages.git^9c661a093fc352871000e353cf2015bf675b5a32
+src-git telephony https://github.com/openwrt/telephony.git^d73a45ba9f4adb8dcd836dd1917dc5aedbbef92d
+src-git management https://github.com/openwrt-management/packages.git^1912a034e5d1d0606a1535a9b6281ccc80a7e322
+src-git oldpackages git://github.com/8devices/carambola2-packages.git^bd5a15b2d2b5d3ae279f449c797faa01dd1c6b1c
 
 #src-svn xwrt http://x-wrt.googlecode.com/svn/trunk/package
 #src-svn phone svn://svn.openwrt.org/openwrt/feeds/phone
