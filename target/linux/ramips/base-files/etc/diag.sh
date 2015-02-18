@@ -88,9 +88,7 @@ get_status_led() {
 	m4)
 		status_led="m4:blue:status"
 		;;
-	mlw221)
-		status_led="kingston:blue:status"
-		;;
+	mlw221|\
 	mlwg2)
 		status_led="kingston:blue:system"
 		;;
@@ -169,6 +167,9 @@ get_status_led() {
 		;;
 	wli-tx4-ag300n)
 		status_led="buffalo:blue:power"
+		;;
+	wzr-agl300nh)
+		status_led="buffalo:green:router"
 		;;
 	wl-351)
 		status_led="wl-351:amber:power"

@@ -28,7 +28,7 @@ tools-y += m4 libtool autoconf automake flex bison pkg-config sed mklibs
 tools-y += sstrip ipkg-utils genext2fs e2fsprogs mtd-utils mkimage
 tools-y += firmware-utils patch-image patch quilt yaffs2 flock padjffs2
 tools-y += mm-macros xorg-macros xfce-macros missing-macros xz cmake scons bc
-tools-y += findutils gengetopt
+tools-y += findutils gengetopt patchelf
 tools-$(CONFIG_TARGET_orion_generic) += wrt350nv2-builder upslug2
 tools-$(CONFIG_powerpc) += upx
 tools-$(CONFIG_TARGET_x86) += qemu
@@ -74,6 +74,7 @@ $(curdir)/cloog/compile := $(curdir)/ppl/install
 $(curdir)/bc/compile := $(curdir)/bison/install
 $(curdir)/findutils/compile := $(curdir)/bison/install
 $(curdir)/gengetopt/compile := $(curdir)/libtool/install
+$(curdir)/patchelf/compile := $(curdir)/libtool/install
 
 ifneq ($(CONFIG_CCACHE),)
 $(foreach tool, $(tools-y), $(eval $(curdir)/$(tool)/compile += $(curdir)/ccache/install))
@@ -111,47 +112,10 @@ $(STAGING_DIR_HOST)/.prepared: $(TMP_DIR)/.build
 	ln -sf lib $(STAGING_DIR_HOST)/lib64
 	touch $@
 
-
-define PrepareCommand
-$(STAGING_DIR_HOST)/bin/$(1): $(STAGING_DIR)/.prepared
-	@mkdir -p "$$(dir $$@)"; rm -f "$$@"
-	@export FILE="$$$$(which $(2) 2>/dev/null | grep -v 'not found' | head -n1)"; [ -n "$$$$FILE" ] || { \
-		echo "Command $(1) not found."; false; \
-	}; ln -s "$$$$FILE" "$$@"
-
-endef
 endif
 
-$(STAGING_DIR_HOST)/bin/stat: $(STAGING_DIR)/.prepared
-	@rm -f $@
-	@if stat --version > /dev/null 2>&1; then \
-		ln -s `which stat` $@; \
-	elif gstat --version > /dev/null 2>&1; then \
-		ln -s `which gstat` $@; \
-	elif gnustat --version > /dev/null 2>&1; then \
-		ln -s `which gnustat` $@; \
-	else \
-		echo "GNU stat not found"; \
-		false; \
-	fi
-
-$(STAGING_DIR_HOST)/bin/ldconfig: $(STAGING_DIR)/.prepared
-	touch $@
-	chmod +x $@
-
-$(eval $(call PrepareCommand,md5sum,gmd5sum md5sum $(SCRIPT_DIR)/md5sum))
-$(eval $(call PrepareCommand,cp,gcp cp))
-$(eval $(call PrepareCommand,seq,gseq seq))
-$(eval $(call PrepareCommand,python,python2 python2.7 python))
-$(eval $(call PrepareCommand,awk,gawk awk))
-$(eval $(call PrepareCommand,getopt,gnugetopt /usr/local/bin/getopt getopt))
-$(eval $(call PrepareCommand,grep,ggrep grep))
-$(eval $(call PrepareCommand,tar,gtar tar))
-$(eval $(call PrepareCommand,diff,gdiff diff))
-
-$(curdir)/cmddeps = $(patsubst %,$(STAGING_DIR_HOST)/bin/%,md5sum cp stat seq python awk getopt grep tar diff ldconfig)
-$(curdir)//prepare = $(STAGING_DIR)/.prepared $(STAGING_DIR_HOST)/.prepared $($(curdir)/cmddeps)
-$(curdir)//compile = $(STAGING_DIR)/.prepared $(STAGING_DIR_HOST)/.prepared $($(curdir)/cmddeps)
+$(curdir)//prepare = $(STAGING_DIR)/.prepared $(STAGING_DIR_HOST)/.prepared
+$(curdir)//compile = $(STAGING_DIR)/.prepared $(STAGING_DIR_HOST)/.prepared
 
 # prerequisites for the individual targets
 $(curdir)/ := .config prereq

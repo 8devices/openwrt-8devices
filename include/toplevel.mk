@@ -19,7 +19,7 @@ else
   REVISION:=$(shell $(TOPDIR)/scripts/getver.sh)
 endif
 
-HOSTCC ?= gcc
+HOSTCC ?= $(CC)
 OPENWRTVERSION:=$(RELEASE)$(if $(REVISION), ($(REVISION)))
 export RELEASE
 export REVISION
@@ -66,6 +66,7 @@ ULIMIT_FIX=_limit=`ulimit -n`; [ "$$_limit" = "unlimited" -o "$$_limit" -ge 1024
 prepare-mk: FORCE ;
 
 prepare-tmpinfo: FORCE
+	@+$(MAKE) -r -s tmp/.prereq-build $(PREP_MK)
 	mkdir -p tmp/info
 	$(_SINGLE)$(NO_TRACE_MAKE) -j1 -r -s -f include/scan.mk SCAN_TARGET="packageinfo" SCAN_DIR="package" SCAN_NAME="package" SCAN_DEPS="$(TOPDIR)/include/package*.mk $(TOPDIR)/overlay/*/*.mk" SCAN_DEPTH=5 SCAN_EXTRA=""
 	$(_SINGLE)$(NO_TRACE_MAKE) -j1 -r -s -f include/scan.mk SCAN_TARGET="targetinfo" SCAN_DIR="target/linux" SCAN_NAME="target" SCAN_DEPS="profiles/*.mk $(TOPDIR)/include/kernel*.mk $(TOPDIR)/include/target.mk" SCAN_DEPTH=2 SCAN_EXTRA="" SCAN_MAKEOPTS="TARGET_BUILD=1"
@@ -135,13 +136,19 @@ kernel_menuconfig: prepare_kernel_conf
 kernel_nconfig: prepare_kernel_conf
 	$(_SINGLE)$(NO_TRACE_MAKE) -C target/linux nconfig
 
-tmp/.prereq-build: $(if $(SDK),.git/config) include/prereq-build.mk
+tmp/.prereq-build: include/prereq-build.mk
 	mkdir -p tmp
 	rm -f tmp/.host.mk
 	@$(_SINGLE)$(NO_TRACE_MAKE) -j1 -r -s -f $(TOPDIR)/include/prereq-build.mk prereq 2>/dev/null || { \
 		echo "Prerequisite check failed. Use FORCE=1 to override."; \
 		false; \
 	}
+  ifneq ($(realpath $(TOPDIR)/include/prepare.mk),)
+	@$(_SINGLE)$(NO_TRACE_MAKE) -j1 -r -s -f $(TOPDIR)/include/prepare.mk prepare 2>/dev/null || { \
+		echo "Preparation failed."; \
+		false; \
+	}
+  endif
 	touch $@
 
 printdb: FORCE
@@ -157,7 +164,6 @@ clean dirclean: .config
 	@+$(SUBMAKE) -r $@ 
 
 prereq:: prepare-tmpinfo .config
-	@+$(MAKE) -r -s tmp/.prereq-build $(PREP_MK)
 	@+$(NO_TRACE_MAKE) -r -s $@
 
 ifeq ($(SDK),1)
