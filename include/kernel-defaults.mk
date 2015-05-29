@@ -107,7 +107,6 @@ define Kernel/Configure/Default
 	echo "# CONFIG_KALLSYMS_EXTRA_PASS is not set" >> $(LINUX_DIR)/.config.target
 	echo "# CONFIG_KALLSYMS_ALL is not set" >> $(LINUX_DIR)/.config.target
 	echo "# CONFIG_KALLSYMS_UNCOMPRESSED is not set" >> $(LINUX_DIR)/.config.target
-	echo "# CONFIG_KPROBES is not set" >> $(LINUX_DIR)/.config.target
 	$(SCRIPT_DIR)/metadata.pl kconfig $(TMP_DIR)/.packageinfo $(TOPDIR)/.config $(KERNEL_PATCHVER) > $(LINUX_DIR)/.config.override
 	$(SCRIPT_DIR)/kconfig.pl 'm+' '+' $(LINUX_DIR)/.config.target /dev/null $(LINUX_DIR)/.config.override > $(LINUX_DIR)/.config
 	$(call Kernel/SetNoInitramfs)
@@ -126,11 +125,6 @@ define Kernel/CompileModules/Default
 endef
 
 OBJCOPY_STRIP = -R .reginfo -R .notes -R .note -R .comment -R .mdebug -R .note.gnu.build-id
-
-# AVR32 uses a non-standard location
-ifeq ($(LINUX_KARCH),avr32)
-IMAGES_DIR:=images
-endif
 
 # AMD64 shares the location with x86
 ifeq ($(LINUX_KARCH),x86_64)

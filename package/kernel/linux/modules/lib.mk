@@ -72,7 +72,7 @@ define KernelPackage/lib-crc16
   TITLE:=CRC16 support
   KCONFIG:=CONFIG_CRC16
   FILES:=$(LINUX_DIR)/lib/crc16.ko
-  AUTOLOAD:=$(call AutoProbe,crc16)
+  AUTOLOAD:=$(call AutoLoad,20,crc16,1)
 endef
 
 define KernelPackage/lib-crc16/description
@@ -119,7 +119,6 @@ $(eval $(call KernelPackage,lib-lzo))
 
 define KernelPackage/lib-lz4
   SUBMENU:=$(LIB_MENU)
-  DEPENDS:=@!(LINUX_3_3||LINUX_3_8||LINUX_3_10||LINUX_3_13||LINUX_3_14)
   TITLE:=LZ4 support
   KCONFIG:= \
 	CONFIG_LZ4_COMPRESS \

@@ -72,7 +72,7 @@
 #define MT7621_FE_GDM1_AF	BIT(28)
 #define MT7621_FE_GDM2_AF	BIT(29)
 
-static const u32 mt7620_reg_table[FE_REG_COUNT] = {
+static const u16 mt7620_reg_table[FE_REG_COUNT] = {
 	[FE_REG_PDMA_GLO_CFG] = RT5350_PDMA_GLO_CFG,
 	[FE_REG_PDMA_RST_CFG] = RT5350_PDMA_RST_CFG,
 	[FE_REG_DLY_INT_CFG] = RT5350_DLY_INT_CFG,
@@ -92,7 +92,7 @@ static const u32 mt7620_reg_table[FE_REG_COUNT] = {
 	[FE_REG_FE_INT_STATUS2] = MT7620_FE_INT_STATUS2,
 };
 
-static const u32 mt7621_reg_table[FE_REG_COUNT] = {
+static const u16 mt7621_reg_table[FE_REG_COUNT] = {
 	[FE_REG_PDMA_GLO_CFG] = RT5350_PDMA_GLO_CFG,
 	[FE_REG_PDMA_RST_CFG] = RT5350_PDMA_RST_CFG,
 	[FE_REG_DLY_INT_CFG] = RT5350_DLY_INT_CFG,
@@ -229,7 +229,6 @@ static void mt7621_set_mac(struct fe_priv *priv, unsigned char *mac)
 }
 
 static struct fe_soc_data mt7620_data = {
-	.mac = { 0x00, 0x11, 0x22, 0x33, 0x44, 0x55 },
 	.init_data = mt7620_init_data,
 	.reset_fe = mt7620_fe_reset,
 	.set_mac = mt7620_set_mac,
@@ -251,7 +250,6 @@ static struct fe_soc_data mt7620_data = {
 };
 
 static struct fe_soc_data mt7621_data = {
-	.mac = { 0x00, 0x11, 0x22, 0x33, 0x44, 0x55 },
 	.init_data = mt7621_init_data,
 	.reset_fe = mt7621_fe_reset,
 	.set_mac = mt7621_set_mac,

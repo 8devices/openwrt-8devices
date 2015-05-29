@@ -8,13 +8,13 @@
 include $(TOPDIR)/rules.mk
 
 PKG_NAME:=uhttpd
-PKG_VERSION:=2015-01-25.2
+PKG_VERSION:=2015-03-30
 PKG_RELEASE=$(PKG_SOURCE_VERSION)
 
 PKG_SOURCE_PROTO:=git
 PKG_SOURCE_URL:=git://nbd.name/uhttpd2.git
 PKG_SOURCE_SUBDIR:=$(PKG_NAME)-$(PKG_VERSION)
-PKG_SOURCE_VERSION:=db79faae848e9ca5ed1c5b62cdd9d01650687fff
+PKG_SOURCE_VERSION:=b9178b9357798ae23a5724333cc6572d14f23958
 PKG_SOURCE:=$(PKG_NAME)-$(PKG_VERSION)-$(PKG_SOURCE_VERSION).tar.gz
 PKG_MAINTAINER:=Felix Fietkau <nbd@openwrt.org>
 PKG_LICENSE:=ISC
@@ -106,6 +106,10 @@ define Package/uhttpd/conffiles
 /etc/uhttpd.crt
 /etc/uhttpd.key
 endef
+
+ifneq ($(CONFIG_USE_GLIBC),)
+  TARGET_CFLAGS += -D_DEFAULT_SOURCE
+endif
 
 TARGET_LDFLAGS += -lcrypt
 

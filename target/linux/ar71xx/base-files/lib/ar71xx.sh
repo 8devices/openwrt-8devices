@@ -37,16 +37,26 @@ wndr3700_board_detect() {
 		machine="NETGEAR WNDR3700"
 		;;
 	"33373031")
-		local model
-		model=$(ar71xx_get_mtd_offset_size_format art 56 10 %c)
-		if [ -z "$model" ] || [ "$model" = $'\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff' ]; then
-			machine="NETGEAR WNDR3700v2"
-		elif [ -z "$model" ] || [ "$model" = $'\xff\xff\xff\xff\xff\xff\xff\xff\xffN' ]; then
-			machine="NETGEAR WNDRMAC"
-		else
+		# Use awk to remove everything after the first zero byte
+		model="$(ar71xx_get_mtd_offset_size_format art 41 32 %c | awk 'BEGIN{FS="[[:cntrl:]]"} {print $1; exit}')"
+		case $model in
+		$'\xff'*)
+			if [ "${model:24:1}" = 'N' ]; then
+				machine="NETGEAR WNDRMAC"
+			else
+				machine="NETGEAR WNDR3700v2"
+			fi
+			;;
+		'29763654+16+64'*)
+			machine="NETGEAR ${model:14}"
+			;;
+		'29763654+16+128'*)
+			machine="NETGEAR ${model:15}"
+			;;
+		*)
+			# Unknown ID
 			machine="NETGEAR $model"
-		fi
-		;;
+		esac
 	esac
 
 	AR71XX_BOARD_NAME="$name"
@@ -129,6 +139,9 @@ tplink_board_detect() {
 		;;
 	"075000"*)
 		model="TP-Link TL-WA750RE"
+		;;
+	"721000"*)
+		model="TP-Link TL-WA7210N"
 		;;
 	"751000"*)
 		model="TP-Link TL-WA7510N"
@@ -271,6 +284,19 @@ tplink_pharos_board_detect() {
 	[ -n "$model" ] && AR71XX_MODEL="$model v$2"
 }
 
+gl_inet_board_detect() {
+	local size="$(mtd_get_part_size 'firmware')"
+
+	case "$size" in
+	8192000)
+		AR71XX_MODEL='GL-iNet 6408A v1'
+		;;
+	16580608)
+		AR71XX_MODEL='GL-iNet 6416A v1'
+		;;
+	esac
+}
+
 ar71xx_board_detect() {
 	local machine
 	local name
@@ -398,6 +424,7 @@ ar71xx_board_detect() {
 		;;
 	*"GL-CONNECT INET v1")
 		name="gl-inet"
+		gl_inet_board_detect
 		;;
 	*"EnGenius ESR1750")
 		name="esr1750"
@@ -443,6 +470,12 @@ ar71xx_board_detect() {
 		;;
 	*"MAC1200R")
 		name="mc-mac1200r"
+		;;
+	*MR12)
+		name="mr12"
+		;;
+	*MR16)
+		name="mr16"
 		;;
 	*MR600v2)
 		name="mr600v2"
@@ -494,6 +527,9 @@ ar71xx_board_detect() {
 		;;
 	*OM5P)
 		name="om5p"
+		;;
+	*"OM5P AN")
+		name="om5p-an"
 		;;
 	*PB42)
 		name="pb42"
@@ -552,6 +588,9 @@ ar71xx_board_detect() {
 	*"RouterBOARD 911G-5HPnD")
 		name="rb-911g-5hpnd"
 		;;
+	*"RouterBOARD 911G-5HPacD")
+		name="rb-911g-5hpacd"
+		;;
 	*"RouterBOARD 912UAG-2HPnD")
 		name="rb-912uag-2hpnd"
 		;;
@@ -587,6 +626,9 @@ ar71xx_board_detect() {
 		;;
 	*"Rocket M")
 		name="rocket-m"
+		;;
+	*"Rocket M XW")
+		name="rocket-m-xw"
 		;;
 	*RouterStation)
 		name="routerstation"
@@ -650,6 +692,9 @@ ar71xx_board_detect() {
 		;;
 	*"TL-WA701ND v2")
 		name="tl-wa701nd-v2"
+		;;
+	*"TL-WA7210N v2")
+		name="tl-wa7210n-v2"
 		;;
 	*TL-WA750RE)
 		name="tl-wa750re"
@@ -732,7 +777,7 @@ ar71xx_board_detect() {
 	*"TL-MR12U")
 		name="tl-mr12u"
 		;;
-	*"TL-MR13U")
+	*"TL-MR13U v1")
 		name="tl-mr13u"
 		;;
 	*"Tube2H")
@@ -764,6 +809,12 @@ ar71xx_board_detect() {
 		;;
 	*WPE72)
 		name="wpe72"
+		;;
+	*WPJ344)
+		name="wpj344"
+		;;
+	*WPJ558)
+		name="wpj558"
 		;;
 	*WNDAP360)
 		name="wndap360"

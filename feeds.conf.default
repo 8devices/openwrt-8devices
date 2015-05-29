@@ -4,7 +4,7 @@ src-git routing https://github.com/openwrt-routing/packages.git^9c661a093fc35287
 src-git telephony https://github.com/openwrt/telephony.git^d73a45ba9f4adb8dcd836dd1917dc5aedbbef92d
 src-git management https://github.com/openwrt-management/packages.git^1912a034e5d1d0606a1535a9b6281ccc80a7e322
 src-git oldpackages git://github.com/8devices/carambola2-packages.git^789cc3d0297f5b3d9781c68856b0b260abc8b11b
-
+#src-git targets https://github.com/openwrt/targets.git
 #src-svn xwrt http://x-wrt.googlecode.com/svn/trunk/package
 #src-svn phone svn://svn.openwrt.org/openwrt/feeds/phone
 #src-svn efl svn://svn.openwrt.org/openwrt/feeds/efl

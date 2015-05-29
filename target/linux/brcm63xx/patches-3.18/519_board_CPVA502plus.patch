@@ -1,6 +1,6 @@
 --- a/arch/mips/bcm63xx/boards/board_bcm963xx.c
 +++ b/arch/mips/bcm63xx/boards/board_bcm963xx.c
-@@ -530,6 +530,40 @@ static struct board_info __initdata boar
+@@ -425,6 +425,27 @@ static struct board_info __initdata boar
  	},
  };
  
@@ -22,26 +22,13 @@
 +		.phy_id			= 0,
 +	},
 +
-+	.leds = {
-+		{
-+			.name		= "CPVA502+:green:phone",
-+			.gpio		= 0,
-+			.active_low	= 1,
-+		},
-+		{
-+			.name		= "CPVA502+:amber:link",
-+			.gpio		= 5,
-+			.active_low	= 1,
-+		},
-+	},
-+
 +	.ephy_reset_gpio		= 4,
-+	.ephy_reset_gpio_flags		= GPIOF_INIT_HIGH,
++	.ephy_reset_gpio_flags		= GPIO_ACTIVE_LOW,
 +};
  
  static struct board_info __initdata board_ct536_ct5621 = {
  	.name				= "CT536_CT5621",
-@@ -1922,6 +1956,7 @@ static const struct board_info __initcon
+@@ -1127,6 +1148,7 @@ static const struct board_info __initcon
  	&board_V2110,
  	&board_ct536_ct5621,
  	&board_96348A_122,
@@ -49,3 +36,11 @@
  #endif
  
  #ifdef CONFIG_BCM63XX_CPU_6358
+@@ -1179,6 +1201,7 @@ static struct of_device_id const bcm963x
+ 	{ .compatible = "t-com,spw500v", .data = &board_spw500v, },
+ 	{ .compatible = "tecom,gw6000", .data = &board_gw6000, },
+ 	{ .compatible = "tecom,gw6200", .data = &board_gw6200, },
++	{ .compatible = "telsey,cpva502+", .data = &board_CPVA502plus, },
+ 	{ .compatible = "telsey,magic", .data = &board_96348sv, },
+ 	{ .compatible = "tp-link,td-w8900gb", .data = &board_96348gw_11, },
+ 	{ .compatible = "usr,9108", .data = &board_96348gw_a, },

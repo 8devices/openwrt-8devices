@@ -16,9 +16,7 @@ define KernelPackage/fb
   TITLE:=Framebuffer support
   DEPENDS:=@DISPLAY_SUPPORT
   KCONFIG:=CONFIG_FB
-  FILES:= \
-	$(LINUX_DIR)/drivers/video/fb.ko@lt3.15 \
-	$(LINUX_DIR)/drivers/video/fbdev/core/fb.ko@ge3.15
+  FILES:=$(LINUX_DIR)/drivers/video/fbdev/core/fb.ko
   AUTOLOAD:=$(call AutoLoad,06,fb)
 endef
 
@@ -38,9 +36,7 @@ define KernelPackage/fb-cfb-fillrect
   TITLE:=Framebuffer software rectangle filling support
   DEPENDS:=+kmod-fb
   KCONFIG:=CONFIG_FB_CFB_FILLRECT
-  FILES:= \
-	$(LINUX_DIR)/drivers/video/cfbfillrect.ko@lt3.15 \
-	$(LINUX_DIR)/drivers/video/fbdev/core/cfbfillrect.ko@ge3.15
+  FILES:=$(LINUX_DIR)/drivers/video/fbdev/core/cfbfillrect.ko
   AUTOLOAD:=$(call AutoLoad,07,cfbfillrect)
 endef
 
@@ -56,9 +52,7 @@ define KernelPackage/fb-cfb-copyarea
   TITLE:=Framebuffer software copy area support
   DEPENDS:=+kmod-fb
   KCONFIG:=CONFIG_FB_CFB_COPYAREA
-  FILES:= \
-	$(LINUX_DIR)/drivers/video/cfbcopyarea.ko@lt3.15 \
-	$(LINUX_DIR)/drivers/video/fbdev/core/cfbcopyarea.ko@ge3.15
+  FILES:=$(LINUX_DIR)/drivers/video/fbdev/core/cfbcopyarea.ko
   AUTOLOAD:=$(call AutoLoad,07,cfbcopyarea)
 endef
 
@@ -73,9 +67,7 @@ define KernelPackage/fb-cfb-imgblt
   TITLE:=Framebuffer software image blit support
   DEPENDS:=+kmod-fb
   KCONFIG:=CONFIG_FB_CFB_IMAGEBLIT
-  FILES:= \
-	$(LINUX_DIR)/drivers/video/cfbimgblt.ko@lt3.15 \
-	$(LINUX_DIR)/drivers/video/fbdev/core/cfbimgblt.ko@ge3.15
+  FILES:=$(LINUX_DIR)/drivers/video/fbdev/core/cfbimgblt.ko
   AUTOLOAD:=$(call AutoLoad,07,cfbimgblt)
 endef
 
@@ -164,22 +156,6 @@ endef
 $(eval $(call KernelPackage,video-cpia2))
 
 
-define KernelPackage/video-sn9c102
-  TITLE:=SN9C102 Camera Chip support
-  DEPENDS:=@USB_SUPPORT +kmod-usb-core
-  KCONFIG:=CONFIG_USB_SN9C102
-  FILES:=$(LINUX_DIR)/drivers/media/$(V4L2_USB_DIR)/sn9c102/sn9c102.ko
-  AUTOLOAD:=$(call AutoProbe,gspca_sn9c20x)
-  $(call AddDepends/camera)
-endef
-
-define KernelPackage/video-sn9c102/description
- Kernel modules for supporting SN9C102 camera chips
-endef
-
-$(eval $(call KernelPackage,video-sn9c102))
-
-
 define KernelPackage/video-pwc
   TITLE:=Philips USB webcam support
   DEPENDS:=@USB_SUPPORT +kmod-usb-core +kmod-video-videobuf2
@@ -200,12 +176,11 @@ $(eval $(call KernelPackage,video-pwc))
 
 define KernelPackage/video-uvc
   TITLE:=USB Video Class (UVC) support
-  DEPENDS:=@USB_SUPPORT +kmod-usb-core +kmod-video-videobuf2
+  DEPENDS:=@USB_SUPPORT +kmod-usb-core +kmod-video-videobuf2 +kmod-input-core
   KCONFIG:= CONFIG_USB_VIDEO_CLASS
   FILES:=$(LINUX_DIR)/drivers/media/$(V4L2_USB_DIR)/uvc/uvcvideo.ko
   AUTOLOAD:=$(call AutoProbe,uvcvideo)
   $(call AddDepends/camera)
-  $(call AddDepends/input)
 endef
 
 define KernelPackage/video-uvc/description

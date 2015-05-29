@@ -115,8 +115,7 @@ define KernelPackage/et131x
   TITLE:=Agere ET131x Gigabit Ethernet driver
   URL:=http://sourceforge.net/projects/et131x
   FILES:= \
-	$(LINUX_DIR)/drivers/staging/et131x/et131x.ko@lt3.18 \
-	$(LINUX_DIR)/drivers/net/ethernet/agere/et131x.ko@ge3.18
+	$(LINUX_DIR)/drivers/net/ethernet/agere/et131x.ko
   KCONFIG:= \
 	CONFIG_ET131X \
 	CONFIG_ET131X_DEBUG=n
@@ -484,7 +483,7 @@ $(eval $(call KernelPackage,igb))
 define KernelPackage/b44
   TITLE:=Broadcom 44xx driver
   KCONFIG:=CONFIG_B44
-  DEPENDS:=@PCI_SUPPORT @!TARGET_brcm47xx_mips74k +!TARGET_brcm47xx:kmod-ssb +kmod-mii +(!LINUX_3_10&&!LINUX_3_13):kmod-libphy
+  DEPENDS:=@PCI_SUPPORT @!TARGET_brcm47xx_mips74k +!TARGET_brcm47xx:kmod-ssb +kmod-mii +kmod-libphy
   SUBMENU:=$(NETWORK_DEVICES_MENU)
   FILES:=$(LINUX_DIR)/drivers/net/ethernet/broadcom/b44.ko
   AUTOLOAD:=$(call AutoLoad,19,b44,1)
@@ -810,3 +809,41 @@ define KernelPackage/vmxnet3/description
 endef
 
 $(eval $(call KernelPackage,vmxnet3))
+
+
+define KernelPackage/stmmac
+  SUBMENU:=$(NETWORK_DEVICES_MENU)
+  TITLE:=STMicro 10/100/1000 Ethernet driver
+  DEPENDS:=+kmod-mii +kmod-ptp
+  KCONFIG:=CONFIG_NET_VENDOR_STMICRO=y \
+	  CONFIG_STMMAC_ETH \
+	  CONFIG_STMMAC_PLATFORM=y \
+	  CONFIG_STMMAC_DEBUG_FS=y \
+	  CONFIG_STMMAC_DA=y \
+	  CONFIG_DWMAC_IPQ806X=y
+  FILES:=$(LINUX_DIR)/drivers/net/ethernet/stmicro/stmmac/stmmac.ko
+  AUTOLOAD:=$(call AutoLoad,50,stmmac.ko)
+endef
+
+define KernelPackage/stmmac/description
+  Kernel module for STMicroelectronics 10/100/1000 Ethernet driver
+endef
+
+$(eval $(call KernelPackage,stmmac))
+
+
+define KernelPackage/spi-ks8995
+  SUBMENU:=$(NETWORK_DEVICES_MENU)
+  TITLE:=Micrel/Kendin KS8995 Ethernet switch control
+  FILES:=$(LINUX_DIR)/drivers/net/phy/spi_ks8995.ko
+  KCONFIG:=CONFIG_MICREL_KS8995MA \
+	CONFIG_SPI=y \
+	CONFIG_SPI_MASTER=y
+  AUTOLOAD:=$(call AutoLoad,50,spi_ks8995)
+endef
+
+define KernelPackage/spi-ks8995/description
+  Kernel module for Micrel/Kendin KS8995 ethernet switch
+endef
+
+$(eval $(call KernelPackage,spi-ks8995))

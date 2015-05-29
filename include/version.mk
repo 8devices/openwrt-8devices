@@ -53,9 +53,9 @@ $(lastword $(subst :, ,$(1)))
 endef
 
 VERSION_TAINT_SPECS := \
-	-ALL:no-all \
+	-ALL_KMODS:no-all \
 	-IPV6:no-ipv6 \
-	+USE_EGLIBC:eglibc \
+	+USE_GLIBC:glibc \
 	+USE_MKLIBS:mklibs \
 	+BUSYBOX_CUSTOM:busybox \
 	+OVERRIDE_PKGS:override \

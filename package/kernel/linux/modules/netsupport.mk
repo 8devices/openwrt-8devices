@@ -148,7 +148,6 @@ $(eval $(call KernelPackage,8021q))
 define KernelPackage/udptunnel4
   SUBMENU:=$(NETWORK_SUPPORT_MENU)
   TITLE:=IPv4 UDP tunneling support
-  DEPENDS:=@(!LINUX_3_8&&!LINUX_3_10&&!LINUX_3_13&&!LINUX_3_14)
   KCONFIG:=CONFIG_NET_UDP_TUNNEL
   FILES:=$(LINUX_DIR)/net/ipv4/udp_tunnel.ko
   AUTOLOAD:=$(call AutoLoad,32,udp_tunnel)
@@ -160,7 +159,6 @@ $(eval $(call KernelPackage,udptunnel4))
 define KernelPackage/udptunnel6
   SUBMENU:=$(NETWORK_SUPPORT_MENU)
   TITLE:=IPv6 UDP tunneling support
-  DEPENDS:=@(!LINUX_3_8&&!LINUX_3_10&&!LINUX_3_13&&!LINUX_3_14) +kmod-ipv6
   KCONFIG:=CONFIG_NET_UDP_TUNNEL
   FILES:=$(LINUX_DIR)/net/ipv6/ip6_udp_tunnel.ko
   AUTOLOAD:=$(call AutoLoad,32,ip6_udp_tunnel)
@@ -174,8 +172,8 @@ define KernelPackage/vxlan
   TITLE:=Native VXLAN Kernel support
   DEPENDS:= \
 	+kmod-iptunnel \
-	+(!LINUX_3_8&&!LINUX_3_10&&!LINUX_3_13&&!LINUX_3_14):kmod-udptunnel4 \
-	+(!LINUX_3_8&&!LINUX_3_10&&!LINUX_3_13&&!LINUX_3_14&&IPV6):kmod-udptunnel6
+	+kmod-udptunnel4 \
+	+IPV6:kmod-udptunnel6
   KCONFIG:=CONFIG_VXLAN
   FILES:=$(LINUX_DIR)/drivers/net/vxlan.ko
   AUTOLOAD:=$(call AutoLoad,13,vxlan)
@@ -403,6 +401,22 @@ define KernelPackage/iptunnel/description
 endef
 
 $(eval $(call KernelPackage,iptunnel))
+
+
+define KernelPackage/ipvti
+  SUBMENU:=$(NETWORK_SUPPORT_MENU)
+  TITLE:=IP VTI (Virtual Tunnel Interface)
+  DEPENDS:=+kmod-iptunnel +kmod-iptunnel4 +kmod-ipsec4
+  KCONFIG:=CONFIG_NET_IPVTI
+  FILES:=$(LINUX_DIR)/net/ipv4/ip_vti.ko
+  AUTOLOAD:=$(call AutoLoad,33,ip_vti)
+endef
+
+define KernelPackage/ipvti/description
+ Kernel modules for IP VTI (Virtual Tunnel Interface)
+endef
+
+$(eval $(call KernelPackage,ipvti))
 
 
 define KernelPackage/iptunnel4
@@ -809,14 +823,15 @@ $(eval $(call KernelPackage,sched))
 define KernelPackage/ax25
   SUBMENU:=$(NETWORK_SUPPORT_MENU)
   TITLE:=AX25 support
+  DEPENDS:=+kmod-lib-crc16
   KCONFIG:= \
+	CONFIG_HAMRADIO=y \
 	CONFIG_AX25 \
 	CONFIG_MKISS
   FILES:= \
 	$(LINUX_DIR)/net/ax25/ax25.ko \
 	$(LINUX_DIR)/drivers/net/hamradio/mkiss.ko
   AUTOLOAD:=$(call AutoLoad,80,ax25 mkiss)
-  $(call AddDepends/crc16)
 endef
 
 define KernelPackage/ax25/description
@@ -824,33 +839,6 @@ define KernelPackage/ax25/description
 endef
 
 $(eval $(call KernelPackage,ax25))
-
-
-define KernelPackage/mp-alg
-  SUBMENU:=$(NETWORK_SUPPORT_MENU)
-  TITLE:=ECMP caching algorithms
-  KCONFIG:= \
-	CONFIG_IP_ROUTE_MULTIPATH_RR \
-	CONFIG_IP_ROUTE_MULTIPATH_RANDOM \
-	CONFIG_IP_ROUTE_MULTIPATH_WRANDOM \
-	CONFIG_IP_ROUTE_MULTIPATH_DRR
-  FILES:= \
-	$(LINUX_DIR)/net/ipv4/multipath_rr.ko \
-	$(LINUX_DIR)/net/ipv4/multipath_random.ko \
-	$(LINUX_DIR)/net/ipv4/multipath_wrandom.ko \
-	$(LINUX_DIR)/net/ipv4/multipath_drr.ko
-  AUTOLOAD:=$(call AutoLoad,35,multipath_rr multipath_random multipath_wrandom multipath_drr)
-endef
-
-define KernelPackage/mp-alg/description
- Kernel modules that provide several different algorithms for multipath
- route selection from the route cache. The iproute "mpath" argument allows
- specifying which algorithm to use for routes.
- quagga (at least <=0.99.6) requires a multipath patch to support this
- cached mp route feature.
-endef
-
-$(eval $(call KernelPackage,mp-alg))
 
 
 define KernelPackage/pktgen
@@ -873,8 +861,8 @@ define KernelPackage/l2tp
   TITLE:=Layer Two Tunneling Protocol (L2TP)
   DEPENDS:= \
 	+IPV6:kmod-ipv6 \
-	+(!LINUX_3_8&&!LINUX_3_10&&!LINUX_3_13&&!LINUX_3_14):kmod-udptunnel4 \
-	+(!LINUX_3_8&&!LINUX_3_10&&!LINUX_3_13&&!LINUX_3_14&&IPV6):kmod-udptunnel6
+	+kmod-udptunnel4 \
+	+IPV6:kmod-udptunnel6
   KCONFIG:=CONFIG_L2TP \
 	CONFIG_L2TP_V3=y \
 	CONFIG_L2TP_DEBUGFS=n
@@ -908,10 +896,12 @@ $(eval $(call KernelPackage,l2tp-eth))
 define KernelPackage/l2tp-ip
   SUBMENU:=$(NETWORK_SUPPORT_MENU)
   TITLE:=L2TP IP encapsulation for L2TPv3
-  DEPENDS:=+kmod-l2tp
+  DEPENDS:=+kmod-l2tp +IPV6:kmod-ipv6
   KCONFIG:=CONFIG_L2TP_IP
-  FILES:=$(LINUX_DIR)/net/l2tp/l2tp_ip.ko
-  AUTOLOAD:=$(call AutoLoad,33,l2tp_ip)
+  FILES:= \
+	$(LINUX_DIR)/net/l2tp/l2tp_ip.ko \
+	$(if $(CONFIG_IPV6),$(LINUX_DIR)/net/l2tp/l2tp_ip6.ko)
+  AUTOLOAD:=$(call AutoLoad,33,l2tp_ip $(if $(CONFIG_IPV6),l2tp_ip6))
 endef
 
 define KernelPackage/l2tp-ip/description

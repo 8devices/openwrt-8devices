@@ -46,7 +46,6 @@ $(eval $(call KernelPackage,hwmon-vid))
 
 define KernelPackage/hwmon-adt7410
   TITLE:=ADT7410 monitoring support
-ifeq ($(CONFIG_LINUX_3_8),)
   KCONFIG:= \
 	CONFIG_SENSORS_ADT7X10 \
 	CONFIG_SENSORS_ADT7410
@@ -54,11 +53,6 @@ ifeq ($(CONFIG_LINUX_3_8),)
 	$(LINUX_DIR)/drivers/hwmon/adt7x10.ko \
 	$(LINUX_DIR)/drivers/hwmon/adt7410.ko
   AUTOLOAD:=$(call AutoLoad,60,adt7x10 adt7410)
-else
-  KCONFIG:=CONFIG_SENSORS_ADT7410
-  FILES:=$(LINUX_DIR)/drivers/hwmon/adt7410.ko
-  AUTOLOAD:=$(call AutoLoad,60,adt7410)
-endif
   $(call AddDepends/hwmon,+kmod-i2c-core)
 endef
 
@@ -296,7 +290,6 @@ define KernelPackage/hwmon-pwmfan
   FILES:=$(LINUX_DIR)/drivers/hwmon/pwm-fan.ko
   AUTOLOAD:=$(call AutoLoad,60,pwm-fan)
   $(call AddDepends/hwmon,)
-  DEPENDS+=@!LINUX_3_8 @!LINUX_3_10 @!LINUX_3_14
 endef
 
 define KernelPackage/hwmon-pwmfan/description
@@ -311,7 +304,7 @@ define KernelPackage/hwmon-k10temp
   KCONFIG:=CONFIG_SENSORS_K10TEMP
   FILES:=$(LINUX_DIR)/drivers/hwmon/k10temp.ko
   AUTOLOAD:=$(call AutoLoad,60,k10temp)
-  $(call AddDepends/hwmon,@PCI_SUPPORT @(x86||x86_64))
+  $(call AddDepends/hwmon,@PCI_SUPPORT @TARGET_x86)
 endef
 
 define KernelPackage/hwmon-k10temp/description

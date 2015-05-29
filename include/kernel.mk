@@ -1,4 +1,4 @@
-# 
+#
 # Copyright (C) 2006-2015 OpenWrt.org
 #
 # This is free software, licensed under the GNU General Public License v2.
@@ -52,7 +52,7 @@ else
   LINUX_SOURCE:=linux-$(LINUX_VERSION).tar.xz
   TESTING:=$(if $(findstring -rc,$(LINUX_VERSION)),/testing,)
   ifeq ($(call qstrip,$(CONFIG_EXTERNAL_KERNEL_TREE))$(call qstrip,$(CONFIG_KERNEL_GIT_CLONE_URI)),)
-      LINUX_SITE:=@KERNEL/linux/kernel/v3.x$(TESTING)
+      LINUX_SITE:=@KERNEL/linux/kernel/v$(word 1,$(subst ., ,$(KERNEL_BASE))).x$(TESTING)
   endif
 
   ifneq ($(TARGET_BUILD),1)
@@ -88,7 +88,7 @@ define ModuleAutoLoad
 		mods="$$$$$$$$1"; \
 		boot="$$$$$$$$2"; \
 		shift 2; \
-		for mod in $$$$$$$$($(SCRIPT_DIR)/metadata.pl version_filter $(KERNEL_PATCHVER) $$$$$$$$mods); do \
+		for mod in $$$$$$$$mods; do \
 			mkdir -p $(2)/etc/modules.d; \
 			echo "$$$$$$$$mod" >> $(2)/etc/modules.d/$(1); \
 		done; \
@@ -97,7 +97,7 @@ define ModuleAutoLoad
 				mkdir -p $(2)/etc/modules-boot.d; \
 				ln -s ../modules.d/$(1) $(2)/etc/modules-boot.d/; \
 			fi; \
-			modules="$$$$$$$${modules:+$$$$$$$$modules}"; \
+			modules="$$$$$$$${modules:+$$$$$$$$modules }$$$$$$$$mods"; \
 		fi; \
 	}; \
 	add_module() { \
@@ -105,7 +105,7 @@ define ModuleAutoLoad
 		mods="$$$$$$$$2"; \
 		boot="$$$$$$$$3"; \
 		shift 3; \
-		for mod in $$$$$$$$($(SCRIPT_DIR)/metadata.pl version_filter $(KERNEL_PATCHVER) $$$$$$$$mods); do \
+		for mod in $$$$$$$$mods; do \
 			mkdir -p $(2)/etc/modules.d; \
 			echo "$$$$$$$$mod" >> $(2)/etc/modules.d/$$$$$$$$priority-$(1); \
 		done; \
@@ -121,11 +121,11 @@ define ModuleAutoLoad
 	if [ -n "$$$$$$$$modules" ]; then \
 		mkdir -p $(2)/etc/modules.d; \
 		mkdir -p $(2)/CONTROL; \
-		echo "#!/bin/sh" > $(2)/CONTROL/postinst; \
-		echo "[ -z \"\$$$$$$$$IPKG_INSTROOT\" ] || exit 0" >> $(2)/CONTROL/postinst; \
-		echo ". /lib/functions.sh" >> $(2)/CONTROL/postinst; \
-		echo "insert_modules $$$$$$$$modules" >> $(2)/CONTROL/postinst; \
-		chmod 0755 $(2)/CONTROL/postinst; \
+		echo "#!/bin/sh" > $(2)/CONTROL/postinst-pkg; \
+		echo "[ -z \"\$$$$$$$$IPKG_INSTROOT\" ] || exit 0" >> $(2)/CONTROL/postinst-pkg; \
+		echo ". /lib/functions.sh" >> $(2)/CONTROL/postinst-pkg; \
+		echo "insert_modules $$$$$$$$modules" >> $(2)/CONTROL/postinst-pkg; \
+		chmod 0755 $(2)/CONTROL/postinst-pkg; \
 	fi
 endef
 
@@ -157,6 +157,12 @@ define KernelPackage
     $(call KernelPackage/$(1)/$(BOARD))
   endef
 
+  ifdef KernelPackage/$(1)/conffiles
+    define Package/kmod-$(1)/conffiles
+$(call KernelPackage/$(1)/conffiles)
+    endef
+  endif
+
   ifdef KernelPackage/$(1)/description
     define Package/kmod-$(1)/description
 $(call KernelPackage/$(1)/description)
@@ -174,7 +180,7 @@ $(call KernelPackage/$(1)/config)
   ifneq ($(if $(filter-out %=y %=n %=m,$(KCONFIG)),$(filter m y,$(foreach c,$(filter-out %=y %=n %=m,$(KCONFIG)),$($(c)))),.),)
     ifneq ($(if $(SDK),$(filter-out $(LINUX_DIR)/%.ko,$(FILES)),$(strip $(FILES))),)
       define Package/kmod-$(1)/install
-		  @for mod in $$$$$$$$($(SCRIPT_DIR)/metadata.pl version_filter $(KERNEL_PATCHVER) $$(FILES)); do \
+		  @for mod in $$(call version_filter,$$(FILES)); do \
 			if [ -e $$$$$$$$mod ]; then \
 				mkdir -p $$(1)/$(MODULES_SUBDIR) ; \
 				$(CP) -L $$$$$$$$mod $$(1)/$(MODULES_SUBDIR)/ ; \
@@ -209,12 +215,14 @@ $(call KernelPackage/$(1)/config)
   $$(IPKG_kmod-$(1)): $$(wildcard $$(FILES))
 endef
 
+version_filter=$(if $(findstring @,$(1)),$(shell $(SCRIPT_DIR)/metadata.pl version_filter $(KERNEL_PATCHVER) $(1)),$(1))
+
 define AutoLoad
-  add_module "$(1)" "$(2)" "$(3)";
+  add_module "$(1)" "$(call version_filter,$(2))" "$(3)";
 endef
 
 define AutoProbe
-  probe_module "$(1)" "$(2)";
+  probe_module "$(call version_filter,$(1))" "$(2)";
 endef
 
 version_field=$(if $(word $(1),$(2)),$(word $(1),$(2)),0)

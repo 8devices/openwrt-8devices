@@ -55,6 +55,7 @@ drv_mac80211_init_iface_config() {
 	config_add_int maxassoc
 	config_add_int max_listen_int
 	config_add_int dtim_period
+	config_add_int start_disabled
 
 	# mesh
 	config_add_string mesh_id
@@ -314,12 +315,13 @@ mac80211_hostapd_setup_bss() {
 	append hostapd_cfg "$type=$ifname" "$N"
 
 	hostapd_set_bss_options hostapd_cfg "$vif" || return 1
-	json_get_vars wds dtim_period max_listen_int
+	json_get_vars wds dtim_period max_listen_int start_disabled
 
 	set_default wds 0
+	set_default start_disabled 0
 
 	[ "$wds" -gt 0 ] && append hostapd_cfg "wds_sta=1" "$N"
-	[ "$staidx" -gt 0 ] && append hostapd_cfg "start_disabled=1" "$N"
+	[ "$staidx" -gt 0 -o "$start_disabled" -eq 1 ] && append hostapd_cfg "start_disabled=1" "$N"
 
 	cat >> /var/run/hostapd-$phy.conf <<EOF
 $hostapd_cfg
@@ -588,23 +590,22 @@ mac80211_setup_vif() {
 
 	case "$mode" in
 		mesh)
-			for var in $MP_CONFIG_INT $MP_CONFIG_BOOL $MP_CONFIG_STRING; do
-				json_get_var mp_val "$var"
-				[ -n "$mp_val" ] && iw dev "$ifname" set mesh_param "$var" "$mp_val"
-			done
-
-			# authsae
+			# authsae or wpa_supplicant
 			json_get_vars key
 			if [ -n "$key" ]; then
 				if [ -e "/lib/wifi/authsae.sh" ]; then
 					. /lib/wifi/authsae.sh
 					authsae_start_interface || failed=1
 				else
-					wireless_setup_vif_failed AUTHSAE_NOT_INSTALLED
-					json_select ..
-					return
+					wireless_vif_parse_encryption
+					mac80211_setup_supplicant || failed=1
 				fi
 			fi
+
+			for var in $MP_CONFIG_INT $MP_CONFIG_BOOL $MP_CONFIG_STRING; do
+				json_get_var mp_val "$var"
+				[ -n "$mp_val" ] && iw dev "$ifname" set mesh_param "$var" "$mp_val"
+			done
 		;;
 		adhoc)
 			wireless_vif_parse_encryption

@@ -41,7 +41,6 @@ proto_ncm_setup() {
 	[ -n "$apn" ] || {
 		echo "No APN specified"
 		proto_notify_error "$interface" NO_APN
-		proto_set_available "$interface" 0
 		return 1
 	}
 
@@ -69,7 +68,6 @@ proto_ncm_setup() {
 	[ $? -ne 0 ] && {
 		echo "Failed to get modem information"
 		proto_notify_error "$interface" GETINFO_FAILED
-		proto_set_available "$interface" 0
 		return 1
 	}
 
@@ -86,7 +84,6 @@ proto_ncm_setup() {
 		eval COMMAND="$i" gcom -d "$device" -s /etc/gcom/runcommand.gcom || {
 			echo "Failed to initialize modem"
 			proto_notify_error "$interface" INITIALIZE_FAILED
-			proto_set_available "$interface" 0
 			return 1
 		}
 	done
@@ -105,7 +102,6 @@ proto_ncm_setup() {
 		COMMAND="$setmode" gcom -d "$device" -s /etc/gcom/runcommand.gcom || {
 			echo "Failed to set operating mode"
 			proto_notify_error "$interface" SETMODE_FAILED
-			proto_set_available "$interface" 0
 			return 1
 		}
 		json_select ..
@@ -115,7 +111,6 @@ proto_ncm_setup() {
 	eval COMMAND="$connect" gcom -d "$device" -s /etc/gcom/runcommand.gcom || {
 		echo "Failed to connect"
 		proto_notify_error "$interface" CONNECT_FAILED
-		proto_set_available "$interface" 0
 		return 1
 	}
 
@@ -125,13 +120,13 @@ proto_ncm_setup() {
 	proto_send_update "$interface"
 
 	json_init
-	json_add_string name "${interface}_dhcp"
+	json_add_string name "${interface}_4"
 	json_add_string ifname "@$interface"
 	json_add_string proto "dhcp"
 	ubus call network add_dynamic "$(json_dump)"
 
 	json_init
-	json_add_string name "${interface}_dhcpv6"
+	json_add_string name "${interface}_6"
 	json_add_string ifname "@$interface"
 	json_add_string proto "dhcpv6"
 	ubus call network add_dynamic "$(json_dump)"

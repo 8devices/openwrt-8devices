@@ -180,10 +180,13 @@ platform_check_image() {
 	ap136-020 | \
 	ap135-020 | \
 	ap96 | \
+	bxu2000n-2-a1 | \
 	db120 | \
 	f9k1115v2 |\
 	hornet-ub | \
-	bxu2000n-2-a1 | \
+	mr12 | \
+	mr16 | \
+	wpj558 | \
 	zcn-1523h-2 | \
 	zcn-1523h-5)
 		[ "$magic_long" != "68737173" -a "$magic_long" != "19852003" ] && {
@@ -223,9 +226,11 @@ platform_check_image() {
 	loco-m-xw | \
 	nanostation-m | \
 	rocket-m | \
+	rocket-m-xw | \
 	nanostation-m-xw | \
 	rw2458n | \
 	wndap360 | \
+	wpj344 | \
 	wzr-hp-g300nh2 | \
 	wzr-hp-g300nh | \
 	wzr-hp-g450h | \
@@ -287,7 +292,8 @@ platform_check_image() {
 	om2p-hs | \
 	om2p-hsv2 | \
 	om2p-lc | \
-	om5p)
+	om5p | \
+	om5p-an)
 		platform_check_image_openmesh "$magic_long" "$1" && return 0
 		return 1
 		;;
@@ -312,6 +318,7 @@ platform_check_image() {
 	tl-mr3420 | \
 	tl-mr3420-v2 | \
 	tl-wa701nd-v2 | \
+	tl-wa7210n-v2 | \
 	tl-wa7510n | \
 	tl-wa750re | \
 	tl-wa850re | \
@@ -443,6 +450,19 @@ platform_check_image() {
 	return 1
 }
 
+platform_pre_upgrade() {
+	local board=$(ar71xx_board_name)
+
+	case "$board" in
+	nbg6716 | \
+	r6100 | \
+	wndr3700v4 | \
+	wndr4300 )
+		nand_do_upgrade "$1"
+		;;
+	esac
+}
+
 platform_do_upgrade() {
 	local board=$(ar71xx_board_name)
 
@@ -486,7 +506,8 @@ platform_do_upgrade() {
 	om2p-hs | \
 	om2p-hsv2 | \
 	om2p-lc | \
-	om5p)
+	om5p | \
+	om5p-an)
 		platform_do_upgrade_openmesh "$ARGV"
 		;;
 	unifi-outdoor-plus | \

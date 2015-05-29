@@ -11,7 +11,6 @@ PKG_NAME:=iperf
 PKG_VERSION:=3.0.11
 PKG_RELEASE:=1
 
-PKG_BUILD_DIR:=$(BUILD_DIR)/$(PKG_NAME)-$(PKG_VERSION)
 PKG_SOURCE:=$(PKG_NAME)-$(PKG_VERSION).tar.gz
 PKG_SOURCE_URL:=http://downloads.es.net/pub/iperf
 PKG_MD5SUM:=a3b2bed7961ba184566df3c3d47f96a6
@@ -31,6 +30,7 @@ define Package/iperf3
   URL:=http://sourceforge.net/projects/iperf/
 endef
 
+TARGET_CFLAGS += -D_GNU_SOURCE
 CONFIGURE_ARGS += --disable-shared
 
 MAKE_FLAGS += noinst_PROGRAMS=

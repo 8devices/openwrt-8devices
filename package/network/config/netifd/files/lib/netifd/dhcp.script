@@ -19,7 +19,12 @@ setup_interface () {
 	# TODO: apply $broadcast
 
 	for i in $router; do
+		proto_add_ipv4_route "$i" 32 "" "$ip"
 		proto_add_ipv4_route 0.0.0.0 0 "$i" "$ip"
+
+		for r in $CUSTOMROUTES; do
+			proto_add_ipv4_route "${r%%/*}" "${r##*/}" "$i" "$ip"
+		done
 	done
 
 	# CIDR STATIC ROUTES (rfc3442)
@@ -56,7 +61,7 @@ setup_interface () {
 		local ip6rdbr="${ip6rd%% *}"
 
 		[ -n "$ZONE" ] || ZONE=$(fw3 -q network $INTERFACE)
-		[ -z "$IFACE6RD" -o "$IFACE6RD" = 1 ] && IFACE6RD=${INTERFACE}_6rd
+		[ -z "$IFACE6RD" -o "$IFACE6RD" = 1 ] && IFACE6RD=${INTERFACE}_6
 
 		json_init
 		json_add_string name "$IFACE6RD"
@@ -92,6 +97,6 @@ case "$1" in
 esac
 
 # user rules
-[ -f /etc/udhcpc.user ] && . /etc/udhcpc.user
+[ -f /etc/udhcpc.user ] && . /etc/udhcpc.user "$@"
 
 exit 0

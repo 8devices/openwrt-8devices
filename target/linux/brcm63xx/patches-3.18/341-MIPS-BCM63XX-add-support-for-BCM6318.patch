@@ -35,7 +35,7 @@ Subject: [PATCH 51/53] MIPS: BCM63XX: add support for BCM6318
  	select SYS_HAS_CPU_BMIPS4350
 --- a/arch/mips/bcm63xx/boards/board_bcm963xx.c
 +++ b/arch/mips/bcm63xx/boards/board_bcm963xx.c
-@@ -737,7 +737,7 @@ void __init board_prom_init(void)
+@@ -717,7 +717,7 @@ void __init board_prom_init(void)
  	/* read base address of boot chip select (0)
  	 * 6328/6362 do not have MPI but boot from a fixed address
  	 */
@@ -216,7 +216,7 @@ Subject: [PATCH 51/53] MIPS: BCM63XX: add support for BCM6318
  		periph_bases[1] += PERF_IRQMASK_6328_REG(1);
 --- a/arch/mips/bcm63xx/prom.c
 +++ b/arch/mips/bcm63xx/prom.c
-@@ -72,7 +72,7 @@ void __init prom_init(void)
+@@ -68,7 +68,7 @@ void __init prom_init(void)
  
  			if (reg & OTP_6328_REG3_TP1_DISABLED)
  				bmips_smp_enabled = 0;
@@ -274,7 +274,7 @@ Subject: [PATCH 51/53] MIPS: BCM63XX: add support for BCM6318
  		bcm63xx_reset_bits = bcm6328_reset_bits;
 --- a/arch/mips/bcm63xx/setup.c
 +++ b/arch/mips/bcm63xx/setup.c
-@@ -71,6 +71,9 @@ void bcm63xx_machine_reboot(void)
+@@ -72,6 +72,9 @@ void bcm63xx_machine_reboot(void)
  	case BCM3368_CPU_ID:
  		perf_regs[0] = PERF_EXTIRQ_CFG_REG_3368;
  		break;
@@ -284,7 +284,7 @@ Subject: [PATCH 51/53] MIPS: BCM63XX: add support for BCM6318
  	case BCM6328_CPU_ID:
  		perf_regs[0] = PERF_EXTIRQ_CFG_REG_6328;
  		break;
-@@ -110,7 +113,7 @@ void bcm63xx_machine_reboot(void)
+@@ -111,7 +114,7 @@ void bcm63xx_machine_reboot(void)
  		bcm6348_a1_reboot();
  
  	printk(KERN_INFO "triggering watchdog soft-reset...\n");
@@ -648,8 +648,8 @@ Subject: [PATCH 51/53] MIPS: BCM63XX: add support for BCM6318
 -	if (BCMCPU_IS_6328())
 +	if (BCMCPU_IS_6318() || BCMCPU_IS_6328())
  		enetsw_pd.num_ports = ENETSW_PORTS_6328;
- 	else if (BCMCPU_IS_6362() || BCMCPU_IS_6368() ||
- 		 BCMCPU_VARIANT_IS_63168() || BCMCPU_VARIANT_IS_63169())
+ 	else if (BCMCPU_IS_6362() || BCMCPU_IS_6368())
+ 		enetsw_pd.num_ports = ENETSW_PORTS_6368;
 --- a/arch/mips/include/asm/mach-bcm63xx/bcm63xx_gpio.h
 +++ b/arch/mips/include/asm/mach-bcm63xx/bcm63xx_gpio.h
 @@ -9,6 +9,8 @@ int __init bcm63xx_gpio_init(void);

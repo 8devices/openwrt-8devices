@@ -1,6 +1,6 @@
 --- a/arch/mips/bcm63xx/boards/board_bcm963xx.c
 +++ b/arch/mips/bcm63xx/boards/board_bcm963xx.c
-@@ -4212,6 +4212,108 @@ static struct board_info __initdata boar
+@@ -1761,6 +1761,53 @@ static struct board_info __initdata boar
  		},
  	},
  };
@@ -50,66 +50,11 @@
 +			},
 +		},
 +	},
-+
-+	.leds = {
-+		{
-+			.name		= "VW6339GU:green:power",
-+			.gpio		= 1,
-+			.active_low	= 1,
-+		},
-+		{
-+			.name		= "VW6339GU:red:power",
-+			.gpio		= 0,
-+			.active_low	= 1,
-+		},
-+		{
-+			.name		= "VW6339GU:green:internet",
-+			.gpio		= 8,
-+			.active_low	= 1,
-+		},
-+		{
-+			.name		= "VW6339GU:red:internet",
-+			.gpio		= 2,
-+			.active_low	= 1,
-+		},
-+		{
-+			.name		= "VW6339GU:green:dsl",
-+			.gpio		= 3,
-+			.active_low	= 1,
-+		},
-+		{
-+			.name		= "VW6339GU:green:wps",
-+			.gpio		= 7,
-+			.active_low	= 1,
-+		},
-+		{
-+			.name		= "VW6339GU:green:usb",
-+			.gpio		= 15,
-+			.active_low	= 1,
-+		},
-+	},
-+
-+	.buttons = {
-+		{
-+			.desc		= "reset",
-+			.gpio		= 32,
-+			.type		= EV_KEY,
-+			.code		= KEY_RESTART,
-+			.debounce_interval = BCM963XX_KEYS_DEBOUNCE_INTERVAL,
-+		},
-+		{
-+			.desc		= "wps",
-+			.gpio		= 34,
-+			.type		= EV_KEY,
-+			.code		= KEY_WPS_BUTTON,
-+			.debounce_interval = BCM963XX_KEYS_DEBOUNCE_INTERVAL,
-+		},
-+	},
 +};
  #endif /* CONFIG_BCM63XX_CPU_63268 */
  
  /*
-@@ -4298,6 +4400,7 @@ static const struct board_info __initcon
+@@ -1847,6 +1894,7 @@ static const struct board_info __initcon
  #endif
  #ifdef CONFIG_BCM63XX_CPU_63268
  	&board_963269bhr,
@@ -117,3 +62,11 @@
  #endif
  };
  
+@@ -1937,6 +1985,7 @@ static struct of_device_id const bcm963x
+ #endif
+ #ifdef CONFIG_BCM63XX_CPU_63268
+ 	{ .compatible = "brcm,bcm963269bhr", .data = &board_963269bhr, },
++	{ .compatible = "inteno,vg50", .data = &board_vw6339gu, },
+ #endif
+ #endif /* CONFIG_OF */
+ 	{ },

@@ -22,7 +22,7 @@ endef
 
 $(eval $(call KernelPackage,leds-gpio))
 
-LED_TRIGGER_DIR=$(LINUX_DIR)/drivers/leds$(if $(CONFIG_LINUX_3_8),,/trigger)
+LED_TRIGGER_DIR=$(LINUX_DIR)/drivers/leds/trigger
 
 define KernelPackage/ledtrig-heartbeat
   SUBMENU:=$(LEDS_MENU)
@@ -181,6 +181,22 @@ define KernelPackage/ledtrig-oneshot/description
 endef
 
 $(eval $(call KernelPackage,ledtrig-oneshot))
+
+
+define KernelPackage/leds-pca963x
+  SUBMENU:=$(LEDS_MENU)
+  TITLE:=PCA963x LED support
+  DEPENDS:=+kmod-i2c-core
+  KCONFIG:=CONFIG_LEDS_PCA963X
+  FILES:=$(LINUX_DIR)/drivers/leds/leds-pca963x.ko
+  AUTOLOAD:=$(call AutoLoad,60,leds-pca963x,1)
+endef
+
+define KernelPackage/leds-pca963x/description
+ Driver for the NXP PCA963x I2C LED controllers.
+endef
+
+$(eval $(call KernelPackage,leds-pca963x))
 
 
 define KernelPackage/leds-tlc59116

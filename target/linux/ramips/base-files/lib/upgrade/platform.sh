@@ -33,6 +33,7 @@ platform_check_image() {
 	bc2 | \
 	broadway | \
 	carambola | \
+	cf-wr800n | \
 	d105 | \
 	dap-1350 | \
 	dcs-930 | \
@@ -60,11 +61,13 @@ platform_check_image() {
 	m2m | \
 	m3 | \
 	m4 | \
+	microwrt | \
 	mlw221 | \
 	mlwg2 | \
 	mofi3500-3gn | \
 	mpr-a1 | \
 	mpr-a2 | \
+	mr-102n | \
 	mzk-w300nh2 | \
 	nbg-419n | \
 	nw718 | \
@@ -114,6 +117,7 @@ platform_check_image() {
 	xiaomi-miwifi-mini |\
 	y1 |\
 	y1s |\
+	zte-q7 |\
 	zbt-wa05)
 		[ "$magic" != "27051956" ] && {
 			echo "Invalid image type."

@@ -78,3 +78,22 @@ Signed-off-by: John Crispin <blogic@openwrt.org>
  
  	return 0;
  }
+--- a/arch/mips/ralink/Kconfig
++++ b/arch/mips/ralink/Kconfig
+@@ -1,11 +1,16 @@
+ if RALINK
+ 
++config CEVT_SYSTICK_QUIRK
++	bool
++	default n
++
+ config CLKEVT_RT3352
+ 	bool
+ 	depends on SOC_RT305X || SOC_MT7620
+ 	default y
+ 	select CLKSRC_OF
+ 	select CLKSRC_MMIO
++	select CEVT_SYSTICK_QUIRK
+ 
+ config RALINK_ILL_ACC
+ 	bool

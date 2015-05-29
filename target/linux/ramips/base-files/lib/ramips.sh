@@ -85,11 +85,17 @@ ramips_board_detect() {
 	*"Aztech HW550-3G")
 		name="hw550-3g"
 		;;
+	*"AXIMCom MR-102N")
+		name="mr-102n"
+		;;
 	*"Buffalo WSR-600DHP")
 		name="wsr-600"
 		;;
 	*"Buffalo WSR-1166DHP")
 		name="wsr-1166"
+		;;
+	*"Comfast CF-WR800N")
+		name="cf-wr800n"
 		;;
 	*"Firefly FireWRT")
 		name="firewrt"
@@ -201,6 +207,9 @@ ramips_board_detect() {
 		;;
 	*"Planex MZK-750DHP")
 		name="mzk-750dhp"
+		;;
+	*"Microduino MicroWRT")
+		name="microwrt"
 		;;
 	*"NBG-419N")
 		name="nbg-419n"
@@ -378,6 +387,9 @@ ramips_board_detect() {
 		;;
 	*"ZBT WR8305RT")
 		name="wr8305rt"
+		;;
+	*"ZTE Q7")
+		name="zte-q7"
 		;;
 	*"Lenovo Y1")
 		name="y1"

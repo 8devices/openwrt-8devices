@@ -8,12 +8,12 @@
 include $(TOPDIR)/rules.mk
 
 PKG_NAME:=lldpd
-PKG_VERSION:=0.7.13
+PKG_VERSION:=0.7.15
 PKG_RELEASE:=1
 
 PKG_SOURCE:=$(PKG_NAME)-$(PKG_VERSION).tar.gz
 PKG_SOURCE_URL:=http://media.luffy.cx/files/lldpd
-PKG_MD5SUM:=13e8be761753eac9a8e12128acba40b4
+PKG_MD5SUM:=46f7ad97fc1d04084ab11b32fc0ed708
 
 PKG_MAINTAINER:=Jo-Philipp Wich <jow@openwrt.org>
 PKG_LICENSE:=ISC
@@ -31,7 +31,7 @@ define Package/lldpd
   SUBMENU:=Routing and Redirection
   TITLE:=Link Layer Discovery Protocol daemon
   URL:=https://github.com/vincentbernat/lldpd/wiki
-  DEPENDS:=+libevent2 +USE_EGLIBC:libbsd +LLDPD_WITH_JSON:libjson-c
+  DEPENDS:=+libevent2 +USE_GLIBC:libbsd +LLDPD_WITH_JSON:libjson-c
   USERID:=lldp=121:lldp=129
   MENU:=1
 endef
@@ -47,6 +47,14 @@ define Package/lldpd/description
 	CDP (Cisco Discovery Protocol).
 	The goal of LLDP is to provide an inter-vendor compatible mechanism to deliver
 	Link-Layer notifications to adjacent network devices.
+endef
+
+define Build/InstallDev
+	$(INSTALL_DIR) $(1)/usr/lib
+	$(CP) $(PKG_INSTALL_DIR)/usr/lib/liblldpctl.so* $(1)/usr/lib/
+	$(INSTALL_DIR) $(1)/usr/include
+	$(CP) $(PKG_INSTALL_DIR)/usr/include/lldpctl.h $(1)/usr/include/lldpctl.h
+	$(CP) $(PKG_INSTALL_DIR)/usr/include/lldp-const.h $(1)/usr/include/lldp-const.h
 endef
 
 define Package/lldpd/install
@@ -77,16 +85,22 @@ define Package/lldpd/conffiles
 endef
 
 CONFIGURE_ARGS += \
+	$(if $(CONFIG_LLDPD_WITH_PRIVSEP), \
 	--with-privsep-user=lldp \
 	--with-privsep-group=lldp \
 	--with-privsep-chroot=/var/run/lldp \
+	,--disable-privsep) \
 	--with-readline=no \
 	--with-embedded-libevent=no \
+	--disable-hardening \
 	$(if $(CONFIG_LLDPD_WITH_CDP),,--disable-cdp) \
 	$(if $(CONFIG_LLDPD_WITH_FDP),,--disable-fdp) \
 	$(if $(CONFIG_LLDPD_WITH_EDP),,--disable-edp) \
+	$(if $(CONFIG_LLDPD_WITH_LLDPMED),,--disable-lldpmed) \
+	$(if $(CONFIG_LLDPD_WITH_DOT1),,--disable-dot1) \
+	$(if $(CONFIG_LLDPD_WITH_DOT3),,--disable-dot3) \
 	$(if $(CONFIG_LLDPD_WITH_SONMP),,--disable-sonmp) \
-	$(if $(CONFIG_LLDPD_WITH_JSON),--with-json=json-c)
+	$(if $(CONFIG_LLDPD_WITH_JSON),--with-json=json-c,--with-json=no)
 
 
 $(eval $(call BuildPackage,lldpd))
