@@ -184,14 +184,14 @@ get_image() { # <source> [ <command> ]
 		*) cmd="cat";;
 	esac
 	if [ -z "$conc" ]; then
-		local magic="$(eval $cmd $from 2>/dev/null | dd bs=2 count=1 2>/dev/null | hexdump -n 2 -e '1/1 "%02x"')"
+		local magic="$(eval $cmd \"$from\" 2>/dev/null | dd bs=2 count=1 2>/dev/null | hexdump -n 2 -e '1/1 "%02x"')"
 		case "$magic" in
 			1f8b) conc="zcat";;
 			425a) conc="bzcat";;
 		esac
 	fi
 
-	eval "$cmd $from 2>/dev/null ${conc:+| $conc}"
+	eval "$cmd \"$from\" 2>/dev/null ${conc:+| $conc}"
 }
 
 get_magic_word() {
@@ -212,12 +212,16 @@ jffs2_copy_config() {
 	fi
 }
 
+# Flash firmware to MTD partition
+#
+# $(1): path to image
+# $(2): (optional) pipe command to extract firmware, e.g. dd bs=n skip=m
 default_do_upgrade() {
 	sync
 	if [ "$SAVE_CONFIG" -eq 1 ]; then
-		get_image "$1" | mtd $MTD_CONFIG_ARGS -j "$CONF_TAR" write - "${PART_NAME:-image}"
+		get_image "$1" "$2" | mtd $MTD_CONFIG_ARGS -j "$CONF_TAR" write - "${PART_NAME:-image}"
 	else
-		get_image "$1" | mtd write - "${PART_NAME:-image}"
+		get_image "$1" "$2" | mtd write - "${PART_NAME:-image}"
 	fi
 }
 

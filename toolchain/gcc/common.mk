@@ -41,14 +41,6 @@ ifeq ($(findstring linaro, $(CONFIG_GCC_VERSION)),linaro)
       PKG_MD5SUM:=5ba2f3a449b1658ccc09d27cc7ab3c03
       PKG_COMP:=xz
     endif
-    ifeq ($(CONFIG_GCC_VERSION),"4.9-linaro")
-      LINARO_RELEASE:=14.10
-      PKG_REV:=4.9-2014.10
-      PKG_VERSION:=4.9.2
-      PKG_VERSION_MAJOR:=4.9
-      PKG_MD5SUM:=230da25b1e7661a8659eb770c5c88442
-      PKG_COMP:=xz
-    endif
     ifneq ($(LINARO_RELEASE),)
       PKG_SOURCE_URL:=http://releases.linaro.org/$(LINARO_RELEASE)/components/toolchain/gcc-linaro/$(PKG_VERSION_MAJOR)
     else
@@ -61,11 +53,11 @@ else
   PKG_SOURCE_URL:=@GNU/gcc/gcc-$(PKG_VERSION)
   PKG_SOURCE:=$(PKG_NAME)-$(PKG_VERSION).tar.bz2
 
-  ifeq ($(PKG_VERSION),4.6.3)
-    PKG_MD5SUM:=773092fe5194353b02bb0110052a972e
-  endif
   ifeq ($(PKG_VERSION),4.8.0)
     PKG_MD5SUM:=e6040024eb9e761c3bea348d1fa5abb0
+  endif
+  ifeq ($(PKG_VERSION),5.2.0)
+    PKG_MD5SUM:=a51bcfeb3da7dd4c623e27207ed43467
   endif
 endif
 
@@ -127,7 +119,7 @@ GCC_CONFIGURE:= \
 		$(SOFT_FLOAT_CONFIG_OPTION) \
 		$(call qstrip,$(CONFIG_EXTRA_GCC_CONFIG_OPTIONS)) \
 		$(if $(CONFIG_mips64)$(CONFIG_mips64el),--with-arch=mips64 \
-			--with-abi=$(subst ",,$(CONFIG_MIPS64_ABI))) \
+			--with-abi=$(call qstrip,$(CONFIG_MIPS64_ABI))) \
 		--with-gmp=$(TOPDIR)/staging_dir/host \
 		--with-mpfr=$(TOPDIR)/staging_dir/host \
 		--with-mpc=$(TOPDIR)/staging_dir/host \

@@ -60,13 +60,7 @@ define Build/asus-trx
 	mv $@.new $@
 endef
 
-define Build/netgear-chk
-	$(STAGING_DIR_HOST)/bin/mkchkimg \
-		-o $@.new -k $@ -b $(BOARD_ID) -r $(REGION)
-	mv $@.new $@
-endef
-
-DEVICE_VARS += DT PRODUCTID BOARD_ID REGION
+DEVICE_VARS += DT PRODUCTID NETGEAR_BOARD_ID NETGEAR_REGION
 
 define Device/Default
   # .dtb files are prefixed by SoC type, e.g. bcm4708- which is not included in device/image names
@@ -96,22 +90,30 @@ endef
 define Device/netgear
   IMAGES := chk
   IMAGE/chk := trx-nand | netgear-chk
-  REGION := 1
+  NETGEAR_REGION := 1
+endef
+
+define NetgearDevice
+  define Device/netgear-$(1)
+	$$(Device/netgear)
+	NETGEAR_BOARD_ID := $(2)
+  endef
+  TARGET_DEVICES += netgear-$(1)
 endef
 
 define Device/netgear-r6250
   $(Device/netgear)
-  BOARD_ID := U12H245T00_NETGEAR
+  NETGEAR_BOARD_ID := U12H245T00_NETGEAR
 endef
 
 define Device/netgear-r6300-v2
   $(Device/netgear)
-  BOARD_ID := U12H240T00_NETGEAR
+  NETGEAR_BOARD_ID := U12H240T00_NETGEAR
 endef
 
 define Device/netgear-r8000
   $(Device/netgear)
-  BOARD_ID := U12H315T00_NETGEAR
+  NETGEAR_BOARD_ID := U12H315T00_NETGEAR
 endef
 
 define Device/smartrg-sr400ac
@@ -129,5 +131,6 @@ $(eval $(call AsusDevice,rt-ac56u,RT-AC56U))
 $(eval $(call AsusDevice,rt-ac68u,RT-AC68U))
 $(eval $(call AsusDevice,rt-ac87u,RT-AC87U))
 $(eval $(call AsusDevice,rt-n18u,RT-N18U))
+$(eval $(call NetgearDevice,r7000,U12H270T00_NETGEAR))
 
 $(eval $(call BuildImage))

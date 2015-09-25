@@ -90,7 +90,6 @@ define KernelPackage/fs-cifs
   AUTOLOAD:=$(call AutoLoad,30,cifs)
   $(call AddDepends/nls)
   DEPENDS+= \
-    +kmod-crypto-arc4 \
     +kmod-crypto-hmac \
     +kmod-crypto-md5 \
     +kmod-crypto-md4 \
@@ -160,6 +159,7 @@ define KernelPackage/fs-ext4
     +kmod-crypto-hash
   KCONFIG:= \
 	CONFIG_EXT4_FS \
+	CONFIG_EXT4_ENCRYPTION=n \
 	CONFIG_JBD2
   FILES:= \
 	$(LINUX_DIR)/fs/ext4/ext4.ko \

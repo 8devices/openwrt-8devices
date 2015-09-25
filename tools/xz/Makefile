@@ -7,15 +7,19 @@
 include $(TOPDIR)/rules.mk
 
 PKG_NAME:=xz
-PKG_VERSION:=5.0.5
+PKG_VERSION:=5.2.1
 
 PKG_SOURCE:=$(PKG_NAME)-$(PKG_VERSION).tar.bz2
 PKG_SOURCE_URL:=http://tukaani.org/xz
-PKG_MD5SUM:=db44efe0d53ac4317627624b98c63da0
+PKG_MD5SUM:=d484910b26fec5aff99ee66350589e29
 
 HOST_BUILD_PARALLEL:=1
 
 include $(INCLUDE_DIR)/host-build.mk
+
+HOST_CONFIGURE_ARGS += \
+	--enable-static=yes \
+	--enable-shared=no \
 
 define Host/Install
 	+$(MAKE) $(HOST_JOBS) -C $(HOST_BUILD_DIR) install xzlinks="unxz xzcat"

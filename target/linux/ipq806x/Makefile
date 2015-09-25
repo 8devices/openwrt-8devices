@@ -5,7 +5,7 @@ include $(TOPDIR)/rules.mk
 ARCH:=arm
 BOARD:=ipq806x
 BOARDNAME:=Qualcomm Atheros IPQ806X
-FEATURES:=squashfs
+FEATURES:=squashfs nand ubifs
 CPU_TYPE:=cortex-a7
 MAINTAINER:=John Crispin <blogic@openwrt.org>
 
@@ -15,7 +15,7 @@ KERNELNAME:=zImage Image dtbs
 
 include $(INCLUDE_DIR)/target.mk
 DEFAULT_PACKAGES += \
-	kmod-leds-gpio kmod-gpio-button-hotplug kmod-stmmac swconfig \
+	kmod-leds-gpio kmod-gpio-button-hotplug swconfig \
 	kmod-ata-core kmod-ata-ahci kmod-ata-ahci-platform
 
 

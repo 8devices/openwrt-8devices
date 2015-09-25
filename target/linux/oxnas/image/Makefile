@@ -19,7 +19,6 @@ POGOPLUG_PRO_UBIFS_OPTS = -m 2048 -e 126KiB -c 4096
 POGOPLUG_V3_UBI_OPTS = -m 2048 -p 128KiB -s 512
 POGOPLUG_V3_UBIFS_OPTS = -m 2048 -e 126KiB -c 4096
 
-KDIR_TMP:=$(KDIR)/tmp
 VMLINUX:=$(BIN_DIR)/$(IMG_PREFIX)-vmlinux
 UIMAGE:=$(BIN_DIR)/$(IMG_PREFIX)-uImage
 
@@ -38,7 +37,7 @@ define Image/BuildKernel/Template
 	$(CP) $(KDIR)/fit-$(1)-initramfs.itb $(BIN_DIR)/$(IMG_PREFIX)-$(1)-fit-uImage-initramfs.itb
 	if [ -e "$(KDIR)/u-boot.bin" ]; then \
 	( dd if=$(KDIR)/u-boot.bin bs=128k conv=sync ; dd if=$(KDIR)/fit-$(1)-initramfs.itb bs=128k conv=sync ) \
-		> $(BIN_DIR)/$(IMG_PREFIX)-$(1)-u-boot-initramfs.itb; \
+		> $(BIN_DIR)/$(IMG_PREFIX)-$(1)-u-boot-initramfs.bin; \
 	fi
  endif
 

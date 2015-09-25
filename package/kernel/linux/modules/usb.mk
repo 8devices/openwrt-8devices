@@ -300,6 +300,7 @@ $(eval $(call KernelPackage,usb-uhci,1))
 define KernelPackage/usb-ohci
   TITLE:=Support for OHCI controllers
   DEPENDS:= \
+	+TARGET_bcm53xx:kmod-usb-bcma \
 	+TARGET_brcm47xx:kmod-usb-bcma \
 	+TARGET_brcm47xx:kmod-usb-ssb
   KCONFIG:= \
@@ -314,7 +315,10 @@ define KernelPackage/usb-ohci
   FILES:= \
 	$(LINUX_DIR)/drivers/usb/host/ohci-hcd.ko \
 	$(LINUX_DIR)/drivers/usb/host/ohci-platform.ko
-  AUTOLOAD:=$(call AutoLoad,50,ohci-hcd ohci-platform,1)
+  ifneq ($(wildcard $(LINUX_DIR)/drivers/usb/host/ohci-at91.ko),)
+    FILES+=$(LINUX_DIR)/drivers/usb/host/ohci-at91.ko
+  endif
+  AUTOLOAD:=$(call AutoLoad,50,ohci-hcd ohci-platform ohci-at91,1)
   $(call AddDepends/usb)
 endef
 
@@ -415,14 +419,18 @@ define KernelPackage/usb2
 	CONFIG_USB_EHCI_MXC=y \
 	CONFIG_USB_OCTEON_EHCI=y \
 	CONFIG_USB_EHCI_HCD_ORION=y \
-	CONFIG_USB_EHCI_HCD_PLATFORM=y
+	CONFIG_USB_EHCI_HCD_PLATFORM=y \
+	CONFIG_USB_EHCI_HCD_AT91=y
   FILES:= \
 	$(LINUX_DIR)/drivers/usb/host/ehci-hcd.ko \
 	$(LINUX_DIR)/drivers/usb/host/ehci-platform.ko
   ifneq ($(wildcard $(LINUX_DIR)/drivers/usb/host/ehci-orion.ko),)
     FILES+=$(LINUX_DIR)/drivers/usb/host/ehci-orion.ko
   endif
-  AUTOLOAD:=$(call AutoLoad,40,ehci-hcd ehci-platform ehci-orion,1)
+  ifneq ($(wildcard $(LINUX_DIR)/drivers/usb/host/ehci-atmel.ko),)
+    FILES+=$(LINUX_DIR)/drivers/usb/host/ehci-atmel.ko
+  endif
+  AUTOLOAD:=$(call AutoLoad,40,ehci-hcd ehci-platform ehci-orion ehci-atmel,1)
   $(call AddDepends/usb)
 endef
 
@@ -458,7 +466,8 @@ define KernelPackage/usb-dwc2
 	CONFIG_USB_DWC2_PLATFORM \
 	CONFIG_USB_DWC2_DEBUG=n \
 	CONFIG_USB_DWC2_VERBOSE=n \
-	CONFIG_USB_DWC2_TRACK_MISSED_SOFS=n
+	CONFIG_USB_DWC2_TRACK_MISSED_SOFS=n \
+	CONFIG_USB_DWC2_DEBUG_PERIODIC=n
   FILES:= \
 	$(LINUX_DIR)/drivers/usb/dwc2/dwc2.ko \
 	$(LINUX_DIR)/drivers/usb/dwc2/dwc2_platform.ko
@@ -1259,6 +1268,36 @@ endef
 $(eval $(call KernelPackage,usb-net-qmi-wwan))
 
 
+define KernelPackage/usb-net-rtl8150
+  TITLE:=Kernel module for USB-to-Ethernet Realtek convertors
+  KCONFIG:=CONFIG_USB_RTL8150
+  FILES:=$(LINUX_DIR)/drivers/$(USBNET_DIR)/rtl8150.ko
+  AUTOLOAD:=$(call AutoProbe,rtl8150)
+  $(call AddDepends/usb-net)
+endef
+
+define KernelPackage/usb-net-rtl8150/description
+ Kernel module for USB-to-Ethernet Realtek 8150 convertors
+endef
+
+$(eval $(call KernelPackage,usb-net-rtl8150))
+
+
+define KernelPackage/usb-net-rtl8152
+  TITLE:=Kernel module for USB-to-Ethernet Realtek convertors
+  KCONFIG:=CONFIG_USB_RTL8152
+  FILES:=$(LINUX_DIR)/drivers/$(USBNET_DIR)/r8152.ko
+  AUTOLOAD:=$(call AutoProbe,r8152)
+  $(call AddDepends/usb-net)
+endef
+
+define KernelPackage/usb-net-rtl8152/description
+ Kernel module for USB-to-Ethernet Realtek 8152 USB2.0/3.0 convertors
+endef
+
+$(eval $(call KernelPackage,usb-net-rtl8152))
+
+
 define KernelPackage/usb-net-rndis
   TITLE:=Support for RNDIS connections
   KCONFIG:=CONFIG_USB_NET_RNDIS_HOST
@@ -1526,7 +1565,9 @@ XHCI_AUTOLOAD := $(patsubst $(LINUX_DIR)/drivers/usb/host/%.ko,%,$(XHCI_FILES))
 
 define KernelPackage/usb3
   TITLE:=Support for USB3 controllers
-  DEPENDS:=+TARGET_omap:kmod-usb-phy-omap-usb3
+  DEPENDS:= \
+	+TARGET_bcm53xx:kmod-usb-bcma \
+	+TARGET_omap:kmod-usb-phy-omap-usb3
   KCONFIG:= \
 	CONFIG_USB_XHCI_HCD \
 	CONFIG_USB_XHCI_PCI \
