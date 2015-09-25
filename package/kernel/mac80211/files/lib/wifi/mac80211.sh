@@ -121,7 +121,7 @@ config wifi-iface
 	option device   radio$devidx
 	option network  lan
 	option mode     ap
-	option ssid     Carambola2
+	option ssid     OpenWrt
 	option encryption none
 
 EOF

@@ -283,3 +283,16 @@ set network.@switch_port[-1].port='$port'
 EOF
 }
 
+ucidef_set_system_hostname() {
+	local hostname=$1
+	uci batch <<EOF
+set system.@system[0].hostname='$hostname'
+EOF
+}
+
+ucidef_set_wifi_ssid() {
+	local ssid=$1
+	uci batch <<EOF
+set wireless.@wifi-iface[0].ssid='$ssid'
+EOF
+}
