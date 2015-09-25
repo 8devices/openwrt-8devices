@@ -198,6 +198,8 @@ platform_check_image() {
 	ap81 | \
 	ap83 | \
 	ap132 | \
+	carambola2 | \
+	centipede | \
 	dgl-5500-a1 |\
 	dhp-1565-a1 |\
 	dir-505-a1 | \
@@ -242,8 +244,7 @@ platform_check_image() {
 	wlae-ag300n | \
 	nbg460n_550n_550nh | \
 	unifi | \
-	unifi-outdoor | \
-	carambola2 )
+	unifi-outdoor )
 		[ "$magic" != "2705" ] && {
 			echo "Invalid image type."
 			return 1

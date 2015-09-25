@@ -885,8 +885,11 @@ ar71xx_board_detect() {
 	*EmbWir-Dorin-Router)
 		name="ew-dorin-router"
 		;;
-	"8devices Carambola2"*)
+	*"8devices Carambola2"*)
 		name="carambola2"
+		;;
+	*"8devices Centipede"*)
+		name="centipede"
 		;;
 	*"Sitecom WLR-8100")
 		name="wlr8100"

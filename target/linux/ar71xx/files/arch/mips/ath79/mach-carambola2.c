@@ -1,5 +1,5 @@
 /*
- *  8devices Carambola2 board support
+ *  8devices Carambola2/Centipede board support
  *
  *  Copyright (C) 2013 Darius Augulis <darius@8devices.com>
  *
@@ -34,6 +34,8 @@
 #define CARAMBOLA2_CALDATA_OFFSET		0x1000
 #define CARAMBOLA2_WMAC_MAC_OFFSET		0x1002
 
+#define CENTIPEDE_GPIO_LED_ETH0			13
+
 static struct gpio_led carambola2_leds_gpio[] __initdata = {
 	{
 		.name		= "carambola2:green:wlan",
@@ -46,6 +48,14 @@ static struct gpio_led carambola2_leds_gpio[] __initdata = {
 	}, {
 		.name		= "carambola2:orange:eth1",
 		.gpio		= CARAMBOLA2_GPIO_LED_ETH1,
+		.active_low	= 0,
+	}
+};
+
+static struct gpio_led centipede_leds_gpio[] __initdata = {
+	{
+		.name		= "centipede:greeen:eth0",
+		.gpio		= CENTIPEDE_GPIO_LED_ETH0,
 		.active_low	= 0,
 	}
 };
@@ -71,9 +81,23 @@ static void __init carambola2_common_setup(void)
 
 	ath79_setup_ar933x_phy4_switch(true, true);
 
+	ath79_gpio_function_disable(AR724X_GPIO_FUNC_ETH_SWITCH_LED0_EN |
+				    AR724X_GPIO_FUNC_ETH_SWITCH_LED1_EN |
+				    AR724X_GPIO_FUNC_ETH_SWITCH_LED2_EN |
+				    AR724X_GPIO_FUNC_ETH_SWITCH_LED3_EN |
+				    AR724X_GPIO_FUNC_ETH_SWITCH_LED4_EN);
+
+	ath79_register_usb();
+}
+
+static void __init carambola2_setup(void)
+{
+	u8 *art = (u8 *) KSEG1ADDR(0x1fff0000);
+
+	carambola2_common_setup();
+
 	ath79_init_mac(ath79_eth0_data.mac_addr, art + CARAMBOLA2_MAC0_OFFSET, 0);
 	ath79_init_mac(ath79_eth1_data.mac_addr, art + CARAMBOLA2_MAC1_OFFSET, 0);
-
 	ath79_register_mdio(0, 0x0);
 
 	/* LAN ports */
@@ -81,25 +105,33 @@ static void __init carambola2_common_setup(void)
 
 	/* WAN port */
 	ath79_register_eth(0);
-}
-
-static void __init carambola2_setup(void)
-{
-	carambola2_common_setup();
-
-	ath79_gpio_function_disable(AR724X_GPIO_FUNC_ETH_SWITCH_LED0_EN |
-				AR724X_GPIO_FUNC_ETH_SWITCH_LED1_EN |
-				AR724X_GPIO_FUNC_ETH_SWITCH_LED2_EN |
-				AR724X_GPIO_FUNC_ETH_SWITCH_LED3_EN |
-				AR724X_GPIO_FUNC_ETH_SWITCH_LED4_EN);
 
 	ath79_register_leds_gpio(-1, ARRAY_SIZE(carambola2_leds_gpio),
 				 carambola2_leds_gpio);
 	ath79_register_gpio_keys_polled(-1, CARAMBOLA2_KEYS_POLL_INTERVAL,
 					ARRAY_SIZE(carambola2_gpio_keys),
 					carambola2_gpio_keys);
-	ath79_register_usb();
+
+}
+
+static void __init centipede_setup(void)
+{
+	u8 *art = (u8 *) KSEG1ADDR(0x1fff0000);
+
+	carambola2_common_setup();
+
+	ath79_init_mac(ath79_eth1_data.mac_addr, art + CARAMBOLA2_MAC0_OFFSET, 0);
+	ath79_register_mdio(0, 0x0);
+
+	/* LAN port */
+	ath79_register_eth(1);
+	
+	ath79_register_leds_gpio(-1, ARRAY_SIZE(centipede_leds_gpio),
+				 centipede_leds_gpio);
 }
 
 MIPS_MACHINE(ATH79_MACH_CARAMBOLA2, "CARAMBOLA2", "8devices Carambola2 board",
 		carambola2_setup);
+
+MIPS_MACHINE(ATH79_MACH_CENTIPEDE, "CENTIPEDE", "8devices Centipede board",
+		centipede_setup);

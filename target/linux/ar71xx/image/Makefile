@@ -126,7 +126,13 @@ define Device/carambola2
   CONSOLE = ttyATH0,115200
   MTDPARTS = spi0.0:256k(u-boot)ro,64k(u-boot-env)ro,16000k(firmware),64k(art)ro
 endef
-TARGET_DEVICES += carambola2
+
+define Device/centipede
+$(Device/carambola2)
+  BOARDNAME = CENTIPEDE
+endef
+
+TARGET_DEVICES += carambola2 centipede
 
 define Device/wndr3700
   BOARDNAME = WNDR3700
@@ -1935,6 +1941,7 @@ $(eval $(call SingleProfile,Zcomax,64k,ZCN1523H516,zcn-1523h-5-16,ZCN-1523H-5,tt
 
 $(eval $(call SingleProfile,ZyXEL,64k,NBG_460N_550N_550NH,nbg460n_550n_550nh,NBG460N,ttyS0,115200,NBG-460N))
 
+$(eval $(call MultiProfile,ALL8DEVICES,CARAMBOLA2 CENTIPEDE))
 $(eval $(call MultiProfile,AP121,AP121_2M AP121_4M))
 $(eval $(call MultiProfile,AP136,AP136_010 AP136_020))
 $(eval $(call MultiProfile,EWDORIN, EWDORINAP EWDORINRT EWDORIN16M))

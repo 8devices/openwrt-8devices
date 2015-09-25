@@ -38,17 +38,6 @@ endef
 
 $(eval $(call Profile,AP121MINI))
 
-define Profile/CARAMBOLA2
-        NAME:=Carambola2 board from 8Devices
-        PACKAGES:=kmod-usb-core kmod-usb2
-endef
-
-define Profile/CARAMBOLA2/Description
-        Package set optimized for the 8devices Carambola2 board.
-endef
-
-$(eval $(call Profile,CARAMBOLA2))
-
 define Profile/AP132
 	NAME:=Atheros AP132 reference board
 	PACKAGES:=kmod-usb-core kmod-usb2 kmod-usb-storage
