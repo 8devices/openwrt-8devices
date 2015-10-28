@@ -3,6 +3,10 @@
 # Copyright (C) 2011 OpenWrt.org
 #
 
+[ -e /etc/config/branding ] && exit 0
+
+touch /etc/config/branding
+
 . /lib/functions/uci-defaults.sh
 . /lib/ar71xx.sh
 
