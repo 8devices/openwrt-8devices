@@ -6,9 +6,14 @@
 include $(TOPDIR)/rules.mk
 
 PKG_NAME:=mmio
-PKG_RELEASE:=2
+PKG_VERSION:=2012-10-14
+PKG_RELEASE:=3
 
-PKG_BUILD_DIR := $(BUILD_DIR)/$(PKG_NAME)
+PKG_SOURCE_PROTO:=git
+PKG_SOURCE_URL:=https://github.com/8devices/mmio.git
+PKG_SOURCE_SUBDIR:=$(PKG_NAME)-$(PKG_VERSION)
+PKG_SOURCE_VERSION:=30618dacfd07fd1050496e8a896c84bb201a1c14
+PKG_SOURCE:=$(PKG_NAME)-$(PKG_VERSION)-$(PKG_SOURCE_VERSION).tar.gz
 
 include $(INCLUDE_DIR)/package.mk
 
@@ -16,28 +21,17 @@ define Package/mmio
   SECTION:=utils
   CATEGORY:=Utilities
   TITLE:=Memory Mapped I/O
+  MAKE_PATH:=src
 endef
 
 define Package/mmio/description
 Memory Mapped I/O utility
 endef
 
-define Build/Prepare
-	mkdir -p $(PKG_BUILD_DIR)
-	$(CP) ./src/* $(PKG_BUILD_DIR)/
-endef
-
-define Build/Compile
-	make -C $(PKG_BUILD_DIR)		\
-		$(TARGET_CONFIGURE_OPTS)	\
-		CFLAGS="$(TARGET_CFLAGS) $(TARGET_CPPFLAGS)"	\
-		LIBS="$(TARGET_LDFLAGS)"
-endef
-
 define Package/mmio/install
 	$(INSTALL_DIR) $(1)/usr/sbin
-	$(INSTALL_BIN) $(PKG_BUILD_DIR)/mmio $(1)/usr/sbin/mmio
-	$(INSTALL_BIN) $(PKG_BUILD_DIR)/rtscts $(1)/usr/sbin/rtscts
+	$(INSTALL_BIN) $(PKG_BUILD_DIR)/$(MAKE_PATH)/mmio $(1)/usr/sbin/mmio
+	$(INSTALL_BIN) $(PKG_BUILD_DIR)/$(MAKE_PATH)/rtscts $(1)/usr/sbin/rtscts
 endef
 
 $(eval $(call BuildPackage,mmio))
