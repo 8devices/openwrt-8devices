@@ -27,14 +27,13 @@ endef
 
 $(eval $(call Profile,CENTIPEDE))
 
-
-define Profile/ALL8DEVICES
+define Profile/8DEV
 	NAME:=8devices Products
 	PACKAGES:=kmod-usb-core kmod-usb2
 endef
 
-define Profile/ALL8DEVICES/Description
+define Profile/8DEV/Description
 	Build images for all 8devices products
 endef
 
-$(eval $(call Profile,ALL8DEVICES))
+$(eval $(call Profile,8DEV))

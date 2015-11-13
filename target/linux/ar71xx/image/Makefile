@@ -193,6 +193,7 @@ endef
 TARGET_DEVICES += bsb
 
 define Device/carambola2
+  DEVICE_PROFILE := 8DEV CARAMBOLA2
   BOARDNAME = CARAMBOLA2
   IMAGE_SIZE = 16000k
   CONSOLE = ttyATH0,115200
@@ -201,6 +202,7 @@ endef
 
 define Device/centipede
 $(Device/carambola2)
+  DEVICE_PROFILE := 8DEV CENTIPEDE
   BOARDNAME = CENTIPEDE
 endef
 
@@ -2298,7 +2300,6 @@ $(eval $(call SingleProfile,Zcomax,64k,ZCN1523H516,zcn-1523h-5-16,ZCN-1523H-5,tt
 
 $(eval $(call SingleProfile,ZyXEL,64k,NBG_460N_550N_550NH,nbg460n_550n_550nh,NBG460N,ttyS0,115200,NBG-460N))
 
-$(eval $(call MultiProfile,ALL8DEVICES,CARAMBOLA2 CENTIPEDE))
 $(eval $(call MultiProfile,AP121,AP121_2M AP121_4M AP121_8M))
 $(eval $(call MultiProfile,AP136,AP136_010 AP136_020))
 $(eval $(call MultiProfile,AP143,AP143_8M AP143_16M))
