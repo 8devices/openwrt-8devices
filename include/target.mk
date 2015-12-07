@@ -16,7 +16,7 @@ DEFAULT_PACKAGES:=base-files libc libgcc busybox dropbear mtd uci opkg netifd fs
 # For nas targets
 DEFAULT_PACKAGES.nas:=block-mount fdisk lsblk mdadm
 # For router targets
-DEFAULT_PACKAGES.router:=dnsmasq iptables ip6tables ppp ppp-mod-pppoe kmod-nf-nathelper firewall odhcpd odhcp6c
+DEFAULT_PACKAGES.router:=dnsmasq iptables ip6tables ppp ppp-mod-pppoe firewall odhcpd odhcp6c
 DEFAULT_PACKAGES.bootloader:=
 
 ifneq ($(DUMP),)
@@ -212,6 +212,7 @@ ifeq ($(DUMP),1)
     CPU_CFLAGS_mips32 = -mips32 -mtune=mips32
     CPU_CFLAGS_mips32r2 = -mips32r2 -mtune=mips32r2
     CPU_CFLAGS_mips64 = -mips64 -mtune=mips64 -mabi=64
+    CPU_CFLAGS_24kc = -mips32r2 -mtune=24kc
     CPU_CFLAGS_24kec = -mips32r2 -mtune=24kec
     CPU_CFLAGS_34kc = -mips32r2 -mtune=34kc
     CPU_CFLAGS_74kc = -mips32r2 -mtune=74kc
@@ -243,6 +244,7 @@ ifeq ($(DUMP),1)
       CPU_CFLAGS_neon = -mfpu=neon
       CPU_CFLAGS_vfp = -mfpu=vfp
       CPU_CFLAGS_vfpv3 = -mfpu=vfpv3-d16
+      CPU_CFLAGS_neon-vfpv4 = -mfpu=neon-vfpv4
     endif
   endif
   ifeq ($(ARCH),powerpc)
@@ -258,6 +260,10 @@ ifeq ($(DUMP),1)
   ifeq ($(ARCH),aarch64)
     CPU_TYPE ?= armv8-a
     CPU_CFLAGS_armv8-a = -mcpu=armv8-a
+  endif
+  ifeq ($(ARCH),arc)
+    CPU_TYPE ?= arc700
+    CPU_CFLAGS_arc700 = -marc700
   endif
   DEFAULT_CFLAGS=$(strip $(CPU_CFLAGS) $(CPU_CFLAGS_$(CPU_TYPE)) $(CPU_CFLAGS_$(CPU_SUBTYPE)))
 endif

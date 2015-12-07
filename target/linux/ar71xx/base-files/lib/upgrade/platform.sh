@@ -173,6 +173,7 @@ platform_check_image() {
 		;;
 	alfa-ap96 | \
 	alfa-nx | \
+	arduino-yun | \
 	ap113 | \
 	ap121 | \
 	ap121-mini | \
@@ -212,6 +213,7 @@ platform_check_image() {
 	dir-615-i1 | \
 	dir-825-c1 | \
 	dir-835-a1 | \
+	dlan-hotspot | \
 	dlan-pro-500-wp | \
 	dlan-pro-1200-ac | \
 	dragino2 | \
@@ -220,6 +222,9 @@ platform_check_image() {
 	esr900 | \
 	ew-dorin | \
 	ew-dorin-router | \
+	gl-ar150 | \
+	gl-ar300 | \
+	gl-domino | \
 	hiwifi-hc6361 | \
 	hornet-ub-x2 | \
 	mzk-w04nu | \
@@ -319,6 +324,7 @@ platform_check_image() {
 	el-mini | \
 	gl-inet | \
 	mc-mac1200r | \
+	minibox-v1 |\
 	onion-omega | \
 	oolite | \
 	smart-300 | \
@@ -361,6 +367,7 @@ platform_check_image() {
 	tl-wr842n-v2 | \
 	tl-wr941nd | \
 	tl-wr941nd-v5 | \
+	tl-wr941nd-v6 | \
 	tl-wr1041n-v2 | \
 	tl-wr1043nd | \
 	tl-wr1043nd-v2 | \
@@ -405,6 +412,7 @@ platform_check_image() {
 		return 1
 		;;
 
+	nbg6616 | \
 	unifi-outdoor-plus | \
 	uap-pro)
 		[ "$magic_long" != "19852003" ] && {

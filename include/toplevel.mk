@@ -22,8 +22,6 @@ endif
 HOSTCC ?= $(CC)
 export RELEASE
 export REVISION
-export LD_LIBRARY_PATH:=$(subst ::,:,$(if $(LD_LIBRARY_PATH),$(LD_LIBRARY_PATH):)$(TOPDIR)/staging_dir/host/lib)
-export DYLD_LIBRARY_PATH:=$(subst ::,:,$(if $(DYLD_LIBRARY_PATH),$(DYLD_LIBRARY_PATH):)$(TOPDIR)/staging_dir/host/lib)
 export GIT_CONFIG_PARAMETERS='core.autocrlf=false'
 export MAKE_JOBSERVER=$(filter --jobserver%,$(MAKEFLAGS))
 
@@ -215,7 +213,7 @@ docs/clean: FORCE
 	@$(_SINGLE)$(SUBMAKE) -C docs clean
 
 distclean:
-	rm -rf tmp build_dir staging_dir dl .config* feeds package/feeds package/openwrt-packages bin
+	rm -rf bin build_dir .config* dl feeds key-build* logs package/feeds package/openwrt-packages staging_dir tmp
 	@$(_SINGLE)$(SUBMAKE) -C scripts/config clean
 
 ifeq ($(findstring v,$(DEBUG)),)

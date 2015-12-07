@@ -322,7 +322,6 @@ nand_upgrade_stage1() {
 		exit 0
 	}
 }
-append sysupgrade_pre_upgrade nand_upgrade_stage1
 
 # Check if passed file is a valid one for NAND sysupgrade. Currently it accepts
 # 3 types of files:
@@ -347,9 +346,6 @@ nand_do_platform_check() {
 		echo "Invalid sysupgrade file."
 		return 1
 	}
-
-	echo -n $2 > /tmp/sysupgrade-nand-path
-	cp /sbin/upgraded /tmp/
 
 	return 0
 }

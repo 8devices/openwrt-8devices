@@ -12,9 +12,11 @@ get_status_led() {
 	all0305)
 		status_led="eap7660d:green:ds4"
 		;;
-	antminer-s1|\
+	antminer-s1)
+		status_led="antminer-s1:green:system"
+		;;
 	antminer-s3)
-		status_led="bitmain:green:system"
+		status_led="antminer-s3:green:system"
 		;;
 	ap132)
 		status_led="ap132:green:status"
@@ -83,6 +85,9 @@ get_status_led() {
 	dir-825-c1 |\
 	dir-835-a1)
 		status_led="d-link:amber:power"
+		;;
+	dlan-hotspot)
+		status_led="devolo:green:wifi"
 		;;
 	dlan-pro-500-wp)
 		status_led="devolo:green:wlan-2g"
@@ -171,8 +176,11 @@ get_status_led() {
 	nbg460n_550n_550nh)
 		status_led="nbg460n:green:power"
 		;;
+	nbg6616)
+		status_led="nbg6616:green:power"
+		;;
 	nbg6716)
-		status_led="zyxel:white:power"
+		status_led="nbg6716:white:power"
 		;;
 	om2p | \
 	om2pv2 | \
@@ -224,6 +232,9 @@ get_status_led() {
 		;;
 	smart-300)
 		status_led="nc-link:green:system"
+		;;
+	minibox-v1)
+		status_led="minibox-v1:green:system"
 		;;
 	oolite)
 		status_led="oolite:red:system"
@@ -287,7 +298,8 @@ get_status_led() {
 	tl-wdr4300 | \
 	tl-wr703n | \
 	tl-wr710n | \
-	tl-wr720n-v3)
+	tl-wr720n-v3 | \
+	tl-wr941nd-v6)
 		status_led="tp-link:blue:system"
 		;;
 	tl-wr841n-v9)

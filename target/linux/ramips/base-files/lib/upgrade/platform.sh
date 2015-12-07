@@ -55,12 +55,15 @@ platform_check_image() {
 	firewrt|\
 	fonera20n|\
 	freestation5|\
+	hc5*61|\
 	hg255d|\
 	hlk-rm04|\
 	hpm|\
 	ht-tm02|\
 	hw550-3g|\
 	ip2202|\
+	linkits7688|\
+	linkits7688d|\
 	m2m|\
 	m3|\
 	m4|\
@@ -97,6 +100,7 @@ platform_check_image() {
 	sl-r7205|\
 	tew-691gr|\
 	tew-692gr|\
+	tiny-ac|\
 	ur-326n4g|\
 	ur-336un|\
 	v22rw-2x2|\
@@ -104,6 +108,7 @@ platform_check_image() {
 	w150m|\
 	w306r-v20|\
 	w502u|\
+	wf-2881|\
 	whr-1166d|\
 	whr-300hp2|\
 	whr-600d|\
@@ -128,8 +133,10 @@ platform_check_image() {
 	y1|\
 	y1s|\
 	zbt-wa05|\
+	zbt-wg2626|\
 	zbt-wr8305rt|\
-	zte-q7)
+	zte-q7|\
+	youku-yk1)
 		[ "$magic" != "27051956" ] && {
 			echo "Invalid image type."
 			return 1
@@ -198,4 +205,9 @@ disable_watchdog() {
 	}
 }
 
+blink_led() {
+	. /etc/diag.sh; set_state upgrade
+}
+
 append sysupgrade_pre_upgrade disable_watchdog
+append sysupgrade_pre_upgrade blink_led
