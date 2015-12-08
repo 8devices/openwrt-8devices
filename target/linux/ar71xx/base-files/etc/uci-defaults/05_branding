@@ -21,6 +21,11 @@ carambola2)
 centipede)
 	ucidef_set_system_hostname "Centipede"
 	ucidef_set_wifi_ssid "Centipede"
+
+	# Centipede is not internet gateway device
+	# WAN zone is used for eth0 (DHCP client)
+	# Change firwall rule to allow access from eth0
+	uci set firewall.@zone[1].input='ACCEPT'
 	;;
 
 *)
@@ -30,5 +35,6 @@ esac
 
 uci commit system
 uci commit wireless
+uci commit firewall
 
 exit 0
