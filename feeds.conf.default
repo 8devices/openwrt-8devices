@@ -1,9 +1,9 @@
-src-git packages git://github.com/8devices/carambola2-new-packages.git^d2039da79466962ad6badc77274fb03b9745b0f3
-src-git luci https://github.com/openwrt/luci.git^de5ec52b8784cc44d9f7d391916b8d466ee8f5f6
-src-git routing https://github.com/openwrt-routing/packages.git^9c661a093fc352871000e353cf2015bf675b5a32
-src-git telephony https://github.com/openwrt/telephony.git^d73a45ba9f4adb8dcd836dd1917dc5aedbbef92d
-src-git management https://github.com/openwrt-management/packages.git^1912a034e5d1d0606a1535a9b6281ccc80a7e322
-src-git oldpackages git://github.com/8devices/carambola2-packages.git^789cc3d0297f5b3d9781c68856b0b260abc8b11b
+src-git packages git://github.com/8devices/carambola2-new-packages.git^5d1002980c64c08633cb9537433e85d3c8667c51
+src-git luci https://github.com/openwrt/luci.git^63155e99325d2f7b57eee99496648e7a3cf6c14b
+src-git routing https://github.com/openwrt-routing/packages.git^263877ad8dd53e14c9f30c4cbb0e7fc421e5960e
+src-git telephony https://github.com/openwrt/telephony.git^e22f7315c6cf6a36458da010f7cad7edec730097
+src-git management https://github.com/openwrt-management/packages.git^16049178163c57a936cfb9dbdeb9819d8eb407e3
+
 #src-git targets https://github.com/openwrt/targets.git
 #src-svn xwrt http://x-wrt.googlecode.com/svn/trunk/package
 #src-svn phone svn://svn.openwrt.org/openwrt/feeds/phone
