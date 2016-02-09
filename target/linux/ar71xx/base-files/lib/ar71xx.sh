@@ -992,6 +992,9 @@ ar71xx_board_detect() {
 	*"8devices Centipede"*)
 		name="centipede"
 		;;
+	*"8devices Lima"*)
+		name="lima"
+		;;
 	*"Sitecom WLR-8100")
 		name="wlr8100"
 		;;

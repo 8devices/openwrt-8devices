@@ -178,7 +178,14 @@ $(Device/carambola2)
   BOARDNAME = CENTIPEDE
 endef
 
-TARGET_DEVICES += carambola2 centipede
+define Device/lima
+  DEVICE_PROFILE := 8DEV LIMA
+  BOARDNAME = LIMA
+  IMAGE_SIZE = 16000k
+  MTDPARTS = spi0.0:256k(u-boot)ro,64k(u-boot-env)ro,64k(art)ro,16000k(firmware)
+endef
+
+TARGET_DEVICES += carambola2 centipede lima
 
 define Device/cf-e316n-v2
   BOARDNAME = CF-E316N-V2

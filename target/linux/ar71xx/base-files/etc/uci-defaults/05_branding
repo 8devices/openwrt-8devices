@@ -28,6 +28,11 @@ centipede)
 	uci set firewall.@zone[1].input='ACCEPT'
 	;;
 
+lima)
+	ucidef_set_system_hostname "Lima"
+	ucidef_set_wifi_ssid "Lima"
+	;;
+
 *)
 	ucidef_set_system_hostname "OpenWRT"
 	;;
