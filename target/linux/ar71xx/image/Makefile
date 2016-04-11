@@ -181,8 +181,10 @@ endef
 define Device/lima
   DEVICE_PROFILE := 8DEV LIMA
   BOARDNAME = LIMA
-  IMAGE_SIZE = 16000k
-  MTDPARTS = spi0.0:256k(u-boot)ro,64k(u-boot-env)ro,64k(art)ro,16000k(firmware)
+  BLOCKSIZE = 256k
+  IMAGE_SIZE = 15616k
+  MTDPARTS = spi0.0:256k(u-boot)ro,256k(u-boot-env)ro,256k(art)ro,-(firmware)
+  IMAGE/sysupgrade.bin = append-kernel $$(BLOCKSIZE) | append-rootfs | pad-rootfs | check-size $$$$(IMAGE_SIZE)
 endef
 
 TARGET_DEVICES += carambola2 centipede lima

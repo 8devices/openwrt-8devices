@@ -45,7 +45,7 @@ static struct gpio_keys_button lima_gpio_keys[] __initdata = {
 
 static void __init lima_setup(void)
 {
-	u8 *art = (u8 *)KSEG1ADDR(0x1f050000);
+	u8 *art = (u8 *)KSEG1ADDR(0x1f080000);
 
 	ath79_register_m25p80(NULL);
 	ath79_register_gpio_keys_polled(-1, LIMA_KEYS_POLL_INTERVAL,
