@@ -1,0 +1,40 @@
+--- a/arch/mips/ath79/Kconfig
++++ b/arch/mips/ath79/Kconfig
+@@ -724,6 +724,17 @@ config ATH79_MACH_R6100
+ 	select ATH79_DEV_USB
+ 	select ATH79_DEV_WMAC
+ 
++config ATH79_MACH_RAMBUTAN
++	bool "8devices Rambutan board support"
++	select SOC_QCA955X
++	select ATH79_DEV_AP9X_PCI if PCI
++	select ATH79_DEV_ETH
++	select ATH79_DEV_GPIO_BUTTONS
++	select ATH79_DEV_LEDS_GPIO
++	select ATH79_DEV_NFC
++	select ATH79_DEV_USB
++	select ATH79_DEV_WMAC
++
+ config ATH79_MACH_MC_MAC1200R
+ 	bool "MERCURY MAC1200R board support"
+ 	select SOC_AR934X
+--- a/arch/mips/ath79/Makefile
++++ b/arch/mips/ath79/Makefile
+@@ -115,6 +115,7 @@ obj-$(CONFIG_ATH79_MACH_PB44)		+= mach-p
+ obj-$(CONFIG_ATH79_MACH_PB92)		+= mach-pb92.o
+ obj-$(CONFIG_ATH79_MACH_QIHOO_C301)	+= mach-qihoo-c301.o
+ obj-$(CONFIG_ATH79_MACH_R6100)		+= mach-r6100.o
++obj-$(CONFIG_ATH79_MACH_RAMBUTAN)	+= mach-rambutan.o
+ obj-$(CONFIG_ATH79_MACH_RB4XX)		+= mach-rb4xx.o
+ obj-$(CONFIG_ATH79_MACH_RB750)		+= mach-rb750.o
+ obj-$(CONFIG_ATH79_MACH_RB91X)		+= mach-rb91x.o
+--- a/arch/mips/ath79/machtypes.h
++++ b/arch/mips/ath79/machtypes.h
+@@ -113,6 +113,7 @@ enum ath79_mach_type {
+ 	ATH79_MACH_PB92,		/* Atheros PB92 */
+ 	ATH79_MACH_QIHOO_C301,		/* Qihoo 360 C301 */
+ 	ATH79_MACH_R6100,		/* NETGEAR R6100 */
++	ATH79_MACH_RAMBUTAN,		/* 8devices Rambutan */
+ 	ATH79_MACH_RB_411,		/* MikroTik RouterBOARD 411/411A/411AH */
+ 	ATH79_MACH_RB_411U,		/* MikroTik RouterBOARD 411U */
+ 	ATH79_MACH_RB_433,		/* MikroTik RouterBOARD 433/433AH */

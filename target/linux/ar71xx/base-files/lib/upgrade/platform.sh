@@ -437,6 +437,7 @@ platform_check_image() {
 		;;
 	nbg6716 | \
 	r6100 | \
+	rambutan | \
 	wndr3700v4 | \
 	wndr4300 )
 		nand_do_platform_check $board $1
@@ -491,6 +492,7 @@ platform_pre_upgrade() {
 	case "$board" in
 	nbg6716 | \
 	r6100 | \
+	rambutan | \
 	wndr3700v4 | \
 	wndr4300 )
 		nand_do_upgrade "$1"

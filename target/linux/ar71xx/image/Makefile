@@ -187,6 +187,7 @@ define Device/lima
   IMAGE/sysupgrade.bin = append-kernel $$(BLOCKSIZE) | append-rootfs | pad-rootfs | check-size $$$$(IMAGE_SIZE)
 endef
 
+
 TARGET_DEVICES += carambola2 centipede lima
 
 define Device/cf-e316n-v2
@@ -2430,6 +2431,24 @@ $(eval $(call MultiProfile,Madwifi,EAP7660D WP543))
 endif # ifeq ($(SUBTARGET),generic)
 
 ifeq ($(SUBTARGET),nand)
+
+define Device/rambutan
+  DEVICE_PROFILE := RAMBUTAN
+  BOARDNAME = RAMBUTAN
+  CONSOLE = ttyS0,115200
+  MTDPARTS = ar934x-nfc:3M(u-boot)ro,2M(u-boot-env),1M(art),122M(ubi)
+  UBIFS_OPTS = -m 2048 -e 124KiB -c 950 -U -F
+  BLOCKSIZE = 128KiB
+  PAGESIZE := 2048
+  KERNEL_IN_UBI := 1
+  UBI_NO_EOF := 1
+  IMAGES := nand-factory.ubi nand-sysupgrade.tar
+  IMAGE/nand-factory.ubi := append-ubi
+  IMAGE/nand-sysupgrade.tar := sysupgrade-nand
+endef
+
+TARGET_DEVICES += rambutan
+
 $(eval $(call SingleProfile,NetgearNAND,64k,WNDR3700V4,wndr3700v4,WNDR3700_V4,ttyS0,115200,$$(wndr4300_mtdlayout),0x33373033,WNDR3700v4,"",-H 29763948+128+128,wndr4300))
 $(eval $(call SingleProfile,NetgearNAND,64k,WNDR4300V1,wndr4300,WNDR4300,ttyS0,115200,$$(wndr4300_mtdlayout),0x33373033,WNDR4300,"",-H 29763948+0+128+128+2x2+3x3,wndr4300))
 $(eval $(call SingleProfile,NetgearNAND,64k,R6100,r6100,R6100,ttyS0,115200,$$(r6100_mtdlayout),0x36303030,R6100,"",-H 29764434+0+128+128+2x2+2x2,wndr4300))

@@ -41,6 +41,10 @@ om2p-hsv2 | \
 om2p-lc)
 	ubootenv_add_uci_config "/dev/mtd1" "0x0" "0x40000" "0x40000"
 	;;
+rambutan)
+	ubootenv_add_uci_config "/dev/mtd1" "0x0" "0x20000" "0x20000"
+	ubootenv_add_uci_config "/dev/mtd1" "0x100000" "0x20000" "0x20000"
+	;;
 wzr-hp-ag300h)
 	ubootenv_add_uci_config "/dev/mtd3" "0x0" "0x10000" "0x10000"
 	;;
