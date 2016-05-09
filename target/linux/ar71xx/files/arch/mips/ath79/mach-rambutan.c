@@ -52,8 +52,8 @@ static struct mdio_board_info rambutan_mdio1_info[] = {
 
 static struct resource rambutan_uart1_resources[] = {
 	{
-		.start	= 0x18500000, //TODO add define
-		.end	= 0x18500000 + AR71XX_UART_SIZE - 1,
+		.start	= QCA955X_UART1_BASE,
+		.end	= QCA955X_UART1_BASE + QCA955X_UART1_SIZE - 1,
 		.flags	= IORESOURCE_MEM,
 	},
 	{
