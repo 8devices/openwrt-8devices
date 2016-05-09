@@ -1,0 +1,16 @@
+--- a/drivers/tty/serial/ar933x_uart.c
++++ b/drivers/tty/serial/ar933x_uart.c
+@@ -430,6 +430,13 @@ static int ar933x_uart_startup(struct ua
+ 	up->ier = AR933X_UART_INT_RX_VALID;
+ 	ar933x_uart_write(up, AR933X_UART_INT_EN_REG, up->ier);
+ 
++	/* Set RX/TX_READY_ORIDE if flowcontol is disabled */
++	if ((ar933x_uart_read(up, AR933X_UART_CS_REG) &
++	    (AR933X_UART_CS_FLOW_CTRL_M << AR933X_UART_CS_FLOW_CTRL_S)) == 0)
++		ar933x_uart_rmw_set(up, AR933X_UART_CS_REG,
++					AR933X_UART_CS_TX_READY_ORIDE |
++					AR933X_UART_CS_RX_READY_ORIDE);
++
+ 	spin_unlock_irqrestore(&up->port.lock, flags);
+ 
+ 	return 0;
