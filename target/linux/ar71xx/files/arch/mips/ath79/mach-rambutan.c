@@ -19,6 +19,7 @@
 #include <linux/platform/ar934x_nfc.h>
 #include <linux/ar8216_platform.h>
 #include <linux/platform_data/phy-at803x.h>
+#include <linux/platform_data/i2c-designware.h>
 #include "common.h"
 #include "dev-eth.h"
 #include "dev-gpio-buttons.h"
@@ -50,6 +51,37 @@ static struct mdio_board_info rambutan_mdio1_info[] = {
 	},
 };
 
+
+static struct resource rambutan_i2c_resources[] = {
+	{
+		.start  = QCA955X_I2C_BASE,
+		.end    = QCA955X_I2C_BASE + QCA955X_I2C_SIZE - 1,
+		.flags  = IORESOURCE_MEM,
+	},
+	{
+		.start  = ATH79_MISC_IRQ(24),
+		.end    = ATH79_MISC_IRQ(24),
+		.flags  = IORESOURCE_IRQ,
+	},
+};
+
+static struct dw_i2c_platform_data rambutan_i2c_pdata = {
+	.i2c_scl_freq	= 100000,
+	.i2c_ref_freq	= 100000000,
+	.is_qca95xx	= true,
+};
+
+static struct platform_device rambutan_i2c_device = {
+	.name		= "i2c_designware",
+	.id		= -1,
+	.resource	= rambutan_i2c_resources,
+	.num_resources	= ARRAY_SIZE(rambutan_i2c_resources),
+	.dev = {
+		.platform_data	= &rambutan_i2c_pdata,
+	},
+};
+
+
 static struct resource rambutan_uart1_resources[] = {
 	{
 		.start	= QCA955X_UART1_BASE,
@@ -76,6 +108,7 @@ static void __init rambutan_setup(void)
 	ath79_register_nfc();
 
 	platform_device_register(&rambutan_uart1_device);
+	platform_device_register(&rambutan_i2c_device);
 	
 	ath79_register_usb();
 

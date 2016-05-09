@@ -189,6 +189,23 @@ endef
 $(eval $(call KernelPackage,i2c-piix4))
 
 
+I2C_DESIGNWARE_MODULES:= \
+  CONFIG_I2C_DESIGNWARE_CORE:drivers/i2c/busses/i2c-designware-core \
+  CONFIG_I2C_DESIGNWARE_PLATFORM:drivers/i2c/busses/i2c-designware-platform
+
+define KernelPackage/i2c-designware
+  $(call i2c_defaults,$(I2C_DESIGNWARE_MODULES),59)
+  TITLE:=Synopsys Designware I2C interfaces
+  DEPENDS:=kmod-i2c-core
+endef
+
+define KernelPackage/i2c-designware/description
+ Support for the Synopsys Designware I2C interfaces, .... TODO
+endef
+
+$(eval $(call KernelPackage,i2c-designware))
+
+
 I2C_MUX_MODULES:= \
   CONFIG_I2C_MUX:drivers/i2c/i2c-mux
 
