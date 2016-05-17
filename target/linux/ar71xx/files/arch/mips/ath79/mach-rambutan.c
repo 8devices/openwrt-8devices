@@ -81,6 +81,52 @@ static struct platform_device rambutan_i2c_device = {
 	},
 };
 
+static struct ath79_spi_controller_data rambutan_spi0_cdata =
+{
+	.cs_type = ATH79_SPI_CS_TYPE_INTERNAL,
+	.cs_line = 0,
+};
+
+static struct ath79_spi_controller_data rambutan_spi1_cdata =
+{
+	.cs_type = ATH79_SPI_CS_TYPE_INTERNAL,
+	.cs_line = 1,
+};
+
+static struct ath79_spi_controller_data rambutan_spi2_cdata =
+{
+	.cs_type = ATH79_SPI_CS_TYPE_INTERNAL,
+	.cs_line = 2,
+};
+
+static struct spi_board_info rambutan_spi_info[] = {
+	{
+		.bus_num	= 0,
+		.chip_select	= 0,
+		.max_speed_hz	= 25000000,
+		.modalias	= "spidev",
+		.controller_data = &rambutan_spi0_cdata,
+	},
+	{
+		.bus_num	= 0,
+		.chip_select	= 1,
+		.max_speed_hz   = 25000000,
+		.modalias	= "spidev",
+		.controller_data = &rambutan_spi1_cdata,
+	},
+	{
+		.bus_num	= 0,
+		.chip_select	= 2,
+		.max_speed_hz   = 25000000,
+		.modalias	= "spidev",
+		.controller_data = &rambutan_spi2_cdata,
+	}
+};
+
+static struct ath79_spi_platform_data rambutan_spi_data = {
+		.bus_num	= 0,
+		.num_chipselect	= 3,
+};
 
 static struct resource rambutan_uart1_resources[] = {
 	{
@@ -109,6 +155,7 @@ static void __init rambutan_setup(void)
 
 	platform_device_register(&rambutan_uart1_device);
 	platform_device_register(&rambutan_i2c_device);
+	ath79_register_spi(&rambutan_spi_data, rambutan_spi_info, 3);
 	
 	ath79_register_usb();
 
