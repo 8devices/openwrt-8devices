@@ -2436,7 +2436,7 @@ define Device/rambutan
   DEVICE_PROFILE := RAMBUTAN
   BOARDNAME = RAMBUTAN
   CONSOLE = ttyS0,115200
-  MTDPARTS = ar934x-nfc:3M(u-boot)ro,2M(u-boot-env),1M(art),122M(ubi)
+  MTDPARTS = ar934x-nfc:3M(u-boot)ro,2M(u-boot-env)ro,1M(art)ro,122M(ubi)
   UBIFS_OPTS = -m 2048 -e 124KiB -c 950 -U -F
   BLOCKSIZE = 128KiB
   PAGESIZE := 2048
