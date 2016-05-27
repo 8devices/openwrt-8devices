@@ -1,4 +1,4 @@
-/include/ "rt5350.dtsi"
+#include "rt5350.dtsi"
 
 / {
 	compatible = "PX-4885", "ralink,rt5350-soc";
@@ -18,7 +18,7 @@
 	};
 
 	esw@10110000 {
-		ralink,portmap = <0x3f>;
+		mediatek,portmap = <0x3f>;
 	};
 
 	wmac@10180000 {

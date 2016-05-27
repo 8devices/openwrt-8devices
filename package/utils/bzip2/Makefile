@@ -89,18 +89,15 @@ HOST_CFLAGS += \
 	$(HOST_LDFLAGS)
 
 HOST_MAKE_FLAGS+= \
-	-f Makefile-libbz2_so \
 	CFLAGS="$(HOST_CFLAGS)" \
 	all
 
 HOST_CONFIGURE_ARGS+= \
-	--prefix=$(STAGING_DIR_HOST)
+	--prefix=$(STAGING_DIR)/host
 
 define Host/Install
-	$(INSTALL_DIR) $(STAGING_DIR_HOST)/bin/ $(STAGING_DIR_HOST)/usr/lib
-	$(MAKE) -C $(HOST_BUILD_DIR) PREFIX=$(STAGING_DIR_HOST)/usr/ install
-	$(CP) $(HOST_BUILD_DIR)/libbz2.so* $(STAGING_DIR_HOST)/usr/lib/
-	$(CP) $(HOST_BUILD_DIR)/libbz2.so.1.0 $(STAGING_DIR_HOST)/usr/lib/libbz2.so
+	$(INSTALL_DIR) $(STAGING_DIR)/host/bin/
+	$(MAKE) -C $(HOST_BUILD_DIR) PREFIX=$(STAGING_DIR)/host/ install
 endef
 
 $(eval $(call HostBuild))

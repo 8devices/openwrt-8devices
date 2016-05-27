@@ -66,6 +66,10 @@ tplink_get_image_hwid() {
 	get_image "$@" | dd bs=4 count=1 skip=16 2>/dev/null | hexdump -v -n 4 -e '1/1 "%02x"'
 }
 
+tplink_get_image_mid() {
+	get_image "$@" | dd bs=4 count=1 skip=17 2>/dev/null | hexdump -v -n 4 -e '1/1 "%02x"'
+}
+
 tplink_get_image_boot_size() {
 	get_image "$@" | dd bs=4 count=1 skip=37 2>/dev/null | hexdump -v -n 4 -e '1/1 "%02x"'
 }
@@ -167,7 +171,10 @@ platform_check_image() {
 	case "$board" in
 	all0315n | \
 	all0258n | \
-	cap4200ag)
+	cap324 | \
+	cap4200ag | \
+	cr3000 |\
+	cr5000)
 		platform_check_image_allnet "$1" && return 0
 		return 1
 		;;
@@ -181,9 +188,11 @@ platform_check_image() {
 	ap136-020 | \
 	ap135-020 | \
 	ap147-010 | \
+	ap152 | \
 	ap96 | \
 	bxu2000n-2-a1 | \
 	db120 | \
+	dr344 | \
 	f9k1115v2 |\
 	hornet-ub | \
 	mr12 | \
@@ -202,6 +211,7 @@ platform_check_image() {
 	ap132 | \
 	carambola2 | \
 	centipede | \
+	c-55 | \
 	cf-e316n-v2 | \
 	dgl-5500-a1 |\
 	dhp-1565-a1 |\
@@ -233,6 +243,7 @@ platform_check_image() {
 	tew-632brp | \
 	tew-712br | \
 	tew-732br | \
+	tew-823dru | \
 	wrt400n | \
 	airgateway | \
 	airgatewaypro | \
@@ -247,6 +258,7 @@ platform_check_image() {
 	rw2458n | \
 	wpj531 | \
 	wndap360 | \
+	wpj342 | \
 	wpj344 | \
 	wzr-hp-g300nh2 | \
 	wzr-hp-g300nh | \
@@ -259,7 +271,9 @@ platform_check_image() {
 	wlae-ag300n | \
 	nbg460n_550n_550nh | \
 	unifi | \
+	unifiac | \
 	unifi-outdoor | \
+
 	weio )
 		[ "$magic" != "2705" ] && {
 			echo "Invalid image type."
@@ -437,7 +451,6 @@ platform_check_image() {
 		;;
 	nbg6716 | \
 	r6100 | \
-	rambutan | \
 	wndr3700v4 | \
 	wndr4300 )
 		nand_do_platform_check $board $1
@@ -492,7 +505,6 @@ platform_pre_upgrade() {
 	case "$board" in
 	nbg6716 | \
 	r6100 | \
-	rambutan | \
 	wndr3700v4 | \
 	wndr4300 )
 		nand_do_upgrade "$1"

@@ -1,6 +1,6 @@
 /dts-v1/;
 
-/include/ "rt3050.dtsi"
+#include "rt3050.dtsi"
 
 / {
 	compatible = "ATP-52B", "ralink,rt3052-soc";
@@ -83,7 +83,7 @@
 	};
 
 	esw@10110000 {
-		ralink,portmap = <0x3e>;
+		mediatek,portmap = <0x3e>;
 	};
 
 	wmac@10180000 {

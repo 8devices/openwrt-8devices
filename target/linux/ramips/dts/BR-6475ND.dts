@@ -1,6 +1,6 @@
 /dts-v1/;
 
-/include/ "rt3883.dtsi"
+#include "rt3883.dtsi"
 
 / {
 	compatible = "BR-6475ND", "ralink,rt3883-soc";
@@ -34,7 +34,7 @@
 		mtd-mac-address = <&devdata 0x0d>;
 
 		port@0 {
-			ralink,fixed-link = <1000 1 1 1>;
+			mediatek,fixed-link = <1000 1 1 1>;
 		};
 	};
 

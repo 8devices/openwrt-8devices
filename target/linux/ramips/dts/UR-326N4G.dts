@@ -1,6 +1,6 @@
 /dts-v1/;
 
-/include/ "rt3050.dtsi"
+#include "rt3050.dtsi"
 
 / {
 	compatible = "UR-326N4G", "ralink,rt3052-soc";
@@ -52,7 +52,7 @@
 	};
 
 	esw@10110000 {
-		ralink,portmap = <0x2f>;
+		mediatek,portmap = <0x2f>;
 	};
 
 	wmac@10180000 {

@@ -1,6 +1,6 @@
 /dts-v1/;
 
-/include/ "mt7628an.dtsi"
+#include "mt7628an.dtsi"
 
 / {
 	compatible = "mediatek,linkit", "mediatek,mt7628an-soc";
@@ -8,6 +8,10 @@
 
 	chosen {
 		bootargs = "console=ttyS2,57600";
+	};
+
+	aliases {
+		serial0 = &uart2;
 	};
 
 	memory@0 {
@@ -59,6 +63,10 @@
 		};
 	};
 
+	wmac@10300000 {
+		status = "okay";
+	};
+
 	palmbus@10000000 {
 		spi@b00 {
 			status = "okay";
@@ -69,7 +77,7 @@
 			m25p80@0 {
 				#address-cells = <1>;
 				#size-cells = <1>;
-				compatible = "mx25l25635e";
+				compatible = "jedec,spi-nor";
 				reg = <0 0>;
 				linux,modalias = "m25p80", "mx25l25635e";
 				spi-max-frequency = <40000000>;

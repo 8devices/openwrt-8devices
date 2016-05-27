@@ -18,6 +18,9 @@ get_status_led() {
 	antminer-s3)
 		status_led="antminer-s3:green:system"
 		;;
+	antminer-r1)
+		status_led="antminer-r1:green:system"
+		;;
 	ap132)
 		status_led="ap132:green:status"
 		;;
@@ -55,6 +58,12 @@ get_status_led() {
 	bxu2000n-2-a1)
 		status_led="bhu:green:status"
 		;;
+	cap324)
+		status_led="pcs:green:power"
+		;;
+	c-55)
+		status_led="c-55:green:pwr"
+		;;
 	cap4200ag)
 		status_led="senao:green:pwr"
 		;;
@@ -63,6 +72,12 @@ get_status_led() {
 		;;
 	cpe510)
 		status_led="tp-link:green:link4"
+		;;
+	cr3000)
+		status_led="pcs:amber:power"
+		;;
+	cr5000)
+		status_led="pcs:amber:power"
 		;;
 	db120)
 		status_led="db120:green:status"
@@ -94,6 +109,9 @@ get_status_led() {
 		;;
 	dlan-pro-1200-ac)
 		status_led="devolo:status:wlan"
+		;;
+	dr344)
+		status_led="dr344:green:status"
 		;;
 	dragino2)
 		status_led="dragino2:red:system"
@@ -149,6 +167,9 @@ get_status_led() {
 	mr16)
 		status_led="mr16:green:power"
 		;;
+	mr18)
+		status_led="mr18:green:tricolor0"
+		;;
 	mr600)
 		status_led="mr600:orange:power"
 		;;
@@ -192,6 +213,16 @@ get_status_led() {
 	om5p | \
 	om5p-an)
 		status_led="om5p:blue:power"
+		;;
+	om5p-ac | \
+	om5p-acv2)
+		status_led="om5pac:blue:power"
+		;;
+	omy-g1)
+		status_led="omy:green:wlan"
+		;;
+	omy-x1)
+		status_led="omy:green:power"
 		;;
 	onion-omega)
 		status_led="onion:amber:system"
@@ -242,6 +273,9 @@ get_status_led() {
 	qihoo-c301)
 		status_led="qihoo:green:status"
 		;;
+	tellstick-znet-lite)
+		status_led="tellstick:white:system"
+		;;
 	tew-632brp)
 		status_led="tew-632brp:green:status"
 		;;
@@ -249,7 +283,8 @@ get_status_led() {
 		status_led="trendnet:blue:wps"
 		;;
 	tew-712br|\
-	tew-732br)
+	tew-732br|\
+	tew-823dru)
 		status_led="trendnet:green:power"
 		;;
 	tl-mr3020)
@@ -273,6 +308,7 @@ get_status_led() {
 	tl-wa901nd | \
 	tl-wa901nd-v2 | \
 	tl-wa901nd-v3 | \
+	tl-wa901nd-v4 | \
 	tl-wdr3320-v2 | \
 	tl-wdr3500 | \
 	tl-wr1041n-v2 | \
@@ -299,6 +335,7 @@ get_status_led() {
 	tl-wr703n | \
 	tl-wr710n | \
 	tl-wr720n-v3 | \
+	tl-wr810n | \
 	tl-wr941nd-v6)
 		status_led="tp-link:blue:system"
 		;;
@@ -317,7 +354,8 @@ get_status_led() {
 	unifi)
 		status_led="ubnt:green:dome"
 		;;
-	uap-pro)
+	uap-pro | \
+	unifiac)
 		status_led="ubnt:white:dome"
 		;;
 	unifi-outdoor-plus)
@@ -346,13 +384,18 @@ get_status_led() {
 	wndr3700v4 | \
 	wndr4300 | \
 	wnr2000 | \
+	wnr2000-v3 |\
 	wnr2200 |\
 	wnr612-v2 |\
-	wnr1000-v2)
+	wnr1000-v2 |\
+	wpn824n)
 		status_led="netgear:green:power"
 		;;
 	wp543)
 		status_led="wp543:green:diag"
+		;;
+	wpj342)
+		status_led="wpj342:green:sig3"
 		;;
 	wpj344)
 		status_led="wpj344:green:status"

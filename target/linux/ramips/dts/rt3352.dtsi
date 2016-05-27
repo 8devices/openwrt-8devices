@@ -23,6 +23,7 @@
 	aliases {
 		spi0 = &spi0;
 		spi1 = &spi1;
+		serial0 = &uartlite;
 	};
 
 	palmbus@10000000 {
@@ -175,7 +176,7 @@
 			status = "disabled";
 		};
 
-		uartlite@c00 {
+		uartlite: uartlite@c00 {
 			compatible = "ralink,rt3352-uart", "ralink,rt2880-uart", "ns16550a";
 			reg = <0xc00 0x100>;
 
@@ -230,18 +231,20 @@
 
 	ethernet@10100000 {
 		compatible = "ralink,rt3352-eth", "ralink,rt3050-eth";
-		reg = <0x10100000 10000>;
+		reg = <0x10100000 0x10000>;
 
 		resets = <&rstctrl 21>;
 		reset-names = "fe";
 
 		interrupt-parent = <&cpuintc>;
 		interrupts = <5>;
+
+		mediatek,switch = <&esw>;
 	};
 
-	esw@10110000 {
+	esw: esw@10110000 {
 		compatible = "ralink,rt3352-esw", "ralink,rt3050-esw";
-		reg = <0x10110000 8000>;
+		reg = <0x10110000 0x8000>;
 
 		resets = <&rstctrl 23>;
 		reset-names = "esw";
@@ -250,8 +253,9 @@
 		interrupts = <17>;
 	};
 
-	usbphy {
-		compatible = "ralink,rt3xxx-usbphy";
+	usbphy: usbphy {
+		compatible = "ralink,rt3352-usbphy";
+		#phy-cells = <1>;
 
 		resets = <&rstctrl 22 &rstctrl 25>;
 		reset-names = "host", "device";
@@ -259,7 +263,7 @@
 
 	wmac@10180000 {
 		compatible = "ralink,rt3352-wmac", "ralink,rt2880-wmac";
-		reg = <0x10180000 40000>;
+		reg = <0x10180000 0x40000>;
 
 		interrupt-parent = <&cpuintc>;
 		interrupts = <6>;
@@ -268,8 +272,11 @@
 	};
 
 	ehci@101c0000 {
-		compatible = "ralink,rt3xxx-ehci", "ehci-platform";
+		compatible = "generic-ehci";
 		reg = <0x101c0000 0x1000>;
+
+		phys = <&usbphy 1>;
+		phy-names = "usb";
 
 		interrupt-parent = <&intc>;
 		interrupts = <18>;
@@ -278,8 +285,11 @@
 	};
 
 	ohci@101c1000 {
-		compatible = "ralink,rt3xxx-ohci", "ohci-platform";
+		compatible = "generic-ohci";
 		reg = <0x101c1000 0x1000>;
+
+		phys = <&usbphy 1>;
+		phy-names = "usb";
 
 		interrupt-parent = <&intc>;
 		interrupts = <18>;

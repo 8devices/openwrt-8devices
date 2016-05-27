@@ -14,6 +14,11 @@ platform_check_image() {
 		}
 		return 0
 		;;
+	"dockstar"|\
+	"iconnect")
+		nand_do_platform_check $board $1
+		return $?
+		;;
 	esac
 
 	echo "Sysupgrade is not yet supported on $board."
@@ -27,6 +32,17 @@ platform_do_upgrade() {
 	"linksys-audi"|\
 	"linksys-viper")
 		platform_do_upgrade_linksys "$ARGV"
+		;;
+	esac
+}
+
+platform_pre_upgrade() {
+	local board=$(kirkwood_board_name)
+
+	case "$board" in
+	"dockstar"|\
+	"iconnect")
+		nand_do_upgrade $1
 		;;
 	esac
 }

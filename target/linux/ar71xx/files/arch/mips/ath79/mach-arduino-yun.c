@@ -19,9 +19,8 @@
 #include "machtypes.h"
 #include <asm/mach-ath79/ar71xx_regs.h>
 #include <asm/mach-ath79/ath79.h>
+#include <linux/gpio.h>
 #include "common.h"
-#include "gpio.h"
-#include "linux/gpio.h"
 
 // Uncomment to have reset on gpio18 instead of gipo7
 #define DS2_B
@@ -58,6 +57,17 @@ static struct gpio_led ds_leds_gpio[] __initdata = {
 		.name		= "arduino:blue:wlan",
 		.gpio		= DS_GPIO_LED_WLAN,
 		.active_low	= 0,
+	},
+};
+
+static struct gpio_keys_button ds_gpio_keys[] __initdata = {
+	{
+		.desc		= "configuration button",
+		.type		= EV_KEY,
+		.code		= KEY_WPS_BUTTON,
+		.debounce_interval = DS_KEYS_DEBOUNCE_INTERVAL,
+		.gpio		= DS_GPIO_CONF_BTN,
+		.active_low	= 1,
 	},
 };
 
@@ -98,7 +108,17 @@ static void __init ds_setup(void)
 
 	ath79_register_leds_gpio(-1, ARRAY_SIZE(ds_leds_gpio),
 				 ds_leds_gpio);
+	ath79_register_gpio_keys_polled(-1, DS_KEYS_POLL_INTERVAL,
+					ARRAY_SIZE(ds_gpio_keys),
+					ds_gpio_keys);
 	ath79_register_usb();
+
+	/* use the swtich_led directly form sysfs */
+	ath79_gpio_function_disable(AR933X_GPIO_FUNC_ETH_SWITCH_LED0_EN |
+								AR933X_GPIO_FUNC_ETH_SWITCH_LED1_EN |
+								AR933X_GPIO_FUNC_ETH_SWITCH_LED2_EN |
+								AR933X_GPIO_FUNC_ETH_SWITCH_LED3_EN |
+								AR933X_GPIO_FUNC_ETH_SWITCH_LED4_EN);
 
 	//Disable the Function for some pins to have GPIO functionality active
 	// GPIO6-7-8 and GPIO11

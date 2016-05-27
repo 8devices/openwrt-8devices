@@ -3,7 +3,7 @@
 # Copyright (C) 2014-2015 OpenWrt.org
 #
 
-. /lib/functions/uci-defaults-new.sh
+. /lib/functions/uci-defaults.sh
 . /lib/mvebu.sh
 
 board_config_update
@@ -30,6 +30,9 @@ armada-385-db-ap)
 	;;
 armada-xp-gp)
 	ucidef_set_interface_lan "eth0 eth1 eth2 eth3"
+	;;
+armada-388-clearfog)
+	ucidef_set_interfaces_lan_wan "eth0 eth1" "eth2"
 	;;
 *)
 	ucidef_set_interface_lan "eth0"
