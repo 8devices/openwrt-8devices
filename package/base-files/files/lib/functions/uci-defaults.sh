@@ -557,26 +557,6 @@ ucidef_set_rssimon() {
 
 }
 
-ucidef_set_system_hostname() {
-	local hostname=$1
-
-	json_select_object system
-	json_select_object system[0]
-		json_add_string name "$hostname"
-	json_select ..
-	json_select ..
-}
-
-ucidef_set_wifi_ssid() {
-	local ssid=$1
-
-	json_select_object wireless
-	json_select_object wifi-face[0]
-		json_add_string ssid "$ssid"
-	json_select ..
-	json_select ..
-}
-
 ucidef_add_gpio_switch() {
 	local cfg="$1"
 	local name="$2"
