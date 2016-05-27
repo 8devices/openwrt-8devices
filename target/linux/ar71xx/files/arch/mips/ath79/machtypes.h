@@ -49,6 +49,7 @@ enum ath79_mach_type {
 	ATH79_MACH_CAP324,		/* PowerCloud CAP324 */
 	ATH79_MACH_CAP4200AG,		/* Senao CAP4200AG */
 	ATH79_MACH_CARAMBOLA2,		/* 8devices Carambola2 */
+	ATH79_MACH_CENTIPEDE,		/* 8devices Centipede */
 	ATH79_MACH_CF_E316N_V2,		/* COMFAST CF-E316N v2 */
 	ATH79_MACH_CPE510,		/* TP-LINK CPE510 */
 	ATH79_MACH_CR3000,		/* PowerCloud CR3000 */
@@ -92,6 +93,7 @@ enum ath79_mach_type {
 	ATH79_MACH_JA76PF2,		/* jjPlus JA76PF2 */
 	ATH79_MACH_JWAP003,		/* jjPlus JWAP003 */
 	ATH79_MACH_HORNET_UB,		/* ALFA Networks Hornet-UB */
+	ATH79_MACH_LIMA,		/* 8devices Lima */
 	ATH79_MACH_MR12,		/* Cisco Meraki MR12 */
 	ATH79_MACH_MR16,		/* Cisco Meraki MR16 */
 	ATH79_MACH_MR18,		/* Cisco Meraki MR18 */
@@ -124,6 +126,7 @@ enum ath79_mach_type {
 	ATH79_MACH_PB92,		/* Atheros PB92 */
 	ATH79_MACH_QIHOO_C301,		/* Qihoo 360 C301 */
 	ATH79_MACH_R6100,		/* NETGEAR R6100 */
+	ATH79_MACH_RAMBUTAN,		/* 8devices Rambutan */
 	ATH79_MACH_RB_411,		/* MikroTik RouterBOARD 411/411A/411AH */
 	ATH79_MACH_RB_411U,		/* MikroTik RouterBOARD 411U */
 	ATH79_MACH_RB_433,		/* MikroTik RouterBOARD 433/433AH */

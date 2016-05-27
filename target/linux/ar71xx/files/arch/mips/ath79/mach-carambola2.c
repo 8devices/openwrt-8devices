@@ -1,5 +1,5 @@
 /*
- *  8devices Carambola2/Centipede board support
+ *  8devices Carambola2 board support
  *
  *  Copyright (C) 2013 Darius Augulis <darius@8devices.com>
  *
@@ -34,8 +34,6 @@
 #define CARAMBOLA2_CALDATA_OFFSET		0x1000
 #define CARAMBOLA2_WMAC_MAC_OFFSET		0x1002
 
-#define CENTIPEDE_GPIO_LED_ETH0			13
-
 static struct gpio_led carambola2_leds_gpio[] __initdata = {
 	{
 		.name		= "carambola2:green:wlan",
@@ -52,14 +50,6 @@ static struct gpio_led carambola2_leds_gpio[] __initdata = {
 	}
 };
 
-static struct gpio_led centipede_leds_gpio[] __initdata = {
-	{
-		.name		= "centipede:green:eth0",
-		.gpio		= CENTIPEDE_GPIO_LED_ETH0,
-		.active_low	= 1,
-	}
-};
-
 static struct gpio_keys_button carambola2_gpio_keys[] __initdata = {
 	{
 		.desc		= "jumpstart button",
@@ -71,7 +61,7 @@ static struct gpio_keys_button carambola2_gpio_keys[] __initdata = {
 	},
 };
 
-static void __init carambola2_common_setup(void)
+static void __init carambola2_setup(void)
 {
 	u8 *art = (u8 *) KSEG1ADDR(0x1fff0000);
 
@@ -88,13 +78,6 @@ static void __init carambola2_common_setup(void)
 				    AR724X_GPIO_FUNC_ETH_SWITCH_LED4_EN);
 	ath79_register_usb();
 	ath79_register_mdio(0, 0x0);
-}
-
-static void __init carambola2_setup(void)
-{
-	u8 *art = (u8 *) KSEG1ADDR(0x1fff0000);
-
-	carambola2_common_setup();
 
 	ath79_init_mac(ath79_eth0_data.mac_addr, art + CARAMBOLA2_MAC0_OFFSET, 0);
 	ath79_init_mac(ath79_eth1_data.mac_addr, art + CARAMBOLA2_MAC1_OFFSET, 0);
@@ -113,23 +96,5 @@ static void __init carambola2_setup(void)
 
 }
 
-static void __init centipede_setup(void)
-{
-	u8 *art = (u8 *) KSEG1ADDR(0x1fff0000);
-
-	carambola2_common_setup();
-
-	ath79_init_mac(ath79_eth1_data.mac_addr, art + CARAMBOLA2_MAC0_OFFSET, 0);
-
-	/* LAN port */
-	ath79_register_eth(1);
-
-	ath79_register_leds_gpio(-1, ARRAY_SIZE(centipede_leds_gpio),
-				 centipede_leds_gpio);
-}
-
 MIPS_MACHINE(ATH79_MACH_CARAMBOLA2, "CARAMBOLA2", "8devices Carambola2 board",
 		carambola2_setup);
-
-MIPS_MACHINE(ATH79_MACH_CENTIPEDE, "CENTIPEDE", "8devices Centipede board",
-		centipede_setup);
