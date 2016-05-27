@@ -7,7 +7,7 @@
 
 define Profile/RAMBUTAN
         NAME:=Rambutan board from 8Devices
-        PACKAGES:=kmod-usb-core kmod-usb2
+        PACKAGES:=kmod-usb-core kmod-usb2 kmod-i2c-designware
 endef
 
 define Profile/RAMBUTAN/Description
