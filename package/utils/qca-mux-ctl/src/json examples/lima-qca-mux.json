@@ -1,0 +1,10 @@
+{
+	"mux_list": [
+		{"gpio" : 15, "signal_direction": "OUT", "gpio_direction" : "OUT","signal": "LED_LINK_0"},
+		{"gpio" : 11, "gpio_direction" : "OUT"}
+		],
+
+	"functions": [
+		{"gpio_function" : "DISABLE_JTAG", "state" : true}
+		]
+}
