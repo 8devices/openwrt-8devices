@@ -4,13 +4,13 @@
  	t[1].rx_buf = buf;
  	t[1].rx_nbits = m25p80_rx_nbits(nor);
  	t[1].len = len;
-+    t[1].bits_per_word = 32;
-+    if (len % 4) {
-+        t[1].bits_per_word = 16;
-+        if (len % 2)
-+            t[1].bits_per_word = 8;
-+    }
-+    //printk("mp: bpw: %x len:%x\n", t[1].bits_per_word,len);
++	t[1].bits_per_word = 32;
++	if (len % 4) {
++	    t[1].bits_per_word = 16;
++	    if (len % 2)
++	        t[1].bits_per_word = 8;
++	}
++
  	spi_message_add_tail(&t[1], &m);
  
  	spi_sync(spi, &m);
@@ -24,7 +24,7 @@
  #include <asm/mach-ath79/ar71xx_regs.h>
  #include <asm/mach-ath79/ath79_spi_platform.h>
  
-@@ -231,6 +232,22 @@ static u32 ath79_spi_txrx_mode0(struct s
+@@ -231,6 +232,19 @@ static u32 ath79_spi_txrx_mode0(struct s
  	return ath79_spi_rr(sp, AR71XX_SPI_REG_RDS);
  }
  
@@ -33,52 +33,23 @@
 +{
 +	struct ath79_spi *sp = ath79_spidev_to_sp(spi);
 +	struct ath79_spi_controller_data *cdata = spi->controller_data;
-+    u32 ret; //DBG
 +
 +	ath79_spi_wr(sp, AR71XX_SPI_REG_WDS, word);
 +	ath79_spi_wr(sp, AR71XX_SPI_REG_CDS, AR71XX_SPI_CDS_EN |
 +					     AR71XX_SPI_CDS_CS(cdata->cs_line) | bits);
-+	ret = ath79_spi_rr(sp, AR71XX_SPI_REG_RDS);
-+    //if (bits == 0x20)
-+    //    printk("trx w %x rd[%2x] %08x\n", word, bits, ret);
-+    return ret;
++
++	return ath79_spi_rr(sp, AR71XX_SPI_REG_RDS);
 +}
 +
  static int ath79_spi_do_read_flash_data(struct spi_device *spi,
  					struct spi_transfer *t)
  {
-@@ -287,6 +304,12 @@ static bool ath79_spi_is_data_read(struc
- 	return t->type == SPI_TRANSFER_FLASH_READ_DATA;
- }
- 
-+static bool ath79_spi_is_3byte_addr(struct ath79_spi *sp,
-+				    struct spi_transfer *t)
-+{
-+    return (sp->read_addr+t->len) < 0x1000000;
-+}
-+
- static int ath79_spi_txrx_bufs(struct spi_device *spi, struct spi_transfer *t)
- {
- 	struct ath79_spi *sp = ath79_spidev_to_sp(spi);
-@@ -296,7 +319,11 @@ static int ath79_spi_txrx_bufs(struct sp
- 	case ATH79_SPI_STATE_WAIT_CMD:
- 		if (ath79_spi_is_read_cmd(spi, t)) {
- 			ret = ath79_spi_do_read_flash_cmd(spi, t);
--			sp->state = ATH79_SPI_STATE_WAIT_READ;
-+			if (ath79_spi_is_3byte_addr(sp, t)) {
-+				sp->state = ATH79_SPI_STATE_WAIT_READ;
-+			} else {
-+				ret = spi_bitbang_bufs(spi, t);
-+			}
- 		} else {
- 			ret = spi_bitbang_bufs(spi, t);
- 		}
-@@ -371,7 +398,10 @@ static int ath79_spi_probe(struct platfo
+@@ -371,7 +385,10 @@ static int ath79_spi_probe(struct platfo
  
  	sp->bitbang.master = master;
  	sp->bitbang.chipselect = ath79_spi_chipselect;
 -	sp->bitbang.txrx_word[SPI_MODE_0] = ath79_spi_txrx_mode0;
-+	if (soc_is_qca953x() | soc_is_qca955x() | soc_is_qca956x())
++	if (pdata->use_hw_shiftreg == true)
 +		sp->bitbang.txrx_word[SPI_MODE_0] = ath79_spi_txrx_shiftreg_mode0;
 +	else
 +		sp->bitbang.txrx_word[SPI_MODE_0] = ath79_spi_txrx_mode0;
@@ -87,7 +58,7 @@
  
 --- a/arch/mips/include/asm/mach-ath79/ar71xx_regs.h
 +++ b/arch/mips/include/asm/mach-ath79/ar71xx_regs.h
-@@ -811,6 +811,8 @@
+@@ -818,6 +818,8 @@
  #define AR71XX_SPI_REG_CTRL	0x04	/* SPI Control */
  #define AR71XX_SPI_REG_IOC	0x08	/* SPI I/O Control */
  #define AR71XX_SPI_REG_RDS	0x0c	/* Read Data Shift */
@@ -96,7 +67,7 @@
  
  #define AR71XX_SPI_FS_GPIO	BIT(0)	/* Enable GPIO mode */
  
-@@ -826,6 +828,9 @@
+@@ -833,6 +835,9 @@
  #define AR71XX_SPI_IOC_CS_ALL	(AR71XX_SPI_IOC_CS0 | AR71XX_SPI_IOC_CS1 | \
  				 AR71XX_SPI_IOC_CS2)
  
@@ -106,3 +77,13 @@
  /*
   * GPIO block
   */
+--- a/arch/mips/include/asm/mach-ath79/ath79_spi_platform.h
++++ b/arch/mips/include/asm/mach-ath79/ath79_spi_platform.h
+@@ -14,6 +14,7 @@
+ struct ath79_spi_platform_data {
+ 	unsigned	bus_num;
+ 	unsigned	num_chipselect;
++	bool		use_hw_shiftreg;
+ };
+ 
+ enum ath79_spi_cs_type {
