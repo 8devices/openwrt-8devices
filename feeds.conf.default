@@ -1,4 +1,4 @@
-src-git packages https://github.com/8devices/carambola2-new-packages.git^9fad0f2d9e3815dcbedabcf065b9c2f2908c35b1
+src-git packages https://github.com/8devices/carambola2-new-packages.git^ddeefc08e47cc2cfe307c7bf939bd4744e1a3281
 src-git luci https://github.com/openwrt/luci.git^c46963613f7f1312dac62e507346777ba6f8d8a6
 src-git routing https://github.com/openwrt-routing/packages.git^0d9c99ce5caf51b7a3922831088cf321ef795313
 src-git telephony https://github.com/openwrt/telephony.git^ec4f3a1e6b56ff7f3184665b3308b69b2d291613
