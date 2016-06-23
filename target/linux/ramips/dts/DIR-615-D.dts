@@ -1,6 +1,6 @@
 /dts-v1/;
 
-/include/ "rt3050.dtsi"
+#include "rt3050.dtsi"
 
 / {
 	compatible = "DIR-615-D", "ralink,rt3050-soc";
@@ -48,7 +48,7 @@
 	};
 
 	esw@10110000 {
-		ralink,portmap = <0x2f>;
+		mediatek,portmap = <0x2f>;
 	};
 
 	wmac@10180000 {

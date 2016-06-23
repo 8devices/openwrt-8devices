@@ -2,7 +2,7 @@
 
 . /lib/functions.sh
 . /lib/ramips.sh
-. /lib/functions/uci-defaults-new.sh
+. /lib/functions/uci-defaults.sh
 . /lib/functions/system.sh
 
 ramips_setup_rt3x5x_vlans()
@@ -35,6 +35,7 @@ ramips_setup_interfaces()
 	case $board in
 	3g150b|\
 	3g300m|\
+	a5-v11|\
 	all0256n|\
 	all5002|\
 	all5003|\
@@ -44,13 +45,14 @@ ramips_setup_interfaces()
 	ht-tm02|\
 	linkits7688 | \
 	linkits7688d | \
+	m2m|\
 	microwrt|\
 	ncs601w|\
 	w150m|\
 	wnce2001|\
 	zte-q7)
 		ucidef_add_switch "switch0"
-		ucidef_add_switch_attr "switch0" "reset" "false"
+		ucidef_add_switch_attr "switch0" "enable" "false"
 		ucidef_set_interface_lan "eth0"
 		;;
 	3g-6200nl|\
@@ -68,28 +70,29 @@ ramips_setup_interfaces()
 	firewrt|\
 	hlk-rm04|\
 	miwifi-mini|\
+	miwifi-nano|\
 	mt7621|\
 	mt7628|\
 	mzk-750dhp|\
 	mzk-w300nh2|\
 	oy-0001|\
 	pbr-m1|\
+	psg1208|\
 	sap-g3200u3|\
 	wf-2881|\
 	whr-300hp2|\
 	whr-600d|\
+	witi|\
+	wndr3700v5|\
 	wsr-1166|\
 	wsr-600|\
 	wt1520|\
 	y1|\
 	zbt-wg2626|\
+	zbt-wg3526|\
 	youku-yk1)
 		ucidef_add_switch "switch0" \
 			"0:lan" "1:lan" "2:lan" "3:lan" "4:wan" "6@eth0"
-		;;
-	a5-v11)
-		ucidef_add_switch "switch0" \
-			"0:lan" "6t@eth0"
 		;;
 	ar670w|\
 	ar725w|\
@@ -111,10 +114,20 @@ ramips_setup_interfaces()
 	dir-860l-b1|\
 	f5d8235-v1|\
 	f5d8235-v2|\
+	gl-mt300a|\
+	gl-mt300n|\
+	gl-mt750|\
 	hg255d|\
+	mzk-wdpr|\
+	jhr-n805r|\
+	jhr-n825r|\
+	jhr-n926r|\
 	rt-n14u|\
+	ubnt-erx|\
 	ur-326n4g|\
 	wrtnode|\
+	wrtnode2p | \
+	wrtnode2r | \
 	wt3020|\
 	zbt-wa05)
 		ucidef_add_switch "switch0" \
@@ -137,7 +150,8 @@ ramips_setup_interfaces()
 		ucidef_add_switch "switch0" \
 			"1:lan" "2:lan" "3:lan" "4:lan" "0:wan" "9@eth0"
 		;;
-	cf-wr800n)
+	cf-wr800n|\
+	ex2700)
 		ucidef_add_switch "switch0" \
 			"4:lan" "6t@eth0"
 		;;
@@ -145,10 +159,14 @@ ramips_setup_interfaces()
 		ucidef_add_switch "switch0" \
 			"0:lan" "1:lan" "2:lan" "3:lan" "4:wan" "9@eth0"
 		;;
+	cs-qr10|\
 	d105|\
 	hpm|\
+	mzk-ex300np|\
+	mzk-ex750np|\
 	na930|\
-	wli-tx4-ag300n)
+	wli-tx4-ag300n|\
+	wrh-300cr)
 		ucidef_set_interface_lan "eth0"
 		;;
 	e1700|\
@@ -160,11 +178,6 @@ ramips_setup_interfaces()
 	y1s)
 		ucidef_add_switch "switch0" \
 			"1:lan" "2:lan" "3:lan" "4:lan" "5:lan" "0:wan" "6@eth0"
-		;;
-	m2m)
-		ucidef_add_switch "switch0"
-		ucidef_add_switch_attr "switch0" "reset" "false"
-		ucidef_set_interface_lan "eth0"
 		;;
 	mlwg2|\
 	wizard8800|\
@@ -203,6 +216,7 @@ ramips_setup_interfaces()
 		ucidef_add_switch "switch0" \
 			"1:lan" "2:lan" "0:wan" "6@eth0"
 		;;
+	zbt-we826|\
 	zbt-wr8305rt)
 		ucidef_add_switch "switch0" \
 			"0:lan" "1:lan" "2:lan" "3:lan" "4:wan" "6@eth0"
@@ -226,6 +240,16 @@ ramips_setup_macs()
 
 	case $board in
 	a5-v11|\
+	ht-tm02)
+		lan_mac=$(cat /sys/class/net/eth0/address)
+		;;
+	all0239-3g|\
+	carambola|\
+	freestation5|\
+	w502u|\
+	wnce2001)
+		wan_mac=$(mtd_get_mac_binary factory 46)
+		;;
 	bc2|\
 	broadway|\
 	d105|\
@@ -245,13 +269,6 @@ ramips_setup_macs()
 		lan_mac=$(macaddr_setbit_la "$lan_mac")
 		wan_mac=$(macaddr_add "$lan_mac" 1)
 		;;
-	all0239-3g|\
-	carambola|\
-	freestation5|\
-	w502u|\
-	wnce2001)
-		wan_mac=$(mtd_get_mac_binary factory 46)
-		;;
 	br-6475nd)
 		lan_mac=$(cat /sys/class/net/eth0/address)
 		wan_mac=$(mtd_get_mac_binary devdata 7)
@@ -268,9 +285,6 @@ ramips_setup_macs()
 		lan_mac=`mtd_get_mac_ascii bdinfo "Vfac_mac "`
 		[ -n "$lan_mac" ] || lan_mac=$(cat /sys/class/net/eth0/address)
 		wan_mac=$(macaddr_add "$lan_mac" 1)
-		;;
-	ht-tm02)
-		lan_mac=$(cat /sys/class/net/eth0/address)
 		;;
 	linkits7688 | \
 	linkits7688d)

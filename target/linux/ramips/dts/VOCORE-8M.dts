@@ -1,6 +1,6 @@
 /dts-v1/;
 
-/include/ "VOCORE.dtsi"
+#include "VOCORE.dtsi"
 
 &spi0 {
 	status = "okay";
@@ -8,7 +8,7 @@
 	m25p80@0 {
 		#address-cells = <1>;
 		#size-cells = <1>;
-		compatible = "s25fl064k";
+		compatible = "jedec,spi-nor";
 		reg = <0>;
 		linux,modalias = "m25p80", "s25fl064k";
 		spi-max-frequency = <10000000>;

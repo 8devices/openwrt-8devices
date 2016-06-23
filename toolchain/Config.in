@@ -188,6 +188,7 @@ menuconfig EXTRA_TARGET_ARCH
 			bool "n64"
 
 		config MIPS64_ABI_N32
+			depends on !LIBC_USE_MUSL
 			bool "n32"
 
 		config MIPS64_ABI_O32
@@ -210,7 +211,6 @@ comment "C Library"
 
 choice
 	prompt "C Library implementation" if TOOLCHAINOPTS
-	default LIBC_USE_GLIBC if mips64 || mips64el
 	default LIBC_USE_UCLIBC if arc
 	default LIBC_USE_MUSL
 	help
@@ -230,13 +230,12 @@ choice
 	config LIBC_USE_MUSL
 		select USE_MUSL
 		bool "Use musl"
-		depends on !(arc || mips64 || mips64el)
+		depends on !(arc)
 
 endchoice
 
 source "toolchain/glibc/Config.in"
 source "toolchain/uClibc/Config.in"
-source "toolchain/musl/Config.in"
 
 comment "Debuggers"
 	depends on TOOLCHAINOPTS
@@ -261,11 +260,11 @@ config USE_GLIBC
 	bool
 
 config USE_UCLIBC
-	default y if !TOOLCHAINOPTS && !EXTERNAL_TOOLCHAIN && !NATIVE_TOOLCHAIN && (arc || mips64 || mips64el)
+	default y if !TOOLCHAINOPTS && !EXTERNAL_TOOLCHAIN && !NATIVE_TOOLCHAIN && (arc)
 	bool
 
 config USE_MUSL
-	default y if !TOOLCHAINOPTS && !EXTERNAL_TOOLCHAIN && !NATIVE_TOOLCHAIN && !(arc || mips64 || mips64el)
+	default y if !TOOLCHAINOPTS && !EXTERNAL_TOOLCHAIN && !NATIVE_TOOLCHAIN && !(arc)
 	bool
 
 config USE_EXTERNAL_LIBC

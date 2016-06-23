@@ -13,6 +13,10 @@
 		bootargs = "console=ttyS0,57600";
 	};
 
+	aliases {
+		serial0 = &uartlite;
+	};
+
 	cpuintc: cpuintc@0 {
 		#address-cells = <0>;
 		#interrupt-cells = <1>;
@@ -154,7 +158,7 @@
 			status = "disabled";
 		};
 
-		uartlite@c00 {
+		uartlite: uartlite@c00 {
 			compatible = "ns16550a";
 			reg = <0xc00 0x100>;
 
@@ -192,7 +196,7 @@
 			status = "disabled";
 		};
 
-		uart2@e00 {
+		uart2: uart2@e00 {
 			compatible = "ns16550a";
 			reg = <0xe00 0x100>;
 
@@ -340,17 +344,18 @@
 		#reset-cells = <1>;
 	};
 
-	usbphy: usbphy {
-		compatible = "ralink,mt7628an-usbphy", "ralink,mt7620a-usbphy";
+	usbphy: usbphy@10120000 {
+		compatible = "ralink,mt7628an-usbphy", "mediatek,mt7620-usbphy";
+		reg = <0x10120000 0x4000>;
 		#phy-cells = <1>;
 
-		resets = <&rstctrl 22>;
-		reset-names = "host";
+		resets = <&rstctrl 22 &rstctrl 25>;
+		reset-names = "host", "device";
 	};
 
 	sdhci@10130000 {
 		compatible = "ralink,mt7620-sdhci";
-		reg = <0x10130000 4000>;
+		reg = <0x10130000 0x4000>;
 
 		interrupt-parent = <&intc>;
 		interrupts = <14>;
@@ -362,7 +367,7 @@
 	};
 
 	ehci@101c0000 {
-		compatible = "ralink,rt3xxx-ehci";
+		compatible = "generic-ehci";
 		reg = <0x101c0000 0x1000>;
 
 		phys = <&usbphy 1>;
@@ -373,7 +378,7 @@
 	};
 
 	ohci@101c1000 {
-		compatible = "ralink,rt3xxx-ohci";
+		compatible = "generic-ohci";
 		reg = <0x101c1000 0x1000>;
 
 		phys = <&usbphy 1>;
@@ -385,18 +390,20 @@
 
 	ethernet@10100000 {
 		compatible = "ralink,rt5350-eth";
-		reg = <0x10100000 10000>;
+		reg = <0x10100000 0x10000>;
 
 		interrupt-parent = <&cpuintc>;
 		interrupts = <5>;
 
 		resets = <&rstctrl 21 &rstctrl 23>;
 		reset-names = "fe", "esw";
+
+		mediatek,switch = <&esw>;
 	};
 
-	esw@10110000 {
+	esw: esw@10110000 {
 		compatible = "ralink,rt3050-esw";
-		reg = <0x10110000 8000>;
+		reg = <0x10110000 0x8000>;
 
 		resets = <&rstctrl 23>;
 		reset-names = "esw";
@@ -437,5 +444,18 @@
 
 			device_type = "pci";
 		};
+	};
+
+	wmac: wmac@10300000 {
+		compatible = "mediatek,mt7628-wmac";
+		reg = <0x10300000 0x100000>;
+
+		interrupt-parent = <&cpuintc>;
+		interrupts = <6>;
+
+		status = "disabled";
+
+		mediatek,mtd-eeprom = <&factory 0x0000>;
+		mediatek,5ghz = <0>;
 	};
 };

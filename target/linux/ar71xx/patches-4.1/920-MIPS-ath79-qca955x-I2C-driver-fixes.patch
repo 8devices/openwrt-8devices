@@ -1,0 +1,140 @@
+--- a/drivers/i2c/busses/i2c-designware-core.c
++++ b/drivers/i2c/busses/i2c-designware-core.c
+@@ -253,10 +253,14 @@ static u32 i2c_dw_scl_lcnt(u32 ic_clk, u
+ static void __i2c_dw_enable(struct dw_i2c_dev *dev, bool enable)
+ {
+ 	int timeout = 100;
++	uint32_t enable_status_reg = DW_IC_ENABLE_STATUS;
++
++	if (dev->hw_type == HW_QCA95XX)
++		enable_status_reg =  DW_IC_ENABLE;
+ 
+ 	do {
+ 		dw_writel(dev, enable, DW_IC_ENABLE);
+-		if ((dw_readl(dev, DW_IC_ENABLE_STATUS) & 1) == enable)
++		if ((dw_readl(dev, enable_status_reg) & 1) == enable)
+ 			return;
+ 
+ 		/*
+@@ -297,19 +301,23 @@ int i2c_dw_init(struct dw_i2c_dev *dev)
+ 
+ 	input_clock_khz = dev->get_clk_rate_khz(dev);
+ 
+-	reg = dw_readl(dev, DW_IC_COMP_TYPE);
+-	if (reg == ___constant_swab32(DW_IC_COMP_TYPE_VALUE)) {
+-		/* Configure register endianess access */
+-		dev->accessor_flags |= ACCESS_SWAP;
+-	} else if (reg == (DW_IC_COMP_TYPE_VALUE & 0x0000ffff)) {
+-		/* Configure register access mode 16bit */
+-		dev->accessor_flags |= ACCESS_16BIT;
+-	} else if (reg != DW_IC_COMP_TYPE_VALUE) {
+-		dev_err(dev->dev, "Unknown Synopsys component type: "
+-			"0x%08x\n", reg);
+-		if (dev->release_lock)
+-			dev->release_lock(dev);
+-		return -ENODEV;
++	if (dev->hw_type == HW_QCA95XX)
++		dev_dbg(dev->dev, "QCA95XX based device, skipping ID check\n");
++	else {
++		reg = dw_readl(dev, DW_IC_COMP_TYPE);
++		if (reg == ___constant_swab32(DW_IC_COMP_TYPE_VALUE)) {
++			/* Configure register endianess access */
++			dev->accessor_flags |= ACCESS_SWAP;
++		} else if (reg == (DW_IC_COMP_TYPE_VALUE & 0x0000ffff)) {
++			/* Configure register access mode 16bit */
++			dev->accessor_flags |= ACCESS_16BIT;
++		} else if (reg != DW_IC_COMP_TYPE_VALUE) {
++			dev_err(dev->dev, "Unknown Synopsys component type: "
++				"0x%08x\n", reg);
++			if (dev->release_lock)
++				dev->release_lock(dev);
++			return -ENODEV;
++		}
+ 	}
+ 
+ 	/* Disable the adapter */
+--- a/drivers/i2c/busses/i2c-designware-platdrv.c
++++ b/drivers/i2c/busses/i2c-designware-platdrv.c
+@@ -51,6 +51,20 @@ static u32 i2c_dw_get_clk_rate_khz(struc
+ 	return clk_get_rate(dev->clk)/1000;
+ }
+ 
++static u32 i2c_dw_get_clk_rate_pdata_khz(struct dw_i2c_dev *dev)
++{
++	struct dw_i2c_platform_data *pdata;
++
++	pdata = dev_get_platdata(dev->dev);
++	if (pdata)
++		return (pdata->i2c_ref_freq/1000);
++	else {
++		dev_err(dev->dev, "Platform data unavailable");
++		return 0;
++	}
++}
++
++
+ #ifdef CONFIG_ACPI
+ /*
+  * The HCNT/LCNT information coming from ACPI should be the most accurate
+@@ -209,8 +223,11 @@ static int dw_i2c_probe(struct platform_
+ 		}
+ 	} else {
+ 		pdata = dev_get_platdata(&pdev->dev);
+-		if (pdata)
++		if (pdata) {
+ 			clk_freq = pdata->i2c_scl_freq;
++			if (pdata->is_qca95xx)
++				dev->hw_type = HW_QCA95XX;
++		}
+ 	}
+ 
+ 	r = i2c_dw_eval_lock_support(dev);
+@@ -232,10 +249,15 @@ static int dw_i2c_probe(struct platform_
+ 			DW_IC_CON_RESTART_EN | DW_IC_CON_SPEED_FAST;
+ 
+ 	dev->clk = devm_clk_get(&pdev->dev, NULL);
+-	dev->get_clk_rate_khz = i2c_dw_get_clk_rate_khz;
+-	if (IS_ERR(dev->clk))
+-		return PTR_ERR(dev->clk);
+-	clk_prepare_enable(dev->clk);
++	if (dev->hw_type == HW_QCA95XX) {
++		dev->get_clk_rate_khz = i2c_dw_get_clk_rate_pdata_khz;
++	}
++	else {
++		dev->get_clk_rate_khz = i2c_dw_get_clk_rate_khz;
++		if (IS_ERR(dev->clk))
++			return PTR_ERR(dev->clk);
++		clk_prepare_enable(dev->clk);
++	}
+ 
+ 	if (!dev->sda_hold_time && ht) {
+ 		u32 ic_clk = dev->get_clk_rate_khz(dev);
+--- a/drivers/i2c/busses/i2c-designware-core.h
++++ b/drivers/i2c/busses/i2c-designware-core.h
+@@ -107,11 +107,15 @@ struct dw_i2c_dev {
+ 	int			(*acquire_lock)(struct dw_i2c_dev *dev);
+ 	void			(*release_lock)(struct dw_i2c_dev *dev);
+ 	bool			pm_runtime_disabled;
++	u32			hw_type;
+ };
+ 
+ #define ACCESS_SWAP		0x00000001
+ #define ACCESS_16BIT		0x00000002
+ 
++#define HW_DEFAULT		0x00000000
++#define HW_QCA95XX		0x00000001
++
+ extern u32 dw_readl(struct dw_i2c_dev *dev, int offset);
+ extern void dw_writel(struct dw_i2c_dev *dev, u32 b, int offset);
+ extern int i2c_dw_init(struct dw_i2c_dev *dev);
+--- a/include/linux/platform_data/i2c-designware.h
++++ b/include/linux/platform_data/i2c-designware.h
+@@ -16,6 +16,8 @@
+ 
+ struct dw_i2c_platform_data {
+ 	unsigned int i2c_scl_freq;
++	bool is_qca95xx;
++	unsigned int i2c_ref_freq;
+ };
+ 
+ #endif

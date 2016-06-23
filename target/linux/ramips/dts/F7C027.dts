@@ -1,6 +1,6 @@
 /dts-v1/;
 
-/include/ "rt5350.dtsi"
+#include "rt5350.dtsi"
 
 / {
 	compatible = "F7C027", "ralink,rt5350-soc";
@@ -13,7 +13,7 @@
 			m25p80@0 {
 				#address-cells = <1>;
 				#size-cells = <1>;
-				compatible = "mx25l12805d";
+				compatible = "jedec,spi-nor";
 				reg = <0 0>;
 				linux,modalias = "m25p80", "mx25l12805d";
 				spi-max-frequency = <10000000>;

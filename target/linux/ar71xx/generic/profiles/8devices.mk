@@ -27,6 +27,17 @@ endef
 
 $(eval $(call Profile,CENTIPEDE))
 
+define Profile/LIMA
+        NAME:=Lima board from 8Devices
+        PACKAGES:=kmod-usb-core kmod-usb2
+endef
+
+define Profile/LIMA/Description
+        Package set optimized for the 8devices Lima board.
+endef
+
+$(eval $(call Profile,LIMA))
+
 define Profile/8DEV
 	NAME:=8devices Products
 	PACKAGES:=kmod-usb-core kmod-usb2

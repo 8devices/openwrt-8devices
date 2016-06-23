@@ -6,7 +6,11 @@ USE_PROCD=1
 start_daemon() {
 	local cfg="$1"
 
-	local atmdev
+	local atmdev disabled
+
+	config_get_bool disabled "$cfg" disabled 0
+	[ "$disabled" -eq 1 ] && return
+
 	config_get atmdev "$cfg" atmdev 0
 
 	local unit
@@ -54,20 +58,11 @@ start_daemon() {
 
 	procd_open_instance
 	procd_set_param command \
-		/usr/sbin/br2684ctl \
+		/usr/sbin/br2684ctl_wrap "nas$unit" \
 		-c "$unit" -e "$encaps" -p "$payload" \
-		-a "$circuit" ${qos:+-q "$qos"} ${sendsize:+-s "$sendsize"}
+		-a "$circuit" ${qos:+-q "$qos"} ${sendsize:+-s "$sendsize"} \
+		-S /lib/netifd/br2684-up
 	procd_close_instance
-}
-
-service_running() {
-	. /lib/functions/network.sh
-
-	sleep 1
-	for path in /sys/class/net/nas*; do
-		dev="${path##*/}"
-		network_ready_device "$dev"
-	done
 }
 
 service_triggers() {
@@ -76,7 +71,7 @@ service_triggers() {
 
 	procd_open_trigger
 	procd_add_raw_trigger hotplug.atm 2000 /etc/init.d/$name reload
-	procd_add_config_trigger "config.change" "$file" /etc/init.d/$name reload
+	procd_add_config_trigger "config.change" "network" /etc/init.d/$name reload
 	procd_close_trigger
 }
 

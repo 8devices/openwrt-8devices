@@ -1,2 +1,0 @@
-i2c-dev
-i2c-gpio-custom bus0=0,18,19

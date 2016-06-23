@@ -14,9 +14,13 @@ touch /etc/config/ubootenv
 board=$(ar71xx_board_name)
 
 case "$board" in
+alfa-ap120c | \
 all0258n | \
+cap324 | \
 cap4200ag | \
 carambola2 | \
+cr3000 | \
+cr5000 | \
 eap300v2 | \
 hornet-ub | \
 hornet-ub-x2 | \
@@ -27,6 +31,8 @@ mr900 | \
 mr900v2 | \
 nbg6716 | \
 om5p-an | \
+om5p-ac | \
+om5p-acv2 | \
 om5p | \
 tube2h | \
 wndr3700)
@@ -40,6 +46,10 @@ om2p-hs | \
 om2p-hsv2 | \
 om2p-lc)
 	ubootenv_add_uci_config "/dev/mtd1" "0x0" "0x40000" "0x40000"
+	;;
+rambutan)
+	ubootenv_add_uci_config "/dev/mtd1" "0x0" "0x20000" "0x20000"
+	ubootenv_add_uci_config "/dev/mtd1" "0x100000" "0x20000" "0x20000"
 	;;
 wzr-hp-ag300h)
 	ubootenv_add_uci_config "/dev/mtd3" "0x0" "0x10000" "0x10000"

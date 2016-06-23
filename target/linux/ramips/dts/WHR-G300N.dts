@@ -1,6 +1,6 @@
 /dts-v1/;
 
-/include/ "rt3050.dtsi"
+#include "rt3050.dtsi"
 
 / {
 	compatible = "WHR-G300N", "ralink,rt3052-soc";
@@ -25,7 +25,7 @@
 	};
 
 	esw@10110000 {
-		ralink,portmap = <0x2f>;
+		mediatek,portmap = <0x2f>;
 	};
 
 	/* FIXME: no partitions defined */

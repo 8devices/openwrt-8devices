@@ -173,11 +173,9 @@ default_prerm() {
 	done
 }
 
-default_postinst() {
-	local root="${IPKG_INSTROOT}"
-	local pkgname="$(basename ${1%.*})"
+add_group_and_user() {
+	local pkgname="$1"
 	local rusers="$(sed -ne 's/^Require-User: *//p' $root/usr/lib/opkg/info/${pkgname}.control 2>/dev/null)"
-	local ret=0
 
 	if [ -n "$rusers" ]; then
 		local tuple oIFS="$IFS"
@@ -208,10 +206,40 @@ default_postinst() {
 			unset uid gid uname gname
 		done
 	fi
+}
+
+default_postinst() {
+	local root="${IPKG_INSTROOT}"
+	local pkgname="$(basename ${1%.*})"
+	local ret=0
+
+	add_group_and_user "${pkgname}"
 
 	if [ -f "$root/usr/lib/opkg/info/${pkgname}.postinst-pkg" ]; then
 		( . "$root/usr/lib/opkg/info/${pkgname}.postinst-pkg" )
 		ret=$?
+	fi
+
+	if [ -z "$root" ] && grep -q -s "^/etc/uci-defaults/" "$root/usr/lib/opkg/info/${pkgname}.list"; then
+		. /lib/functions/system.sh
+		[ -d /tmp/.uci ] || mkdir -p /tmp/.uci
+		cd /etc/uci-defaults
+		for i in $(grep -s "^/etc/uci-defaults/" "$root/usr/lib/opkg/info/${pkgname}.list"); do
+			( . "./$(basename $i)" ) && rm -f "$i"
+		done
+		uci commit
+		cd $OLDPWD
+	fi
+
+	if [ -z "$root" ] && grep -q -s "^/etc/uci-defaults/" "/usr/lib/opkg/info/${pkgname}.list"; then
+		. /lib/functions/system.sh
+		[ -d /tmp/.uci ] || mkdir -p /tmp/.uci
+		cd /etc/uci-defaults
+		for i in $(grep -s "^/etc/uci-defaults/" "/usr/lib/opkg/info/${pkgname}.list"); do
+			( . "./$(basename $i)" ) && rm -f "$i"
+		done
+		uci commit
+		cd $OLDPWD
 	fi
 
 	[ -n "$root" ] || rm -f /tmp/luci-indexcache 2>/dev/null

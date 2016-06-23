@@ -1,6 +1,6 @@
 /dts-v1/;
 
-/include/ "mt7621.dtsi"
+#include "mt7621.dtsi"
 
 / {
 	compatible = "mediatek,mt7621-eval-board", "mediatek,mt7621-soc";
@@ -22,12 +22,7 @@
 	};
 
 	nand@1e003000 {
-		compatible = "mtk,mt7621-nand";
-		bank-width = <2>;
-		reg = <0x1e003000 0x800
-				0x1e003800 0x800>;
-		#address-cells = <1>;
-		#size-cells = <1>;
+		status = "okay";
 
 		partition@0 {
 			label = "u-boot";
@@ -53,19 +48,9 @@
 			read-only;
 		};
 
-		firmware {
-			label = "firmware";
-			reg = <0x140000 0x6EC0000>;
-		};
-
 		partition@140000 {
-			label = "kernel";
-			reg = <0x140000 0x200000>;
-		};
-
-		partition@340000 {
-			label = "ubi";
-			reg = <0x340000 0x6CC0000>;
+			label = "firmware";
+			reg = <0x140000 0x7E40000>;
 		};
 	};
 

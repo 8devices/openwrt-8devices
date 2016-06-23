@@ -1,6 +1,6 @@
 /dts-v1/;
 
-/include/ "rt5350.dtsi"
+#include "rt5350.dtsi"
 
 / {
 	compatible = "wizfi630a", "ralink,rt5350-soc";
@@ -21,7 +21,7 @@
 			m25p80@0 {
 				#address-cells = <1>;
 				#size-cells = <1>;
-				compatible = "w25q128";
+				compatible = "jedec,spi-nor";
 				reg = <0>;
 				linux,modalias = "m25p80", "w25q128";
 				spi-max-frequency = <10000000>;
@@ -59,6 +59,8 @@
 			interrupt-parent = <&intc>;
 			interrupts = <5>;
 			reg-shift = <2>;
+			pinctrl-names = "default";
+			pinctrl-0 = <&uartf_pins>;
 			status = "okay";
 		};
 
@@ -103,7 +105,7 @@
 	};
 
 	esw@10110000 {
-		ralink,portmap = <0x17>;
+		mediatek,portmap = <0x17>;
 	};
 
 	wmac@10180000 {

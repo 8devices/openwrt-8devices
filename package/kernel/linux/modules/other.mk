@@ -130,6 +130,16 @@ endef
 $(eval $(call KernelPackage,bluetooth-hci-h4p))
 
 
+define KernelPackage/dma-buf
+  TITLE:=DMA shared buffer support
+  HIDDEN:=1
+  KCONFIG:=CONFIG_DMA_SHARED_BUFFER
+  FILES:=$(LINUX_DIR)/drivers/dma-buf/dma-shared-buffer.ko
+  AUTOLOAD:=$(call AutoLoad,20,dma-shared-buffer)
+endef
+$(eval $(call KernelPackage,dma-buf))
+
+
 define KernelPackage/eeprom-93cx6
   SUBMENU:=$(OTHER_MENU)
   TITLE:=EEPROM 93CX6 support
@@ -656,6 +666,22 @@ endef
 
 $(eval $(call KernelPackage,rtc-pt7c4338))
 
+define KernelPackage/rtc-snvs
+  SUBMENU:=$(OTHER_MENU)
+  TITLE:=Freescale SNVS RTC support
+  DEPENDS:=@TARGET_imx6 @RTC_SUPPORT
+  KCONFIG:=CONFIG_RTC_DRV_SNVS \
+	CONFIG_RTC_CLASS=y
+  FILES:=$(LINUX_DIR)/drivers/rtc/rtc-snvs.ko
+  AUTOLOAD:=$(call AutoLoad,50,rtc-snvs,1)
+endef
+
+define KernelPackage/rtc-snvs/description
+ Kernel module for Freescale SNVS RTC on chip module
+endef
+
+$(eval $(call KernelPackage,rtc-snvs))
+
 
 define KernelPackage/mtdtests
   SUBMENU:=$(OTHER_MENU)
@@ -820,7 +846,9 @@ define KernelPackage/ptp
   SUBMENU:=$(OTHER_MENU)
   TITLE:=PTP clock support
   DEPENDS:=+kmod-pps
-  KCONFIG:=CONFIG_PTP_1588_CLOCK
+  KCONFIG:= \
+	CONFIG_PTP_1588_CLOCK \
+	CONFIG_NET_PTP_CLASSIFY=y
   FILES:=$(LINUX_DIR)/drivers/ptp/ptp.ko
   AUTOLOAD:=$(call AutoLoad,18,ptp,1)
 endef

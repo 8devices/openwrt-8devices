@@ -3,14 +3,11 @@
 # Copyright (C) 2014-2015 OpenWrt.org
 #
 
-. /lib/functions/uci-defaults-new.sh
-. /lib/functions/octeon.sh
+. /lib/functions/uci-defaults.sh
 
 board_config_update
 
-board=$(octeon_board_name)
-
-case "$board" in
+case "$(cat /tmp/sysinfo/board_name)" in
 erlite)
 	ucidef_set_interfaces_lan_wan "eth0" "eth1"
 	;;

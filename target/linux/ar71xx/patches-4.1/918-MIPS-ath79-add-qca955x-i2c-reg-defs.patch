@@ -1,0 +1,11 @@
+--- a/arch/mips/include/asm/mach-ath79/ar71xx_regs.h
++++ b/arch/mips/include/asm/mach-ath79/ar71xx_regs.h
+@@ -133,6 +133,8 @@
+ #define QCA955X_PCI_CTRL_BASE1	(AR71XX_APB_BASE + 0x00280000)
+ #define QCA955X_PCI_CTRL_SIZE	0x100
+ 
++#define QCA955X_I2C_BASE	(AR71XX_APB_BASE + 0x00018000)
++#define QCA955X_I2C_SIZE	0x100
+ #define QCA955X_GMAC_BASE	(AR71XX_APB_BASE + 0x00070000)
+ #define QCA955X_GMAC_SIZE	0x40
+ #define QCA955X_WMAC_BASE	(AR71XX_APB_BASE + 0x00100000)
