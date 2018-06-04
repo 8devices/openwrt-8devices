@@ -1,0 +1,41 @@
+diff -urN a/arch/mips/Kbuild.platforms b/arch/mips/Kbuild.platforms
+--- a/arch/mips/Kbuild.platforms	2016-02-24 15:50:14.723862791 +0800
++++ b/arch/mips/Kbuild.platforms	2016-02-24 15:49:46.019862320 +0800
+@@ -30,6 +30,6 @@
+ platforms += sni
+ platforms += txx9
+ platforms += vr41xx
+-
++platforms += rtl8197f
+ # include the platform specific files
+ include $(patsubst %, $(srctree)/arch/mips/%/Platform, $(platforms))
+diff -urN a/arch/mips/Kconfig b/arch/mips/Kconfig
+--- a/arch/mips/Kconfig	2016-02-24 15:50:31.395863065 +0800
++++ b/arch/mips/Kconfig	2016-02-24 15:49:52.503862426 +0800
+@@ -454,6 +454,17 @@
+	select ARCH_HAS_RESET_CONTROLLER
+	select RESET_CONTROLLER
+
++config REALTEK_97F
++	bool "Realtek 97F based machines"
++	select CEVT_R4K
++	select CSRC_R4K
++	select DMA_NONCOHERENT
++	select IRQ_CPU
++	select SYS_HAS_CPU_MIPS32_R2
++	select SYS_SUPPORTS_32BIT_KERNEL
++	select SYS_SUPPORTS_LITTLE_ENDIAN
++	select SYS_HAS_EARLY_PRINTK
++
+ config SGI_IP22
+	bool "SGI IP22 (Indy/Indigo2)"
+	select FW_ARC
+@@ -853,7 +864,7 @@
+ source "arch/mips/loongson1/Kconfig"
+ source "arch/mips/netlogic/Kconfig"
+ source "arch/mips/paravirt/Kconfig"
+-
++source "arch/mips/rtl8197f/Kconfig"
+ endmenu
+
+ config RWSEM_GENERIC_SPINLOCK

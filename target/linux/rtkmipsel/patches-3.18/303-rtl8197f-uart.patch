@@ -1,0 +1,61 @@
+diff -urN a/include/uapi/linux/serial_reg.h b/include/uapi/linux/serial_reg.h
+--- a/include/uapi/linux/serial_reg.h	2016-02-24 16:55:52.131927499 +0800
++++ b/include/uapi/linux/serial_reg.h	2016-02-24 16:55:33.491927192 +0800
+@@ -17,8 +17,13 @@
+ /*
+  * DLAB=0
+  */
++#ifdef CONFIG_RTL_8197F
++#define UART_RX		9	/* In:  Receive buffer */
++#define UART_TX		9	/* Out: Transmit buffer */
++#else
+ #define UART_RX		0	/* In:  Receive buffer */
+ #define UART_TX		0	/* Out: Transmit buffer */
++#endif
+
+ #define UART_IER	1	/* Out: Interrupt Enable Register */
+ #define UART_IER_MSI		0x08 /* Enable Modem status interrupt */
+@@ -32,7 +37,13 @@
+
+ #define UART_IIR	2	/* In:  Interrupt ID Register */
+ #define UART_IIR_NO_INT		0x01 /* No interrupts pending */
+-#define UART_IIR_ID		0x0e /* Mask for the interrupt ID */
++
++#ifdef CONFIG_RTL_8197F
++#define UART_IIR_ID		0x0E /* Mask for the interrupt ID */
++#else
++#define UART_IIR_ID		0x06 /* Mask for the interrupt ID */
++#endif
++
+ #define UART_IIR_MSI		0x00 /* Modem status interrupt */
+ #define UART_IIR_THRI		0x02 /* Transmitter holding register empty */
+ #define UART_IIR_RDI		0x04 /* Receiver data interrupt */
+@@ -106,8 +117,14 @@
+ #define UART_LCR_STOP		0x04 /* Stop bits: 0=1 bit, 1=2 bits */
+ #define UART_LCR_WLEN5		0x00 /* Wordlength: 5 bits */
+ #define UART_LCR_WLEN6		0x01 /* Wordlength: 6 bits */
++
++#ifdef CONFIG_RTL_8197F
++#define UART_LCR_WLEN7		0x00 /* Wordlength: 7 bits */
++#define UART_LCR_WLEN8		0x01 /* Wordlength: 8 bits */
++#else
+ #define UART_LCR_WLEN7		0x02 /* Wordlength: 7 bits */
+ #define UART_LCR_WLEN8		0x03 /* Wordlength: 8 bits */
++#endif
+
+ /*
+  * Access to some registers depends on register access / configuration
+@@ -151,6 +168,13 @@
+
+ #define UART_SCR	7	/* I/O: Scratch Register */
+
++#ifdef CONFIG_RTL_8197F
++#define UART_OVSR_ADJ_MASK	0x7FF0000
++#define UART_STS	8
++#define UART_RESET_RCV	0x08
++#define UART_OVSR_MASK	0x0F
++#endif
++
+ /*
+  * DLAB=1
+  */

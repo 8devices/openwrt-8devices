@@ -1,0 +1,58 @@
+diff -urN a/drivers/i2c/busses/i2c-designware-platdrv.c b/drivers/i2c/busses/i2c-designware-platdrv.c
+--- a/drivers/i2c/busses/i2c-designware-platdrv.c	2016-09-23 13:26:32.002828537 +0800
++++ b/drivers/i2c/busses/i2c-designware-platdrv.c	2016-09-23 13:26:41.094828179 +0800
+@@ -212,7 +212,10 @@
+	} else {
+		pdata = dev_get_platdata(&pdev->dev);
+		if (pdata)
++		{
+			clk_freq = pdata->i2c_scl_freq;
++			ht = pdata->sda_hold_time_ns;
++		}
+	}
+
+	dev->functionality =
+diff -urN a/drivers/i2c/busses/Kconfig b/drivers/i2c/busses/Kconfig
+--- a/drivers/i2c/busses/Kconfig	2016-09-23 13:46:03.350782394 +0800
++++ b/drivers/i2c/busses/Kconfig	2016-09-23 13:45:39.974783315 +0800
+@@ -446,6 +446,7 @@
+ config I2C_DESIGNWARE_PLATFORM
+	tristate "Synopsys DesignWare Platform"
+	select I2C_DESIGNWARE_CORE
++	select I2C_DEFAULT_PINMUX
+	depends on (ACPI && COMMON_CLK) || !ACPI
+	help
+	  If you say yes to this option, support will be included for the
+@@ -454,6 +455,21 @@
+	  This driver can also be built as a module.  If so, the module
+	  will be called i2c-designware-platform.
+
++choice
++	prompt "Select DesignWare I2C PINMUX"
++	depends on I2C_DESIGNWARE_CORE
++	default I2C_DEFAULT_PINMUX
++	help
++		The pinmux sets are provided by 8197F without 8367r.
++
++config I2C_DEFAULT_PINMUX
++	bool "I2C0: TXCTL + RXCTL; I2C1: TXD1 + RXC"
++
++config I2C_PINMUX_2
++	bool "I2C0: TXCTL + RXCTL; I2C1: TXC + TXD0"
++endchoice
++
++
+ config I2C_DESIGNWARE_PCI
+	tristate "Synopsys DesignWare PCI"
+	depends on PCI
+diff -urN a/include/linux/platform_data/i2c-designware.h b/include/linux/platform_data/i2c-designware.h
+--- a/include/linux/platform_data/i2c-designware.h	2016-09-23 13:25:06.266831915 +0800
++++ b/include/linux/platform_data/i2c-designware.h	2016-09-23 13:26:04.858829607 +0800
+@@ -16,6 +16,7 @@
+
+ struct dw_i2c_platform_data {
+	unsigned int i2c_scl_freq;
++	unsigned int sda_hold_time_ns;
+ };
+
+ #endif

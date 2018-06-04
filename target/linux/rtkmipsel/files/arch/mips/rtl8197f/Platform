@@ -1,0 +1,8 @@
+#
+# Realtek mips SoC
+#
+core-$(CONFIG_REALTEK_97F)           += arch/mips/rtl8197f/
+cflags-$(CONFIG_REALTEK_97F)         += -I$(srctree)/arch/mips/include/asm/mach-rtl8197f
+
+load-$(CONFIG_SOC_RTL8197F)       += 0xffffffff80000000
+cflags-$(CONFIG_SOC_RTL8197F)     += -I$(srctree)/arch/mips/include/asm/mach-rtl8197f/rtl8197f

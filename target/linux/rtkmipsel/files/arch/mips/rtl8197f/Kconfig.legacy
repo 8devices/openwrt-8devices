@@ -1,0 +1,22 @@
+config RTL_8197F_GW
+	bool
+		select RTL_8197F
+        select SYS_HAS_EARLY_PRINTK
+	default n
+
+config RTL_8197F
+        bool
+	select RTL_819X
+        default y
+
+# common flag for Realtek 819X SoC
+config RTL_819X
+        bool
+        default y
+
+## kernel option flag for openWrt SDK
+config OPENWRT_SDK
+        def_bool n
+
+config WRT_BARRIER_BREAKER
+        def_bool n

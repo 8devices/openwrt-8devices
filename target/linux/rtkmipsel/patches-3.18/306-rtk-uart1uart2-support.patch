@@ -1,0 +1,52 @@
+diff -urN a/drivers/tty/serial/8250/Kconfig b/drivers/tty/serial/8250/Kconfig
+--- a/drivers/tty/serial/8250/Kconfig	2016-10-06 13:55:55.694512698 +0800
++++ b/drivers/tty/serial/8250/Kconfig	2016-10-06 13:55:45.902513084 +0800
+@@ -317,3 +317,48 @@
+	help
+	  If you have a Mediatek based board and want to use the
+	  serial port, say Y to this option. If unsure, say N.
++
++config SERIAL_RTL_UART1
++	bool "819x RTL UART1 support"
++	depends on SERIAL_8250 && (SERIAL_8250_NR_UARTS != 1 && SERIAL_8250_RUNTIME_UARTS != 1)
++	default y
++	help
++		Enable RTL819x UART1 support, and this MAY add an uart device to ttyS1.
++		NOTE: We don't provide option for this port to be console.
++
++choice
++	prompt "Select UART1 PINMUX"
++	depends on SERIAL_RTL_UART1
++	default SERIAL_RTL_UART1_PINMUX1
++	help
++		The pinmux sets are provided by 8197FS.
++
++config SERIAL_RTL_UART1_PINMUX1
++	bool "P0_TXD0 + P0_TXC + P0_TXCTL + P0_RXCTL"
++
++config SERIAL_RTL_UART1_PINMUX2
++	bool "MMC_DAT0 + MMC_DAT1 + MMC_DAT2 + MMC_DAT3"
++endchoice
++
++config SERIAL_RTL_UART2
++	bool "819x RTL UART2 support"
++	depends on SERIAL_8250 && (SERIAL_8250_NR_UARTS != 1 && SERIAL_8250_RUNTIME_UARTS != 1)
++	default y if SERIAL_8250_NR_UARTS = 3 && SERIAL_8250_RUNTIME_UARTS = 3
++	help
++		Enable RTL819x UART2 support, and this MAY add an uart device to ttyS2.
++		NOTE: We don't provide option for this port to be console.
++
++choice
++	prompt "Select UART2 PINMUX"
++	depends on SERIAL_RTL_UART2
++	default SERIAL_RTL_UART2_PINMUX1
++	help
++		The pinmux sets are provided by 8197FS.
++
++config SERIAL_RTL_UART2_PINMUX1
++	bool "P0_RXD0 + P0_RXD1 + P0_RXD2 + P0_RXD3"
++
++config SERIAL_RTL_UART2_PINMUX2
++	bool "MMC_DAT0 + MMC_DAT1 + MMC_DAT2 + MMC_DAT3"
++	depends on !SERIAL_RTL_UART1_PINMUX2
++endchoice
