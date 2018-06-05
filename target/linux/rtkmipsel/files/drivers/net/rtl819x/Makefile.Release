@@ -1,0 +1,32 @@
+obj-y := rtl_glue.o
+obj-y += rtl_nic.o
+obj-y += re865x.o
+
+EXTRA_CFLAGS += -DCONFIG_RTL865X_MODULE_INTERNAL
+EXTRA_CFLAGS += -DRTL865X_OVER_KERNEL -DRTL865X_OVER_LINUX -D__KERNEL__ -Wno-implicit
+
+EXTRA_CFLAGS += -DCONFIG_RTL865X_IGMP_SNOOPING
+#######################################################################################################_CFLAGS
+#
+#       FAST EXTERNAL DEVICES related files
+#
+#       Fast path for external device process
+#
+########################################################################################################
+
+EXTRA_CFLAGS += -I$(ROOTDIR)/include
+EXTRA_CFLAGS += -I$(ROOTDIR)/$(LINUXDIR)/drivers/net/re865x/AsicDriver
+EXTRA_CFLAGS += -I$(ROOTDIR)/$(LINUXDIR)/drivers/net/re865x/common
+EXTRA_CFLAGS += -I$(ROOTDIR)/$(LINUXDIR)/drivers/net/re865x/l2Driver
+EXTRA_CFLAGS += -I$(ROOTDIR)/$(LINUXDIR)/drivers/net/re865x/l3Driver
+EXTRA_CFLAGS += -I$(ROOTDIR)/$(LINUXDIR)/drivers/net/re865x/l4Driver
+EXTRA_CFLAGS += -I$(ROOTDIR)/$(LINUXDIR)/drivers/net/re865x/igmpsnooping
+EXTRA_CFLAGS += -I$(ROOTDIR)/$(LINUXDIR)/drivers/net/re865x/cle
+EXTRA_CFLAGS += -I$(ROOTDIR)/$(LINUXDIR)/drivers/net/re865x
+EXTRA_CFLAGS += -D__KERNEL__
+EXTRA_CFLAGS += -DEXPORT_SYMTAB
+ifeq ($(CONFIG_RTL865X_MODULE_ROMEDRV),y)
+EXTRA_CFLAGS += -G 0
+EXTRA_CFLAGS += -DMODULE
+EXTRA_CFLAGS += -mlong-calls
+endif
