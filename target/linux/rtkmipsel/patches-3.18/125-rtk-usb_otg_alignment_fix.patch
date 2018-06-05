@@ -1,0 +1,281 @@
+--- a/drivers/usb/dwc_otg/dwc_otg_cil.c
++++ b/drivers/usb/dwc_otg/dwc_otg_cil.c
+@@ -57,6 +57,7 @@
+  *
+  */
+ #include <asm/unaligned.h>
++#include <linux/dma-mapping.h>
+ #ifdef DEBUG
+ #include <linux/jiffies.h>
+ #endif
+@@ -65,6 +66,9 @@
+ #include "dwc_otg_regs.h"
+ #include "dwc_otg_cil.h"
+
++
++#include "dwc_otg_hcd.h"
++
+ /**
+  * This function is called to initialize the DWC_otg CSR data
+  * structures.	The register addresses in the device and host
+@@ -1840,11 +1844,40 @@ void dwc_otg_hc_start_transfer(dwc_otg_c
+	if (_core_if->dma_enable)
+	{
+ #endif
++
++#if 0 //jason
+		//100415 cathy start, check if 4 bytes alignment at dma starting address
+		if((unsigned int)_hc->xfer_buff & 0x3)
+			printk("DWC_otg: dma address:0x%08x is not at alignment!\n", (unsigned int)_hc->xfer_buff);
+		/////100415 cathy end
++
+		dwc_write_reg32(&hc_regs->hcdma, (uint32_t)_hc->xfer_buff);
++#else
++#if 1 // jason 0317 // defined (CONFIG_DWC_OTG_HOST_ONLY)
++		if ((uint32_t)_hc->xfer_buff & 0x3) {
++			/* non DWORD-aligned buffer case*/
++			if(!_hc->qh->dw_align_buf) {
++				_hc->qh->dw_align_buf =
++					dma_alloc_coherent(NULL,
++					   		   _core_if->core_params->max_transfer_size,
++					   		   &_hc->qh->dw_align_buf_dma,
++					   		   GFP_ATOMIC | GFP_DMA);
++				if (!_hc->qh->dw_align_buf) {
++					DWC_ERROR("%s: Failed to allocate memory to handle "
++						  "non-dword aligned buffer case\n", __func__);
++					return;
++				}
++			}
++			if (!_hc->ep_is_in) {
++			    memcpy(_hc->qh->dw_align_buf, phys_to_virt((uint32_t)_hc->xfer_buff), _hc->xfer_len);
++			}
++
++			dwc_write_reg32(&hc_regs->hcdma, _hc->qh->dw_align_buf_dma);
++		}
++		else
++#endif
++		dwc_write_reg32(&hc_regs->hcdma, (uint32_t)_hc->xfer_buff);
++#endif
+ #ifndef DMA_ONLY
+	}
+ #endif
+--- a/drivers/usb/dwc_otg/dwc_otg_hcd.h
++++ b/drivers/usb/dwc_otg/dwc_otg_hcd.h
+@@ -481,7 +481,8 @@ extern void dwc_otg_async (dwc_otg_hcd_t
+ /* Implemented in dwc_otg_hcd_queue.c */
+ extern dwc_otg_qh_t *dwc_otg_hcd_qh_create (dwc_otg_hcd_t *_hcd, struct urb *_urb);
+ extern void dwc_otg_hcd_qh_init (dwc_otg_hcd_t *_hcd, dwc_otg_qh_t *_qh, struct urb *_urb);
+-extern void dwc_otg_hcd_qh_free (dwc_otg_qh_t *_qh);
++//extern void dwc_otg_hcd_qh_free (dwc_otg_qh_t *_qh);
++extern void dwc_otg_hcd_qh_free(dwc_otg_hcd_t *hcd, dwc_otg_qh_t *_qh);
+ extern int dwc_otg_hcd_qh_add (dwc_otg_hcd_t *_hcd, dwc_otg_qh_t *_qh);
+ extern void dwc_otg_hcd_qh_remove (dwc_otg_hcd_t *_hcd, dwc_otg_qh_t *_qh);
+ extern void dwc_otg_hcd_qh_deactivate (dwc_otg_hcd_t *_hcd, dwc_otg_qh_t *_qh, int sched_csplit);
+@@ -491,7 +492,7 @@ static inline void dwc_otg_hcd_qh_remove
+						   dwc_otg_qh_t *_qh)
+ {
+	dwc_otg_hcd_qh_remove (_hcd, _qh);
+-	dwc_otg_hcd_qh_free (_qh);
++	dwc_otg_hcd_qh_free(_hcd, _qh);
+ }
+
+ /** Allocates memory for a QH structure.
+--- a/drivers/usb/dwc_otg/dwc_otg_hcd_def.h
++++ b/drivers/usb/dwc_otg/dwc_otg_hcd_def.h
+@@ -145,6 +145,9 @@ typedef struct dwc_otg_qh {
+
+	/** Entry for QH in either the periodic or non-periodic schedule. */
+	struct list_head        qh_list_entry;
++	/* For non-dword aligned buffer support */
++	uint8_t			*dw_align_buf;
++	dma_addr_t		dw_align_buf_dma;
+ } dwc_otg_qh_t;
+
+ /**
+--- a/drivers/usb/dwc_otg/dwc_otg_hcd_intr.c
++++ b/drivers/usb/dwc_otg/dwc_otg_hcd_intr.c
+@@ -213,6 +213,11 @@ int32_t dwc_otg_hcd_handle_sof_intr (dwc
+	if (tr_type != DWC_OTG_TRANSACTION_NONE) {
+		dwc_otg_hcd_queue_transactions(_hcd, tr_type);
+	}
++	else
++	{
++		udelay(1);
++		//panic_printk("Scheduler returned no transactions but needed sched!");
++	}
+
+	/* Clear interrupt */
+	gintsts.b.sofintr = 1;
+@@ -559,14 +564,17 @@ static uint32_t get_actual_xfer_length(d
+  * @return 1 if the data transfer specified by the URB is completely finished,
+  * 0 otherwise.
+  */
+-static int update_urb_state_xfer_comp(dwc_hc_t *_hc,
+-				      dwc_otg_hc_regs_t *_hc_regs,
+-				      struct urb *_urb,
+-				      dwc_otg_qtd_t *_qtd)
++static int update_urb_state_xfer_comp(dwc_hc_t *hc,
++				      dwc_otg_hc_regs_t *hc_regs,
++				      struct urb *urb,
++				      dwc_otg_qtd_t *qtd)
+ {
+	int 		xfer_done = 0;
+	int 		short_read = 0;
+-
++	int		overflow_read=0;
++	uint32_t	len = 0;
++	int		max_packet;
++#if 0
+	_urb->actual_length += get_actual_xfer_length(_hc, _hc_regs, _qtd,
+						      DWC_OTG_HC_XFER_COMPLETE,
+						      &short_read);
+@@ -585,19 +593,51 @@ static int update_urb_state_xfer_comp(dw
+			_urb->status = 0;
+		}
+	}
+-
++#else
++	len = get_actual_xfer_length(hc, hc_regs, qtd,
++				     DWC_OTG_HC_XFER_COMPLETE,
++				     &short_read);
++
++	/* Data overflow case: by Steven */
++	if (len > urb->transfer_buffer_length) {
++	    len = urb->transfer_buffer_length;
++	    overflow_read = 1;
++	}
++
++	/* non DWORD-aligned buffer case handling. */
++	if (((uint32_t)hc->xfer_buff & 0x3) && len && hc->qh->dw_align_buf && hc->ep_is_in) {
++		memcpy(urb->transfer_buffer + urb->actual_length, hc->qh->dw_align_buf, len);
++	}
++	urb->actual_length +=len;
++
++	max_packet = usb_maxpacket(urb->dev, urb->pipe, !usb_pipein(urb->pipe));
++	if((len) && usb_pipebulk(urb->pipe) &&
++	   (urb->transfer_flags & URB_ZERO_PACKET) &&
++	   (urb->actual_length == urb->transfer_buffer_length) &&
++	   (!(urb->transfer_buffer_length % max_packet))) {
++	} else if (short_read || urb->actual_length == urb->transfer_buffer_length) {
++		xfer_done = 1;
++		if (short_read && (urb->transfer_flags & URB_SHORT_NOT_OK)) {
++			urb->status = -EREMOTEIO;
++		} else if (overflow_read) {
++			urb->status = -EOVERFLOW;
++		} else {
++			urb->status = 0;
++		}
++	}
++#endif
+ #ifdef DEBUG  //wei add
+ //	int lvl = SET_DEBUG_LEVEL(DBG_HCDV);
+	{
+		hctsiz_data_t 	hctsiz;
+-		hctsiz.d32 = dwc_read_reg32(&_hc_regs->hctsiz);
++		hctsiz.d32 = dwc_read_reg32(&hc_regs->hctsiz);
+		DWC_DEBUGPL(DBG_HCDV, "DWC_otg: %s: %s, channel %d\n",
+-			    __func__, (_hc->ep_is_in ? "IN" : "OUT"), _hc->hc_num);
+-		DWC_DEBUGPL(DBG_HCDV, "  hc->xfer_len %d\n", _hc->xfer_len);
++			    __func__, (hc->ep_is_in ? "IN" : "OUT"), hc->hc_num);
++		DWC_DEBUGPL(DBG_HCDV, "  hc->xfer_len %d\n", hc->xfer_len);
+		DWC_DEBUGPL(DBG_HCDV, "  hctsiz.xfersize %d\n", hctsiz.b.xfersize);
+		DWC_DEBUGPL(DBG_HCDV, "  urb->transfer_buffer_length %d\n",
+-			    _urb->transfer_buffer_length);
+-		DWC_DEBUGPL(DBG_HCDV, "  urb->actual_length %d\n", _urb->actual_length);
++			    urb->transfer_buffer_length);
++		DWC_DEBUGPL(DBG_HCDV, "  urb->actual_length %d\n", urb->actual_length);
+		DWC_DEBUGPL(DBG_HCDV, "  short_read %d, xfer_done %d\n",
+			    short_read, xfer_done);
+	}
+@@ -701,7 +741,12 @@ update_isoc_urb_state(dwc_otg_hcd_t *_hc
+			get_actual_xfer_length(_hc, _hc_regs, _qtd,
+					       _halt_status, NULL);
+
+-		urb->actual_length+=frame_desc->actual_length ;  //avoid interrupt endpoint issue for web cam
++		/* non DWORD-aligned buffer case handling. */
++		if (frame_desc->actual_length && ((uint32_t)_hc->xfer_buff & 0x3) &&
++				_hc->qh->dw_align_buf && _hc->ep_is_in) {
++			memcpy(urb->transfer_buffer + frame_desc->offset + _qtd->isoc_split_offset,
++				_hc->qh->dw_align_buf, frame_desc->actual_length);
++		}
+
+		break;
+	case DWC_OTG_HC_XFER_FRAME_OVERRUN:
+@@ -724,6 +769,13 @@ update_isoc_urb_state(dwc_otg_hcd_t *_hc
+		frame_desc->actual_length =
+			get_actual_xfer_length(_hc, _hc_regs, _qtd,
+					       _halt_status, NULL);
++	/* non DWORD-aligned buffer case handling. */
++		if (frame_desc->actual_length && ((uint32_t)_hc->xfer_buff & 0x3) &&
++				_hc->qh->dw_align_buf && _hc->ep_is_in) {
++			memcpy(urb->transfer_buffer + frame_desc->offset + _qtd->isoc_split_offset,
++				_hc->qh->dw_align_buf, frame_desc->actual_length);
++		}
++		break;
+	default:
+		DWC_ERROR("%s: Unhandled _halt_status (%d)\n", __func__,
+			  _halt_status);
+--- a/drivers/usb/dwc_otg/dwc_otg_hcd_queue.c
++++ b/drivers/usb/dwc_otg/dwc_otg_hcd_queue.c
+@@ -51,7 +51,7 @@
+ #include "lm.h"
+ /* Ethan:: */
+ //#include <asm/arch/irqs.h>
+-
++#include <linux/dma-mapping.h>
+ #include "dwc_otg_driver.h"
+ #include "dwc_otg_hcd.h"
+ #include "dwc_otg_regs.h"
+@@ -85,7 +85,7 @@ dwc_otg_qh_t *dwc_otg_hcd_qh_create (dwc
+  *
+  * @param[in] _qh The QH to free.
+  */
+-void dwc_otg_hcd_qh_free (dwc_otg_qh_t *_qh)
++void dwc_otg_hcd_qh_free (dwc_otg_hcd_t *hcd, dwc_otg_qh_t *_qh)
+ {
+	dwc_otg_qtd_t *qtd;
+	struct list_head *pos;
+@@ -102,7 +102,12 @@ void dwc_otg_hcd_qh_free (dwc_otg_qh_t *
+		dwc_otg_hcd_qtd_free (qtd);
+	}
+	local_irq_restore (flags);
+-
++	if (_qh->dw_align_buf) {
++		dma_free_coherent((dwc_otg_hcd_to_hcd(hcd))->self.controller,
++				  hcd->core_if->core_params->max_transfer_size,
++				  _qh->dw_align_buf,
++				  _qh->dw_align_buf_dma);
++	}
+	kfree (_qh);
+	return;
+ }
+@@ -176,10 +181,10 @@ void dwc_otg_hcd_qh_init(dwc_otg_hcd_t *
+
+		/** @todo Account for split transfers in the bus time. */
+		int bytecount = dwc_hb_mult(_qh->maxp) * dwc_max_packet(_qh->maxp);
+-		_qh->usecs = usb_calc_bus_time(_urb->dev->speed,
++		_qh->usecs = NS_TO_US(usb_calc_bus_time(_urb->dev->speed,
+					       usb_pipein(_urb->pipe),
+					       (_qh->ep_type == USB_ENDPOINT_XFER_ISOC),
+-					       bytecount);
++					       bytecount));
+
+		/* Start in a slightly future (micro)frame. */
+		_qh->sched_frame = dwc_frame_num_inc(_hcd->frame_number,
+@@ -234,6 +239,7 @@ void dwc_otg_hcd_qh_init(dwc_otg_hcd_t *
+	}
+ #endif
+ #endif
++        _qh->dw_align_buf = NULL;
+	return;
+ }
+
+@@ -289,7 +295,7 @@ static int check_periodic_bandwidth(dwc_
+		 * High speed mode.
+		 * Max periodic usecs is 80% x 125 usec = 100 usec.
+		 */
+-		max_claimed_usecs = 900 - _qh->usecs;
++		max_claimed_usecs = 100 - _qh->usecs;
+	} else {
+		/*
+		 * Full speed mode.

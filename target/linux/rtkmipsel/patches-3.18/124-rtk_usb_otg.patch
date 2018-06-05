@@ -1,0 +1,170 @@
+--- a/drivers/usb/Kconfig
++++ b/drivers/usb/Kconfig
+@@ -143,6 +143,8 @@ source "drivers/usb/misc/Kconfig"
+
+ source "drivers/usb/atm/Kconfig"
+
++source "drivers/usb/dwc_otg/Kconfig"
++
+ endif # USB
+
+ source "drivers/usb/phy/Kconfig"
+--- a/drivers/usb/Makefile
++++ b/drivers/usb/Makefile
+@@ -62,3 +62,5 @@ obj-$(CONFIG_USB_GADGET)	+= gadget/
+ obj-$(CONFIG_USB_COMMON)	+= common/
+
+ obj-$(CONFIG_USBIP_CORE)	+= usbip/
++
++obj-$(CONFIG_DWC_OTG)		+= dwc_otg/
+--- a/drivers/usb/core/hcd.c
++++ b/drivers/usb/core/hcd.c
+@@ -998,7 +998,7 @@ static void usb_deregister_bus (struct u
+  *
+  * Return: 0 if successful. A negative error code otherwise.
+  */
+-static int register_root_hub(struct usb_hcd *hcd)
++int register_root_hub(struct usb_hcd *hcd)
+ {
+	struct device *parent_dev = hcd->self.controller;
+	struct usb_device *usb_dev = hcd->self.root_hub;
+--- a/drivers/usb/dwc_otg/dwc_otg_hcd.c
++++ b/drivers/usb/dwc_otg/dwc_otg_hcd.c
+@@ -204,6 +204,7 @@ static void del_xfer_timers(dwc_otg_hcd_
+ static void del_timers(dwc_otg_hcd_t *_hcd)
+ {
+   del_xfer_timers(_hcd);
++if (timer_pending(&_hcd->conn_timer))
+   del_timer(&_hcd->conn_timer);
+ }
+
+@@ -928,7 +929,7 @@ void dwc_otg_hcd_stop(struct usb_hcd *_h
+ /** Returns the current frame number. */
+ int dwc_otg_hcd_get_frame_number(struct usb_hcd *_hcd)
+ {
+-	printk("%s \n", __FUNCTION__);
++	//printk("%s \n", __FUNCTION__);
+   dwc_otg_hcd_t *dwc_otg_hcd = hcd_to_dwc_otg_hcd(_hcd);
+   hfnum_data_t hfnum;
+
+@@ -971,7 +972,7 @@ void dwc_otg_hcd_free(struct usb_hcd *_h
+           kfree(hc);
+         }
+     }
+-
++	if(dwc_otg_hcd->core_if != NULL){
+	if (dwc_otg_hcd->core_if->dma_enable) {
+		if (dwc_otg_hcd->status_buf_dma) {
+           dma_free_coherent(_hcd->self.controller,
+@@ -979,6 +980,7 @@ void dwc_otg_hcd_free(struct usb_hcd *_h
+                             dwc_otg_hcd->status_buf,
+                             dwc_otg_hcd->status_buf_dma);
+         }
++	}
+	} else if (dwc_otg_hcd->status_buf != NULL) {
+     kfree(dwc_otg_hcd->status_buf);
+	}
+@@ -1828,8 +1830,10 @@ static void do_in_ack(void)
+	//fprintf(stderr, "GINTSTS: %08x\n", gintsts.d32);
+ }
+ #endif /* DWC_HS_ELECT_TST */
+-#define REG32(reg)   (*(volatile unsigned int *)((unsigned int)reg))
++//#define REG32(reg)   (*(volatile unsigned int *)((unsigned int)reg))
++#ifndef CONFIG_RTL_8198C
+ extern Enable_OTG_Suspend(int sel, int en); //sel=0 src from sys, then see en, sel=1, src from otg mac,
++#endif
+ /** Handles hub class-specific requests.*/
+ int dwc_otg_hcd_hub_control(struct usb_hcd *_hcd,
+			    u16 _typeReq,
+@@ -1838,11 +1842,13 @@ int dwc_otg_hcd_hub_control(struct usb_h
+			    char *_buf,
+			    u16 _wLength)
+ {
+-	//printk("%s \n", __FUNCTION__);
++//	printk("%s %d\n", __FUNCTION__,__LINE__);
+   int retval = 0;
++#ifndef CONFIG_RTL_8198C
+   #ifdef CONFIG_USB3G_SUPPORT
+   static int retry_one=0;
+   #endif
++#endif
+   dwc_otg_hcd_t *dwc_otg_hcd = hcd_to_dwc_otg_hcd (_hcd);
+   dwc_otg_core_if_t *core_if = hcd_to_dwc_otg_hcd (_hcd)->core_if;
+   struct usb_hub_descriptor *desc;
+@@ -1949,6 +1955,11 @@ int dwc_otg_hcd_hub_control(struct usb_h
+       desc->wHubCharacteristics = 0x08;
+       desc->bPwrOn2PwrGood = 1;
+       desc->bHubContrCurrent = 0;
++#if CONFIG_RTL_8198C
++		/* two bitmaps:  ports removable, and usb 1.0 legacy PortPwrCtrlMask */
++	  memset(&desc->u.hs.DeviceRemovable[0], 0, 1);
++	  memset(&desc->u.hs.DeviceRemovable[1], 0xff, 1);
++#endif
+ #ifndef CONFIG_WRT_BARRIER_BREAKER
+       desc->bitmap[0] = 0;
+       desc->bitmap[1] = 0xff;
+@@ -2119,6 +2130,7 @@ int dwc_otg_hcd_hub_control(struct usb_h
+             if (!_hcd->self.is_b_host) {
+			MDELAY (1);
+                 hprt0.b.prtrst = 1;
++#ifndef CONFIG_RTL_8198C
+			  #ifdef CONFIG_USB3G_SUPPORT
+				if(retry_one)
+				 {
+@@ -2126,14 +2138,18 @@ int dwc_otg_hcd_hub_control(struct usb_h
+                 }
+
+			#endif
++#endif
+			//	hprt0.b.prtena=1;
+                 dwc_write_reg32(core_if->host_if->hprt0, hprt0.d32);
+				MDELAY (500);
+               }
+			/* Clear reset bit in 10ms (FS/LS) or 50ms (HS) */
+			MDELAY (60);
++#ifndef CONFIG_RTL_8198C
+			Enable_OTG_Suspend(0,0);
++#endif
+			hprt0.b.prtrst = 0;
++#ifndef CONFIG_RTL_8198C
+  #ifdef CONFIG_USB3G_SUPPORT
+             if(retry_one)
+             {
+@@ -2141,6 +2157,7 @@ int dwc_otg_hcd_hub_control(struct usb_h
+				retry_one=!retry_one;
+             }
+ #endif
++#endif
+			dwc_write_reg32(core_if->host_if->hprt0, hprt0.d32);
+			MDELAY (500);
+			break;
+--- a/drivers/usb/dwc_otg/dwc_otg_pcd.c
++++ b/drivers/usb/dwc_otg/dwc_otg_pcd.c
+@@ -805,10 +805,10 @@ static struct usb_ep_ops dwc_otg_pcd_ep_
+
+	.alloc_request	= dwc_otg_pcd_alloc_request,
+	.free_request	= dwc_otg_pcd_free_request,
+-
++#ifndef CONFIG_RTL_8198C
+	.alloc_buffer	= dwc_otg_pcd_alloc_buffer,
+	.free_buffer	= dwc_otg_pcd_free_buffer,
+-
++#endif
+	.queue		= dwc_otg_pcd_ep_queue,
+	.dequeue	= dwc_otg_pcd_ep_dequeue,
+
+--- a/include/linux/usb/gadget.h
++++ b/include/linux/usb/gadget.h
+@@ -129,6 +129,12 @@ struct usb_ep_ops {
+		gfp_t gfp_flags);
+	void (*free_request) (struct usb_ep *ep, struct usb_request *req);
+
++#ifdef CONFIG_RTL_USB_OTG
++	void *(*alloc_buffer) (struct usb_ep *ep, unsigned bytes,
++		dma_addr_t *dma, gfp_t gfp_flags);
++	void (*free_buffer) (struct usb_ep *ep, void *buf, dma_addr_t dma,
++			unsigned bytes);
++#endif
+	int (*queue) (struct usb_ep *ep, struct usb_request *req,
+		gfp_t gfp_flags);
+	int (*dequeue) (struct usb_ep *ep, struct usb_request *req);

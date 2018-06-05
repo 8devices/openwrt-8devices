@@ -1,0 +1,440 @@
+--- a/drivers/usb/dwc_otg/dwc_otg_hcd.c
++++ b/drivers/usb/dwc_otg/dwc_otg_hcd.c
+@@ -290,6 +290,11 @@ static int32_t dwc_otg_hcd_disconnect_cb
+   gintsts_data_t 	intr;
+   dwc_otg_hcd_t 	*dwc_otg_hcd = hcd_to_dwc_otg_hcd (_p);
+
++#if defined(CONFIG_RTL_8198C)
++	unsigned long flags;
++	spin_lock_irqsave(&dwc_otg_hcd->lock, flags);
++#endif
++
+   //DWC_DEBUGPL(DBG_HCDV, "%s(%p)\n", __func__, _p);
+   /*
+    * Set status flags for the hub driver.
+@@ -406,6 +411,11 @@ static int32_t dwc_otg_hcd_disconnect_cb
+	if(!timer_pending(&dwc_otg_hcd->disconn_cnt_timer))
+		mod_timer(&dwc_otg_hcd->disconn_cnt_timer, jiffies+200);
+ #endif
++
++#if defined(CONFIG_RTL_8198C)
++	spin_unlock_irqrestore(&dwc_otg_hcd->lock, flags);
++#endif
++
+   return 1;
+ }
+
+@@ -840,6 +850,11 @@ int dwc_otg_hcd_start(struct usb_hcd *_h
+
+   int retval;
+
++#if defined(CONFIG_RTL_8198C)
++	unsigned long flags;
++	spin_lock_irqsave(&dwc_otg_hcd->lock, flags);
++#endif
++
+   DWC_DEBUGPL(DBG_HCD, "DWC OTG HCD START\n");
+
+   bus = hcd_to_bus(_hcd);
+@@ -848,6 +863,9 @@ int dwc_otg_hcd_start(struct usb_hcd *_h
+    * HALT the USB bus and return. */
+   if (dwc_otg_is_device_mode (core_if))    {
+       _hcd->state = HC_STATE_HALT;
++#if defined(CONFIG_RTL_8198C)
++      spin_unlock_irqrestore(&dwc_otg_hcd->lock, flags);
++#endif
+       return 0;
+     }
+   _hcd->state = HC_STATE_RUNNING;
+@@ -863,17 +881,25 @@ int dwc_otg_hcd_start(struct usb_hcd *_h
+       udev->speed = USB_SPEED_HIGH;
+       if (!udev)         {
+           DWC_DEBUGPL(DBG_HCD, "DWC OTG HCD Error udev alloc\n");
++#if defined(CONFIG_RTL_8198C)
++          spin_unlock_irqrestore(&dwc_otg_hcd->lock, flags);
++#endif
+           return -ENODEV;
+         }
+
+       if ((retval = register_root_hub(_hcd)) != 0)     {
+           DWC_DEBUGPL(DBG_HCD, "DWC OTG HCD Error registering %d\n", retval);
++#if defined(CONFIG_RTL_8198C)
++          spin_unlock_irqrestore(&dwc_otg_hcd->lock, flags);
++#endif
+           return -ENODEV;
+         }
+     }
+
+   hcd_reinit(dwc_otg_hcd);
+-
++#if defined(CONFIG_RTL_8198C)
++  spin_unlock_irqrestore(&dwc_otg_hcd->lock, flags);
++#endif
+   return 0;
+ }
+
+@@ -882,11 +908,19 @@ static void qh_list_free(dwc_otg_hcd_t *
+   struct list_head 	*item;
+   dwc_otg_qh_t		*qh;
+
++#if defined(CONFIG_RTL_8198C)
++	unsigned long flags;
++#endif
++
+	if (_qh_list->next == NULL) {
+		/* The list hasn't been initialized yet. */
+		return;
+	}
+
++#if defined(CONFIG_RTL_8198C)
++	spin_lock_irqsave(&_hcd->lock, flags);
++#endif
++
+   /* Ensure there are no QTDs or URBs left. */
+   kill_urbs_in_qh_list(_hcd, _qh_list);
+
+@@ -894,6 +928,9 @@ static void qh_list_free(dwc_otg_hcd_t *
+       qh = list_entry(item, dwc_otg_qh_t, qh_list_entry);
+       dwc_otg_hcd_qh_remove_and_free(_hcd, qh);
+     }
++#if defined(CONFIG_RTL_8198C)
++	spin_unlock_irqrestore(&_hcd->lock, flags);
++#endif
+ }
+
+ /**
+@@ -906,6 +943,11 @@ void dwc_otg_hcd_stop(struct usb_hcd *_h
+   dwc_otg_hcd_t *dwc_otg_hcd = hcd_to_dwc_otg_hcd (_hcd);
+   hprt0_data_t hprt0 = { .d32=0 };
+
++#if defined(CONFIG_RTL_8198C)
++  unsigned long flags;
++  spin_lock_irqsave(&dwc_otg_hcd->lock, flags);
++#endif
++
+   DWC_DEBUGPL(DBG_HCD, "DWC OTG HCD STOP\n");
+
+   /* Turn off all host-specific interrupts. */
+@@ -922,6 +964,9 @@ void dwc_otg_hcd_stop(struct usb_hcd *_h
+   hprt0.b.prtpwr = 0;
+   dwc_write_reg32(dwc_otg_hcd->core_if->host_if->hprt0, hprt0.d32);
+
++#if defined(CONFIG_RTL_8198C)
++  spin_unlock_irqrestore(&dwc_otg_hcd->lock, flags);
++#endif
+   return;
+ }
+
+@@ -1098,6 +1143,10 @@ int dwc_otg_hcd_urb_enqueue(struct usb_h
+	dwc_otg_hcd_t *dwc_otg_hcd = hcd_to_dwc_otg_hcd (_hcd);
+	dwc_otg_qtd_t *qtd;
+
++#if defined(CONFIG_RTL_8198C)
++	unsigned long flags;
++#endif
++
+ #ifdef DEBUG
+	if (CHK_DEBUG_LEVEL(DBG_HCDV | DBG_HCD_URB)) {
+		dump_urb_info(_urb, "dwc_otg_hcd_urb_enqueue");
+@@ -1140,7 +1189,12 @@ int retval = 0;
+
+	DWC_DEBUGPL(DBG_HCD, "DWC OTG HCD URB Dequeue\n");
+
++#if defined(CONFIG_RTL_8198C)
++	dwc_otg_hcd = hcd_to_dwc_otg_hcd(_hcd);
++	spin_lock_irqsave(&dwc_otg_hcd->lock, flags);
++#else
+	local_irq_save(flags);
++#endif
+
+	dwc_otg_hcd = hcd_to_dwc_otg_hcd(_hcd);
+	urb_qtd = (dwc_otg_qtd_t *)_urb->hcpriv;
+@@ -1212,8 +1266,11 @@ int retval = 0;
+
+ done:
+
++#if defined(CONFIG_RTL_8198C)
++	spin_unlock_irqrestore(&dwc_otg_hcd->lock, flags);
++#else
+	local_irq_restore(flags);
+-
++#endif
+	_urb->hcpriv = NULL;
+
+	/* Higher layer software sets URB status. */
+@@ -1238,6 +1295,11 @@ void dwc_otg_hcd_endpoint_disable(struct
+   dwc_otg_qh_t *qh;
+   dwc_otg_hcd_t *dwc_otg_hcd = hcd_to_dwc_otg_hcd(_hcd);
+
++#if defined(CONFIG_RTL_8198C)
++	unsigned long flags;
++	spin_lock_irqsave(&dwc_otg_hcd->lock, flags);
++#endif
++
+   DWC_DEBUGPL(DBG_HCD, "DWC OTG HCD EP DISABLE: _bEndpointAddress=0x%02x, "
+               "endpoint=%d\n", _ep->desc.bEndpointAddress,
+               dwc_ep_addr_to_endpoint(_ep->desc.bEndpointAddress));
+@@ -1256,6 +1318,10 @@ void dwc_otg_hcd_endpoint_disable(struct
+       _ep->hcpriv = NULL;
+     }
+
++#if defined(CONFIG_RTL_8198C)
++	spin_unlock_irqrestore(&dwc_otg_hcd->lock, flags);
++#endif
++
+	return;
+ }
+
+@@ -1275,9 +1341,13 @@ irqreturn_t dwc_otg_hcd_irq(struct usb_h
+	DWC_DEBUGPL(DBG_HCDV, "----------hcd IRQ in\n");  //wei add
+
+	dwc_otg_hcd_t *dwc_otg_hcd = hcd_to_dwc_otg_hcd (_hcd);
++#if !defined(CONFIG_RTL_8198C)
+	spin_lock_irqsave(&dwc_otg_hcd->lock, flags);
++#endif
+	ret = dwc_otg_hcd_handle_intr(dwc_otg_hcd);
++#if !defined(CONFIG_RTL_8198C)
+	spin_unlock_irqrestore (&dwc_otg_hcd->lock, flags);
++#endif
+
+	return IRQ_RETVAL(ret);
+ #endif
+@@ -2085,6 +2155,12 @@ int dwc_otg_hcd_hub_control(struct usb_h
+ #endif
+ #endif
+		case USB_PORT_FEAT_SUSPEND:
++#if defined(CONFIG_RTL_8198C)
++		{
++			unsigned long flags;
++			spin_lock_irqsave(&dwc_otg_hcd->lock, flags);
++#endif
++
+			DWC_DEBUGPL (DBG_HCD, "DWC OTG HCD HUB CONTROL - "
+				     "SetPortFeature - USB_PORT_FEAT_SUSPEND\n");
+                         if (_hcd->self.otg_port == _wIndex &&
+@@ -2105,7 +2181,10 @@ int dwc_otg_hcd_hub_control(struct usb_h
+                                 pcgcctl.b.stoppclk = 1;
+                                 dwc_write_reg32(core_if->pcgcctl, pcgcctl.d32);
+                         }
+-
++#if defined(CONFIG_RTL_8198C)
++			spin_unlock_irqrestore(&dwc_otg_hcd->lock, flags);
++		}
++#endif
+                         /* For HNP the bus must be suspended for at least 200ms.*/
+                         if (_hcd->self.b_hnp_enable) {
+                                 mdelay(200);
+--- a/drivers/usb/dwc_otg/dwc_otg_hcd.h
++++ b/drivers/usb/dwc_otg/dwc_otg_hcd.h
+@@ -525,10 +525,14 @@ static inline void dwc_otg_hcd_qtd_free
+  * @param[in] _qtd QTD to remove from list. */
+ static inline void dwc_otg_hcd_qtd_remove (dwc_otg_qtd_t *_qtd)
+ {
++#if !defined(CONFIG_RTL_8198C)
+	unsigned long flags;
+	local_irq_save (flags);
++#endif
+	list_del (&_qtd->qtd_list_entry);
++#if !defined(CONFIG_RTL_8198C)
+	local_irq_restore (flags);
++#endif
+ }
+
+ /** Remove and free a QTD */
+--- a/drivers/usb/dwc_otg/dwc_otg_hcd_intr.c
++++ b/drivers/usb/dwc_otg/dwc_otg_hcd_intr.c
+@@ -176,6 +176,9 @@ int32_t dwc_otg_hcd_handle_sof_intr (dwc
+	dwc_otg_qh_t 		*qh;
+	dwc_otg_transaction_type_e tr_type;
+	gintsts_data_t gintsts = {.d32 = 0};
++#if defined(CONFIG_RTL_8198C)
++	unsigned long flags;
++#endif
+
+	hfnum.d32 = dwc_read_reg32(&_hcd->core_if->host_if->host_global_regs->hfnum);
+
+@@ -194,6 +197,11 @@ int32_t dwc_otg_hcd_handle_sof_intr (dwc
+	track_missed_sofs(_hcd->frame_number);
+ #endif
+
++#if defined(CONFIG_RTL_8198C)
++	dwc_otg_hcd_t *hostds = _hcd;
++	spin_lock_irqsave(&hostds->lock, flags);
++#endif
++
+ #ifndef NON_PERIODIC_ONLY
+	/* Determine whether any periodic QHs should be executed. */
+	qh_entry = _hcd->periodic_sched_inactive.next;
+@@ -213,11 +221,10 @@ int32_t dwc_otg_hcd_handle_sof_intr (dwc
+	if (tr_type != DWC_OTG_TRANSACTION_NONE) {
+		dwc_otg_hcd_queue_transactions(_hcd, tr_type);
+	}
+-	else
+-	{
+-		udelay(1);
+-		//panic_printk("Scheduler returned no transactions but needed sched!");
+-	}
++
++#if defined(CONFIG_RTL_8198C)
++	spin_unlock_irqrestore(&hostds->lock, flags);
++#endif
+
+	/* Clear interrupt */
+	gintsts.b.sofintr = 1;
+@@ -278,9 +285,18 @@ int32_t dwc_otg_hcd_handle_rx_status_q_l
+  * interrupt is enabled only in Slave mode. */
+ int32_t dwc_otg_hcd_handle_np_tx_fifo_empty_intr (dwc_otg_hcd_t *_dwc_otg_hcd)
+ {
++#if defined(CONFIG_RTL_8198C)
++	unsigned long flags;
++	spin_lock_irqsave(&_dwc_otg_hcd->lock, flags);
++#endif
++
+	DWC_DEBUGPL(DBG_HCD, "--Non-Periodic TxFIFO Empty Interrupt--\n");
+	dwc_otg_hcd_queue_transactions(_dwc_otg_hcd,
+				       DWC_OTG_TRANSACTION_NON_PERIODIC);
++
++#if defined(CONFIG_RTL_8198C)
++	spin_unlock_irqrestore(&_dwc_otg_hcd->lock, flags);
++#endif
+	return 1;
+ }
+
+@@ -290,9 +306,18 @@ int32_t dwc_otg_hcd_handle_np_tx_fifo_em
+  * enabled only in Slave mode. */
+ int32_t dwc_otg_hcd_handle_perio_tx_fifo_empty_intr (dwc_otg_hcd_t *_dwc_otg_hcd)
+ {
++#if defined(CONFIG_RTL_8198C)
++	unsigned long flags;
++	spin_lock_irqsave(&_dwc_otg_hcd->lock, flags);
++#endif
++
+	DWC_DEBUGPL(DBG_HCD, "--Periodic TxFIFO Empty Interrupt--\n");
+	dwc_otg_hcd_queue_transactions(_dwc_otg_hcd,
+				       DWC_OTG_TRANSACTION_PERIODIC);
++
++#if defined(CONFIG_RTL_8198C)
++	spin_unlock_irqrestore(&_dwc_otg_hcd->lock, flags);
++#endif
+	return 1;
+ }
+
+@@ -815,6 +840,9 @@ static void release_channel(dwc_otg_hcd_
+ {
+	dwc_otg_transaction_type_e tr_type;
+	int free_qtd;
++#if defined(CONFIG_RTL_8198C)
++	unsigned long flags;
++#endif
+
+	DWC_DEBUGPL(DBG_HCDV, "  %s: channel %d, halt_status %d\n",
+		    __func__, _hc->hc_num, _halt_status);
+@@ -854,8 +882,13 @@ static void release_channel(dwc_otg_hcd_
+		break;
+	}
+
+-
++#if defined(CONFIG_RTL_8198C)
++	spin_lock_irqsave(&_hcd->lock, flags);
++#endif
+	deactivate_qh(_hcd, _hc->qh, free_qtd);
++#if defined(CONFIG_RTL_8198C)
++	spin_unlock_irqrestore(&_hcd->lock, flags);
++#endif
+
+  cleanup:
+	/*
+@@ -867,6 +900,10 @@ static void release_channel(dwc_otg_hcd_
+	if(!_hc->ep_is_in)
+		atomic_dec(&_hcd->out_channel_num);
+
++#if defined(CONFIG_RTL_8198C)
++	spin_lock_irqsave(&_hcd->lock, flags);
++#endif
++
+	dwc_otg_hc_cleanup(_hcd->core_if, _hc);
+	list_add_tail(&_hc->hc_list_entry, &_hcd->free_hc_list);
+
+@@ -898,6 +935,10 @@ static void release_channel(dwc_otg_hcd_
+	}
+ }
+ #endif
++
++#if defined(CONFIG_RTL_8198C)
++	spin_unlock_irqrestore(&_hcd->lock, flags);
++#endif
+ }
+
+ /**
+@@ -948,9 +989,17 @@ static void halt_channel(dwc_otg_hcd_t *
+			 * halt to be queued when the periodic schedule is
+			 * processed.
+			 */
++#if defined(CONFIG_RTL_8198C)
++			unsigned long flags;
++			spin_lock_irqsave(&_hcd->lock, flags);
++#endif
++
+			list_move(&_hc->qh->qh_list_entry,
+				  &_hcd->periodic_sched_assigned);
+
++#if defined(CONFIG_RTL_8198C)
++			spin_unlock_irqrestore(&_hcd->lock, flags);
++#endif
+			/*
+			 * Make sure the Periodic Tx FIFO Empty interrupt is
+			 * enabled so that the periodic schedule will be
+@@ -1604,7 +1653,7 @@ static int32_t handle_hc_xacterr_intr(dw
+		break;
+	}
+
+-
++err_exit:
+	disable_hc_int(_hc_regs,xacterr);
+
+	return 1;
+--- a/drivers/usb/dwc_otg/dwc_otg_hcd_queue.c
++++ b/drivers/usb/dwc_otg/dwc_otg_hcd_queue.c
+@@ -662,7 +662,9 @@ int dwc_otg_hcd_qtd_add (dwc_otg_qtd_t *
+
+	//printk("urb=%x", urb);
+
++#if !defined(CONFIG_RTL_8198C)
+	local_irq_save(flags);
++#endif
+
+	/*
+	 * Get the QH which holds the QTD-list to insert to. Create QH if it
+@@ -674,6 +676,9 @@ int dwc_otg_hcd_qtd_add (dwc_otg_qtd_t *
+	if (qh == NULL) {
+		qh = dwc_otg_hcd_qh_create (_dwc_otg_hcd, urb);
+		if (qh == NULL) {
++#if defined(CONFIG_RTL_8198C)
++			return -ENOMEM;
++#endif
+			goto done;
+		}
+		ep->hcpriv = qh;
+@@ -683,6 +688,10 @@ int dwc_otg_hcd_qtd_add (dwc_otg_qtd_t *
+	printk(" QH=%x\n", qh);
+ #endif
+
++#if defined(CONFIG_RTL_8198C)
++	spin_lock_irqsave(&_dwc_otg_hcd->lock, flags);
++#endif
++
+	retval = dwc_otg_hcd_qh_add(_dwc_otg_hcd, qh);
+	if (retval == 0) {
+			//printk("%s %d\n", __FUNCTION__, __LINE__);
+@@ -695,7 +704,12 @@ int dwc_otg_hcd_qtd_add (dwc_otg_qtd_t *
+	}
+
+  done:
++#if defined(CONFIG_RTL_8198C)
++	spin_unlock_irqrestore(&_dwc_otg_hcd->lock, flags);
++#else
+	local_irq_restore(flags);
++#endif
++
+	return retval;
+ }

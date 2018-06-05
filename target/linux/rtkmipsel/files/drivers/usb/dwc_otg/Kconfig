@@ -1,0 +1,85 @@
+config DWC_OTG
+        tristate "Synopsys DWC_OTG support"
+        ---help---
+          This driver supports Synopsys DWC_OTG
+
+config DWC_OTG_DEBUG
+        bool "enable debug mode"
+        depends on DWC_OTG
+
+
+config DWC_OTG_HOST_ONLY
+        bool "HOST ONLY MODE"
+        depends on DWC_OTG
+
+config DWC_OTG_DEVICE_ONLY
+        bool "DEVICE ONLY MODE"
+        depends on DWC_OTG
+
+config RTL_OTGCTRL
+        bool "Enable Realtek usb auto_det control circuit"
+
+config RTL_USB_OTG
+	bool
+	default y if DWC_OTG
+
+config RTL_ULINKER_USB_SUPPORT
+	bool "Realtek Universal Linker USB support"
+	depends on DWC_OTG
+	#select COMPAT_NET_DEV_OPS
+	#select RTK_VLAN_SUPPORT
+	#select RTK_VLAN_NEW_FEATURE
+	#select SCSI
+	#select SCSI_PROC_FS
+	#select BLK_DEV_SD
+	#select SCSI_LOWLEVEL
+	#select USB_ANNOUNCE_NEW_DEVICES
+	#select USB_DEVICE_CLASS
+	#select USB_MON
+	#select USB_EHCI_HCD
+	#select USB_EHCI_ROOT_HUB_TT
+	#select USB_OHCI_HCD
+	#select USB_STORAGE
+	#select USB_GADGET
+	#select USB_GADGET_VBUS_DRAW="2"
+	#select USB_GADGET_SELECTED
+	#select USB_OTG_RTL8672
+	#select USB_OTG_DEVICE_RTL8672
+	#select USB_GADGET_DUALSPEED
+	#select USB_ETH
+	#select USB_ETH_RNDIS
+	#select USB
+	#select USB_DEBUG
+	#### power saving
+    #select ARCH_CPU_SLEEP
+	#select USB_FILE_STORAGE
+
+## for init wlan driver by echo proc
+#config RTL_ULINKER_WLAN_DELAY_INIT
+#	bool
+#	default y if RTL_ULINKER_USB_SUPPORT
+
+## for mode switch
+config RTL_ULINKER_GADGET
+	bool
+	default y if RTL_ULINKER_USB_SUPPORT
+
+## for echo mac address
+config RTL_ULINKER_OTG_MACADDR
+	bool
+	default y if RTL_ULINKER_USB_SUPPORT
+
+## for domain name query
+config RTL_ULINKER_DNS
+	bool
+	default y if RTL_ULINKER_USB_SUPPORT
+
+## for bridge shortcut
+config RTL_ULINKER_BRSC
+	bool
+	default y if RTL_ULINKER_USB_SUPPORT
+
+## for bridge shortcut, rx tasklet
+config RTL_ULINKER_BRSC_TASKLET
+	bool
+	default y if RTL_ULINKER_BRSC

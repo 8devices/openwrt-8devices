@@ -1,0 +1,56 @@
+diff -urN a/drivers/usb/host/ehci-hcd.c b/drivers/usb/host/ehci-hcd.c
+--- a/drivers/usb/host/ehci-hcd.c	2016-06-17 14:59:11.885440162 +0800
++++ b/drivers/usb/host/ehci-hcd.c	2016-06-17 14:59:03.073440017 +0800
+@@ -373,6 +373,25 @@
+	hrtimer_cancel(&ehci->hrtimer);
+ }
+
++#if defined(CONFIG_OPENWRT_SDK)
++static void ehci_port_power (struct ehci_hcd *ehci, int is_on)
++{
++	unsigned port;
++
++	if (!HCS_PPC (ehci->hcs_params))
++		return;
++
++	ehci_dbg (ehci, "...power%s ports...\n", is_on ? "up" : "down");
++	for (port = HCS_N_PORTS (ehci->hcs_params); port > 0; )
++		(void) ehci_hub_control(ehci_to_hcd(ehci),
++				is_on ? SetPortFeature : ClearPortFeature,
++				USB_PORT_FEAT_POWER,
++				port--, NULL, 0);
++	/* Flush those writes */
++	ehci_readl(ehci, &ehci->regs->command);
++	msleep(20);
++}
++#endif
+ /*-------------------------------------------------------------------------*/
+
+ /*
+@@ -1298,6 +1317,11 @@
+ #define	PLATFORM_DRIVER		ehci_hcd_sead3_driver
+ #endif
+
++#ifdef CONFIG_RTL_819X
++#include "ehci-rtl819x.c"
++#define PLATFORM_DRIVER     ehci_rtl819x_driver
++#endif
++
+ static int __init ehci_hcd_init(void)
+ {
+	int retval = 0;
+diff -urN a/drivers/usb/host/ohci-hcd.c b/drivers/usb/host/ohci-hcd.c
+--- a/drivers/usb/host/ohci-hcd.c	2016-06-17 14:59:27.477440419 +0800
++++ b/drivers/usb/host/ohci-hcd.c	2016-06-17 14:59:19.665440290 +0800
+@@ -1259,6 +1259,11 @@
+ #define PLATFORM_DRIVER		ohci_hcd_tilegx_driver
+ #endif
+
++#ifdef CONFIG_RTL_819X
++#include "ohci-rtl819x.c"
++#define PLATFORM_DRIVER     ohci_hcd_rtl819x_driver
++#endif
++
+ static int __init ohci_hcd_mod_init(void)
+ {
+	int retval = 0;

@@ -1,0 +1,385 @@
+--- a/drivers/usb/dwc_otg/dwc_otg_cil_def.h
++++ b/drivers/usb/dwc_otg/dwc_otg_cil_def.h
+@@ -511,7 +511,10 @@ typedef struct hc_xfer_info
+ #else
+ #define MAX_EPS_CHANNELS 16
+ #endif
+-#else
++#else //0
++#ifdef MAX_EPS_CHANNELS
++#undef MAX_EPS_CHANNELS
++#endif
+ #define MAX_EPS_CHANNELS 5  //auto-det always 0-4
+ #endif
+
+--- a/drivers/usb/dwc_otg/dwc_otg_pcd_intr.c
++++ b/drivers/usb/dwc_otg/dwc_otg_pcd_intr.c
+@@ -603,15 +603,17 @@ void dwc_otg_pcd_stop(dwc_otg_pcd_t *_pc
+	/* prevent new request submissions, kill any outstanding requests  */
+	for (i = 0; i < MAX_EPS_CHANNELS; i++)
+	{
++		dwc_otg_pcd_ep_t *ep;
+		if( (i!=0) && (_pcd->otg_dev->core_if->dev_if->isIN_EP[i]==0) ) continue;
+-		dwc_otg_pcd_ep_t *ep = &_pcd->in_ep[i];
++		ep = &_pcd->in_ep[i];
+		request_nuke(ep);
+	}
+	/* prevent new request submissions, kill any outstanding requests  */
+	for (i = 0; i < MAX_EPS_CHANNELS; i++)
+	{
++		dwc_otg_pcd_ep_t *ep;
+		if( (i!=0) && (_pcd->otg_dev->core_if->dev_if->isIN_EP[i]!=0) ) continue;
+-		dwc_otg_pcd_ep_t *ep = &_pcd->out_ep[i];
++		ep = &_pcd->out_ep[i];
+		request_nuke(ep);
+	}
+
+@@ -1764,7 +1766,6 @@ static int32_t ep0_complete_request( dwc
+
+ static int ep_in_zlp( dwc_otg_pcd_ep_t *_ep )
+ {
+-	dwc_otg_pcd_request_t *req = 0;
+	int ret = 0;
+
+	if(_ep->dwc_ep.sent_zlp && _ep->dwc_ep.is_in) {
+@@ -2074,7 +2075,7 @@ static inline void handle_in_ep_disable_
+	dwc_otg_pcd_ep_t *ep;
+	dwc_ep_t *dwc_ep;
+
+-        extern USBPhyReset(int);
++        extern void USBPhyReset(int);
+         USBPhyReset(1); //wei add
+         USBPhyReset(0); //wei add
+
+@@ -2305,9 +2306,9 @@ do { \
+					if( _pcd->ep0state == EP0_IDLE ) {
+						ep0xferfinished = 1;
+						if( ep1xferincomplete>0 ) {
+-							gnptxsts_data_t gtxstatus;
+-							gtxstatus.d32 = dwc_read_reg32(&core_if->core_global_regs->gnptxsts);
++							gnptxsts_data_t gtxstatus;
+							depctl_data_t diepctl0;
++							gtxstatus.d32 = dwc_read_reg32(&core_if->core_global_regs->gnptxsts);
+							diepctl0.d32 = dwc_read_reg32(&core_if->dev_if->in_ep_regs[0]->diepctl);
+
+							if ( diepctl0.b.nextep!=1 && gtxstatus.b.nptxqtop_chnep!=0) {
+@@ -2475,9 +2476,9 @@ do { \
+					if( _pcd->ep0state == EP0_IDLE ) {
+						ep0xferfinished = 1;
+						if( ep1xferincomplete>0 ) {
+-							gnptxsts_data_t gtxstatus;
+-							gtxstatus.d32 = dwc_read_reg32(&core_if->core_global_regs->gnptxsts);
++							gnptxsts_data_t gtxstatus;
+							depctl_data_t diepctl0;
++							gtxstatus.d32 = dwc_read_reg32(&core_if->core_global_regs->gnptxsts);
+							diepctl0.d32 = dwc_read_reg32(&core_if->dev_if->in_ep_regs[0]->diepctl);
+
+							if( diepctl0.b.nextep!=1 && gtxstatus.b.nptxqtop_chnep!=0) {
+@@ -2681,7 +2682,7 @@ int32_t dwc_otg_pcd_handle_out_nak_effec
+ #if defined(CONFIG_RTL_ULINKER)
+ int fsg_init_once = 0;
+ #endif
+-#if ULINKER_BRSC_RECOVER_TX_REQ
++#ifdef ULINKER_BRSC_RECOVER_TX_REQ
+ dwc_otg_pcd_t *my_pcd = NULL;
+ #endif
+ int32_t dwc_otg_pcd_handle_intr( dwc_otg_pcd_t *_pcd )
+@@ -2694,7 +2695,7 @@ int32_t dwc_otg_pcd_handle_intr( dwc_otg
+	gintsts_data_t gintr_status;
+	int32_t retval = 0;
+
+-#if ULINKER_BRSC_RECOVER_TX_REQ
++#ifdef ULINKER_BRSC_RECOVER_TX_REQ
+	if (my_pcd == NULL)
+		my_pcd = _pcd;
+	else if (my_pcd != _pcd) {
+@@ -2801,7 +2802,7 @@ int32_t dwc_otg_pcd_handle_intr( dwc_otg
+	return retval;
+ }
+
+-#if ULINKER_BRSC_RECOVER_TX_REQ
++#ifdef ULINKER_BRSC_RECOVER_TX_REQ
+ int early_tx_complete (void)
+ {
+	int32_t retval = 0;
+--- a/drivers/usb/dwc_otg/dwc_otg_plat.h
++++ b/drivers/usb/dwc_otg/dwc_otg_plat.h
+@@ -230,7 +230,7 @@ static inline uint32_t SET_DEBUG_LEVEL(
+  * </code>
+  */
+ //#define DEBUG
+-#if CONFIG_DWC_OTG_DEBUG  //def DEBUG
++#ifdef CONFIG_DWC_OTG_DEBUG  //def DEBUG
+
+ #if 0
+ //#define DWC_DEBUGPL(lvl, x...) do{ if ((lvl)&g_dbg_lvl)printk( KERN_DEBUG USB_DWC x ); }while(0)
+--- a/drivers/usb/dwc_otg/lm.h
++++ b/drivers/usb/dwc_otg/lm.h
+@@ -23,5 +23,5 @@ void lm_device_release(struct device *de
+ #define lm_get_drvdata(lm)	dev_get_drvdata(&(lm)->dev)
+ #define lm_set_drvdata(lm,d)	dev_set_drvdata(&(lm)->dev, d)
+
+-void otg_proc_init();
++void otg_proc_init(void);
+ extern int gHostMode;
+--- a/drivers/usb/dwc_otg/dwc_otg_cil.c
++++ b/drivers/usb/dwc_otg/dwc_otg_cil.c
+@@ -471,9 +471,10 @@ void dwc_otg_core_init(dwc_otg_core_if_t
+	gahbcfg_data_t ahbcfg = { .d32 = 0 };
+	gusbcfg_data_t usbcfg = { .d32 = 0 };
+	gi2cctl_data_t i2cctl = { .d32 = 0 };
++	void extern USBPhyReset(int);
+
+	DWC_DEBUGPL(DBG_CILV, "dwc_otg_core_init(%p)\n",_core_if);
+-	extern USBPhyReset(int);
++
+         USBPhyReset(1);  //wei add
+         USBPhyReset(0);  //wei add
+	/* Common Initialization */
+--- a/drivers/usb/dwc_otg/dwc_otg_driver.c
++++ b/drivers/usb/dwc_otg/dwc_otg_driver.c
+@@ -944,7 +944,8 @@ static struct lm_driver dwc_otg_driver =
+
+ void dwc_otg_phy_write(unsigned char reg, unsigned char val)
+ {
+-	#define USB2_PHY_DELAY __delay(1000)
++	unsigned int tmp;
++	#define USB2_PHY_DELAY __delay(1000)
+
+	if((reg < 0xE0) || (reg > 0xF6) || ((reg>0xE7)&&(reg<0xF0))) {
+		printk("DWC_OTG: Wrong register address: 0x%02x\n", reg);
+@@ -956,8 +957,8 @@ void dwc_otg_phy_write(unsigned char reg
+	tmp = tmp & 0xFF00FF00;
+	REG32(0xb8003314) = (val << 16) | tmp; USB2_PHY_DELAY;
+ #else  //8196D otg
+-	unsigned int tmp = REG32(0xb8000090);  //8672 only
+-#if CONFIG_RTL_8198C
++	tmp = REG32(0xb8000090);  //8672 only
++#ifdef CONFIG_RTL_8198C
+	tmp = tmp & ~(0xff<<(11-11));
+	REG32(0xb8000090) = (val << (11-11)) | tmp; USB2_PHY_DELAY;
+ #else
+@@ -978,6 +979,7 @@ void dwc_otg_phy_write(unsigned char reg
+
+ unsigned char dwc_otg_phy_read(unsigned char reg)
+ {
++	#undef USB2_PHY_DELAY
+	#define USB2_PHY_DELAY __delay(200)
+	unsigned char val = 0;
+
+@@ -1028,14 +1030,14 @@ void Set_SelUSBPort(int port)  // pass 1
+	}
+ }
+ //-----------------------------------------------------------------------------------
+-unsigned int Get_SelUSBPort()
++unsigned int Get_SelUSBPort(void)
+ {
+	#define SYS_USB_SIE 0xb8000034
+	unsigned int oneportsel=(REG32(SYS_USB_SIE) & (1<<18))>>18;
+	return (oneportsel & 0x1);
+ }
+ //-----------------------------------------------------------------------------------
+-TurnOn_OtgClkMgr()
++void TurnOn_OtgClkMgr(void)
+ {
+	#define SYS_CLK_MANAGER 0xb8000010
+	REG32(SYS_CLK_MANAGER) |= ((1<<19)|(1<<20));    //enable lx2, arb
+@@ -1047,7 +1049,7 @@ TurnOn_OtgClkMgr()
+	mdelay(100);
+ }
+ //-----------------------------------------------------------------------------------
+-Set_IDDIG_Level(int force, int device)  // force: 0: auto, 1: force,    device: 1:device 0:host
++void Set_IDDIG_Level(int force, int device)  // force: 0: auto, 1: force,    device: 1:device 0:host
+ {
+	#define SYS_OTG_CONTROL 0xb8000098
+
+@@ -1070,17 +1072,18 @@ Set_IDDIG_Level(int force, int device)
+
+ }
+ //-----------------------------------------------------------------------------------
+-unsigned int Get_IDDIG_Level()
++unsigned int Get_IDDIG_Level(void)
+ {
+	#define GETBITVAL(v,bit)  ((v&(1<<bit))>>bit)
+
+	#define SYS_OTG_CONTROL 0xb8000098
++	unsigned int iddig;
+	unsigned int v=REG32(SYS_OTG_CONTROL);
+
+	unsigned int muxsel=GETBITVAL(v,2);
+	printk("OTGCTRL: Iddig is %s mode \n", (muxsel==1) ? "Force" : "Auto Det");
+
+-	unsigned int iddig;
++
+	if(muxsel==1)
+	{
+		iddig=GETBITVAL(v,3);  //force
+@@ -1093,7 +1096,7 @@ unsigned int Get_IDDIG_Level()
+	return (iddig&01);
+ }
+ //-----------------------------------------------------------------------------------
+-Enable_AutoDetectionCircuit(int en)
++void Enable_AutoDetectionCircuit(int en)
+ {
+	#define SYS_OTG_CONTROL 0xb8000098
+	#define SYS_PIN_MUX 0xb8000040
+@@ -1118,7 +1121,7 @@ Enable_AutoDetectionCircuit(int en)
+	}
+ }
+ //-----------------------------------------------------------------------------------
+-Enable_OTG_Suspend(int sel, int en)  //sel=0 src from sys, then see en, sel=1, src from otg mac,
++void Enable_OTG_Suspend(int sel, int en)  //sel=0 src from sys, then see en, sel=1, src from otg mac,
+ {
+	#define SYS_USB_SIE 0xb8000034
+
+@@ -1141,17 +1144,17 @@ Enable_OTG_Suspend(int sel, int en)  //s
+	}
+ }
+ //-----------------------------------------------------------------------------------
+-USBPhyReset(int reset)  //1: in reset,  0: working
++void USBPhyReset(int reset)  //1: in reset,  0: working
+ {
+	#define SYS_USB_PHY 0xb8000090
+	if(reset==0)
+-#if CONFIG_RTL_8198C
++#ifdef CONFIG_RTL_8198C
+	REG32(SYS_USB_PHY) &= ~(1<<(20-11));   //usbphy_reset=0
+ #else
+	REG32(SYS_USB_PHY) &= ~(1<<20);   //usbphy_reset=0
+ #endif
+	else
+-#if CONFIG_RTL_8198C
++#ifdef CONFIG_RTL_8198C
+	REG32(SYS_USB_PHY) |=  (1<<(20-11));   //usbphy_reset=1
+ #else
+	REG32(SYS_USB_PHY) |=  (1<<20);   //usbphy_reset=1
+@@ -1168,11 +1171,11 @@ int otg_reset_procedure(int mode)
+	#define SYS_USB_PHY 0xb8000090
+	//#define SYS_OTG_CONTROL 0xb8000098
+
+-	Enable_OTG_Suspend(1,NULL);		//sel=0 src from sys, then see en, sel=1, src from otg mac,
++	Enable_OTG_Suspend(1, 0);		//sel=0 src from sys, then see en, sel=1, src from otg mac,
+									//en=1 go to suspend, en=0 not in suspend, is working
+
+	REG32(SYS_USB_SIE) |= (1<<(22-0));     //en_usbotg=1,  connect MAC and PHY
+-#if CONFIG_RTL_8198C
++#ifdef CONFIG_RTL_8198C
+	REG32(SYS_USB_PHY)|=(1<<(19-11));  //USBPHY_EN=1
+	REG32(SYS_USB_PHY)|=(1<<(21-11));  //active_usbphy
+ #else
+@@ -1204,7 +1207,7 @@ int otg_reset_procedure(int mode)
+	}
+ #endif
+ //----------------------------------------
+-#if CONFIG_RTL_8198C
++#ifdef CONFIG_RTL_8198C
+
+	REG32(0xb8000010) = REG32(0xb8000010) | (0x1<<29);
+ #endif
+@@ -1218,7 +1221,7 @@ int otg_reset_procedure(int mode)
+ #endif
+
+ #if 1
+-#if CONFIG_RTL_8198C
++#ifdef CONFIG_RTL_8198C
+
+ //	REG32(0xb8000010) = REG32(0xb8000010) | (0x1<<29);
+	//USBPhyReset(0);
+@@ -1305,6 +1308,12 @@ unsigned long otg_driver_loaded=0;
+
+ int  dwc_otg_driver_init(void)
+ {
++	int rc;
++ 	int retval = 0;
++	int snpsid;
++	struct lm_device *lmdev;
++
++
+	if ( test_bit(OTG_DRIVER_LOADED, &otg_driver_loaded))
+	{	printk("DWC_OTG: driver already init \n");
+		return -1;
+@@ -1315,9 +1324,9 @@ int  dwc_otg_driver_init(void)
+ //	otg_proc_init();
+
+ #if defined(CONFIG_RTL_ULINKER)
+-	int rc=otg_reset_procedure(0);
++	rc=otg_reset_procedure(0);
+ #else
+-	int rc=otg_reset_procedure(1);
++	rc=otg_reset_procedure(1);
+ #endif
+	if(rc)
+	{	printk("OTG: reset procedure init fail \n");
+@@ -1328,9 +1337,6 @@ int  dwc_otg_driver_init(void)
+
+	#define OTG_BASE	0xb8030000
+	#define USB2_PHY_DELAY __delay(200)
+-	int retval = 0;
+-	int snpsid;
+-	struct lm_device *lmdev;
+
+	printk(KERN_INFO "%s: version %s\n", dwc_driver_name, DWC_DRIVER_VERSION);
+
+@@ -1445,7 +1451,7 @@ int  dwc_otg_driver_init(void)
+ #endif
+    //Enhance USB 3.0 IOT issues
+        dwc_otg_phy_write(0xE2, 0x99);
+-#if CONFIG_RTL_8198C
++#ifdef CONFIG_RTL_8198C
+        dwc_otg_phy_write(0xE6, 0xc8);
+ #else
+        dwc_otg_phy_write(0xE6, 0xb8);
+--- a/drivers/usb/dwc_otg/dwc_otg_cil_intr.c
++++ b/drivers/usb/dwc_otg/dwc_otg_cil_intr.c
+@@ -590,15 +590,16 @@ int32_t dwc_otg_handle_usb_suspend_intr(
+	dwc_otg_core_global_regs_t *global_regs =
+	_core_if->core_global_regs;
+ #endif
++	extern void USBPhyReset(int);
+
+-  DWC_DEBUGPL(DBG_ANY,"USB SUSPEND\n");
++	DWC_DEBUGPL(DBG_ANY,"USB SUSPEND\n");
+ #if 1 //wei add, cathy have
+	printk("usb suspend\n");
+	intr_mask.b.usbsuspend = 1;	//disable suspend intr
+	dwc_modify_reg32(&global_regs->gintmsk, intr_mask.d32, 0);
+
+ //	REG32(0xb8003314) |= 0x10000000; 	//utmi_p1 reset
+-        extern USBPhyReset(int);
++
+         USBPhyReset(1); //wei add
+         USBPhyReset(0); //wei add
+ #endif
+--- a/drivers/usb/dwc_otg/dwc_otg_hcd.c
++++ b/drivers/usb/dwc_otg/dwc_otg_hcd.c
+@@ -1338,9 +1338,10 @@ irqreturn_t dwc_otg_hcd_irq(struct usb_h
+ #else
+	int32_t ret;
+	unsigned long		flags;
+-	DWC_DEBUGPL(DBG_HCDV, "----------hcd IRQ in\n");  //wei add
+-
+	dwc_otg_hcd_t *dwc_otg_hcd = hcd_to_dwc_otg_hcd (_hcd);
++
++	DWC_DEBUGPL(DBG_HCDV, "----------hcd IRQ in\n");  //wei add
++
+ #if !defined(CONFIG_RTL_8198C)
+	spin_lock_irqsave(&dwc_otg_hcd->lock, flags);
+ #endif
+@@ -1902,7 +1903,7 @@ static void do_in_ack(void)
+ #endif /* DWC_HS_ELECT_TST */
+ //#define REG32(reg)   (*(volatile unsigned int *)((unsigned int)reg))
+ #ifndef CONFIG_RTL_8198C
+-extern Enable_OTG_Suspend(int sel, int en); //sel=0 src from sys, then see en, sel=1, src from otg mac,
++extern void Enable_OTG_Suspend(int sel, int en); //sel=0 src from sys, then see en, sel=1, src from otg mac,
+ #endif
+ /** Handles hub class-specific requests.*/
+ int dwc_otg_hcd_hub_control(struct usb_hcd *_hcd,
+@@ -2025,7 +2026,7 @@ int dwc_otg_hcd_hub_control(struct usb_h
+       desc->wHubCharacteristics = 0x08;
+       desc->bPwrOn2PwrGood = 1;
+       desc->bHubContrCurrent = 0;
+-#if CONFIG_RTL_8198C
++#ifdef CONFIG_RTL_8198C
+		/* two bitmaps:  ports removable, and usb 1.0 legacy PortPwrCtrlMask */
+	  memset(&desc->u.hs.DeviceRemovable[0], 0, 1);
+	  memset(&desc->u.hs.DeviceRemovable[1], 0xff, 1);
