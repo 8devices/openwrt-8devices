@@ -1,0 +1,274 @@
+--- a/drivers/crypto/Kconfig
++++ b/drivers/crypto/Kconfig
+@@ -437,4 +437,40 @@ config CRYPTO_DEV_QCE
+	  hardware. To compile this driver as a module, choose M here. The
+	  module will be called qcrypto.
+
++config CRYPTO_DEV_REALTEK
++	tristate "Driver Realtek Crypto Engine"
++	select CRYPTO_HMAC
++	select CRYPTO_HASH
++	select CRYPTO_ALGAPI
++	select CRYPTO_BLKCIPHER
++	select CRYPTO_CBC
++	select CRYPTO_CTR
++	select CRYPTO_ECB
++	select CRYPTO_MD5
++	select CRYPTO_SHA1
++	select CRYPTO_AES
++	select CRYPTO_DES
++	depends on RTL_8198C || RTL_8881A || RTL_8198 || RTL_8197F
++	help
++	  This option allows you to have support for Realtek Crypto Engine.
++
++config CRYPTO_DEV_REALTEK_TEST
++	tristate "Driver Realtek Crypto Engine Test"
++	#select CRYPTO_TEST
++	depends on CRYPTO_DEV_REALTEK
++	help
++	  This option for Realtek Crypto Engine Internal Test.
++
++config CRYPTO_DEV_REALTEK_LINUX_SELFTEST
++    tristate "Realtek Crypto Engine Test by Linux Selftest case"
++    select CRYPTO_TEST
++    depends on CRYPTO_DEV_REALTEK && CRYPTO_DEV_REALTEK_TEST
++    help
++      This option for Realtek Crypto Engine Test by Linux Selftest case.
++
++config RTK_OPENVPN_HW_CRYPTO
++	tristate "Openvpn HW encrypt/decrypt"
++	depends on CRYPTO_DEV_REALTEK
++	help
++	This option for Realtek Openvpn HW encrypt/decrypt.
+ endif # CRYPTO_HW
+--- a/drivers/crypto/Makefile
++++ b/drivers/crypto/Makefile
+@@ -25,3 +25,4 @@ obj-$(CONFIG_CRYPTO_DEV_TALITOS) += tali
+ obj-$(CONFIG_CRYPTO_DEV_UX500) += ux500/
+ obj-$(CONFIG_CRYPTO_DEV_QAT) += qat/
+ obj-$(CONFIG_CRYPTO_DEV_QCE) += qce/
++obj-$(CONFIG_CRYPTO_DEV_REALTEK) += realtek/
+--- a/drivers/net/tun.c
++++ b/drivers/net/tun.c
+@@ -74,6 +74,9 @@
+
+ #include <asm/uaccess.h>
+
++#ifdef CONFIG_RTK_OPENVPN_HW_CRYPTO
++#include <net/rtl/rtl_fastvpn.h>
++#endif
+ /* Uncomment to enable debugging */
+ /* #define TUN_DEBUG 1 */
+
+@@ -779,6 +782,13 @@ static netdev_tx_t tun_net_xmit(struct s
+	if (tfile->socket.sk->sk_filter &&
+	    sk_filter(tfile->socket.sk, skb))
+		goto drop;
++	#ifdef CONFIG_RTK_OPENVPN_HW_CRYPTO
++	if(rtl_fastvpn_hook && rtl_fastvpn_hook->vpn_fast_to_wan(skb)==1)
++	{
++		//printk("\n%s:%d#####NETDEV_TX_OK!!!\n",__FUNCTION__,__LINE__);
++		return NETDEV_TX_OK;
++	}
++	#endif
+
+	/* Limit the number of packets queued by dividing txq length with the
+	 * number of queues.
+--- a/include/uapi/linux/netlink.h
++++ b/include/uapi/linux/netlink.h
+@@ -30,6 +30,9 @@
+
+ #define NETLINK_INET_DIAG	NETLINK_SOCK_DIAG
+
++#ifdef CONFIG_RTK_OPENVPN_HW_CRYPTO
++#define OPENVPN_NETLINK_CRYPTO	27
++#endif
+ #define MAX_LINKS 32		
+
+ struct sockaddr_nl {
+--- a/net/ipv4/ip_input.c
++++ b/net/ipv4/ip_input.c
+@@ -146,7 +146,9 @@
+ #include <net/xfrm.h>
+ #include <linux/mroute.h>
+ #include <linux/netlink.h>
+-
++#ifdef CONFIG_RTK_OPENVPN_HW_CRYPTO
++#include <net/rtl/rtl_fastvpn.h>
++#endif
+ /*
+  *	Process Router Attention IP option (RFC 2113)
+  */
+@@ -247,14 +249,48 @@ int ip_local_deliver(struct sk_buff *skb
+	/*
+	 *	Reassemble IP fragments.
+	 */
++#ifdef CONFIG_RTK_OPENVPN_HW_CRYPTO
++	int vpn_port=0, decrypt_ret=0;
++#endif
+
+	if (ip_is_fragment(ip_hdr(skb))) {
+		if (ip_defrag(skb, IP_DEFRAG_LOCAL_DELIVER))
+			return 0;
+	}
++#ifdef CONFIG_RTK_OPENVPN_HW_CRYPTO
++//extern int rtk_openvpn_fragment_hw_decrypto(struct sk_buff *skb);
++//extern int get_openvpn_port(void);
++	if(rtl_fastvpn_hook)
++	{
++	vpn_port=rtl_fastvpn_hook->get_vpn_port();
++	//if(skb->len>1489 && ip_hdr(skb)->protocol==17 && *((unsigned short*)(skb->data+(ip_hdr(skb)->ihl)*4+2))==vpn_port) //dhcp
++	if(skb->len>1393 && ip_hdr(skb)->protocol==17 && *((unsigned short*)(skb->data+(ip_hdr(skb)->ihl)*4+2))==vpn_port) //pppoe
++	//if(skb->len>1300 && ip_hdr(skb)->protocol==17 && *((unsigned short*)(skb->data+(ip_hdr(skb)->ihl)*4+2))==vpn_port) //pppoe
++	{
++		//printk("\n%s:%d recv openvpn fragment pkt!!! skb->len=%d\n",__FUNCTION__,__LINE__,skb->len);
++		decrypt_ret=rtl_fastvpn_hook->vpn_frgmt_hw_decrypto(skb);
++		if(decrypt_ret<0)
++		{
++			kfree_skb(skb);
++			return NET_RX_DROP;
++		}
++		return NET_RX_SUCCESS;
++	}
++	}
++#endif
++
++#if defined(CONFIG_RTL_USB_IP_HOST_SPEEDUP) || defined(CONFIG_HTTP_FILE_SERVER_SUPPORT) || defined(CONFIG_RTL_USB_UWIFI_HOST_SPEEDUP)
++	if(isUsbIp_Reserved(skb,NF_INET_LOCAL_IN, 0)==0){
++		return NF_HOOK(NFPROTO_IPV4, NF_INET_LOCAL_IN, skb, skb->dev, NULL, ip_local_deliver_finish);
++	}else{
++		return ip_local_deliver_finish(skb);
++	}
++
++#else
+
+	return NF_HOOK(NFPROTO_IPV4, NF_INET_LOCAL_IN, skb, skb->dev, NULL,
+		       ip_local_deliver_finish);
++#endif
+ }
+
+ static inline bool ip_rcv_options(struct sk_buff *skb)
+--- a/net/ipv4/ip_output.c
++++ b/net/ipv4/ip_output.c
+@@ -79,6 +79,9 @@
+ #include <linux/mroute.h>
+ #include <linux/netlink.h>
+ #include <linux/tcp.h>
++#ifdef CONFIG_RTK_OPENVPN_HW_CRYPTO
++#include <net/rtl/rtl_fastvpn.h>
++#endif
+
+ int sysctl_ip_default_ttl __read_mostly = IPDEFTTL;
+ EXPORT_SYMBOL(sysctl_ip_default_ttl);
+@@ -211,6 +214,67 @@ static inline int ip_finish_output2(stru
+	return -EINVAL;
+ }
+
++
++#ifdef CONFIG_RTK_OPENVPN_HW_CRYPTO
++static inline int ip_finish_output_for_openvpn2(struct sk_buff *skb)
++{
++	//extern int openvpn_fragment_fast_to_wan(struct sk_buff *skb);
++	if(rtl_fastvpn_hook)
++	return rtl_fastvpn_hook->vpn_frgmt_fast_to_wan(skb);
++}
++
++static inline int ip_finish_output_for_openvpn(struct sk_buff *skb)
++{
++	struct flowi4 fl4;
++	struct rtable *rt;
++	struct iphdr *iph;
++	int encrypt_ret=0;
++
++	//extern int rtk_openvpn_fragment_hw_encrypto(struct sk_buff **skb);
++	extern void build_skb_flow_key(struct flowi4 *fl4, const struct sk_buff *skb, const struct sock *sk);
++	if(rtl_fastvpn_hook==NULL)
++	{
++		kfree_skb(skb);
++		return -EINVAL;
++	}
++
++	encrypt_ret=rtl_fastvpn_hook->vpn_frgmt_hw_encrypto(&skb);
++
++	if(encrypt_ret<0)
++	{
++		kfree_skb(skb);
++		return -EINVAL;
++	}
++
++	//printk("\n%s:%d skb->dev->name=%s skb->len=%d\n",__FUNCTION__,__LINE__,skb->dev->name,skb->len);
++	build_skb_flow_key(&fl4, skb,NULL);
++	rt=ip_route_output_key(dev_net(skb->dev), &fl4);
++	skb_dst_drop(skb);
++	skb_dst_set(skb, &rt->dst);
++
++	ip_select_ident(skb, &rt->dst);
++
++	//printk("\n%s:%d skb->dev->name=%s skb->len=%d\n",__FUNCTION__,__LINE__,skb->dev->name,skb->len);
++
++	//printk("\n%s:%d ip_skb_dst_mtu(skb)=%d\n",__FUNCTION__,__LINE__,ip_skb_dst_mtu(skb));
++	if(skb->len > ip_skb_dst_mtu(skb) && !skb_is_gso(skb))
++	{
++		//return ip_fragment(skb, ip_finish_output2);
++		return ip_fragment(skb, ip_finish_output_for_openvpn2);
++	}
++	else
++	{
++
++		iph = ip_hdr(skb);
++		//iph->id++;
++		//iph->frag_off=0;  //htons(IP_DF);
++		ip_send_check(iph);
++		//return ip_finish_output2(skb);
++		return ip_finish_output_for_openvpn2(skb);
++	}
++}
++#endif
++
+ static int ip_finish_output_gso(struct sk_buff *skb)
+ {
+	netdev_features_t features;
+@@ -265,8 +329,26 @@ static int ip_finish_output(struct sk_bu
+	if (skb_is_gso(skb))
+		return ip_finish_output_gso(skb);
+
+-	if (skb->len > ip_skb_dst_mtu(skb))
++	if ((skb->len > ip_skb_dst_mtu(skb))
++#ifdef CONFIG_RTK_OPENVPN_HW_CRYPTO
++		|| (rtl_fastvpn_hook && strcmp(skb_dst(skb)->dev->name, "tun0")==0 && rtl_fastvpn_hook->is_vpn_frgmt(skb))
++#endif
++	  )
++	  {
++#ifdef CONFIG_RTK_OPENVPN_HW_CRYPTO
++	        if(rtl_fastvpn_hook && strcmp(skb_dst(skb)->dev->name, "tun0")==0)
++	        {
++			//printk("\n%s:%d skb->dev->name=%s skb->len=%d\n",__FUNCTION__,__LINE__,skb->dev->name,skb->len);
++			//printk("\n%s:%d ip_skb_dst_mtu(skb)=%d\n",__FUNCTION__,__LINE__,ip_skb_dst_mtu(skb));
++
++			if(skb->len <= ip_skb_dst_mtu(skb))
++				return ip_finish_output_for_openvpn(skb);
++			else
++				return ip_fragment(skb, ip_finish_output_for_openvpn);
++	        }
++#endif
+		return ip_fragment(skb, ip_finish_output2);
++	  }
+
+	return ip_finish_output2(skb);
+ }
+--- a/net/ipv4/route.c
++++ b/net/ipv4/route.c
+@@ -521,8 +521,11 @@ static void __build_flow_key(struct flow
+			   iph->daddr, iph->saddr, 0, 0);
+ }
+
+-static void build_skb_flow_key(struct flowi4 *fl4, const struct sk_buff *skb,
+-			       const struct sock *sk)
++#ifdef CONFIG_RTK_OPENVPN_HW_CRYPTO
++void build_skb_flow_key(struct flowi4 *fl4, const struct sk_buff *skb, const struct sock *sk)
++#else
++static void build_skb_flow_key(struct flowi4 *fl4, const struct sk_buff *skb, const struct sock *sk)
++#endif
+ {
+	const struct iphdr *iph = ip_hdr(skb);
+	int oif = skb->dev->ifindex;
