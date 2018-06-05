@@ -1,0 +1,28 @@
+diff -urN a/drivers/pwm/Kconfig b/drivers/pwm/Kconfig
+--- a/drivers/pwm/Kconfig	2016-07-19 13:13:31.738772565 +0800
++++ b/drivers/pwm/Kconfig	2016-07-19 13:13:18.822772352 +0800
+@@ -206,6 +206,16 @@
+	  To compile this driver as a module, choose M here: the module
+	  will be called pwm-puv3.
+
++config PWM_RTK
++	tristate "RTK PWM"
++	depends on PWM
++	default n
++	help
++	  Generic PWM framework driver for Realtek.
++
++	  To compile this driver as a module, choose M here: the module
++	  will be called pwm-rtk.
++
+ config PWM_PXA
+	tristate "PXA PWM support"
+	depends on ARCH_PXA
+diff -urN a/drivers/pwm/Makefile b/drivers/pwm/Makefile
+--- a/drivers/pwm/Makefile	2016-07-19 13:13:49.694772860 +0800
++++ b/drivers/pwm/Makefile	2016-07-19 13:13:40.462772708 +0800
+@@ -31,3 +31,4 @@
+ obj-$(CONFIG_PWM_TWL)		+= pwm-twl.o
+ obj-$(CONFIG_PWM_TWL_LED)	+= pwm-twl-led.o
+ obj-$(CONFIG_PWM_VT8500)	+= pwm-vt8500.o
++obj-$(CONFIG_PWM_RTK)           += pwm-rtk.o
