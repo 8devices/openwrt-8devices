@@ -1,0 +1,29 @@
+diff -urN a/drivers/watchdog/Kconfig b/drivers/watchdog/Kconfig
+--- a/drivers/watchdog/Kconfig	2016-02-24 20:06:32.760115513 +0800
++++ b/drivers/watchdog/Kconfig	2016-02-24 20:06:17.244115258 +0800
+@@ -1257,6 +1257,13 @@
+	help
+	  Hardware driver for the Ralink SoC Watchdog Timer.
+
++config RTL819X_WDT
++	tristate "Rtl819x SoC watchdog"
++	select WATCHDOG_CORE
++	depends on RTL_819X
++	help
++	  Hardware driver for the Rtl819x SoC Watchdog Timer.
++
+ # PARISC Architecture
+
+ # POWERPC Architecture
+diff -urN a/drivers/watchdog/Makefile b/drivers/watchdog/Makefile
+--- a/drivers/watchdog/Makefile	2016-02-24 20:06:43.244115686 +0800
++++ b/drivers/watchdog/Makefile	2016-02-24 20:06:24.180115372 +0800
+@@ -143,7 +143,7 @@
+ octeon-wdt-y := octeon-wdt-main.o octeon-wdt-nmi.o
+ obj-$(CONFIG_LANTIQ_WDT) += lantiq_wdt.o
+ obj-$(CONFIG_RALINK_WDT) += rt2880_wdt.o
+-
++obj-$(CONFIG_RTL819X_WDT) += rtl819x_wdt.o
+ # PARISC Architecture
+
+ # POWERPC Architecture
