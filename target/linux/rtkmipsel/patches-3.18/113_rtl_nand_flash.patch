@@ -1,0 +1,100 @@
+--- a/drivers/mtd/nand/Kconfig
++++ b/drivers/mtd/nand/Kconfig
+@@ -516,4 +516,86 @@ config MTD_NAND_XWAY
+	  Enables support for NAND Flash chips on Lantiq XWAY SoCs. NAND is attached
+	  to the External Bus Unit (EBU).
+
++config MTD_NAND_RTK
++	tristate "Realtek NAND Flash Driver"
++	depends on MTD_NAND
++	help
++	  This is Nand flash driver for Realtek.
++
++menu "NAND FLASH Controller"
++choice
++	prompt "controller type"
++	depends on MTD_NAND_RTK
++	default 98C_NAND_FLASH
++
++config 98C_NAND_FLASH
++	bool "98c nand controller"
++	help
++	 This is 98c nand controller
++
++config SPI_NAND_FLASH
++	bool "97F spi nand controller"
++	help
++	 This is 97F spi nand controller
++
++config PARALLEL_NAND_FLASH
++	bool "97F parallel nand controller"
++	help
++	 This is 97F parallel nand controller
++
++endchoice
++endmenu
++
++config RTK_NAND_FLASH_STORAGE
++	bool "nand flash as storage"
++	default no
++	depends on MTD_NAND_RTK
++	help
++	  nand flash as storage device
++
++config MTD_NAND_RTK_CYCLE
++	hex "NAND FLASH cycle "
++	depends on MTD_NAND && MTD_NAND_RTK && RTK_NAND_FLASH_STORAGE
++	default "0x4"
++	help
++	 NAND FLASH cycle
++
++config MTD_NAND_RTK_PAGE_SIZE
++        hex "Nand Flash PAGE Size."
++        depends on MTD_NAND && MTD_NAND_RTK
++        default "0x800"
++        help
++          Nand Flash Page Size
++
++config MTD_NAND_RTK_BLOCK_SIZE
++        hex "Nand Flash Block Size."
++        depends on MTD_NAND && MTD_NAND_RTK
++        default "0x20000"
++        help
++          Nand Flash Block Size
++#
++# Nand Flash Bad Block Table Type
++#
++menu "Bad Block Table Type"
++choice
++	prompt "Table Type"
++	depends on MTD_NAND && MTD_NAND_RTK
++	default RTK_REMAP_BBT
++config RTK_NORMAL_BBT
++	bool "Support Normal BBT - default"
++	help
++	  It would create normal bad block table and just only record bad block infomation .
++config RTK_REMAP_BBT
++	bool "Support Remapping BBT"
++	help
++	  It would create remapping bad block table and replace bad block with another good block from RBA.
++endchoice
++endmenu
++
++config IMAGE_HEADER_CHECK
++	tristate "Check the validity of vm.img"
++	depends on MTD_NAND
++	help
++	  It will add another header include checksum between rootfs and kernel image.
++
+ endif # MTD_NAND
+--- a/drivers/mtd/nand/Makefile
++++ b/drivers/mtd/nand/Makefile
+@@ -50,5 +50,8 @@ obj-$(CONFIG_MTD_NAND_JZ4740)		+= jz4740
+ obj-$(CONFIG_MTD_NAND_GPMI_NAND)	+= gpmi-nand/
+ obj-$(CONFIG_MTD_NAND_XWAY)		+= xway_nand.o
+ obj-$(CONFIG_MTD_NAND_BCM47XXNFLASH)	+= bcm47xxnflash/
++obj-$(CONFIG_98C_NAND_FLASH)		+= rtknflash/
++obj-$(CONFIG_SPI_NAND_FLASH)		+= rtkn_nand/
++obj-$(CONFIG_PARALLEL_NAND_FLASH)	+= rtkn_nand/
+
+ nand-objs := nand_base.o nand_bbt.o nand_timings.o
