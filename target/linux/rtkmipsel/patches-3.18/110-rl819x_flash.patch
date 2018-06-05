@@ -1,0 +1,31 @@
+diff -urN a/drivers/mtd/chips/Kconfig b/drivers/mtd/chips/Kconfig
+--- a/drivers/mtd/chips/Kconfig	2016-02-25 16:15:23.361307478 +0800
++++ b/drivers/mtd/chips/Kconfig	2016-02-25 16:14:53.233306983 +0800
+@@ -230,5 +230,9 @@
+	  This allows MTD support to work with flash memory which is also
+	  used for XIP purposes.  If you're not sure what this is all about
+	  then say N.
+-
++config RTL819X_SPI_FLASH
++	bool "RTL819x SPI flash support"
++	depends on MTD
++	help
++	Support SPI flash for MX25L,SST series
+ endmenu
+diff -urN a/drivers/mtd/chips/Makefile b/drivers/mtd/chips/Makefile
+--- a/drivers/mtd/chips/Makefile	2016-02-25 16:15:37.753307714 +0800
++++ b/drivers/mtd/chips/Makefile	2016-02-25 16:14:46.561306873 +0800
+@@ -13,3 +13,4 @@
+ obj-$(CONFIG_MTD_RAM)		+= map_ram.o
+ obj-$(CONFIG_MTD_ROM)		+= map_rom.o
+ obj-$(CONFIG_MTD_ABSENT)	+= map_absent.o
++obj-$(CONFIG_RTL819X_SPI_FLASH) += rtl819x/
+diff -urN a/drivers/mtd/maps/Makefile b/drivers/mtd/maps/Makefile
+--- a/drivers/mtd/maps/Makefile	2016-02-25 16:16:03.129308131 +0800
++++ b/drivers/mtd/maps/Makefile	2016-02-25 16:14:26.937306551 +0800
+@@ -43,3 +43,5 @@
+ obj-$(CONFIG_MTD_GPIO_ADDR)	+= gpio-addr-flash.o
+ obj-$(CONFIG_MTD_LATCH_ADDR)	+= latch-addr-flash.o
+ obj-$(CONFIG_MTD_LANTIQ)	+= lantiq-flash.o
++obj-$(CONFIG_RTL819X_SPI_FLASH) += rtl819x_flash.o
++
