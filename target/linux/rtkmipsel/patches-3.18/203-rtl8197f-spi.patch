@@ -1,0 +1,24 @@
+diff -urN a/drivers/spi/Kconfig b/drivers/spi/Kconfig
+--- a/drivers/spi/Kconfig	2016-02-24 15:54:09.651866652 +0800
++++ b/drivers/spi/Kconfig	2016-02-24 15:53:54.099866397 +0800
+@@ -402,6 +402,11 @@
+ config SPI_PXA2XX_PCI
+	def_tristate SPI_PXA2XX && PCI && COMMON_CLK
+
++config SPI_SHEIPA
++	bool "Realtek SHEIPA SPI Controller"
++	help
++	  This is the driver for the SHEIPA SPI Controller.
++
+ config SPI_ROCKCHIP
+	tristate "Rockchip SPI controller driver"
+	depends on ARM || ARM64 || AVR32 || HEXAGON || MIPS || SUPERH
+diff -urN a/drivers/spi/Makefile b/drivers/spi/Makefile
+--- a/drivers/spi/Makefile	2016-02-24 15:54:22.247866859 +0800
++++ b/drivers/spi/Makefile	2016-02-24 15:53:58.775866473 +0800
+@@ -86,3 +86,5 @@
+ obj-$(CONFIG_SPI_XCOMM)		+= spi-xcomm.o
+ obj-$(CONFIG_SPI_XILINX)		+= spi-xilinx.o
+ obj-$(CONFIG_SPI_XTENSA_XTFPGA)		+= spi-xtensa-xtfpga.o
++obj-$(CONFIG_SPI_SHEIPA)                += sheipa/
++
