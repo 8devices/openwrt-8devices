@@ -4286,7 +4286,7 @@ emmc_id_dev_show(struct device *dev, struct device_attribute *attr,
     struct mmc_card *card = host->card;
     struct rtksd_host *sdport = mmc_priv(host);
 
-    MMCPRINTF(KERN_INFO "%s(%u)%s %s\n",__func__,__LINE__,__DATE__, __TIME__);
+    //MMCPRINTF(KERN_INFO "%s(%u)%s %s\n",__func__,__LINE__,__DATE__, __TIME__);
     return sprintf(buf, "emmcid=0x%02x%02x\ncfg1=0x%02x,cfg2=0x%02x,cfg3=0x%02x,sts1=0x%02x, \
 		sts2=0x%02x,bus_sts=0x%02x\nsample_pnt=0x%02x,push_pnt=0x%02x,trans=0x%02x,pad_ctl=0x%02x,\
 		ckgen_ctl=0x%02x\nCARD_SELECT=0x%02x,SYS_PLL_EMMC3=0x%08x,PLL_EMMC1=0x%08x\n",
@@ -4809,7 +4809,7 @@ static void rtkcr_display_version (void)
     date = strsep(&running, " ");
     time = strsep(&running, " ");
     printk(BANNER " Rev:%s (%s %s)\n", revision, date, time);
-    printk("%s: build at %s %s\n",DRIVER_NAME, __DATE__, __TIME__);
+    //printk("%s: build at %s %s\n",DRIVER_NAME, __DATE__, __TIME__);
 
 #ifdef CONFIG_MMC_BLOCK_BOUNCE
     printk("%s: CONFIG_MMC_BLOCK_BOUNCE enable\n",DRIVER_NAME);
