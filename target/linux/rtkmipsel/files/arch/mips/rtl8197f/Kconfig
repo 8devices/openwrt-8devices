@@ -13,6 +13,7 @@ choice
 		select HAVE_CLK
 		select CLKDEV_LOOKUP
                 select OPENWRT_SDK
+		select HW_HAS_PCI
                 select WRT_BARRIER_BREAKER
 endchoice
 choice
