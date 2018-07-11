@@ -10,7 +10,7 @@
 #define __RTKSD_OPS_H
 #include <linux/completion.h>
 
-void sync();
+void sync(void);
 int rtkcr_wait_opt_end(char*,struct rtksd_host *sdport,unsigned char cmdcode,unsigned char cpu_mode);
 void rtk_op_complete(struct rtksd_host *sdport);
 char *rtkcr_parse_token(const char *parsed_string, const char *token);

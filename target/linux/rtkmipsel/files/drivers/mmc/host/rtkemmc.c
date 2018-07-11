@@ -512,7 +512,7 @@ static int rtksd_free_dma_buf(struct rtksd_host *sdport)
     return 1;
 }
 
-static int rtksd_get_next_block()
+static int rtksd_get_next_block(void)
 {
     if (pRSP_org)
     {
@@ -523,7 +523,7 @@ static int rtksd_get_next_block()
     }
 }
 
-static int rtksd_get_buffer_start_addr()
+static int rtksd_get_buffer_start_addr(void)
 {
     if (pRSP_org)
 	return (int)pRSP_org;
@@ -4010,7 +4010,7 @@ int mmc_fast_write( unsigned int blk_addr,
 }
 EXPORT_SYMBOL(mmc_fast_write);
 
-int mmc_send_cmd0()
+int mmc_send_cmd0(void)
 {
     int err = 0;
     //struct mmc_host * mmc = mmc_host_local;
