@@ -1,0 +1,12 @@
+diff -urN a/net/core/dev.c b/net/core//dev.c
+--- a/net/core/dev.c	2016-06-14 14:28:17.713150010 +0800
++++ b/net/core/dev.c	2016-06-14 14:28:21.417150071 +0800
+@@ -1166,7 +1166,7 @@
+
+	return err;
+ }
+-
++EXPORT_SYMBOL(dev_change_name);
+ /**
+  *	dev_set_alias - change ifalias of a device
+  *	@dev: device
