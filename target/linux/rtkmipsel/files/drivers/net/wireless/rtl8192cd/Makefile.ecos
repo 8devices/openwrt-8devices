@@ -1,0 +1,193 @@
+#
+# Makefile for TXT/BIN to C
+#
+
+ifeq ($(CONFIG_RTL_92C_SUPPORT),y)
+RTL_WLAN_DATA_DIR := data
+endif
+  
+ifeq ($(CONFIG_RTL_92D_SUPPORT),y)
+RTL_WLAN_DATA_DIR_D := data_92d
+endif
+
+ifeq ($(CONFIG_RTL_88E_SUPPORT),y)
+  RTL_WLAN_DATA_DIR_E := data_88e
+endif
+
+ifeq ($(CONFIG_RTL_8812_SUPPORT),y)
+  RTL_WLAN_DATA_DIR_8812 := data_8812
+endif
+
+ifeq ($(CONFIG_WLAN_HAL),y)	
+	ifeq ($(CONFIG_WLAN_HAL_8192EE),y)
+		RTL_WLAN_DATA_DIR_F := WlanHAL/Data/8192E
+	endif
+	ifeq ($(CONFIG_WLAN_HAL_8881A),y)
+		ifeq ($(CONFIG_MAC_PHY_RF_Parameter_V700),y)
+			RTL_WLAN_DATA_DIR := WlanHAL/Data/8881A/V700
+		endif
+		ifeq ($(CONFIG_MAC_PHY_RF_Parameter_V702B),y)
+			RTL_WLAN_DATA_DIR := WlanHAL/Data/8881A/V702B
+		endif
+		ifeq ($(CONFIG_MAC_PHY_RF_Parameter_V702B_Skyworth),y)
+			RTL_WLAN_DATA_DIR := WlanHAL/Data/8881A/V702B_Skyworth
+		endif
+#		ifeq ($(CONFIG_MAC_PHY_RF_Parameter_V702B_MP),y)
+#			RTL_WLAN_DATA_DIR := WlanHAL/Data/8881A/V702B_MP
+#		endif
+		RTL_WLAN_DATA_DIR_8812 := WlanHAL/Data/8881A/V702B_MP
+	endif
+	ifeq ($(CONFIG_WLAN_HAL_8197F),y)
+		RTL_WLAN_DATA_DIR := WlanHAL/Data/8197F
+	endif
+	ifeq ($(CONFIG_WLAN_HAL_8814AE),y)
+		RTL_WLAN_DATA_DIR_F := WlanHAL/Data/8814A
+	endif
+	ifeq ($(CONFIG_WLAN_HAL_8822BE),y)
+		RTL_WLAN_DATA_DIR := WlanHAL/Data/8822B
+	endif
+endif
+
+#src=$(shell pwd)
+#obj=$(shell pwd)
+src=.
+obj=.
+
+ifneq ($(RTL_WLAN_DATA_DIR),)
+SRCS_TXT = $(addprefix $(src)/data_,$(notdir $(patsubst %.txt,%.c,$(wildcard $(src)/$(RTL_WLAN_DATA_DIR)/*.txt))))
+SRCS_BIN = $(addprefix $(src)/data_,$(notdir $(patsubst %.bin,%.c,$(wildcard $(src)/$(RTL_WLAN_DATA_DIR)/*.bin))))
+SRCS_BIN_U = $(addprefix $(src)/data_,$(notdir $(patsubst %.BIN,%.c,$(wildcard $(src)/$(RTL_WLAN_DATA_DIR)/*.BIN))))
+endif
+ifneq ($(RTL_WLAN_DATA_DIR_D),)
+SRCS_TXT += $(addprefix $(src)/data_,$(notdir $(patsubst %.txt,%.c,$(wildcard $(src)/$(RTL_WLAN_DATA_DIR_D)/*.txt))))
+SRCS_BIN += $(addprefix $(src)/data_,$(notdir $(patsubst %.bin,%.c,$(wildcard $(src)/$(RTL_WLAN_DATA_DIR_D)/*.bin))))
+SRCS_BIN_U += $(addprefix $(src)/data_,$(notdir $(patsubst %.BIN,%.c,$(wildcard $(src)/$(RTL_WLAN_DATA_DIR_D)/*.BIN))))
+endif
+ifneq ($(RTL_WLAN_DATA_DIR_F),)
+SRCS_TXT += $(addprefix $(src)/data_,$(notdir $(patsubst %.txt,%.c,$(wildcard $(src)/$(RTL_WLAN_DATA_DIR_F)/*.txt))))
+SRCS_BIN += $(addprefix $(src)/data_,$(notdir $(patsubst %.bin,%.c,$(wildcard $(src)/$(RTL_WLAN_DATA_DIR_F)/*.bin))))
+SRCS_BIN_U += $(addprefix $(src)/data_,$(notdir $(patsubst %.BIN,%.c,$(wildcard $(src)/$(RTL_WLAN_DATA_DIR_F)/*.BIN))))
+endif
+ifneq ($(RTL_WLAN_DATA_DIR_E),)
+SRCS_TXT += $(addprefix $(src)/data_,$(notdir $(patsubst %.txt,%.c,$(wildcard $(src)/$(RTL_WLAN_DATA_DIR_E)/*.txt))))
+SRCS_BIN += $(addprefix $(src)/data_,$(notdir $(patsubst %.bin,%.c,$(wildcard $(src)/$(RTL_WLAN_DATA_DIR_E)/*.bin))))
+SRCS_BIN_U += $(addprefix $(src)/data_,$(notdir $(patsubst %.BIN,%.c,$(wildcard $(src)/$(RTL_WLAN_DATA_DIR_E)/*.BIN))))
+endif
+ifneq ($(RTL_WLAN_DATA_DIR_8812),)
+SRCS_TXT += $(addprefix $(src)/data_,$(notdir $(patsubst %.txt,%.c,$(wildcard $(src)/$(RTL_WLAN_DATA_DIR_8812)/*.txt))))
+SRCS_BIN += $(addprefix $(src)/data_,$(notdir $(patsubst %.bin,%.c,$(wildcard $(src)/$(RTL_WLAN_DATA_DIR_8812)/*.bin))))
+SRCS_BIN_U += $(addprefix $(src)/data_,$(notdir $(patsubst %.BIN,%.c,$(wildcard $(src)/$(RTL_WLAN_DATA_DIR_8812)/*.BIN))))
+endif
+
+TXPWR_HEADER = 
+ifeq ($(CONFIG_RTL_92C_SUPPORT),y)
+TXPWR_LMT_TXT_92C = $(addprefix $(src)/data/,$(notdir $(wildcard $(src)/$(RTL_WLAN_DATA_DIR)/TXPWR*.txt)))
+TXPWR_LMT_FNAME_92C = $(basename $(notdir $(wildcard $(src)/$(RTL_WLAN_DATA_DIR)/TXPWR*.txt)))
+TXPWR_HEADER += $(obj)/TXPWR_92C.h
+endif
+
+ifeq ($(CONFIG_RTL_92D_SUPPORT),y)
+TXPWR_LMT_TXT_92D = $(addprefix $(src)/data_92d/,$(notdir $(wildcard $(src)/$(RTL_WLAN_DATA_DIR_D)/TXPWR*.txt)))
+TXPWR_LMT_FNAME_92D = $(basename $(notdir $(wildcard $(src)/$(RTL_WLAN_DATA_DIR_D)/TXPWR*.txt)))
+TXPWR_HEADER += $(obj)/TXPWR_92D.h
+endif
+
+ifeq ($(CONFIG_RTL_ODM_WLAN_DRIVER),y)
+	rtl8192cd-objs += \
+	phydm/phydm.o \
+	phydm/phydm_dig.o\
+	phydm/phydm_edcaturbocheck.o\
+	phydm/phydm_antdiv.o\
+	phydm/phydm_dynamicbbpowersaving.o\
+	phydm/phydm_pathdiv.o\
+	phydm/phydm_rainfo.o\
+	phydm/phydm_dynamictxpower.o\
+	phydm/phydm_powertracking_ap.o\
+	phydm/phydm_adaptivity.o\
+	phydm/phydm_debug.o\
+	phydm/phydm_interface.o\
+	phydm/phydm_hwconfig.o\
+	phydm/phydm_dfs.o\
+	phydm/halphyrf_ap.o\
+	phydm/phydm_cfotracking.o\
+	phydm/phydm_acs.o\
+	phydm/phydm_adc_sampling.o\
+	phydm/phydm_ccx.o\
+	EdcaTurboCheck.o
+	EXTRA_CFLAGS += -I$(src) -I$(src)/phydm
+endif
+ifeq ($(CONFIG_WLAN_HAL_8814AE),y)
+	rtl8192cd-objs += phydm/rtl8814a/halphyrf_8814a_ap.o
+	rtl8192cd-objs += phydm/rtl8814a/phydm_iqk_8814a.o
+	ifeq ($(CONFIG_RTL_ODM_WLAN_DRIVER),y)
+		rtl8192cd-objs += \
+        phydm/rtl8814a/halhwimg8814a_bb.o\
+        phydm/rtl8814a/halhwimg8814a_mac.o\
+        phydm/rtl8814a/halhwimg8814a_rf.o\
+        phydm/rtl8814a/phydm_regconfig8814a.o\
+        phydm/rtl8814a/phydm_rtl8814a.o			
+	endif
+endif
+ifeq ($(CONFIG_WLAN_HAL_8814AE),y)
+		EXTRA_CFLAGS += -I$(src)/WlanHAL/RTL88XX/RTL8814A/RTL8814AE -I$(src)/WlanHAL/RTL88XX/RTL8814A
+		rtl8192cd-objs += WlanHAL/RTL88XX/RTL8814A/RTL8814AE/Hal8814AEGen.o \
+				  WlanHAL/RTL88XX/RTL8814A/Hal8814AGen.o \
+				  WlanHAL/RTL88XX/RTL8814A/Hal8814APhyCfg.o \
+				  WlanHAL/RTL88XX/RTL8814A/Hal8814APwrSeqCmd.o	\
+					8812_hw.o					  
+endif
+
+#ifeq ($(CONFIG_RTL_11W_SUPPORT),y)
+#	rtl8192cd-objs += sha256.o
+#endif
+#
+#Build C code for TXT or BIN file
+#
+data :  $(SRCS_TXT) $(SRCS_BIN) $(SRCS_BIN_U) $(TXPWR_HEADER)
+
+$(obj)/data_%.c: $(src)/$(RTL_WLAN_DATA_DIR)/%.txt FORCE
+	rm -f $(obj)/TXPWR_92C.h
+	$(obj)/bin2c.pl $(notdir $(basename $@)) < $< > $@
+$(obj)/data_%.c: $(src)/$(RTL_WLAN_DATA_DIR)/%.bin FORCE
+	$(obj)/bin2c.pl $(notdir $(basename $@)) < $< > $@
+$(obj)/data_%.c: $(src)/$(RTL_WLAN_DATA_DIR)/%.BIN FORCE
+	$(obj)/bin2c.pl $(notdir $(basename $@)) < $< > $@
+$(obj)/data_%.c: $(src)/$(RTL_WLAN_DATA_DIR_D)/%.txt FORCE
+	rm -f $(obj)/TXPWR_92D.h
+	$(obj)/bin2c.pl $(notdir $(basename $@)) < $< > $@
+$(obj)/data_%.c: $(src)/$(RTL_WLAN_DATA_DIR_D)/%.bin FORCE
+	$(obj)/bin2c.pl $(notdir $(basename $@)) < $< > $@
+$(obj)/data_%.c: $(src)/$(RTL_WLAN_DATA_DIR_D)/%.BIN FORCE
+	$(obj)/bin2c.pl $(notdir $(basename $@)) < $< > $@	
+$(obj)/data_%.c: $(src)/$(RTL_WLAN_DATA_DIR_F)/%.bin FORCE
+	$(obj)/bin2c.pl $(notdir $(basename $@)) < $< > $@
+$(obj)/data_%.c: $(src)/$(RTL_WLAN_DATA_DIR_F)/%.BIN FORCE
+	$(obj)/bin2c.pl $(notdir $(basename $@)) < $< > $@
+$(obj)/data_%.c: $(src)/$(RTL_WLAN_DATA_DIR_F)/%.txt FORCE
+	$(obj)/bin2c.pl $(notdir $(basename $@)) < $< > $@			
+$(obj)/data_%.c: $(src)/$(RTL_WLAN_DATA_DIR_E)/%.txt FORCE
+	$(obj)/bin2c.pl $(notdir $(basename $@)) < $< > $@
+$(obj)/data_%.c: $(src)/$(RTL_WLAN_DATA_DIR_E)/%.bin FORCE
+	$(obj)/bin2c.pl $(notdir $(basename $@)) < $< > $@
+$(obj)/data_%.c: $(src)/$(RTL_WLAN_DATA_DIR_E)/%.BIN FORCE
+	$(obj)/bin2c.pl $(notdir $(basename $@)) < $< > $@	
+$(obj)/data_%.c: $(src)/$(RTL_WLAN_DATA_DIR_8812)/%.txt FORCE
+	$(obj)/bin2c.pl $(notdir $(basename $@)) < $< > $@
+$(obj)/data_%.c: $(src)/$(RTL_WLAN_DATA_DIR_8812)/%.bin FORCE
+	$(obj)/bin2c.pl $(notdir $(basename $@)) < $< > $@
+$(obj)/data_%.c: $(src)/$(RTL_WLAN_DATA_DIR_8812)/%.BIN FORCE
+	$(obj)/bin2c.pl $(notdir $(basename $@)) < $< > $@	
+$(obj)/TXPWR_92C.h: $(TXPWR_LMT_TXT_92C) FORCE 		 
+	@echo $(TXPWR_LMT_FNAME_92C) > $(obj)/tmp_TXPWR
+	$(obj)/tplmt2h.pl < $(obj)/tmp_TXPWR > $@
+	rm -f $(obj)/tmp_TXPWR
+$(obj)/TXPWR_92D.h: $(TXPWR_LMT_TXT_92D) FORCE 		 
+	@echo $(TXPWR_LMT_FNAME_92D) > $(obj)/tmp_TXPWR
+	$(obj)/tplmt2h.pl < $(obj)/tmp_TXPWR > $@
+	rm -f $(obj)/tmp_TXPWR	
+
+#
+# A rule to do nothing
+#
+FORCE:
+

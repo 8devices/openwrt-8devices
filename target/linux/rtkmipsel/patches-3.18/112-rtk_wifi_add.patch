@@ -1,0 +1,18 @@
+diff -urN a/drivers/net/wireless/Kconfig b/drivers/net/wireless/Kconfig
+--- a/drivers/net/wireless/Kconfig	2016-05-31 16:16:44.401618597 +0800
++++ b/drivers/net/wireless/Kconfig	2016-05-31 16:16:20.809618210 +0800
+@@ -283,5 +283,6 @@
+ source "drivers/net/wireless/mwifiex/Kconfig"
+ source "drivers/net/wireless/cw1200/Kconfig"
+ source "drivers/net/wireless/rsi/Kconfig"
++source "drivers/net/wireless/rtl8192cd/Kconfig"
+
+ endif # WLAN
+diff -urN a/drivers/net/wireless/Makefile b/drivers/net/wireless/Makefile
+--- a/drivers/net/wireless/Makefile	2016-05-31 16:16:07.629617993 +0800
++++ b/drivers/net/wireless/Makefile	2016-05-31 16:15:49.069617688 +0800
+@@ -60,3 +60,4 @@
+
+ obj-$(CONFIG_CW1200)	+= cw1200/
+ obj-$(CONFIG_RSI_91X)	+= rsi/
++obj-$(CONFIG_RTL8192CD)         += rtl8192cd/

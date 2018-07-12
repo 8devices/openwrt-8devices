@@ -1,0 +1,31 @@
+#
+# Wireless LAN device configuration
+#
+
+tristate '  RTL8192C/D 802.11b/g/n support' CONFIG_RTL8192CD
+
+if [ "$CONFIG_RTL8192CD" != "n" ]; then
+        bool '    Private skb buffer management' CONFIG_RTL8190_PRIV_SKB
+        bool '    WAPI support' CONFIG_RTL_WAPI_SUPPORT
+        if [ "$CONFIG_RTL_WAPI_SUPPORT" = "y" ]; then
+        		bool '      support local AS' CONFIG_RTL_WAPI_LOCAL_AS_SUPPORT
+        		#bool '      enable WAPI module' CONFIG_RTL_WAPI_MODULE_SUPPORT
+        		#bool '      dynamic IRAM mapping for WAPI' CONFIG_RTL_DYNAMIC_IRAM_MAPPING_FOR_WAPI
+        fi
+        bool '    Client Mode support' CONFIG_RTL_CLIENT_MODE_SUPPORT
+        if [ "$CONFIG_RTL_CLIENT_MODE_SUPPORT" = "y" ]; then
+        bool '    Repeater Mode support' CONFIG_RTL_REPEATER_MODE_SUPPORT
+fi
+				bool '    Mesh Mode support' CONFIG_MESH_ENABLE
+				if [ "$CONFIG_MESH_ENABLE" = "y" ]; then
+            dep_bool '        Enable Mesh NMS' CONFIG_NMS $CONFIG_MESH_ENABLE
+						#   bool 'Test Package(netperf, test_traffic ...)' CONFIG_TEST_PKG
+						#   bool 'Enable 11s Test Mode' CONFIG_11S_TEST_MODE
+				fi
+        bool '    WDS Support' CONFIG_RTL_WDS_SUPPORT
+				bool '    Virtual AP Support' CONFIG_RTL_VAP_SUPPORT
+				bool '    Efuse Support' CONFIG_ENABLE_EFUSE
+	bool '    Config File support' CONFIG_RTL_COMAPI_CFGFILE
+        dep_bool '    Wireless Tools v29 support' CONFIG_RTL_COMAPI_WLTOOLS $CONFIG_WIRELESS_EXT_V18
+fi
+

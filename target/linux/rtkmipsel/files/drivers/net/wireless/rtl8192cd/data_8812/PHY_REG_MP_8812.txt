@@ -1,0 +1,5 @@
+//RL6286_MAC_PHY_Parameter_v043_20131129
+0x800 0x8020d410 // disable adc_mask
+0x830 0x2EAA8EB8 // for false alarm
+0xc90 0x01E00000 // 80M RCK for ACPR problem
+0xffff 0xffff

@@ -1,0 +1,670 @@
+#
+# drivers/net/rtl8192cd
+#
+# Makefile for the Linux Wireless network device drivers.
+#
+
+MODULE_NAME := rtl8192cd
+
+ifndef RTK_WIFI_8192CD_ROOT
+	export RTK_WIFI_8192CD_ROOT=$(shell cd ../.. && pwd)
+	export RTK_WIFI_8192CD_SRC=$(shell pwd)
+endif
+
+PWD := $(RTK_WIFI_8192CD_SRC)
+
+include $(PWD)/platform.mk
+include $(PWD)/config.mk
+
+ifeq ($(CONFIG_RTL_92C_SUPPORT),y)
+RTL_WLAN_DATA_DIR := data
+endif
+  
+ifeq ($(CONFIG_RTL_92D_SUPPORT),y)
+RTL_WLAN_DATA_DIR_D := data_92d
+endif
+
+ifeq ($(CONFIG_RTL_88E_SUPPORT),y)
+  RTL_WLAN_DATA_DIR_E := data_88e
+endif
+
+ifeq ($(CONFIG_RTL_8812_SUPPORT),y)
+  RTL_WLAN_DATA_DIR_8812 := data_8812
+endif
+
+ifeq ($(CONFIG_RTL_8723B_SUPPORT),y)
+  RTL_WLAN_DATA_DIR_8723 := data_8723
+endif
+
+ifeq ($(CONFIG_WLAN_HAL),y)
+	ifeq ($(CONFIG_WLAN_HAL_8814AE),y)
+		RTL_WLAN_DATA_DIR_8814 := WlanHAL/Data/8814A
+	endif	
+	ifeq ($(CONFIG_WLAN_HAL_8192EE),y)
+		RTL_WLAN_DATA_DIR_92E := WlanHAL/Data/8192E
+	endif
+	ifeq ($(CONFIG_WLAN_HAL_8881A),y)
+		ifeq ($(CONFIG_MAC_PHY_RF_Parameter_V700),y)
+			RTL_WLAN_DATA_DIR_8881A := WlanHAL/Data/8881A/V700
+		endif
+		ifeq ($(CONFIG_MAC_PHY_RF_Parameter_V702B),y)
+			RTL_WLAN_DATA_DIR_8881A := WlanHAL/Data/8881A/V702B
+		endif
+		ifeq ($(CONFIG_MAC_PHY_RF_Parameter_V702B_Skyworth),y)
+			RTL_WLAN_DATA_DIR_8881A := WlanHAL/Data/8881A/V702B_Skyworth
+		endif
+#		ifeq ($(CONFIG_MAC_PHY_RF_Parameter_V702B_MP),y)
+#			RTL_WLAN_DATA_DIR_8881A := WlanHAL/Data/8881A/V702B_MP
+#		endif
+		RTL_WLAN_DATA_DIR_8812 := WlanHAL/Data/8881A/V702B_MP
+	endif
+	ifeq ($(CONFIG_WLAN_HAL_8197F),y)
+		RTL_WLAN_DATA_DIR_97F := WlanHAL/Data/8197F
+	endif	
+	ifeq ($(CONFIG_WLAN_HAL_8822BE),y)
+		RTL_WLAN_DATA_DIR_8822B := WlanHAL/Data/8822B
+	endif		
+endif
+
+ifeq ($(CONFIG_RTL_MESH_SUPPORT),y)
+        EXTRA_CFLAGS += -DCONFIG_RTK_MESH #-DMESH_USE_METRICOP
+#        ifeq ($(CONFIG_11S_TEST_MODE),y)
+#        EXTRA_CFLAGS += -D_11s_TEST_MODE_
+#        endif
+        obj-mesh = mesh_ext/mesh_proc.o\
+        mesh_ext/mesh_route.o\
+        mesh_ext/mesh_rx.o\
+        mesh_ext/mesh_sme.o\
+        mesh_ext/mesh_security.o\
+        mesh_ext/mesh_tx.o\
+        mesh_ext/mesh_util.o\
+        mesh_ext/mesh_11kv.o\
+        mesh_ext/hash_table.o
+endif
+
+ifeq ($(CONFIG_USB_HCI),y)
+   ifeq ($(CONFIG_RTL_88E_SUPPORT),y)
+      MODULE_NAME := rtl8188eu
+      $(MODULE_NAME)-objs += \
+			usb/8188eu/8192cd_usb.o \
+			usb/8188eu/8192cd_usb_hw.o \
+			usb/8188eu/8192cd_usb_xmit.o \
+			usb/8188eu/8192cd_usb_recv.o \
+			usb/8188eu/8192cd_usb_cmd.o \
+			hal_intf_xmit.o
+   endif
+endif
+
+ifeq ($(CONFIG_SDIO_HCI),y)
+   ifeq ($(CONFIG_RTL_88E_SUPPORT),y)
+      MODULE_NAME := rtl8189es
+      $(MODULE_NAME)-objs += \
+			sdio/8189es/8188e_sdio.o \
+			sdio/8189es/8188e_sdio_hw.o \
+			sdio/8189es/8188e_sdio_xmit.o \
+			sdio/8189es/8188e_sdio_recv.o \
+			sdio/8189es/8188e_sdio_cmd.o \
+			hal_intf_xmit.o
+   endif
+   ifeq ($(CONFIG_WLAN_HAL_8192EE),y)
+      MODULE_NAME := rtl8192es
+      $(MODULE_NAME)-objs += \
+			sdio/8192es/8192e_sdio.o \
+			sdio/8192es/8192e_sdio_hw.o \
+			sdio/8192es/8192e_sdio_xmit.o \
+			sdio/8192es/8192e_sdio_recv.o \
+			sdio/8192es/8192e_sdio_cmd.o \
+			hal_intf_xmit.o
+   endif
+endif
+
+TARGET=$(MODULE_NAME).ko
+
+SRCS_TXT = $(addprefix $(src)/data_,$(notdir $(patsubst %.txt,%.c,$(wildcard $(src)/$(RTL_WLAN_DATA_DIR)/*.txt))))
+SRCS_BIN = $(addprefix $(src)/data_,$(notdir $(patsubst %.bin,%.c,$(wildcard $(src)/$(RTL_WLAN_DATA_DIR)/*.bin))))
+SRCS_BIN_U = $(addprefix $(src)/data_,$(notdir $(patsubst %.BIN,%.c,$(wildcard $(src)/$(RTL_WLAN_DATA_DIR)/*.BIN))))
+SRCS_TXT += $(addprefix $(src)/data_,$(notdir $(patsubst %.txt,%.c,$(wildcard $(src)/$(RTL_WLAN_DATA_DIR_D)/*.txt))))
+SRCS_BIN += $(addprefix $(src)/data_,$(notdir $(patsubst %.bin,%.c,$(wildcard $(src)/$(RTL_WLAN_DATA_DIR_D)/*.bin))))
+SRCS_BIN_U += $(addprefix $(src)/data_,$(notdir $(patsubst %.BIN,%.c,$(wildcard $(src)/$(RTL_WLAN_DATA_DIR_D)/*.BIN))))
+SRCS_TXT += $(addprefix $(src)/data_,$(notdir $(patsubst %.txt,%.c,$(wildcard $(src)/$(RTL_WLAN_DATA_DIR_E)/*.txt))))
+SRCS_BIN += $(addprefix $(src)/data_,$(notdir $(patsubst %.bin,%.c,$(wildcard $(src)/$(RTL_WLAN_DATA_DIR_E)/*.bin))))
+SRCS_BIN_U += $(addprefix $(src)/data_,$(notdir $(patsubst %.BIN,%.c,$(wildcard $(src)/$(RTL_WLAN_DATA_DIR_E)/*.BIN))))
+SRCS_TXT += $(addprefix $(src)/data_,$(notdir $(patsubst %.txt,%.c,$(wildcard $(src)/$(RTL_WLAN_DATA_DIR_8812)/*.txt))))
+SRCS_BIN += $(addprefix $(src)/data_,$(notdir $(patsubst %.bin,%.c,$(wildcard $(src)/$(RTL_WLAN_DATA_DIR_8812)/*.bin))))
+SRCS_BIN_U += $(addprefix $(src)/data_,$(notdir $(patsubst %.BIN,%.c,$(wildcard $(src)/$(RTL_WLAN_DATA_DIR_8812)/*.BIN))))
+SRCS_TXT += $(addprefix $(src)/data_,$(notdir $(patsubst %.txt,%.c,$(wildcard $(src)/$(RTL_WLAN_DATA_DIR_8723)/*.txt))))
+SRCS_BIN += $(addprefix $(src)/data_,$(notdir $(patsubst %.bin,%.c,$(wildcard $(src)/$(RTL_WLAN_DATA_DIR_8723)/*.bin))))
+SRCS_BIN_U += $(addprefix $(src)/data_,$(notdir $(patsubst %.BIN,%.c,$(wildcard $(src)/$(RTL_WLAN_DATA_DIR_8723)/*.BIN))))
+
+SRCS_TXT += $(addprefix $(src)/data_,$(notdir $(patsubst %.txt,%.c,$(wildcard $(src)/$(RTL_WLAN_DATA_DIR_92E)/*.txt))))
+SRCS_BIN += $(addprefix $(src)/data_,$(notdir $(patsubst %.bin,%.c,$(wildcard $(src)/$(RTL_WLAN_DATA_DIR_92E)/*.bin))))
+SRCS_BIN_U += $(addprefix $(src)/data_,$(notdir $(patsubst %.BIN,%.c,$(wildcard $(src)/$(RTL_WLAN_DATA_DIR_92E)/*.BIN))))
+SRCS_TXT += $(addprefix $(src)/data_,$(notdir $(patsubst %.txt,%.c,$(wildcard $(src)/$(RTL_WLAN_DATA_DIR_8822B)/*.txt))))
+SRCS_BIN += $(addprefix $(src)/data_,$(notdir $(patsubst %.bin,%.c,$(wildcard $(src)/$(RTL_WLAN_DATA_DIR_8822B)/*.bin))))
+SRCS_BIN_U += $(addprefix $(src)/data_,$(notdir $(patsubst %.BIN,%.c,$(wildcard $(src)/$(RTL_WLAN_DATA_DIR_8822B)/*.BIN))))
+SRCS_TXT += $(addprefix $(src)/data_,$(notdir $(patsubst %.txt,%.c,$(wildcard $(src)/$(RTL_WLAN_DATA_DIR_97F)/*.txt))))
+SRCS_BIN += $(addprefix $(src)/data_,$(notdir $(patsubst %.bin,%.c,$(wildcard $(src)/$(RTL_WLAN_DATA_DIR_97F)/*.bin))))
+SRCS_BIN_U += $(addprefix $(src)/data_,$(notdir $(patsubst %.BIN,%.c,$(wildcard $(src)/$(RTL_WLAN_DATA_DIR_97F)/*.BIN))))
+SRCS_TXT += $(addprefix $(src)/data_,$(notdir $(patsubst %.txt,%.c,$(wildcard $(src)/$(RTL_WLAN_DATA_DIR_8881A)/*.txt))))
+SRCS_BIN += $(addprefix $(src)/data_,$(notdir $(patsubst %.bin,%.c,$(wildcard $(src)/$(RTL_WLAN_DATA_DIR_8881A)/*.bin))))
+SRCS_BIN_U += $(addprefix $(src)/data_,$(notdir $(patsubst %.BIN,%.c,$(wildcard $(src)/$(RTL_WLAN_DATA_DIR_8881A)/*.BIN))))
+SRCS_TXT += $(addprefix $(src)/data_,$(notdir $(patsubst %.txt,%.c,$(wildcard $(src)/$(RTL_WLAN_DATA_DIR_8814)/*.txt))))
+SRCS_BIN += $(addprefix $(src)/data_,$(notdir $(patsubst %.bin,%.c,$(wildcard $(src)/$(RTL_WLAN_DATA_DIR_8814)/*.bin))))
+SRCS_BIN_U += $(addprefix $(src)/data_,$(notdir $(patsubst %.BIN,%.c,$(wildcard $(src)/$(RTL_WLAN_DATA_DIR_8814)/*.BIN))))
+
+TXPWR_HEADER = 
+ifeq ($(CONFIG_RTL_92C_SUPPORT),y)
+TXPWR_LMT_TXT_92C = $(addprefix $(src)/data/,$(notdir $(wildcard $(src)/$(RTL_WLAN_DATA_DIR)/TXPWR*.txt)))
+TXPWR_LMT_FNAME_92C = $(basename $(notdir $(wildcard $(src)/$(RTL_WLAN_DATA_DIR)/TXPWR*.txt)))
+TXPWR_HEADER += $(obj)/TXPWR_92C.h
+endif
+
+ifeq ($(CONFIG_RTL_92D_SUPPORT),y)
+TXPWR_LMT_TXT_92D = $(addprefix $(src)/data_92d/,$(notdir $(wildcard $(src)/$(RTL_WLAN_DATA_DIR_D)/TXPWR*.txt)))
+TXPWR_LMT_FNAME_92D = $(basename $(notdir $(wildcard $(src)/$(RTL_WLAN_DATA_DIR_D)/TXPWR*.txt)))
+TXPWR_HEADER += $(obj)/TXPWR_92D.h
+endif
+
+ifeq ($(CONFIG_RTL_DOT11K_SUPPORT),y)
+	$(MODULE_NAME)-objs += \
+	dot11k/8192cd_11k.o \
+	dot11k/8192cd_11k_neighbor.o\
+	dot11k/8192cd_11k_link.o\
+	dot11k/8192cd_11k_beacon.o
+endif
+
+ifeq ($(CONFIG_RTL_STA_CONTROL_SUPPORT),y)
+	$(MODULE_NAME)-objs += 8192cd_sta_control.o
+endif
+
+ifeq ($(CONFIG_RTL_WAPI_SUPPORT),y)
+	$(MODULE_NAME)-objs += wapi_wai.o wapiCrypto.o wapiRandom.o
+endif
+obj-$(CONFIG_RTL8192CD) := $(MODULE_NAME).o
+
+ifeq ($(CONFIG_RTL_88E_SUPPORT),y)
+	$(MODULE_NAME)-objs += HalPwrSeqCmd.o\
+	Hal8188EPwrSeq.o\
+	8188e_hw.o 
+	
+	ifeq ($(CONFIG_POWER_SAVE),y)
+		$(MODULE_NAME)-objs += phydm/rtl8188e/Hal8188EFWImg_CE_PS.o
+	else
+		ifneq ($(origin CONFIG_AP_PS), undefined)
+			ifeq ($(CONFIG_AP_PS),1)
+				$(MODULE_NAME)-objs += phydm/rtl8188e/Hal8188EFWImg_CE_OFFLOAD8.o
+				EXTRA_CFLAGS  += -DSDIO_AP_OFFLOAD -DSOFTAP_PS_DURATION
+			endif
+			ifeq ($(CONFIG_AP_PS),2)
+				$(MODULE_NAME)-objs += phydm/rtl8188e/Hal8188EFWImg_CE_OFFLOAD8.o
+				EXTRA_CFLAGS  += -DSDIO_AP_OFFLOAD
+			endif
+			ifeq ($(CONFIG_AP_PS),0)	
+				$(MODULE_NAME)-objs += phydm/rtl8188e/HalHWImg8188E_FW.o
+			endif
+		endif
+	endif
+	ifeq ($(CONFIG_RTL_ODM_WLAN_DRIVER),y)
+		$(MODULE_NAME)-objs += \
+        phydm/rtl8188e/halhwimg8188e_bb.o\
+        phydm/rtl8188e/halhwimg8188e_mac.o\
+        phydm/rtl8188e/halhwimg8188e_rf.o\
+        phydm/rtl8188e/phydm_regconfig8188e.o\
+        phydm/rtl8188e/hal8188erateadaptive.o\
+        phydm/rtl8188e/phydm_rtl8188e.o\
+        phydm/rtl8188e/halphyrf_8188e_ap.o			
+	else
+		$(MODULE_NAME)-objs += Hal8192CDMOutSrc.o \
+		$(MODULE_NAME)-objs += RateAdaptive.o 
+	endif
+endif
+
+ifeq ($(CONFIG_RTL_8723B_SUPPORT),y)				
+	$(MODULE_NAME)-objs += HalPwrSeqCmd.o\
+	Hal8723BPwrSeq.o\
+	8812_hw.o\
+	phydm/rtl8723b/phydm_rtl8723b.o\
+	phydm/rtl8723b/halhwimg8723b_bb.o\
+	phydm/rtl8723b/halhwimg8723b_fw.o\
+	phydm/rtl8723b/halhwimg8723b_mac.o\
+	phydm/rtl8723b/halhwimg8723b_mp.o\
+	phydm/rtl8723b/halhwimg8723b_rf.o\
+	phydm/rtl8723b/phydm_regconfig8723b.o\
+	phydm/rtl8723b/phydm_rtl8723b.o\
+	phydm/rtl8723b/halphyrf_8723b_ap.o
+endif
+
+ifeq ($(CONFIG_RTL_8812_SUPPORT),y)
+       $(MODULE_NAME)-objs += HalPwrSeqCmd.o\
+        Hal8812PwrSeq.o\
+        8812_hw.o
+	ifeq ($(CONFIG_RTL_ODM_WLAN_DRIVER),y)
+	     $(MODULE_NAME)-objs += ./phydm/rtl8812a/halphyrf_8812a_ap.o
+#	     $(MODULE_NAME)-objs += ./phydm/rtl8812a/halphyrf_8812a_ap.o\
+#		phydm/rtl8812a/halhwimg8812a_bb.o\
+#		phydm/rtl8812a/halhwimg8812a_mac.o\
+#		phydm/rtl8812a/halhwimg8812a_rf.o\
+#		phydm/rtl8812a/odm_RegConfig8812A.o
+	endif
+endif
+ifeq ($(CONFIG_RTL_92C_SUPPORT),y) 
+	$(MODULE_NAME)-objs += Hal8192CDMOutSrc.o
+endif
+ifeq ($(CONFIG_RTL_92D_SUPPORT),y)
+        $(MODULE_NAME)-objs += Hal8192CDMOutSrc.o
+endif
+
+EXTRA_CFLAGS += -DDM_ODM_SUPPORT_TYPE=0x01
+ifeq ($(CONFIG_RTL_ODM_WLAN_DRIVER),y)
+	$(MODULE_NAME)-objs += \
+	phydm/phydm.o \
+	phydm/phydm_dig.o\
+	phydm/phydm_edcaturbocheck.o\
+	phydm/phydm_antdiv.o\
+	phydm/phydm_dynamicbbpowersaving.o\
+	phydm/phydm_pathdiv.o\
+	phydm/phydm_rainfo.o\
+	phydm/phydm_dynamictxpower.o\
+	phydm/phydm_powertracking_ap.o\
+	phydm/phydm_adaptivity.o\
+	phydm/phydm_debug.o\
+	phydm/phydm_interface.o\
+	phydm/phydm_hwconfig.o\
+	phydm/phydm_dfs.o\
+	phydm/halphyrf_ap.o\
+	phydm/phydm_cfotracking.o\
+	phydm/phydm_acs.o\
+	phydm/phydm_adc_sampling.o\
+	phydm/phydm_ccx.o\
+	phydm/txbf/phydm_hal_txbf_api.o\
+	EdcaTurboCheck.o
+	EXTRA_CFLAGS += -I$(src) -I$(src)/phydm
+endif
+
+ifeq ($(CONFIG_WLAN_HAL_8881A),y)
+	$(MODULE_NAME)-objs += phydm/rtl8821a/phydm_iqk_8821a_ap.o
+endif
+
+ifeq ($(CONFIG_WLAN_HAL_8192EE),y)
+	$(MODULE_NAME)-objs += \
+	phydm/rtl8192e/halphyrf_8192e_ap.o\
+	phydm/rtl8192e/phydm_rtl8192e.o
+endif
+ifeq ($(CONFIG_WLAN_HAL_8814AE),y)
+	$(MODULE_NAME)-objs += phydm/rtl8814a/halphyrf_8814a_ap.o
+	$(MODULE_NAME)-objs += phydm/rtl8814a/phydm_iqk_8814a.o
+	ifeq ($(CONFIG_RTL_ODM_WLAN_DRIVER),y)
+		$(MODULE_NAME)-objs += \
+        phydm/rtl8814a/halhwimg8814a_bb.o\
+        phydm/rtl8814a/halhwimg8814a_mac.o\
+        phydm/rtl8814a/halhwimg8814a_rf.o\
+        phydm/rtl8814a/phydm_regconfig8814a.o\
+        phydm/rtl8814a/phydm_rtl8814a.o		
+	endif
+endif
+ifeq ($(CONFIG_WLAN_HAL_8822BE),y)
+	rtl8192cd-objs += phydm/rtl8822b/halphyrf_8822b.o
+	rtl8192cd-objs += phydm/rtl8822b/phydm_iqk_8822b.o
+	ifeq ($(CONFIG_RTL_ODM_WLAN_DRIVER),y)
+		rtl8192cd-objs += \
+        phydm/rtl8822b/halhwimg8822b_bb.o\
+        phydm/rtl8822b/halhwimg8822b_mac.o\
+        phydm/rtl8822b/halhwimg8822b_rf.o\
+		phydm/rtl8822b/halhwimg8822b_fw.o\
+        phydm/rtl8822b/phydm_regconfig8822b.o\
+        phydm/rtl8822b/phydm_hal_api8822b.o\
+		phydm/rtl8822b/phydm_rtl8822b.o
+	endif
+endif
+
+ifeq ($(CONFIG_WLAN_HAL_8197F),y)
+		rtl8192cd-objs += phydm/rtl8197f/halphyrf_8197f.o
+		rtl8192cd-objs += phydm/rtl8197f/phydm_iqk_8197f.o
+	ifeq ($(CONFIG_RTL_ODM_WLAN_DRIVER),y)
+		rtl8192cd-objs += \
+		phydm/rtl8197f/halhwimg8197f_bb.o\
+        phydm/rtl8197f/halhwimg8197f_mac.o\
+        phydm/rtl8197f/halhwimg8197f_rf.o\
+		phydm/rtl8197f/phydm_hal_api8197f.o\
+		phydm/rtl8197f/phydm_regconfig8197f.o\
+		phydm/rtl8197f/phydm_rtl8197f.o
+	endif
+endif
+$(MODULE_NAME)-objs +=\
+	8192cd_tx.o\
+	8192cd_rx.o\
+	8192cd_osdep.o\
+	8192cd_sme.o\
+	8192cd_util.o\
+	8192d_hw.o\
+	8192cd_hw.o\
+	8192cd_security.o\
+	8192cd_tkip.o\
+	8192cd_aes.o\
+	8192cd_proc.o\
+	8192cd_br_ext.o\
+	8192cd_eeprom.o\
+	8192cd_mp.o\
+	8192cd_psk.o\
+	8192cd_ioctl.o\
+	1x_kmsm_aes.o\
+	1x_kmsm_hmac.o\
+	1x_md5c.o\
+	1x_rc4.o\
+	8192cd_mib.o\
+	8192cd_dmem.o\
+	8192cd_host.o\
+	8192cd_led.o\
+	8192cd_dfs.o\
+	8192cd_dfs_det.o\
+	8812_vht_gen.o\
+	romeperf.o\
+	HalDMOutSrc.o\
+	Beamforming.o\
+	8192cd_11h.o\
+	sha256.o\
+	$(obj-mesh)
+	
+ifeq ($(CONFIG_RTL_A4_STA_SUPPORT),y)
+$(MODULE_NAME)-objs += 8192cd_a4_sta.o
+endif	
+ifeq ($(CONFIG_RTL_SIMPLE_CONFIG),y)
+$(MODULE_NAME)-objs += 8192cd_profile.o
+endif	
+ifeq ($(CONFIG_RTL_COMAPI_CFGFILE),y)
+$(MODULE_NAME)-objs += 8192cd_comapi.o
+endif
+ifeq ($(CONFIG_RTL_P2P_SUPPORT),y)
+ifeq ($(CONFIG_OPENWRT_SDK),y)
+rtl8192cd-objs += 8192cd_p2p.o
+else
+$(MODULE_NAME)-objs += 8192cd_p2p.o
+endif
+endif
+ifeq ($(CONFIG_RTL_COMAPI_WLTOOLS),y)
+$(MODULE_NAME)-objs += 8192cd_comapi.o
+endif
+ifeq ($(CONFIG_PACP_SUPPORT),y)
+$(MODULE_NAME)-objs += 8192cd_comapi.o
+endif	
+ifeq ($(CONFIG_WPA_CLI),y)
+$(MODULE_NAME)-objs += 8192cd_comapi.o	
+endif
+
+#For Hostapd
+ifeq ($(CONFIG_RTL_HOSTAPD_SUPPORT),y)
+$(MODULE_NAME)-objs += 8192cd_comapi.o
+endif
+ifeq ($(CONFIG_RTL8672),y)
+$(MODULE_NAME)-objs += rtl8672_port.o
+endif
+
+ifeq ($(CONFIG_OPENWRT_SDK),y)
+rtl8192cd-objs += 8192cd_net80211.o
+rtl8192cd-objs += 8192cd_psk_hapd.o
+rtl8192cd-objs += 8192cd_cfg80211.o
+ifeq ($(CONFIG_RTL_P2P_SUPPORT),y)
+rtl8192cd-objs += rtw_android.o
+endif
+ifeq ($(CONFIG_PACP_SUPPORT),y)
+rtl8192cd-objs += 8192cd_comapi.o
+endif
+endif
+
+ifeq ($(CONFIG_WLAN_HAL),y)
+	EXTRA_CFLAGS += -I$(src) -I$(src)/WlanHAL/ -I$(src)/WlanHAL/Include -I$(src)/WlanHAL/HalHeader 
+	$(MODULE_NAME)-objs += WlanHAL/HalCommon.o \
+										WlanHAL/HalCfg.o \
+										WlanHAL/HalDbgCmd.o	\
+										WlanHAL/HalMacFunc.o \
+										WlanHAL/HalMacAPI.o 
+										
+endif
+
+ifeq ($(CONFIG_WLAN_HAL_88XX),y)
+	EXTRA_CFLAGS += -I$(src)/WlanHAL/RTL88XX -I$(src)/WlanHAL/HalMac88XX 
+	$(MODULE_NAME)-objs += WlanHAL/RTL88XX/Hal88XXFirmware.o \
+										WlanHAL/RTL88XX/Hal88XXGen.o \
+										WlanHAL/RTL88XX/Hal88XXHWImg.o \
+										WlanHAL/RTL88XX/Hal88XXIsr.o	\
+										WlanHAL/RTL88XX/Hal88XXPwrSeqCmd.o \
+										WlanHAL/RTL88XX/Hal88XXRxDesc.o \
+										WlanHAL/RTL88XX/Hal88XXTxDesc.o \
+										WlanHAL/RTL88XX/Hal88XXVerify.o \
+										WlanHAL/RTL88XX/Hal88XXPhyCfg.o \
+										WlanHAL/RTL88XX/Hal88XXDM.o
+endif
+
+ifeq ($(CONFIG_WLAN_HAL_8881A),y)
+	EXTRA_CFLAGS += -I$(src)/WlanHAL/RTL88XX/RTL8881A
+	$(MODULE_NAME)-objs += WlanHAL/RTL88XX/RTL8881A/Hal8881AFirmware.o \
+										WlanHAL/RTL88XX/RTL8881A/Hal8881AGen.o \
+										WlanHAL/RTL88XX/RTL8881A/Hal8881AHWImg.o \
+										WlanHAL/RTL88XX/RTL8881A/Hal8881AIsr.o \
+										WlanHAL/RTL88XX/RTL8881A/Hal8881APwrSeqCmd.o \
+										WlanHAL/RTL88XX/RTL8881A/Hal8881ARxDesc.o \
+										WlanHAL/RTL88XX/RTL8881A/Hal8881ATxDesc.o \
+										WlanHAL/RTL88XX/RTL8881A/Hal8881AVerify.o \
+										WlanHAL/RTL88XX/RTL8881A/Hal8881APhyCfg.o \
+										WlanHAL/RTL88XX/RTL8881A/RTL8881AE/Hal8881AEGen.o \
+										8812_hw.o									
+endif
+
+ifeq ($(CONFIG_WLAN_HAL_8192EE),y)
+	EXTRA_CFLAGS += -I$(src)/WlanHAL/RTL88XX/RTL8192E/RTL8192EE -I$(src)/WlanHAL/RTL88XX/RTL8192E
+	$(MODULE_NAME)-objs += WlanHAL/RTL88XX/RTL8192E/Hal8192EGen.o \
+			  WlanHAL/RTL88XX/RTL8192E/Hal8192EPhyCfg.o \
+			  WlanHAL/RTL88XX/RTL8192E/Hal8192EPwrSeqCmd.o
+	ifeq ($(CONFIG_PCI_HCI), y)
+		$(MODULE_NAME)-objs += WlanHAL/RTL88XX/RTL8192E/RTL8192EE/Hal8192EEGen.o
+	endif
+	ifeq ($(CONFIG_SDIO_HCI), y)
+		$(MODULE_NAME)-objs += WlanHAL/RTL88XX/RTL8192E/RTL8192ES/Hal8192ESGen.o
+		ifneq ($(origin CONFIG_AP_PS), undefined)
+			ifeq ($(CONFIG_AP_PS),1)
+				EXTRA_CFLAGS  += -DSDIO_AP_OFFLOAD -DSOFTAP_PS_DURATION
+			endif
+			ifeq ($(CONFIG_AP_PS),2)
+				EXTRA_CFLAGS  += -DSDIO_AP_OFFLOAD
+			endif
+		endif
+	endif
+endif
+
+ifeq ($(CONFIG_WLAN_HAL_8814AE),y)
+		EXTRA_CFLAGS += -I$(src)/WlanHAL/RTL88XX/RTL8814A/RTL8814AE -I$(src)/WlanHAL/RTL88XX/RTL8814A
+		$(MODULE_NAME)-objs += WlanHAL/RTL88XX/RTL8814A/RTL8814AE/Hal8814AEGen.o \
+				  WlanHAL/RTL88XX/RTL8814A/Hal8814AGen.o \
+				  WlanHAL/RTL88XX/RTL8814A/Hal8814APhyCfg.o \
+				  WlanHAL/RTL88XX/RTL8814A/Hal8814APwrSeqCmd.o	\
+					8812_hw.o					  
+endif
+
+ifeq ($(CONFIG_WLAN_HAL_8822BE),y)
+	EXTRA_CFLAGS += -I$(src)/WlanHAL/RTL88XX/RTL8822B
+	rtl8192cd-objs += WlanHAL/RTL88XX/RTL8822B/Hal8822BFirmware.o \
+										WlanHAL/RTL88XX/RTL8822B/RTL8822BE/Hal8822BEGen.o \
+										WlanHAL/RTL88XX/RTL8822B/Hal8822BGen.o \
+										WlanHAL/RTL88XX/RTL8822B/Hal8822BPwrSeqCmd.o \
+										WlanHAL/RTL88XX/RTL8822B/Hal8822BPhyCfg.o \
+										8812_hw.o
+ifeq ($(CONFIG_WLAN_MACHAL_API),y)
+	EXTRA_CFLAGS += -I$(src)/WlanHAL/HalMac88XX 
+	rtl8192cd-objs += WlanHAL/HalMac88XX/halmac_api.o \
+										WlanHAL/HalMac88XX/halmac_88xx/halmac_api_88xx.o \
+										WlanHAL/HalMac88XX/halmac_88xx/halmac_api_88xx_pcie.o \
+										WlanHAL/HalMac88XX/halmac_88xx/halmac_api_88xx_sdio.o \
+										WlanHAL/HalMac88XX/halmac_88xx/halmac_api_88xx_usb.o \
+										WlanHAL/HalMac88XX/halmac_88xx/halmac_func_88xx.o \
+										WlanHAL/HalMac88XX/halmac_88xx/halmac_func_88xx.o \
+										WlanHAL/HalMac88XX/halmac_88xx/halmac_8822b/halmac_8822b_pwr_seq.o \
+										WlanHAL/HalMac88XX/halmac_88xx/halmac_8822b/halmac_api_8822b.o \
+										WlanHAL/HalMac88XX/halmac_88xx/halmac_8822b/halmac_api_8822b_pcie.o \
+										WlanHAL/HalMac88XX/halmac_88xx/halmac_8822b/halmac_api_8822b_sdio.o \
+										WlanHAL/HalMac88XX/halmac_88xx/halmac_8822b/halmac_api_8822b_usb.o \
+										WlanHAL/HalMac88XX/halmac_88xx/halmac_8822b/halmac_func_8822b.o
+endif
+										
+endif
+
+ifeq ($(CONFIG_RTL8672),y)
+	ifeq ($(CONFIG_OPENWRT_SDK),y)
+		ccflags-y += -DCONFIG_RTL8196B -DCONFIG_RTL8196C -DCONFIG_RTL8196B_GW -DCONFIG_RTL8196C_TESTCHIP_PATCH
+	else
+		EXTRA_CFLAGS += -DCONFIG_RTL8196B -DCONFIG_RTL8196C -DCONFIG_RTL8196B_GW -DCONFIG_RTL8196C_TESTCHIP_PATCH
+		ifeq ($(CONFIG_DEFAULTS_KERNEL_2_6),y)
+			EXTRA_CFLAGS += -DCONFIG_COMPAT_NET_DEV_OPS -D_MP_TELNET_SUPPORT_
+		endif
+	endif
+endif
+
+#CONFIG_SINUX_SUPPORT=1
+ifeq ($(CONFIG_SINUX_SUPPORT),1)
+EXTRA_CFLAGS  += -DOPENSSL_FIPS -D__linux__ -DRSDK_BUILT -DOPENSSL_NO_SPEED -DOPENSSL_THREADS -D_REENTRANT \
+                        -DDSO_DLFCN -DHAVE_DLFCN_H -DOPENSSL_NO_KRB5 -DB_ENDIAN -DTERMIO \
+			-fomit-frame-pointer 
+# -save-temps                      
+                        
+$(MODULE_NAME)-objs  += wps/ssl/mem.o wps/ssl/mem_clr.o wps/ssl/bn_add.o wps/ssl/bn_lib.o \
+			wps/ssl/bn_asm.o wps/ssl/bn_const.o wps/ssl/bn_ctx.o \
+                wps/ssl/bn_div.o wps/ssl/bn_exp.o wps/ssl/bn_gcd.o \
+				wps/ssl/bn_mod.o wps/ssl/bn_mont.o \
+                wps/ssl/bn_mul.o wps/ssl/bn_prime.o wps/ssl/bn_rand.o \
+				wps/ssl/bn_recp.o wps/ssl/bn_shift.o wps/ssl/bn_sqr.o \
+                wps/ssl/bn_word.o wps/ssl/dh_check.o wps/ssl/dh_gen.o \
+				wps/ssl/dh_key.o wps/ssl/dh_lib.o wps/ssl/digest.o \
+                wps/ssl/m_sha1.o wps/ssl/hmac.o wps/ssl/md_rand.o \
+				wps/ssl/rand_lib.o wps/ssl/sha1dgst.o wps/ssl/sha256.o \
+                wps/ssl/aes_cbc.o wps/ssl/fips_aes_core.o
+				
+#EXTRA_CFLAGS += -I../../../lib
+$(MODULE_NAME)-objs += wps/8192cd_wscd.o
+$(MODULE_NAME)-objs += wps/sercomm_intf.o
+endif
+
+ifneq ($(origin DIR_BOARD), undefined)
+EXTRA_CFLAGS += -I$(DIR_BOARD) -D'SVN_REV="$(shell svnversion -n $(src))"'
+#EXTRA_CFLAGS += -I$(DIR_BOARD) -Werror
+#EXTRA_CFLAGS += -I$(DIR_LINUX)/drivers/net/rtl819x/
+endif
+
+###############################################################################
+
+#EXTRA_CFLAGS += -D"KBUILD_MODNAME=KBUILD_STR(rtl8192cd)" -DMODULE -D__KERNEL__
+.PHONY: all debug clean install install_dev install_target FORCE
+
+all: $(TARGET)
+
+$(TARGET): FORCE
+	@echo '--- build the $(TARGET) module'
+	make ARCH=$(ARCH) CROSS_COMPILE=$(CROSS_COMPILE) -C $(KSRC)  M=$(PWD) modules 
+	$(CROSS_COMPILE)strip --strip-debug $(TARGET)
+	#cp $(TARGET) $(RTK_WIFI_LIB)/modules
+	#mv Module.symvers rtl8192cd.symvers
+
+debug: EXTRA_CFLAGS +=-DDEBUG -g -O0
+debug: all
+
+clean: 
+#	@if [ -e $(KSRC) ] ; then \
+#                make -C $(KSRC) M=$(PWD) MODFLAGS="$(EXTRA_CFLAGS)" clean; \
+#        fi
+	find . -name ".*.cmd" | xargs rm -f
+	rm -rf Module.symvers rtl8192cd.symvers
+	find . -name "*.o" | xargs rm -f
+	rm -f *.mod.c
+	rm -f modules.order
+	rm -f *.ko
+	rm -rf .tmp_versions
+	rm -f data_*.c
+
+install: install_dev install_target
+
+install_dev:
+
+install_target:
+	#mkdir -p $(FSROOT)/lib/modules
+	#cp -pd $(TARGET) $(FSROOT)/lib/modules
+	#mkdir -p $(BUILD_DEST)/kernel/module.symvers/
+	#cp -pd rtl8192cd.symvers $(BUILD_DEST)/kernel/module.symvers/rtl8192cd
+#
+#Build C code for TXT or BIN file
+#
+$(obj)/8192cd_hw.o :  $(SRCS_TXT) $(SRCS_BIN) $(SRCS_BIN_U) $(TXPWR_HEADER)
+
+$(obj)/data_%.c: $(src)/$(RTL_WLAN_DATA_DIR)/%.txt FORCE
+	rm -f $(obj)/TXPWR_92C.h
+	@perl -f $(obj)/bin2c.pl $(notdir $(basename $@)) < $< > $@
+$(obj)/data_%.c: $(src)/$(RTL_WLAN_DATA_DIR)/%.bin FORCE
+	@perl -f $(obj)/bin2c.pl $(notdir $(basename $@)) < $< > $@
+$(obj)/data_%.c: $(src)/$(RTL_WLAN_DATA_DIR)/%.BIN FORCE
+	@perl -f $(obj)/bin2c.pl $(notdir $(basename $@)) < $< > $@
+$(obj)/data_%.c: $(src)/$(RTL_WLAN_DATA_DIR_D)/%.txt FORCE
+	rm -f $(obj)/TXPWR_92D.h
+	@perl -f $(obj)/bin2c.pl $(notdir $(basename $@)) < $< > $@
+$(obj)/data_%.c: $(src)/$(RTL_WLAN_DATA_DIR_D)/%.bin FORCE
+	@perl -f $(obj)/bin2c.pl $(notdir $(basename $@)) < $< > $@
+$(obj)/data_%.c: $(src)/$(RTL_WLAN_DATA_DIR_D)/%.BIN FORCE
+	@perl -f $(obj)/bin2c.pl $(notdir $(basename $@)) < $< > $@
+$(obj)/data_%.c: $(src)/$(RTL_WLAN_DATA_DIR_E)/%.txt FORCE
+	@perl -f $(obj)/bin2c.pl $(notdir $(basename $@)) < $< > $@
+$(obj)/data_%.c: $(src)/$(RTL_WLAN_DATA_DIR_E)/%.bin FORCE
+	@perl -f $(obj)/bin2c.pl $(notdir $(basename $@)) < $< > $@
+$(obj)/data_%.c: $(src)/$(RTL_WLAN_DATA_DIR_E)/%.BIN FORCE
+	@perl -f $(obj)/bin2c.pl $(notdir $(basename $@)) < $< > $@
+$(obj)/data_%.c: $(src)/$(RTL_WLAN_DATA_DIR_8812)/%.txt FORCE
+	@perl -f $(obj)/bin2c.pl $(notdir $(basename $@)) < $< > $@
+$(obj)/data_%.c: $(src)/$(RTL_WLAN_DATA_DIR_8812)/%.bin FORCE
+	@perl -f $(obj)/bin2c.pl $(notdir $(basename $@)) < $< > $@
+$(obj)/data_%.c: $(src)/$(RTL_WLAN_DATA_DIR_8812)/%.BIN FORCE
+	@perl -f $(obj)/bin2c.pl $(notdir $(basename $@)) < $< > $@
+$(obj)/data_%.c: $(src)/$(RTL_WLAN_DATA_DIR_8723)/%.txt FORCE
+	@perl -f $(obj)/bin2c.pl $(notdir $(basename $@)) < $< > $@
+$(obj)/data_%.c: $(src)/$(RTL_WLAN_DATA_DIR_8723)/%.bin FORCE
+	@perl -f $(obj)/bin2c.pl $(notdir $(basename $@)) < $< > $@
+$(obj)/data_%.c: $(src)/$(RTL_WLAN_DATA_DIR_8723)/%.BIN FORCE
+	@perl -f $(obj)/bin2c.pl $(notdir $(basename $@)) < $< > $@
+
+$(obj)/data_%.c: $(src)/$(RTL_WLAN_DATA_DIR_92E)/%.txt FORCE
+	@perl -f $(obj)/bin2c.pl $(notdir $(basename $@)) < $< > $@
+$(obj)/data_%.c: $(src)/$(RTL_WLAN_DATA_DIR_92E)/%.bin FORCE
+	@perl -f $(obj)/bin2c.pl $(notdir $(basename $@)) < $< > $@
+$(obj)/data_%.c: $(src)/$(RTL_WLAN_DATA_DIR_92E)/%.BIN FORCE
+	@perl -f $(obj)/bin2c.pl $(notdir $(basename $@)) < $< > $@
+	
+$(obj)/data_%.c: $(src)/$(RTL_WLAN_DATA_DIR_97F)/%.txt FORCE
+	@perl -f $(obj)/bin2c.pl $(notdir $(basename $@)) < $< > $@
+$(obj)/data_%.c: $(src)/$(RTL_WLAN_DATA_DIR_97F)/%.bin FORCE
+	@perl -f $(obj)/bin2c.pl $(notdir $(basename $@)) < $< > $@
+$(obj)/data_%.c: $(src)/$(RTL_WLAN_DATA_DIR_97F)/%.BIN FORCE
+	@perl -f $(obj)/bin2c.pl $(notdir $(basename $@)) < $< > $@
+
+$(obj)/data_%.c: $(src)/$(RTL_WLAN_DATA_DIR_8822B)/%.txt FORCE
+	@perl -f $(obj)/bin2c.pl $(notdir $(basename $@)) < $< > $@
+$(obj)/data_%.c: $(src)/$(RTL_WLAN_DATA_DIR_8822B)/%.bin FORCE
+	@perl -f $(obj)/bin2c.pl $(notdir $(basename $@)) < $< > $@
+$(obj)/data_%.c: $(src)/$(RTL_WLAN_DATA_DIR_8822B)/%.BIN FORCE
+	@perl -f $(obj)/bin2c.pl $(notdir $(basename $@)) < $< > $@
+	
+$(obj)/data_%.c: $(src)/$(RTL_WLAN_DATA_DIR_8881A)/%.txt FORCE
+	@perl -f $(obj)/bin2c.pl $(notdir $(basename $@)) < $< > $@
+$(obj)/data_%.c: $(src)/$(RTL_WLAN_DATA_DIR_8881A)/%.bin FORCE
+	@perl -f $(obj)/bin2c.pl $(notdir $(basename $@)) < $< > $@
+$(obj)/data_%.c: $(src)/$(RTL_WLAN_DATA_DIR_8881A)/%.BIN FORCE
+	@perl -f $(obj)/bin2c.pl $(notdir $(basename $@)) < $< > $@
+
+$(obj)/data_%.c: $(src)/$(RTL_WLAN_DATA_DIR_8814)/%.txt FORCE
+	@perl -f $(obj)/bin2c.pl $(notdir $(basename $@)) < $< > $@
+$(obj)/data_%.c: $(src)/$(RTL_WLAN_DATA_DIR_8814)/%.bin FORCE
+	@perl -f $(obj)/bin2c.pl $(notdir $(basename $@)) < $< > $@
+$(obj)/data_%.c: $(src)/$(RTL_WLAN_DATA_DIR_8814)/%.BIN FORCE
+	@perl -f $(obj)/bin2c.pl $(notdir $(basename $@)) < $< > $@
+	
+$(obj)/TXPWR_92C.h: $(TXPWR_LMT_TXT_92C) FORCE 		 
+	@echo $(TXPWR_LMT_FNAME_92C) > $(obj)/tmp_TXPWR
+	@perl -f $(obj)/tplmt2h.pl < $(obj)/tmp_TXPWR > $@
+	rm -f $(obj)/tmp_TXPWR
+$(obj)/TXPWR_92D.h: $(TXPWR_LMT_TXT_92D) FORCE 		 
+	@echo $(TXPWR_LMT_FNAME_92D) > $(obj)/tmp_TXPWR
+	@perl -f $(obj)/tplmt2h.pl < $(obj)/tmp_TXPWR > $@
+	rm -f $(obj)/tmp_TXPWR	

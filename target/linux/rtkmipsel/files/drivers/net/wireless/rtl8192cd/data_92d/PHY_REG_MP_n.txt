@@ -1,0 +1,9 @@
+//Release version: RTL8192D.0.0222.2013
+0xc64 0x5116848b  // L1-DC_TH for sensitivity
+0xc30 0x69e9ac4a  //RX false alarm issue
+0xd04 0x80020403 // d04[31:30]=2'b10 for cfo mask threshold
+0xd14 0x3333bc53 // d14[4]=1 for cfo mask threshold
+0X840 0X03cff456 //MP RX sensitivity improvement
+0x844 0x03cff456 //MP RX sensitivity improvement
+0xc04 0x03a07633 //Rx OFDM54M high max input power improvement
+0xff

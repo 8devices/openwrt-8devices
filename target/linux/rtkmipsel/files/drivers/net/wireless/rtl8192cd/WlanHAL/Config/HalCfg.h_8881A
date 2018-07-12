@@ -1,0 +1,114 @@
+#ifndef __HALCFG_H__
+#define __HALCFG_H__
+/*++
+Copyright (c) Realtek Semiconductor Corp. All rights reserved.
+
+Module Name:
+	HalComDef.h
+	
+Abstract:
+	Defined HAL Mapping Type
+	    
+Major Change History:
+	When       Who               What
+	---------- ---------------   -------------------------------
+	2012-03-23 Filen            Create.	
+--*/
+
+
+//1 Configuration below are decided by Driver
+
+//3  Driver provide some header files in order to eliminate warning message
+#include "../rtl8881a/8881a.h"
+
+//3 Mapping Basic Type 
+#define VOID void
+#define PVOID void *
+
+//typedef unsigned char   		BOOLEAN,*PBOOLEAN;
+//typedef unsigned char			UCHAR, *PUCHAR;
+//typedef unsigned short			USHORT, *PUSHORT;
+typedef short					SHORT;
+//typedef unsigned int			ULONG, *PULONG;
+typedef long					LONG;
+
+typedef long long				LONGLONG;
+//typedef unsigned int			UINT;
+typedef unsigned long long		ULONGLONG;
+typedef unsigned long long  	LARGE_INTEGER;
+
+typedef unsigned char			u1Byte,*pu1Byte;
+typedef unsigned short			u2Byte,*pu2Byte;
+typedef unsigned int			u4Byte,*pu4Byte;
+typedef unsigned long long		u8Byte,*pu8Byte;
+
+typedef signed char				s1Byte,*ps1Byte;
+typedef signed short			s2Byte,*ps2Byte;
+typedef signed int				s4Byte,*ps4Byte;
+typedef signed long long		s8Byte,*ps8Byte;
+typedef unsigned long long		ULONG64,*PULONG64;
+
+//typedef unsigned char			UINT8;
+//typedef unsigned short			UINT16;
+//typedef unsigned int			UINT32;
+//typedef signed int				INT32;
+//typedef signed char				INT8;
+//typedef signed int				INT;
+
+typedef const unsigned char	cu8;
+
+typedef __signed char s8;
+//typedef unsigned char u8;
+
+typedef __signed short s16;
+//typedef unsigned short u16;
+
+typedef __signed int s32;
+//typedef unsigned int u32;
+
+typedef __signed__ long s64;
+//typedef unsigned long u64;
+
+
+//3  Mapping IO
+#define HAL_PADAPTER    PRTL8192CD_PRIV
+#define HAL_RTL_R8(reg)		\
+    (RTL_R8_F(Adapter, reg))
+
+#define HAL_RTL_R16(reg)	\
+    (RTL_R16_F(Adapter, reg))
+
+#define HAL_RTL_R32(reg)	\
+    (RTL_R32_F(Adapter, reg))
+
+#define HAL_RTL_W8(reg, val8)	\
+    do { \
+        RTL_W8_F(Adapter, reg, val8); \
+    } while (0)
+
+#define HAL_RTL_W16(reg, val16)	\
+    do { \
+        RTL_W16_F(Adapter, reg, val16); \
+    } while (0)
+
+#define HAL_RTL_W32(reg, val32)	\
+    do { \
+        RTL_W32_F(Adapter, reg, val32) ; \
+    } while (0)
+
+
+//3  Mapping Linker Section
+#define __HAL_MIPS16__
+#define __HAL_FAST__
+#define __HAL_MIDIUM__
+#define __HAL_LOW__
+
+
+//3 Mapping Critical Section Protection Method
+
+
+//3 Mapping Debug 
+#define HALprintf  printk
+
+
+#endif  //#ifndef __HALCFG_H__

@@ -1,0 +1,5 @@
+svn propdel svn:externals
+svn up
+rm -rf phydm
+svn propset svn:externals "http://cadinfo.realtek.com.tw/svn/CN/MIMO/TRUNK/SWSD/phydm phydm" .
+svn up

@@ -1,0 +1,93 @@
+//RTL8192E_MAC_PHY_Parameter_v043_MP_20141229
+0x7F	0x00082  // for C cut POW_SYN	
+0x81	0x3FC00  // for C cut POW_BB filter	
+0x00	0x30000                                                    	
+0x08	0x08400  //DC leakage                                      	
+0x18	0x00407                                                    	
+0x19	0x00012  //(120918):RC calibration : 1b[4] 1b[1]        	
+0x1B    	0x0394C  //(121226) : default 00  for CCK ACPR	
+0x1E	0x80009                                                    	
+0x1F	0x00880                                                    	
+0x2F	0x1A060                                                    	
+0x3F	0x00000                                                    	
+0x42	0x060C0                                                    	
+0x57	0xd0000  //for 80M OFDM(right) spur                        	
+0x58	0xBE180                                                    	
+0x67	0x01552                                                    	
+0x7F	0x00082  // for C cut	
+0x81	0x3F000  // for C cut	
+0x83	0x00000                                                    	
+0x1C	0x00000                                                    	
+//phking             		
+0xDF	0x00180                      	
+0xEF	0x001a0                      	
+0x51	0x69545  //0x6b25d :spur     	
+0x52	0x7E42e	
+0x53	0x00071                         	
+0x56	0x51FF3                         	
+0x35	0x000a8                         	
+0x35	0x001e0 //CCK DY swing TX EVM   	
+0x35	0x002a8 //OFDM                  	
+0x36	0x01Ca8                         	
+0x36	0x09C24                         	
+0x36	0x11C24                         	
+0x36	0x19C24                         	
+
+0x18	0x00C07                         	
+0X5A	0x48000 //TX IMR 4Be00   // 8bd00          	
+0X19	0x739d0                         	
+
+
+//For MP Chip power saving(92EE)		
+0x34	0xadd7                     	
+0x34	0x9dd4                    	
+0x34	0x8dd1                     	
+0x34	0x7dce                     	
+0x34	0x6dcb                     	
+0x34	0x5dc8   //0x5cea          	
+0x34	0x4dc5   //0x4ce7          	
+0x34	0x34cc   //0x34e7          	
+0x34	0x244f   //0x246a          	
+0x34	0x144c   //0x1467          	
+0x34	0x0014   //0x0068          	
+
+
+//phking		
+0x00	0x30159 //RX mode 	
+// RX setting 20111118		
+0x84	0x68180  // Update by Hillo for better IMR                               	
+0x86	0x000ce  // LNA switch by BB control	
+0x87	0x49f80                               	
+0x8e	0x65540                               	
+0x8f	0x88000                               	
+// RX gain table 20111118      		
+0xef	0x020A0 //Rx gaintable WE                   	
+0x3b	0xf02b0   // 0xf82b0  for CCK ACPR                                   	
+0x3b	0xef7b0                                     	
+0x3b	0xd4fb0                                     	
+0x3b	0xcf060                                     	
+0x3b	0xb0090                                     	
+0x3b	0xa0080                                     	
+0x3b	0x90080                                     	
+0x3b	0x8f780                                     	
+0x3b	0x78730    // update for CS 0x7c2b0                                     	
+0x3b	0x60fb0    // CS gain table                 	
+0x3b	0x5ffa0    // 0x54fb0 update by Gary 120921 	
+0x3b	0x40620   // update for CS 0x407a0   // CS gain table                	
+0x3b	0x37090   // C-cut                                    	
+0x3b	0x20080                                     	
+0x3b	0x1f060   // HG for CCK	
+0x3b	0x0ffb0  // ULG for CCK	
+0xef	0x000A0 //Rx gaintable WEb                  	
+
+0x00	0x10159 //standby mode	
+//0x18	0x0f407  //LC calibration only @ path A  	
+0xfe
+0xfe
+0xfe
+0xfe
+0x1e 	0x00001                          	
+0x1f 	0x80000                          	
+0x00 	0x33e70 //RX mode //pc_wang only 	
+
+0xffff 0xffff

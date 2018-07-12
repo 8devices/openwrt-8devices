@@ -1,0 +1,40 @@
+
+//<Band_P>	<BBSW Positive delta value>, refer to thermal delta value between read and PG. 
+//<Band_N>	<BBSW Negative delta value>, refer to thermal delta value between read and PG.	
+
+//============== 2G CCK PathA&B ===============
+		
+2GCCKA_P	2 4 5 7 8 10 11 13 14 16 17 19 20 22
+2GCCKA_N	1 3 4 6 7 9 10 12 13 15 16 18
+2GCCKB_P	3 5 6 8 9 11 12 14 15 17 18 20 21 23
+2GCCKB_N	1 3 4 6 7 9 10 12 13 15 16 18
+                               
+//============== 2G PathA&B ===============
+		
+2GA_P		2 4 5 7 8 10 11 13 14 16 17 19 20 22
+2GA_N		1 3 4 6 7 9 10 12 13 15 16 18
+2GB_P		3 5 6 8 9 11 12 14 15 17 18 20 21 23
+2GB_N		1 3 4 6 7 9 10 12 13 15 16 18                              
+                               
+//============== 5GL PathA&B ===============
+// 5G bane1&2		
+5GLA_P		0 1 2 4 5 7 8 10 12
+5GLA_N		1 2 3 5 7 9 10 12 14 16
+5GLB_P		0 1 2 4 5 7 8 10 12
+5GLB_N		1 2 3 5 7 9 10 12 14 16
+
+//============== 5GM PathA&B ===============
+// 5G bane3		
+5GMA_P		0 1 2 4 5 7 8 10 12
+5GMA_N		1 2 3 5 7 9 10 12 14 16
+5GMB_P		0 1 2 4 5 7 8 10 12
+5GMB_N		1 2 3 5 7 9 10 12 14 16
+
+//============== 5GH PathA&B ===============
+// 5G bane4		
+5GHA_P		0 1 2 4 5 7 8 10 12
+5GHA_N		1 2 3 5 7 9 10 12 14 16
+5GHB_P		0 1 2 4 5 7 8 10 12
+5GHB_N		1 2 3 5 7 9 10 12 14 16
+
+
