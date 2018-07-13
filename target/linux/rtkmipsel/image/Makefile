@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2006-2010 OpenWrt.org
+# Copyright (C) 2006-2018 OpenWrt.org
 #
 # This is free software, licensed under the GNU General Public License v2.
 # See /LICENSE for more information.
@@ -7,12 +7,16 @@
 include $(TOPDIR)/rules.mk
 include $(INCLUDE_DIR)/image.mk
 
-BlockSize=128k
-ifeq ($(CONFIG_MTD_NAND_RTK_BLOCK_SIZE),0x80000)
-BlockSize=512k
-endif
-ifeq ($(CONFIG_MTD_NAND_RTK_BLOCK_SIZE),0x20000)
-BlockSize=128k
+ifeq ($(CONFIG_MTD_NAND_RTK),y)
+  BlockSize=128k
+  ifeq ($(CONFIG_MTD_NAND_RTK_BLOCK_SIZE),0x80000)
+    BlockSize=512k
+  endif
+  ifeq ($(CONFIG_MTD_NAND_RTK_BLOCK_SIZE),0x20000)
+    BlockSize=128k
+  endif
+else
+  BlockSize=4k
 endif
 
 define mkcmdline
@@ -23,33 +27,22 @@ SINGLE_PROFILES :=
 
 define SingleProfile
 
-  define Image/Build/Profile/$(1)/initramfs
+define Image/Build/Profile/$(1)/initramfs
 	$(call Image/BuildLoader,loader-$(SUBTARGET)-$(1),bin,$(call mkcmdline,$(1),$(2),$(3)) $(4),$(5))
-	cvimg-$(SUBTARGET) linux $(KDIR)/loader-$(SUBTARGET)-$(1).bin $(BIN_DIR)/$(IMG_PREFIX)-$(1)-ramfs.bin $(5) $(6)
-  endef
-ifeq ($(CONFIG_MTD_NAND_RTK),y)
-  define Image/Build/Profile/$(1)/squashfs
+	cvimg-$(SUBTARGET) linux $(KDIR)/loader-$(SUBTARGET)-$(1).bin $(BIN_DIR)/$(IMG_PREFIX)-$(1)-initramfs.bin $(5) $(6)
+endef
+
+define Image/Build/Profile/$(1)/squashfs
 	$(call Image/BuildLoader,loader-$(SUBTARGET)-$(1),bin,$(call mkcmdline,$(1),$(2),$(3),$(6),$(7)),$(5))
 
 	cvimg-$(SUBTARGET) linux $(KDIR)/loader-$(SUBTARGET)-$(1).bin $(BIN_DIR)/$(IMG_PREFIX)-$(1)-linux.bin $(5) $(6)
 	dd if=$(BIN_DIR)/$(IMG_PREFIX)-$(1)-linux.bin of=$(BIN_DIR)/$(IMG_PREFIX)-$(1)-linux_4k.bin bs=$(BlockSize) conv=sync
 	cat $(BIN_DIR)/$(IMG_PREFIX)-$(1)-linux_4k.bin $(KDIR)/root.squashfs-4k > $(BIN_DIR)/$(IMG_PREFIX)-$(1)-fw_4k_cat.bin
-	cvimg-$(SUBTARGET) fix_chksum  $(BIN_DIR)/$(IMG_PREFIX)-$(1)-fw_4k_cat.bin $(BIN_DIR)/$(IMG_PREFIX)-$(1)-fw.bin
+	cvimg-$(SUBTARGET) fix_chksum  $(BIN_DIR)/$(IMG_PREFIX)-$(1)-fw_4k_cat.bin $(BIN_DIR)/$(IMG_PREFIX)-$(1)-squashfs-sysupgrade.bin
 	rm -rf $(BIN_DIR)/$(IMG_PREFIX)-$(1)-linux_4k.bin $(BIN_DIR)/$(IMG_PREFIX)-$(1)-fw_4k_cat.bin $(BIN_DIR)/$(IMG_PREFIX)-$(1)-linux.bin
-  endef
-else
-  define Image/Build/Profile/$(1)/squashfs
-	$(call Image/BuildLoader,loader-$(SUBTARGET)-$(1),bin,$(call mkcmdline,$(1),$(2),$(3),$(6),$(7)),$(5))
+endef
 
-	cvimg-$(SUBTARGET) linux $(KDIR)/loader-$(SUBTARGET)-$(1).bin $(BIN_DIR)/$(IMG_PREFIX)-$(1)-linux.bin $(5) $(6)
-	dd if=$(BIN_DIR)/$(IMG_PREFIX)-$(1)-linux.bin of=$(BIN_DIR)/$(IMG_PREFIX)-$(1)-linux_4k.bin bs=4k conv=sync
-	cat $(BIN_DIR)/$(IMG_PREFIX)-$(1)-linux_4k.bin $(KDIR)/root.squashfs-4k > $(BIN_DIR)/$(IMG_PREFIX)-$(1)-fw_4k_cat.bin
-	cvimg-$(SUBTARGET) fix_chksum  $(BIN_DIR)/$(IMG_PREFIX)-$(1)-fw_4k_cat.bin $(BIN_DIR)/$(IMG_PREFIX)-$(1)-fw.bin
-	rm -rf $(BIN_DIR)/$(IMG_PREFIX)-$(1)-linux_4k.bin $(BIN_DIR)/$(IMG_PREFIX)-$(1)-fw_4k_cat.bin $(BIN_DIR)/$(IMG_PREFIX)-$(1)-linux.bin
-  endef
-
-endif
-  SINGLE_PROFILES += $(1)
+SINGLE_PROFILES += $(1)
 
 endef
 
@@ -90,40 +83,15 @@ endef
 #
 # rtl819xd profiles
 #
-# 98c move default linux 60000
-ifeq ($(CONFIG_TARGET_rtkmips_rtl8198c),y)
-# linun partition offset = 0x6000
-# hw setting parttion offset = 0x20000
-ifeq ($(CONFIG_MTD_NAND_RTK),y)
-$(eval $(call SingleProfile,AP,ttyS0,38400,root=/dev/mtdblock3,0x80500000,800000,0))
-else
-$(eval $(call SingleProfile,AP,ttyS0,38400,root=/dev/mtdblock2,0x80500000,60000,20000))
-endif
-endif
-
-ifeq ($(CONFIG_TARGET_rtkmips_rtl8954e),y)
-# linun partition offset = 0x6000
-# hw setting parttion offset = 0x20000
-ifeq ($(CONFIG_MTD_NAND_RTK),y)
-$(eval $(call SingleProfile,AP,ttyS0,38400,root=/dev/mtdblock3,0x80500000,800000,0))
-else
-$(eval $(call SingleProfile,AP,ttyS0,38400,root=/dev/mtdblock2,0x80500000,60000,20000))
-endif
-endif
-
 ifeq ($(CONFIG_TARGET_rtkmipsel_rtl8197f),y)
-# linun partition offset = 0x6000
 # hw setting parttion offset = 0x20000
 ifeq ($(CONFIG_MTD_NAND_RTK),y)
-$(eval $(call SingleProfile,AP,ttyS0,38400,root=/dev/mtdblock3,0x80500000,800000,0))
+$(eval $(call SingleProfile,Default,ttyS0,38400,root=/dev/mtdblock3,0x80500000,800000,0))
 else
-$(eval $(call SingleProfile,AP,ttyS0,38400,root=/dev/mtdblock2,0x80500000,60000,20000))
-$(eval $(call SingleProfile,rtk_IOT,ttyS0,38400,root=/dev/mtdblock2,0x80500000,60000,20000))
+$(eval $(call SingleProfile,kinkan,ttyS0,38400,root=/dev/mtdblock3,0x80500000,80000,20000))
 endif
 endif
 
-
-#
 
 # RAMFS
 define Image/Build/Initramfs
@@ -131,18 +99,10 @@ define Image/Build/Initramfs
 endef
 
 # SQUASHFS
-ifeq ($(CONFIG_MTD_NAND_RTK),y)
 define Image/Build
 	dd if=$(KDIR)/root.squashfs of=$(KDIR)/root.squashfs-4k bs=$(BlockSize) conv=sync
 	$(call add_jffs2_mark,$(KDIR)/root.squashfs-4k)
 	$(call Image/Build/Profile/$(PROFILE)/squashfs)
 endef
-else
-define Image/Build
-	dd if=$(KDIR)/root.squashfs of=$(KDIR)/root.squashfs-4k bs=4k conv=sync
-	$(call add_jffs2_mark,$(KDIR)/root.squashfs-4k)
-	$(call Image/Build/Profile/$(PROFILE)/squashfs)
-endef
-endif
 
 $(eval $(call BuildImage))
