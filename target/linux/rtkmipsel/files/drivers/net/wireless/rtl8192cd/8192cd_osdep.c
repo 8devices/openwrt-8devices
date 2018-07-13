@@ -189,8 +189,8 @@ u32 if_priv_stactrl[NUM_WLAN_IFACE];
 #endif
 #endif
 #if defined(CONFIG_WIRELESS_LAN_MODULE) && !defined(NOT_RTK_BSP)
-extern int (*wirelessnet_hook)(void);
 #ifdef BR_SHORTCUT
+extern int (*wirelessnet_hook)(void);
 extern struct net_device* (*wirelessnet_hook_shortcut)(unsigned char *da);
 #endif
 #ifdef PERF_DUMP
@@ -14571,8 +14571,8 @@ int MDL_INIT __rtl8192cd_init(unsigned long base_addr)
 #endif
 
 #if defined(CONFIG_WIRELESS_LAN_MODULE) && !defined(NOT_RTK_BSP)
-	wirelessnet_hook = GetCpuCanSuspend;
 #ifdef BR_SHORTCUT
+	wirelessnet_hook = GetCpuCanSuspend;
 	wirelessnet_hook_shortcut = get_shortcut_dev;
 #endif
 #ifdef PERF_DUMP
@@ -14848,8 +14848,8 @@ void MDL_EXIT rtl8192cd_exit (void)
 #endif
 
 #if defined(CONFIG_WIRELESS_LAN_MODULE) && !defined(NOT_RTK_BSP)
-	wirelessnet_hook = NULL;
 #ifdef BR_SHORTCUT
+	wirelessnet_hook = NULL;
 	wirelessnet_hook_shortcut = NULL;
 #endif
 #ifdef PERF_DUMP
