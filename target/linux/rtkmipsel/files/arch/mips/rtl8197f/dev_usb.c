@@ -427,7 +427,7 @@ static int __init rtl819x_usb_setup(void)
 	 REG32(0xb8000180) =0;
 
 #if 1 //port 0
-	printk("enable port 0 two port enable\n");
+	pr_debug("enable port 0 two port enable\n");
 
        REG32(0xb8000180) |= (1<<17);	 //two port usb 0: one port 1: two port
 	   REG32(0xb8000180) |= (1<<18);	 //otg usb host select port 1 host
@@ -440,7 +440,7 @@ static int __init rtl819x_usb_setup(void)
 //#define one_port_select 1
 
 #ifdef one_port_select
-	printk("enable port 1 only ,verify port 1\n");
+	pr_debug("enable port 1 only ,verify port 1\n");
 	//REG32(0xb8000180) |= (1<<17);	 //otg usb host selec
 	REG32(0xb8000180) |= (1<<18);	 //otg usb host select
 #endif
@@ -448,7 +448,7 @@ static int __init rtl819x_usb_setup(void)
 #ifndef one_port_select
 
 //enable port one and port 0
-       printk("enable port 0 and port 1 verify port one \n");
+       pr_debug("enable port 0 and port 1 verify port one \n");
 
 	REG32(0xb8000180) |= (1<<17);	 //otg usb host selec 0: one port 1: two port
 	REG32(0xb8000180) |= (1<<18);	 //otg usb host select // 0: otg 1; ehci
@@ -505,42 +505,42 @@ static int __init rtl819x_usb_setup(void)
 
 	//auto detect usb phy
 #if 1
-	printk("port 0 org 0xe0=%x\n",GetUSBPhy(0xe0) );
-	printk("port 0 org 0xe1=%x\n",GetUSBPhy(0xe1) );
-	printk("port 0 org 0xe2=%x\n",GetUSBPhy(0xe2) );
-	printk("port 0 org 0xe4=%x\n",GetUSBPhy(0xe4) );
-	printk("port 0 org 0xe6=%x\n",GetUSBPhy(0xe6) );
+	pr_debug("port 0 org 0xe0=%x\n",GetUSBPhy(0xe0) );
+	pr_debug("port 0 org 0xe1=%x\n",GetUSBPhy(0xe1) );
+	pr_debug("port 0 org 0xe2=%x\n",GetUSBPhy(0xe2) );
+	pr_debug("port 0 org 0xe4=%x\n",GetUSBPhy(0xe4) );
+	pr_debug("port 0 org 0xe6=%x\n",GetUSBPhy(0xe6) );
 
-	printk("port 1 org 0xe0=%x\n",GetUSBPhy_1(0xe0) );
-	printk("port 1 org 0xe1=%x\n",GetUSBPhy_1(0xe1) );
-	printk("port 1 org 0xe2=%x\n",GetUSBPhy_1(0xe2) );
-	printk("port 1 org 0xe4=%x\n",GetUSBPhy_1(0xe4) );
-	printk("port 1 org 0xe6=%x\n",GetUSBPhy_1(0xe6) );
+	pr_debug("port 1 org 0xe0=%x\n",GetUSBPhy_1(0xe0) );
+	pr_debug("port 1 org 0xe1=%x\n",GetUSBPhy_1(0xe1) );
+	pr_debug("port 1 org 0xe2=%x\n",GetUSBPhy_1(0xe2) );
+	pr_debug("port 1 org 0xe4=%x\n",GetUSBPhy_1(0xe4) );
+	pr_debug("port 1 org 0xe6=%x\n",GetUSBPhy_1(0xe6) );
 #endif
 
 #if 1 //auto detect PHY
 	if ((GetUSBPhy(0xe0)==0x9c) && (GetUSBPhy(0xe1)==0xac)) {
-		printk("port 0  is U55 0287B \n");
+		pr_debug("port 0  is U55 0287B \n");
 		uphy_port0=1;
 	}
 
 	if ((GetUSBPhy(0xe0)==0xe0) && (GetUSBPhy(0xe1)==0x2f))	{
-		printk("port0 is u28 0599 PHY\n");
+		pr_debug("port0 is u28 0599 PHY\n");
 		uphy_port0=2;
 	}
 
 	if ((GetUSBPhy_1(0xe0)==0x9c) && (GetUSBPhy_1(0xe1)==0xac)) {
-		printk("port1 is U55 0287B \n");
+		pr_debug("port1 is U55 0287B \n");
 		uphy_port1=1;
 	}
 
 	if ((GetUSBPhy_1(0xe0)==0xe1) && (GetUSBPhy_1(0xe1)==0x2f)) {
-		printk("port1 is u28 0599 PHY\n");
+		pr_debug("port1 is u28 0599 PHY\n");
 		uphy_port1=2;
 	}
 
 	if ((GetUSBPhy_1(0xe0)==0xe0) & (GetUSBPhy_1(0xe1)==0x2e)) {
-		printk("port1 is u28 0599 PHY\n");
+		pr_debug("port1 is u28 0599 PHY\n");
 		uphy_port1=2;
 	}
 #endif
@@ -704,7 +704,7 @@ static int __init rtl819x_usb_setup(void)
 //#define 97F_B cut ASIC 40Mhz
 if(REG32(0xb8000008)&(1<<24))
 {
-	printk("patch new usb phy para for 40M OSC\n");
+	pr_debug("patch new usb phy para for 40M OSC\n");
 //printk("  PHY reg 0xf4=%x\n",GetUSBPhy(0xf4) );
 
 //port 0
@@ -731,7 +731,7 @@ if(REG32(0xb8000008)&(1<<24))
 }
 else
 {
-printk("patch new usb phy para for 25M OSC\n");
+pr_debug("patch new usb phy para for 25M OSC\n");
 printk("  PHY reg 0xf4=%x\n",GetUSBPhy(0xf4) );
 
 //port 0
@@ -772,7 +772,7 @@ printk("  PHY reg 0xf4=%x\n",GetUSBPhy(0xf4) );
 #else
 //#define 97F_B cut ASIC 40Mhz OK
 
-printk("patch new usb phy para for 40M OSC\n");
+pr_debug("patch new usb phy para for 40M OSC\n");
 //printk("  PHY reg 0xf4=%x\n",GetUSBPhy(0xf4) );
 
 //port 0
@@ -813,40 +813,40 @@ SetUSBPhy(0xf4,0x9b,1);
 
 
 
-	printk("system  reg %x=0x%x\n",0xb8000010,REG32(0xb8000010));
-	printk("system  reg %x=0x%x\n",0xb8000014,REG32(0xb8000014));
-	printk("system  reg %x=0x%x\n",0xb8000160,REG32(0xb8000160));
-	printk("system  reg %x=0x%x\n",0xb8000164,REG32(0xb8000164));
-	printk("system  reg %x=0x%x\n",0xb8000168,REG32(0xb8000168));
-	printk("system  reg %x=0x%x\n",0xb800016c,REG32(0xb800016c));
-	printk("system  reg %x=0x%x\n",0xb8000180,REG32(0xb8000180));
-	printk("system  reg %x=0x%x\n",0xb8021094,REG32(0xb8021094));
-	printk("system  reg %x=0x%x\n",0xb8140200,REG32(0xb8140200));
-	printk("system  reg %x=0x%x\n",0xb8140204,REG32(0xb8140204));
-	printk("system  reg %x=0x%x\n",0xb8140208,REG32(0xb8140208));
-	printk("system  reg %x=0x%x\n",0xb814020c,REG32(0xb814020c));
-	printk("system  reg %x=0x%x\n",0xb8140210,REG32(0xb8140210));
+	pr_debug("system  reg %x=0x%x\n",0xb8000010,REG32(0xb8000010));
+	pr_debug("system  reg %x=0x%x\n",0xb8000014,REG32(0xb8000014));
+	pr_debug("system  reg %x=0x%x\n",0xb8000160,REG32(0xb8000160));
+	pr_debug("system  reg %x=0x%x\n",0xb8000164,REG32(0xb8000164));
+	pr_debug("system  reg %x=0x%x\n",0xb8000168,REG32(0xb8000168));
+	pr_debug("system  reg %x=0x%x\n",0xb800016c,REG32(0xb800016c));
+	pr_debug("system  reg %x=0x%x\n",0xb8000180,REG32(0xb8000180));
+	pr_debug("system  reg %x=0x%x\n",0xb8021094,REG32(0xb8021094));
+	pr_debug("system  reg %x=0x%x\n",0xb8140200,REG32(0xb8140200));
+	pr_debug("system  reg %x=0x%x\n",0xb8140204,REG32(0xb8140204));
+	pr_debug("system  reg %x=0x%x\n",0xb8140208,REG32(0xb8140208));
+	pr_debug("system  reg %x=0x%x\n",0xb814020c,REG32(0xb814020c));
+	pr_debug("system  reg %x=0x%x\n",0xb8140210,REG32(0xb8140210));
 
-	printk("\n\nEHCI  reg %x=0x%x\n",0xb8021050,REG32(0xb8021050));
-	printk("EHCI  reg %x=0x%x\n",0xb8021054,REG32(0xb8021054));
-	printk("EHCI  reg %x=0x%x\n",0xb8021058,REG32(0xb8021058));
+	pr_debug("\n\nEHCI  reg %x=0x%x\n",0xb8021050,REG32(0xb8021050));
+	pr_debug("EHCI  reg %x=0x%x\n",0xb8021054,REG32(0xb8021054));
+	pr_debug("EHCI  reg %x=0x%x\n",0xb8021058,REG32(0xb8021058));
 #ifdef CONFIG_USB_ARCH_HAS_OHCI
-	printk("OHCI  reg %x=0x%x\n",0xb8020000,REG32(0xb8020000));
-	printk("OHCI  reg %x=0x%x\n",0xb8020004,REG32(0xb8020004));
+	pr_debug("OHCI  reg %x=0x%x\n",0xb8020000,REG32(0xb8020000));
+	pr_debug("OHCI  reg %x=0x%x\n",0xb8020004,REG32(0xb8020004));
 #endif
 
 #if 1 //wei add
 	//dump
 	//int i;
 	for(i=0xe0;i<=0xe7; i++)
-		printk("port 0 reg %x=%x\n", i,GetUSBPhy(i) );
+		pr_debug("port 0 reg %x=%x\n", i,GetUSBPhy(i) );
 	for(i=0xf0;i<=0xf6; i++)
-		printk("port 0 reg %x=%x\n", i,GetUSBPhy(i) );
+		pr_debug("port 0 reg %x=%x\n", i,GetUSBPhy(i) );
 
     for(i=0xe0;i<=0xe7; i++)
-		printk("port 1 reg %x=%x\n", i,GetUSBPhy_1(i) );
+		pr_debug("port 1 reg %x=%x\n", i,GetUSBPhy_1(i) );
 	for(i=0xf0;i<=0xf6; i++)
-		printk("port 1 reg %x=%x\n", i,GetUSBPhy_1(i) );
+		pr_debug("port 1 reg %x=%x\n", i,GetUSBPhy_1(i) );
 #endif
 
 	return 0;
