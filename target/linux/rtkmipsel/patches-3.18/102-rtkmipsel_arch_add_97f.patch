@@ -12,7 +12,7 @@ diff -urN a/arch/mips/Kbuild.platforms b/arch/mips/Kbuild.platforms
 diff -urN a/arch/mips/Kconfig b/arch/mips/Kconfig
 --- a/arch/mips/Kconfig	2016-02-24 15:50:31.395863065 +0800
 +++ b/arch/mips/Kconfig	2016-02-24 15:49:52.503862426 +0800
-@@ -454,6 +454,17 @@
+@@ -454,6 +454,18 @@
 	select ARCH_HAS_RESET_CONTROLLER
 	select RESET_CONTROLLER
 
@@ -26,6 +26,7 @@ diff -urN a/arch/mips/Kconfig b/arch/mips/Kconfig
 +	select SYS_SUPPORTS_32BIT_KERNEL
 +	select SYS_SUPPORTS_LITTLE_ENDIAN
 +	select SYS_HAS_EARLY_PRINTK
++	select MIPS_MACHINE
 +
  config SGI_IP22
 	bool "SGI IP22 (Indy/Indigo2)"

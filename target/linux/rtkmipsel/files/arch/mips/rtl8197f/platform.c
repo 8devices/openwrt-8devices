@@ -202,3 +202,25 @@ unsigned int rtl819x_bond_option(void)
 	return ret;
 }
 EXPORT_SYMBOL(rtl819x_bond_option);
+
+static void __init kinkan_setup(void)
+{
+	
+}
+
+/* TODO: move to machtypes.h */
+#define RTKMIPSEL_MACH_KINKAN 1
+#include <asm/mips_machine.h>
+static int __init rtl8197f_setup(void)
+{
+	mips_machine_setup();
+
+	return 0;
+}
+
+arch_initcall(rtl8197f_setup);
+
+__setup("board=", mips_machtype_setup);
+
+MIPS_MACHINE(RTKMIPSEL_MACH_KINKAN, "KINKAN", "8devices Kinkan devboard",
+			 kinkan_setup);
