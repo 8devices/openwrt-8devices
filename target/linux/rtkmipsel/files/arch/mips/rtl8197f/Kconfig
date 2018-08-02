@@ -65,3 +65,19 @@ config RTK_DUALIMAGE_FLASH_OFFSET
 	help
 	  offset of second bank, in most case it should be half of your flash size.
 endif
+
+
+menu "Realtek RTL8197F machine selection"
+
+config RTL8197_MACH_GENERIC
+	bool "Generic RTL8197F board"
+	help
+	  Say 'Y' here if you want your kernel to support a
+	  Generic RTL8197F board.
+
+config RTL8197_MACH_KINKAN
+	bool "8devices Kinkan devboard"
+	help
+	  Say 'Y' here if you want your kernel to support the
+	  8devices Kinkan development board.
+endmenu

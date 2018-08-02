@@ -19,6 +19,7 @@
 #endif
 #include <asm/mach-realtek/bspchip.h>
 
+#include "machtypes.h"
 #include "dev_leds_gpio.h"
 #include "dev-gpio-buttons.h"
 
@@ -111,10 +112,8 @@ static void __init mach_RTL819x_setup(void)
 	rtl819x_gpio_pin_enable(BSP_UART2_PIN);
 #endif
 #endif
-
+	mach_rtl819x_export_gpio_pin();
 }
-
-pure_initcall(mach_RTL819x_setup);
 
 void mach_rtl819x_export_gpio_pin(void)
 {
@@ -142,4 +141,5 @@ void mach_rtl819x_export_gpio_pin(void)
 	//gpio_export(BSP_GPIO_PIN_A6,1);
 }
 
-late_initcall(mach_rtl819x_export_gpio_pin);
+MIPS_MACHINE(RTL8197_MACH_GENERIC, "Generic", "Generic RTL8197F board",
+			 mach_RTL819x_setup);
