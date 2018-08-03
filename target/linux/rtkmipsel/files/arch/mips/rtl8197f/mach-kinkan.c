@@ -42,6 +42,20 @@ static struct gpio_keys_button kinkan_buttons[] __initdata = {
 	}
 };
 
+#define SET_PINMUX(reg, field, val)\
+	REG32(reg) = (REG32(reg) & (~(0xF << field))) | (val << field)
+
+static void kinkan_set_sd_pinmux(void)
+{
+	SET_PINMUX(BSP_PIN_MUX_SEL15, 28, 0); // MMC_D0
+	SET_PINMUX(BSP_PIN_MUX_SEL15, 24, 0); // MMC_D1
+	SET_PINMUX(BSP_PIN_MUX_SEL15, 20, 0); // MMC_D2
+	SET_PINMUX(BSP_PIN_MUX_SEL15, 16, 0); // MMC_D3
+	SET_PINMUX(BSP_PIN_MUX_SEL16,  8, 0); // MMC_CD
+	SET_PINMUX(BSP_PIN_MUX_SEL16,  4, 0); // MMC_CLK
+	SET_PINMUX(BSP_PIN_MUX_SEL16,  0, 0); // MMC_CMD
+}
+
 static void __init kinkan_setup(void)
 {
 	int i;
@@ -60,6 +74,7 @@ static void __init kinkan_setup(void)
 				       ARRAY_SIZE(kinkan_buttons),
 				       kinkan_buttons);
 
+	kinkan_set_sd_pinmux();
 }
 
 MIPS_MACHINE(RTL8197_MACH_KINKAN, "KINKAN", "8devices Kinkan devboard",
