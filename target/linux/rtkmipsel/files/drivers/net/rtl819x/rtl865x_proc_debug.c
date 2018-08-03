@@ -199,7 +199,7 @@ static struct proc_dir_entry *mmd_entry,	*mem_entry, *diagnostic_entry,
 extern int32 mmd_read(uint32 phyId, uint32 devId, uint32 regId, uint32 *rData);
 extern int32 mmd_write(uint32 phyId, uint32 devId, uint32 regId, uint32 wData);
 
-#if defined(CONFIG_RTL_8197F) && defined(CONFIG_RTL_8211F_SUPPORT)
+#if 0
 extern int rtl_mdio_read(unsigned int mdio_phyaddr, unsigned int reg, unsigned int *pdata);
 extern int rtl_mdio_write(unsigned int mdio_phyaddr, unsigned int reg, unsigned int data);
 #endif
@@ -6874,7 +6874,7 @@ static int32 port_status_read(struct seq_file *s, void *v)
 		regData = READ_MEM32(PSRP0+((port)<<2));
 		data0 = regData & PortStatusLinkUp;
 
-#if defined(CONFIG_RTL_8197F) && defined(CONFIG_RTL_8211F_SUPPORT)
+#if 0
 		if ((port == PHY0) && gpio_simulate_mdc_mdio) {
 			int rp;
 			uint32 regData2;
@@ -7326,7 +7326,7 @@ static int32 port_status_write( struct file *filp, const char *buff,unsigned lon
 					}
 					else {
 						/*Set PHY Register*/
-#if defined(CONFIG_RTL_8197F) && defined(CONFIG_RTL_8211F_SUPPORT) && defined(CONFIG_RTL_EXCHANGE_PORTMASK)
+#if 0 && defined(CONFIG_RTL_EXCHANGE_PORTMASK)
 						if((type == PORT_AUTO) && (port == 0) && gpio_simulate_mdc_mdio){
 							forceLinkSpeed = SPEED1000M;
 						}
@@ -8125,7 +8125,7 @@ static int32 proc_phyReg_write( struct file *filp, const char *buff,unsigned lon
 				goto errout;
 			}
 			regId=simple_strtol(tokptr, NULL, 0);
-#if defined(CONFIG_RTL_8197F) && defined(CONFIG_RTL_8211F_SUPPORT)
+#if 0
 			if (gpio_simulate_mdc_mdio){
 				if ((8 > phyId) && (phyId > 4))
 					ret = rtl_mdio_read(phyId, regId, &regData);
@@ -8168,7 +8168,7 @@ static int32 proc_phyReg_write( struct file *filp, const char *buff,unsigned lon
 				goto errout;
 			}
 			regData=simple_strtol(tokptr, NULL, 0);
-#if defined(CONFIG_RTL_8197F) && defined(CONFIG_RTL_8211F_SUPPORT)
+#if 0
 			if (gpio_simulate_mdc_mdio){
 				if ((8 > phyId) && (phyId > 4))
 					ret = rtl_mdio_write(phyId, regId,regData);
@@ -8746,7 +8746,7 @@ static int32 proc_phyReg_write( struct file *filp, const char *buff,unsigned lon
 			}
 			else 
 #endif
-#if defined(CONFIG_RTL_8197F) && defined(CONFIG_RTL_8211F_SUPPORT)
+#if 0
 			if (gpio_simulate_mdc_mdio){
 				if ((8 > phyId) && (phyId > 4)) {
 					if (pageId>0)
@@ -8851,7 +8851,7 @@ static int32 proc_phyReg_write( struct file *filp, const char *buff,unsigned lon
 			}
 			else 
 #endif		
-#if defined(CONFIG_RTL_8197F) && defined(CONFIG_RTL_8211F_SUPPORT)
+#if 0
 			if (gpio_simulate_mdc_mdio){
 				if ((8 > phyId) && (phyId > 4)){
 					if (pageId>0)

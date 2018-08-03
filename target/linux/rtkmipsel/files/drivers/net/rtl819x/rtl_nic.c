@@ -8411,7 +8411,7 @@ inline void link_enhancement(void)
 
 #endif
 
-#if defined(CONFIG_RTL_8197F) && defined(CONFIG_RTL_8211F_SUPPORT)
+#if 0
 int rp;
 unsigned int regData, regData1, regData2, prelink;
 #define BIT10H 	(1<<5)
@@ -9002,7 +9002,7 @@ static void one_sec_timer(unsigned long task_priv)
 	suspend_check_timer_fn() ;
 #endif
 
-#if defined(CONFIG_RTL_8197F) && defined(CONFIG_RTL_8211F_SUPPORT)
+#if 0
 	if (gpio_simulate_mdc_mdio)
 		ckeck_link_speed();
 #endif
@@ -11896,7 +11896,7 @@ int re865x_ioctl (struct net_device *dev, struct ifreq *rq, int cmd)
 				{
 					if( (1<<i)&wanPortMask )
 					{
-#if defined(CONFIG_RTL_8197F) && defined(CONFIG_RTL_8211F_SUPPORT) && defined(CONFIG_RTL_EXCHANGE_PORTMASK)
+#if 0 && defined(CONFIG_RTL_EXCHANGE_PORTMASK)
 						if (gpio_simulate_mdc_mdio){
 							uint32 phydata=0;
 							rtl_mdio_read(PORT0_RGMII_PHYID, 1, &phydata);
@@ -14764,7 +14764,7 @@ struct proc_dir_entry *rtl_8367r_vlan;
 	rtl_hw_nat_init_refine();
 #endif
 #if defined(CONFIG_NET_SCHED)
-	rtl_qos_init();
+	//rtl_qos_init();
 #endif
 #endif
 	
@@ -21311,7 +21311,7 @@ int rtl865x_reinitSwitchCore(void)
 	rtl819x_save_hw_tables();	
 #endif
 
-#if defined(CONFIG_RTL_8197F) && defined(CONFIG_RTL_8211F_SUPPORT)
+#if 0
 	if(gpio_simulate_mdc_mdio){
 		extern int nfbi_close(void);
 		nfbi_close();
@@ -25332,7 +25332,7 @@ char *rtk_get_mibCounter_name(int mib_idx)
 
 unsigned  int rtk_get_mibCounter_val(int port,int mib_idx)
 {
-#ifndef (CONFIG_RTL_8367R_SUPPORT || CONFIG_RTL_83XX_SUPPORT)
+#if (!defined(CONFIG_RTL_8367R_SUPPORT) && !defined (CONFIG_RTL_83XX_SUPPORT))
 	//extern uint64 rtl865xC_returnAsicCounter64(uint32 offset);
 	uint32 addrOffset_fromP0 = port * MIB_ADDROFFSETBYPORT;	
 	unsigned int counter32=0;

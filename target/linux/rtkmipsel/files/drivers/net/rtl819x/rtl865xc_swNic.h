@@ -322,7 +322,9 @@
 /* rxPreProcess */
 #define	RTL8651_CPU_PORT                0x07 /* in rtl8651_tblDrv.h */
 #define	_RTL865XB_EXTPORTMASKS   7
+#ifndef CONFIG_OPENWRT_SDK
 #define CONFIG_RTL_CUSTOM_PASSTHRU
+#endif
 
 typedef struct {
 	uint16			vid;
