@@ -20,40 +20,40 @@ config AUTO_DHCP_CHECK
 	default n
 	
 config NEW_PCI
-	bool 
+	bool "NEW_PCI"
 	default y 
 	depends on PCI
 
 config RTL_IGMP_PROXY
-	bool
+	bool "RTL_IGMP_PROXY"
 	default y
 
 config RTL_IGMP_SNOOPING
-	bool
+	bool "RTL_IGMP_SNOOPING"
 	default y
 	depends on BRIDGE
 	depends on !BRIDGE_IGMP_SNOOPING
 
 config RTL_MLD_SNOOPING
-	bool 
+	bool "RTL_MLD_SNOOPING"
 	default y
 	depends on RTL_IGMP_SNOOPING
 
 config RTL_QUERIER_SELECTION
-	bool
+	bool "RTL_QUERIER_SELECTION"
 	default y
 	depends on RTL_IGMP_SNOOPING
 
 config RTL_MLD_PROXY
-    bool
+    bool "RTL_MLD_PROXY"
     default y
 
 config RTL_LINKCHG_PROCESS
-	bool
+	bool "RTL_LINKCHG_PROCESS"
 	default y
 
 config RTL_DEBUG_TOOL
-	bool
+	bool "RTL_DEBUG_TOOL"
 	default y
 
 menu "Config MIPS16-Inst Option for Kernel Modules"
