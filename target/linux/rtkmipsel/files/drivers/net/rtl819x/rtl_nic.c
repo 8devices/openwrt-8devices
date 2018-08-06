@@ -42,6 +42,7 @@
 #include <linux/proc_fs.h>
 #include <linux/time.h>
 #include <linux/rtc.h>
+#include <linux/mtd/mtd.h>
 #if defined(CONFIG_SOC_RTL8198C) && defined(CONFIG_OPENWRT_SDK)
 #include <asm/mach-realtek/bspchip.h> 
 #elif defined(CONFIG_SOC_RTL8197F) && defined(CONFIG_OPENWRT_SDK)
@@ -962,6 +963,29 @@ static struct rtl865x_vlanConfig vlanconfig[] = {
 	RTL865X_CONFIG_END,
 };
 #endif
+
+int read_addr_from_flash(unsigned char *mac, int idx)
+{
+	unsigned int offset;
+	struct mtd_info *mtd;
+	size_t bytes_read;
+	int err;
+
+	if (mac == NULL)
+		return -1;
+
+	if(idx > 1)
+		return -1;
+
+	mtd = get_mtd_device_nm("hwpart");
+	if (IS_ERR(mtd))
+		return -1;
+
+	offset = 7 + idx * ETH_ALEN;
+	err = mtd_read(mtd, offset, ETH_ALEN, &bytes_read, mac);
+	return err;
+}
+
 #if defined(CONFIG_RTL_8198C) || defined(CONFIG_RTL_8197F)
 #if defined(CONFIG_RTL_HW_DSLITE_SUPPORT)
 int  get_P2P_local_ip(unsigned char *ifname, unsigned int *ipAddr)
@@ -15378,6 +15402,7 @@ int32 rtl865x_config(struct rtl865x_vlanConfig vlanconfig[])
 		/*add network interface*/
 		memset(&netif, 0, sizeof(rtl865x_netif_t));
 		memcpy(netif.name,vlanconfig[i].ifname,MAX_IFNAMESIZE);
+		read_addr_from_flash(vlanconfig[i].mac.octet, i);
 		memcpy(netif.macAddr.octet,vlanconfig[i].mac.octet,ETHER_ADDR_LEN);
 		netif.mtu = vlanconfig[i].mtu;
 		netif.if_type = vlanconfig[i].if_type;
