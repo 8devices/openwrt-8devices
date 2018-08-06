@@ -41,6 +41,7 @@
 #include <linux/if_ether.h>
 #include <linux/nl80211.h>
 #include <linux/ieee80211.h>
+#include <linux/mtd/mtd.h>
 
 
 
@@ -287,34 +288,29 @@ static int realtek_cancel_remain_on_channel(struct wiphy *wiphy,
 
 #endif //CONFIG_P2P
 
-#if defined(VAP_MAC_DRV_READ_FLASH)
 int read_flash_hw_mac_vap(unsigned char *mac, int vap_idx)
 {
 	unsigned int offset;
+	struct mtd_info *mtd;
+	size_t bytes_read;
+	int err;
 
-	//NLENTER;
-	
 	if(!mac)
 		return -1;
 
-	vap_idx +=1; 
-	
 	if(vap_idx > 7)
 		return -1;
 	
-	offset = HW_SETTING_OFFSET+ sizeof(struct param_header)+ HW_WLAN_SETTING_OFFSET + sizeof(struct hw_wlan_setting) * (rtk_phy_idx-1);
-	offset += (vap_idx*ETH_ALEN);
-	offset |= 0xbd000000;
-	memcpy(mac,(unsigned char *)offset,ETH_ALEN);
-
-	if(is_zero_mac(mac))
+	mtd = get_mtd_device_nm("hwpart");
+	if (IS_ERR(mtd))
 		return -1;
 
-	DEBUG_INFO("VAP[%d][%d]=%02x:%02x:%02x:%02x:%02x:%02x\n", (rtk_phy_idx-1), vap_idx, mac[0],mac[1],mac[2],mac[3],mac[4],mac[5]);
+	offset = sizeof(struct param_header)+ HW_WLAN_SETTING_OFFSET + 0x640 * (rtk_phy_idx-1);
+	offset += (vap_idx*ETH_ALEN);
+	err = mtd_read(mtd, offset, ETH_ALEN, &bytes_read, mac);
 
 	return 0;
 }
-#endif
 
 //brian, get MAC address from utility, rtk_tx_calr
 #if 0

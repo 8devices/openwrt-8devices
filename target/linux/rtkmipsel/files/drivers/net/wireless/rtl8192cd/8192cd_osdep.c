@@ -10424,7 +10424,28 @@ static void MDL_DEVINIT set_mib_default(struct rtl8192cd_priv *priv)
 	// others that are not types of byte and int
 	strcpy((char *)priv->pmib->dot11StationConfigEntry.dot11DesiredSSID, "RTL8186-default");
 	priv->pmib->dot11StationConfigEntry.dot11DesiredSSIDLen = strlen("RTL8186-default");
-	memcpy(p, "\x00\xe0\x4c\x81\x86\x86", MACADDRLEN);
+
+#if defined(RTK_NL80211)
+	char * name;
+	unsigned char * mac=NULL;
+	unsigned int vap_idx=-1;
+
+	name = priv->dev->name;
+	if (!is_WRT_scan_iface(name)) {
+		if (IS_ROOT_INTERFACE(priv)) {
+			vap_idx = 0;
+			mac=priv->rtk->root_mac;
+		} else if ((IS_VAP_INTERFACE(priv)) && (name[strlen(priv->dev->name)-2]=='-')){ //dev->name="wlanX-X"
+			vap_idx=name[strlen(name)-1]-'0';
+			mac=priv->rtk->vap_mac[vap_idx];
+		}
+
+		if((vap_idx<0)||(read_flash_hw_mac_vap(mac, vap_idx)))
+			memcpy(p, "\x00\xe0\x4c\x81\x86\x86", MACADDRLEN);
+		else
+		        memcpy(p, mac, MACADDRLEN);
+	}
+#endif
 
 #if defined(DOT11D) || defined(DOT11H) || defined(DOT11K)
 	// set countryCode for 11d and 11h
@@ -12741,7 +12762,6 @@ register_driver:
 	{
 		priv->dev = dev; 
 
-#if defined(VAP_MAC_DRV_READ_FLASH)
 		if(read_flash_hw_mac_vap(rtk->vap_mac[vap_idx], vap_idx))
 		{
 			memcpy(dev->dev_addr, GET_ROOT(priv)->pmib->dot11Bss.bssid, 6);
@@ -12749,7 +12769,6 @@ register_driver:
 		} else {
 			memcpy(dev->dev_addr, rtk->vap_mac[vap_idx], 6);
 		}
-#endif
 		memcpy(GET_MY_HWADDR, dev->dev_addr, 6);
 		realtek_interface_add(priv, rtk, dev->name, NL80211_IFTYPE_AP, 0, 0);
 	}

@@ -294,9 +294,7 @@ struct rtknl {
 	unsigned char	keep_legacy;
 };
 
-#if defined(VAP_MAC_DRV_READ_FLASH)
 int read_flash_hw_mac_vap( unsigned char *mac, int vap_idx); 
-#endif
 unsigned char is_WRT_scan_iface(unsigned char* if_name); //eric-vap
 void realtek_cfg80211_inform_ss_result(struct rtl8192cd_priv *priv);
 struct rtknl *realtek_cfg80211_create(void); 
