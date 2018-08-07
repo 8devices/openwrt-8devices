@@ -7736,7 +7736,7 @@ static int long_cable_check(void)
 		if ( ( (REG32(PSRP0 + (port*4))) & PortStatusLinkUp ) == FALSE ) {
 			/* Link is down. */
 			if ((1<<port) & curLinkPortMask) {
-				local_bh_disable();
+				//local_bh_disable();
 				if (fe_ads[port].down_speed_renway == 0) {
 					//rtlglue_printf("Port[%d] link down, down_speed_renway is %d\n", port, fe_ads[port].down_speed_renway);
 					if ( !(REG32(PCRP0+(port*4))&EnForceMode) )
@@ -7751,7 +7751,7 @@ static int long_cable_check(void)
 					//rtlglue_printf("Port[%d] link down, down_speed_renway is %d\n", port, fe_ads[port].down_speed_renway);
 					fe_ads[port].down_speed_renway = 0;
 				}
-				local_bh_enable();
+				//local_bh_enable();
 			}
 		} else {
 			/* Link is up. */
