@@ -1952,6 +1952,8 @@ void rtl_netif_rx(struct rtl8192cd_priv *priv, struct sk_buff *pskb, struct stat
 	br_port = GET_BR_PORT(priv->dev);
 #endif
 
+	netif_rx_sum_up(priv, pskb->len);
+
 #ifdef CONFIG_POWER_SAVE
 	if (!IS_MCAST(pskb->data)) {
 		rtw_ap_ps_recv_monitor(priv);

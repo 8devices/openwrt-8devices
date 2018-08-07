@@ -1687,14 +1687,9 @@ static __inline__ unsigned int get_supported_mcs(struct rtl8192cd_priv *priv)
 
 static __inline__ void tx_sum_up(struct rtl8192cd_priv *priv, struct stat_info *pstat, struct tx_insn* txcfg)
 {
-	struct net_device_stats *pnet_stats;
 	unsigned int pktlen = txcfg->fr_len+txcfg->hdr_len+txcfg->iv+txcfg->llc+txcfg->mic+txcfg->icv;
 
 	if (priv) {
-		pnet_stats = &(priv->net_stats);
-		pnet_stats->tx_packets++;
-		pnet_stats->tx_bytes += pktlen;
-
 #if defined(CONFIG_RTL8672) || defined(CONFIG_WLAN_STATS_EXTENTION)
 		extern int IS_BCAST2(unsigned char *da);
 		extern int IS_MCAST(unsigned char *da);
@@ -1771,13 +1766,7 @@ static __inline__ void tx_sum_up(struct rtl8192cd_priv *priv, struct stat_info *
  */
 static __inline__ void rx_sum_up(struct rtl8192cd_priv *priv, struct stat_info *pstat, struct rx_frinfo *pfrinfo)
 {
-	struct net_device_stats *pnet_stats;
-
 	if (priv) {
-		pnet_stats = &(priv->net_stats);       
-		pnet_stats->rx_packets++;
-		pnet_stats->rx_bytes += pfrinfo->pktlen;
-
 #ifdef RX_CRC_EXPTIMER
         priv->ext_stats.rx_packets_exptimer++;
 		priv->ext_stats.rx_packets_by_rate[pfrinfo->rx_rate]++;
@@ -1830,6 +1819,21 @@ static __inline__ void rx_sum_up(struct rtl8192cd_priv *priv, struct stat_info *
 	}
 }
 
+static __inline__ void netif_tx_sum_up(struct rtl8192cd_priv *priv, int pktlen)
+{
+	struct net_device_stats *pnet_stats;
+	pnet_stats = &(priv->net_stats);
+	pnet_stats->tx_packets++;
+	pnet_stats->tx_bytes += pktlen;
+}
+
+static __inline__ void netif_rx_sum_up(struct rtl8192cd_priv *priv, int pktlen)
+{
+	struct net_device_stats *pnet_stats;
+	pnet_stats = &(priv->net_stats);
+	pnet_stats->rx_packets++;
+	pnet_stats->rx_bytes += pktlen;
+}
 
 
 static __inline__ unsigned char get_cck_swing_idx(unsigned int bandwidth, unsigned char ofdm_swing_idx)

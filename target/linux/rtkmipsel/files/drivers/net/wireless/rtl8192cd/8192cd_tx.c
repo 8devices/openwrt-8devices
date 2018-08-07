@@ -10209,6 +10209,8 @@ int __rtl8192cd_start_xmit_out(struct sk_buff *skb, struct stat_info *pstat
 
 	priv = GET_DEV_PRIV(dev);
 
+	netif_tx_sum_up(priv, skb->len);
+
 #if defined(CONFIG_RTK_MESH)
 	if(dev == priv->mesh_dev) {
 		if(ptxcfg->is_11s == 1) {
