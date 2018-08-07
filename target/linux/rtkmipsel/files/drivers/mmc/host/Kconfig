@@ -400,20 +400,6 @@ config MMC_GOLDFISH
 	  This selects the Goldfish Multimedia card Interface emulation
 	  found on the Goldfish Android virtual device emulation.
 
-config MMC_SPI
-	tristate "MMC/SD/SDIO over SPI"
-	depends on SPI_MASTER && !HIGHMEM && HAS_DMA
-	select CRC7
-	select CRC_ITU_T
-	help
-	  Some systems access MMC/SD/SDIO cards using a SPI controller
-	  instead of using a "native" MMC/SD/SDIO controller.  This has a
-	  disadvantage of being relatively high overhead, but a compensating
-	  advantage of working on many systems without dedicated MMC/SD/SDIO
-	  controllers.
-
-	  If unsure, or if your system has no SPI master driver, say N.
-
 config MMC_S3C
 	tristate "Samsung S3C SD/MMC Card Interface support"
 	depends on ARCH_S3C24XX
