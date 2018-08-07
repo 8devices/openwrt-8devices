@@ -10426,6 +10426,12 @@ static void MDL_DEVINIT set_mib_default(struct rtl8192cd_priv *priv)
 	priv->pmib->dot11StationConfigEntry.dot11DesiredSSIDLen = strlen("RTL8186-default");
 
 #if defined(RTK_NL80211)
+	if (IS_ROOT_INTERFACE(priv)) {
+		read_flash_hw_cal_data(priv);
+	}
+#endif
+
+#if defined(RTK_NL80211)
 	char * name;
 	unsigned char * mac=NULL;
 	unsigned int vap_idx=-1;
