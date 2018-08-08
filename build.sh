@@ -2,7 +2,7 @@
 
 help(){
     echo "Usage: $0 [board-name]"
-    echo "valid board names: kinkan"
+    echo "valid board names: kinkan kinkan_full"
     exit
 }
 
@@ -13,6 +13,9 @@ else
     case $1 in
         kinkan)
             config=config_kinkan_minimal
+            ;;
+        kinkan_full)
+            config=config_kinkan_full
             ;;
         help|--help|-h|*)
             help
