@@ -7246,6 +7246,10 @@ unsigned int rtl865x_setLinkEventFlag(unsigned int curLinkPortMask, unsigned int
 				status |= ( 1<<i ); /* add port number flags*/
 				status |= ETHERNET_EVENT_MASK;  /*add ethernet event flags  */
 				ethernet_rtmsg_ifinfo(RTM_NEWLINK, dev, ~0U,status);
+				if (newLinkPortMask & (1<<i))
+					netif_carrier_on(dev);
+				else
+					netif_carrier_off(dev);
 			}
 			
 		}
