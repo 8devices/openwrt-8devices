@@ -19,7 +19,7 @@ CONFIG_BAND_5G_ON_WLAN0=y
 CONFIG_CEVT_R4K=y
 CONFIG_CLKDEV_LOOKUP=y
 CONFIG_CLONE_BACKWARDS=y
-CONFIG_CMDLINE="board=KINKAN console=ttyS0,38400 hwpart=0x20000 mtdparts=m25p80:128k(boot),256k(hwpart),128k(cfg),-(firmware)"
+CONFIG_CMDLINE="board=KINKAN console=ttyS0,115200 hwpart=0x20000 mtdparts=m25p80:128k(boot),256k(hwpart),128k(cfg),-(firmware)"
 CONFIG_CMDLINE_BOOL=y
 CONFIG_CMDLINE_OVERRIDE=y
 CONFIG_COMPAT_BRK=y

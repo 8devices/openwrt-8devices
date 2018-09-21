@@ -115,7 +115,7 @@
  */
 
 
-#define BSP_UART0_BAUD		38400
+#define BSP_UART0_BAUD		115200
 //#define BSP_UART0_MAPSIZE	0x100
 
 #define BSP_UART0_BASE      0xB8002000
