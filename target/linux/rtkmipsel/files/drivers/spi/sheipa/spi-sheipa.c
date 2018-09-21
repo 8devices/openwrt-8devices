@@ -955,35 +955,63 @@ static inline void select_op(struct sheipa_spi *dws, uint32_t addr,
 				uint32_t type, uint8_t cmd)
 {
 	mode = 0;
+	if(enable_addr_4byte_mode){
+		switch (cmd) {
+		case PP:
+			cmd = PP_4B;
+			break;
+		case NORM_READ:
+			cmd = NORM_READ_4B;
+			break;
+		case FAST_READ:
+			cmd = FAST_READ_4B;
+			break;
+		case BE:
+			cmd = BE_4B;
+			break;
+		case SE:
+			cmd = SE_4B;
+			break;
+		}
+	}
 	switch (cmd) {
 	case PP:
+	case PP_4B:
 		flash_write(dws, addr, DATA_WORD, cmd);
 		break;
 	case WREN:
 		flash_write_enable(dws);
 		break;
 	case WRSR:
+	case WRSR2:
+	case WRSR3:
 		flash_set_status(dws, addr, cmd);
 		break;
 	case RDSR:
+	case RDSR2:
+	case RDSR3:
 		flash_read_status(dws, cmd);
 		break;
 	case RDID:
 		flash_read_id(dws, cmd);
 		break;
 	case NORM_READ:
+	case NORM_READ_4B:
 		flash_read(dws, addr, DATA_WORD, cmd);
 		break;
 	case FAST_READ:
+	case FAST_READ_4B:
 		flash_fastread(dws, addr, DATA_WORD, dummy, cmd);
 		break;
 	case CE:
 		flash_chip_erase(dws, cmd);
 		break;
-	case BE_4K:
+	case BE:
+	case BE_4B:
 		flash_be_4k_erase(dws, addr, cmd);
 		break;
 	case SE:
+	case SE_4B:
 		flash_se_erase(dws, addr, cmd);
 		break;
 	case AUTO_MODE:
@@ -992,13 +1020,13 @@ static inline void select_op(struct sheipa_spi *dws, uint32_t addr,
 		break;
 	/* supprot for address 4 byte mdoe */
 	case EN4B:
-		flash_en4b(dws, cmd);
+		//flash_en4b(dws, cmd);
 		enable_addr_4byte_mode = 1;
 		set_addr_length(dws);
 		set_auto_addr_length(dws);
 		break;
 	case EX4B:
-		flash_ex4b(dws, cmd);
+		//flash_ex4b(dws, cmd);
 		enable_addr_4byte_mode = 0;
 		break;
 	default:

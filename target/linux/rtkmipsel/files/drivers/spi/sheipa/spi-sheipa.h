@@ -28,17 +28,32 @@
 #define DEF_WR_BLOCK_BOUND         256
 
 /* General flash opcode. */
-#define WRSR		0x01
 #define PP		0x02
 #define NORM_READ	0x03
 #define WRDI		0x04	/* write disable */
-#define RDSR		0x05
 #define WREN       	0x06
 #define FAST_READ       0x0b
 #define RDID		0x9f
 #define CE		0xc7	/* chip erase */
-#define BE_4K		0x20	/* erase 4KiB Block */
+#define BE		0x20	/* erase 4KiB Block */
 #define SE		0xd8	/* sector erase(usually 64KiB) */
+
+/* Winbond Status registers */
+#define WRENSR          0x50    /* enable write for status register */
+#define WRSR            0x01    /* Write Status register 1 */
+#define WRSR2           0x31    /* Write Status register 2 */
+#define WRSR3           0x11    /* Write Status register 3 */
+#define RDSR            0x05    /* Read Status register 1 */
+#define RDSR2           0x35    /* Read Status register 2 */
+#define RDSR3           0x15    /* Read Status register 3 */
+
+/* Spansion 4byte op code */
+#define NORM_READ_4B    0x13    /* Read data bytes */
+#define FAST_READ_4B    0x0c    /* Read data bytes */
+#define QUAD_READ_4B    0x6c    /* Read data bytes */
+#define PP_4B		0x12    /* Page Program */
+#define BE_4B		0x21    /* Block erase */
+#define SE_4B	        0xdc	/* Sector erase */
 
 /* Support auto mode flash dummy and type info only. */
 #define DEF_RD_DUAL_TYPE           RD_DUAL_IO
