@@ -1,0 +1,40 @@
+From 0059335c5b60c5623a894f08a090fdabd618afae Mon Sep 17 00:00:00 2001
+From: Florian Fainelli <f.fainelli@gmail.com>
+Date: Tue, 11 Sep 2018 17:14:19 -0700
+Subject: [PATCH 1/1] CMakeList: Check that compiler supports
+ -Wimplicit-fallthrough
+
+This is a GCC >= 7 feature, not all compilers support it.
+
+Fixes: 908a9f4f1027 ("CMakeLists.txt: add -Wimplicit-fallthrough to the compiler flags")
+Signed-off-by: Florian Fainelli <f.fainelli@gmail.com>
+---
+ CMakeLists.txt | 12 +++++++++++-
+ 1 file changed, 11 insertions(+), 1 deletion(-)
+
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index 50f62bd..d6203aa 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -1,7 +1,17 @@
+ cmake_minimum_required(VERSION 2.6)
+ 
+ PROJECT(netifd C)
+-ADD_DEFINITIONS(-Os -Wall -Werror --std=gnu99 -Wmissing-declarations -Wno-unknown-warning-option -Wno-format-truncation -Wimplicit-fallthrough)
++
++IF(NOT ${CMAKE_VERSION} LESS 3.0)
++  include(CheckCCompilerFlag)
++  check_c_compiler_flag(-Wimplicit-fallthrough HAS_IMPLICIT_FALLTHROUGH)
++ENDIF()
++
++ADD_DEFINITIONS(-Os -Wall -Werror --std=gnu99 -Wmissing-declarations -Wno-unknown-warning-option -Wno-format-truncation)
++
++IF(HAS_IMPLICIT_FALLTHROUGH)
++  ADD_DEFINITIONS(-Wimplicit-fallthrough)
++ENDIF()
+ 
+ SET(CMAKE_SHARED_LIBRARY_LINK_C_FLAGS "")
+ 
+-- 
+2.17.0
+
