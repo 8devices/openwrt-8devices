@@ -624,3 +624,9 @@ if KERNEL_IP_PNP
 		def_bool y
 
 endif
+
+config KERNEL_BINFMT_MISC
+	bool "Enable MISC binaries support"
+	default n
+	help
+	  Enable kernel support MISC binary types registartion and execution.
