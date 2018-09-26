@@ -16,7 +16,7 @@ ifeq ($(CONFIG_MTD_NAND_RTK),y)
     BlockSize=128k
   endif
 else
-  BlockSize=4k
+  BlockSize=64k
 endif
 
 define mkcmdline
