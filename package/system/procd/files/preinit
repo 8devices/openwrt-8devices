@@ -4,7 +4,14 @@
 
 [ -z "$PREINIT" ] && exec /sbin/init
 
-export PATH="%PATH%"
+. /etc/preinit.conf
+
+[ -z "$pi_suppress_stderr" ] && pi_suppress_stderr="y"
+[ -z "$pi_init_suppress_stderr" ] && pi_init_suppress_stderr="y"
+[ -z "$pi_init_path" ] && pi_init_path="/usr/sbin:/usr/bin:/sbin:/bin"
+[ -z "$pi_init_cmd" ] && pi_init_cmd="/sbin/init"
+
+export PATH="$pi_init_path"
 
 pi_ifname=
 pi_ip=192.168.1.1
@@ -17,11 +24,6 @@ fs_failsafe_broadcast=192.168.1.255
 fs_failsafe_netmask=255.255.255.0
 
 fs_failsafe_wait_timeout=2
-
-pi_suppress_stderr="y"
-pi_init_suppress_stderr="y"
-pi_init_path="%PATH%"
-pi_init_cmd="/sbin/init"
 
 . /lib/functions.sh
 . /lib/functions/preinit.sh

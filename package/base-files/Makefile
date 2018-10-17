@@ -145,7 +145,7 @@ define Package/base-files/install
 
 	$(SED) "s#%PATH%#$(TARGET_INIT_PATH)#g" \
 		$(1)/sbin/hotplug-call \
-		$(1)/etc/preinit \
+		$(1)/etc/preinit.conf \
 		$(1)/etc/profile
 
 	mkdir -p $(1)/CONTROL
