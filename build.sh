@@ -6,6 +6,9 @@ help(){
     exit
 }
 
+config=
+feeds=
+
 if [[ $# -lt 1 ]]
 then
     config=config_minimal
@@ -16,12 +19,18 @@ else
             ;;
         carambola2|centipede|lima)
             config=config_minimal
+            if [ -n "$KEFIR" ]; then
+                config=config_minimal.kefir
+                feeds=feeds.conf.kefir
+            fi
             ;;
         help|--help|-h|*)
             help
             ;;
     esac
 fi
+
+[ -n "$feeds" ] && cp $feeds feeds.conf
 
 echo "Building image using config: '$config'"
 

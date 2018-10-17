@@ -1,0 +1,6 @@
+src-git packages https://github.com/8devices/carambola2-new-packages.git^51bf5a9dd0867204eda7737ec4c9402adc96c671
+src-git routing https://github.com/openwrt-routing/packages.git^0d9c99ce5caf51b7a3922831088cf321ef795313
+src-git telephony https://github.com/openwrt/telephony.git^ec4f3a1e6b56ff7f3184665b3308b69b2d291613
+src-git management https://github.com/openwrt-management/packages.git^de36f62549d8da3723c80182812dc89ead2959fd
+src-git targets https://github.com/openwrt/targets.git
+src-git 8dev https://github.com/8devices/feed-8dev.git
