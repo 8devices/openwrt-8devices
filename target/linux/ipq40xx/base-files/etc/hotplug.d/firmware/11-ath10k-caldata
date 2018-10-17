@@ -130,6 +130,7 @@ case "$FIRMWARE" in
 	;;
 "ath10k/pre-cal-ahb-a000000.wifi.bin")
 	case "$board" in
+	8dev,habanero-* |\
 	8dev,jalapeno |\
 	alfa-network,ap120c-ac |\
 	glinet,gl-b1300 |\
@@ -192,6 +193,7 @@ case "$FIRMWARE" in
 	;;
 "ath10k/pre-cal-ahb-a800000.wifi.bin")
 	case "$board" in
+	8dev,habanero-* |\
 	8dev,jalapeno |\
 	alfa-network,ap120c-ac |\
 	glinet,gl-b1300 |\
