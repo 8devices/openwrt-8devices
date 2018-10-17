@@ -12,6 +12,14 @@ ipq40xx_setup_interfaces()
 	local board="$1"
 
 	case "$board" in
+	8dev,habanero-dvk-c1|\
+	8dev,habanero-dvk-c2|\
+	avm,fritzbox-4040|\
+	linksys,ea6350v3)
+		ucidef_set_interfaces_lan_wan "eth0" "eth1"
+		ucidef_add_switch "switch0" \
+			"0u@eth0" "1:lan" "2:lan" "3:lan" "4:lan"
+		;;
 	8dev,jalapeno|\
 	alfa-network,ap120c-ac|\
 	engenius,ens620ext)
@@ -27,12 +35,6 @@ ipq40xx_setup_interfaces()
 		ucidef_set_interfaces_lan_wan "eth0" "eth1"
 		ucidef_add_switch "switch0" \
 			"0u@eth0" "1:lan:4" "2:lan:3" "3:lan:2" "4:lan:1"
-		;;
-	avm,fritzbox-4040|\
-	linksys,ea6350v3)
-		ucidef_set_interfaces_lan_wan "eth0" "eth1"
-		ucidef_add_switch "switch0" \
-			"0u@eth0" "1:lan" "2:lan" "3:lan" "4:lan"
 		;;
 	avm,fritzbox-7530)
 		ucidef_add_switch "switch0" \

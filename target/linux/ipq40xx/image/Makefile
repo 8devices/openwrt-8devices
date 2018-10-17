@@ -51,6 +51,29 @@ define Device/DniImage
 endef
 DEVICE_VARS += NETGEAR_BOARD_ID NETGEAR_HW_ID
 
+define Device/8dev_habanero-dvk-c1
+	$(call Device/FitImageLzma)
+	DEVICE_DTS := qcom-ipq4019-habanero-dvk-c1
+	DEVICE_TITLE := 8devices Habanero DVK-C1
+	IMAGE_SIZE := 30976k
+	IMAGES := sysupgrade.bin
+	IMAGE/sysupgrade.bin := append-kernel | pad-to 64k | append-rootfs | pad-rootfs | append-metadata | check-size $$$$(IMAGE_SIZE)
+	SUPPORTED_DEVICES += 8dev,habanero-dvk-c2
+	DEVICE_PACKAGES := ipq-wifi-8dev_habanero kmod-sdhci-msm
+endef
+TARGET_DEVICES += 8dev_habanero-dvk-c1
+
+define Device/8dev_habanero-dvk-c2
+	$(call Device/FitImageLzma)
+	DEVICE_DTS := qcom-ipq4019-habanero-dvk-c2
+	DEVICE_TITLE := 8devices Habanero DVK-C2
+	IMAGE_SIZE := 30976k
+	IMAGES := sysupgrade.bin
+	IMAGE/sysupgrade.bin := append-kernel | pad-to 64k | append-rootfs | pad-rootfs | append-metadata | check-size $$$$(IMAGE_SIZE)
+	SUPPORTED_DEVICES += 8dev,habanero-dvk-c1
+	DEVICE_PACKAGES := ipq-wifi-8dev_habanero kmod-sdhci-msm kmod-spi-dev spi-tools spidev-test
+endef
+TARGET_DEVICES += 8dev_habanero-dvk-c2
 
 define Device/8dev_jalapeno
 	$(call Device/FitImage)
