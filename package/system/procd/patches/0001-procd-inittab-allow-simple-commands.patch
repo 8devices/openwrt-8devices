@@ -1,0 +1,46 @@
+diff --git a/inittab.c b/inittab.c
+index f8f0218..f063f4a 100644
+--- a/inittab.c
++++ b/inittab.c
+@@ -134,6 +134,18 @@ static void child_exit(struct uloop_process *proc, int ret)
+         uloop_timeout_set(&a->tout, a->respawn);
+ }
+ 
++static void child_step(struct uloop_process *proc, int ret)
++{
++	DEBUG(4, "done, pid:%d\n", proc->pid);
++	procd_state_next();
++}
++
++static void rcrun(struct init_action *a)
++{
++	a->proc.cb = child_step;
++	fork_worker(a);
++}
++
+ static void respawn(struct uloop_timeout *tout)
+ {
+ 	struct init_action *a = container_of(tout, struct init_action, tout);
+@@ -147,14 +159,15 @@ static void rcdone(struct runqueue *q)
+ 
+ static void runrc(struct init_action *a)
+ {
+-	if (!a->argv[1] || !a->argv[2]) {
+-		ERROR("valid format is rcS <S|K> <param>\n");
+-		return;
++	if (a->argv[1] && a->argv[2]) {
++		/* proceed even if no init or shutdown scripts run */
++		if (rcS(a->argv[1], a->argv[2], rcdone))
++			rcdone(NULL);
++	} else if (!a->argv[1] && !a->argv[2]) {
++		rcrun(a);
++	} else {
++		ERROR("valid format is rcS <S|K> <param> or <command>\n");
+ 	}
+-
+-	/* proceed even if no init or shutdown scripts run */
+-	if (rcS(a->argv[1], a->argv[2], rcdone))
+-		rcdone(NULL);
+ }
+ 
+ static void askfirst(struct init_action *a)
