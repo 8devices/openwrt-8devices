@@ -1,0 +1,15 @@
+diff --git a/src/luaconf.h b/src/luaconf.h
+index e20053e..5ea9c58 100644
+--- a/src/luaconf.h
++++ b/src/luaconf.h
+@@ -164,8 +164,8 @@
+ ** These are kept in a separate configuration file mainly for ease of patching
+ ** (can be changed if integerated to Lua proper).
+ */
+-/*#define LNUM_DOUBLE*/
+-/*#define LNUM_INT32*/
++#define LNUM_DOUBLE
++#define LNUM_INT64
+ #include "lnum_config.h"
+ 
+ /*
