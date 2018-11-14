@@ -22,15 +22,15 @@ int reinit_r4k_clocksource(void)
 {
 	struct clocksource * new_cs;
 
+	if (!cpu_has_counter || !mips_hpt_frequency)
+		return -ENXIO;
+
 	new_cs = (struct clocksource *) kzalloc(sizeof(struct clocksource), GFP_KERNEL);
 	new_cs->name	= curr_cs->name;
 	new_cs->read	= curr_cs->read;
 	new_cs->mask	= curr_cs->mask;
 	new_cs->flags	= curr_cs->flags;
 	new_cs->rating	= curr_cs->rating;
-
-        if (!cpu_has_counter || !mips_hpt_frequency)
-                return -ENXIO;
 
         clocksource_register_hz(new_cs, mips_hpt_frequency);
 	clocksource_unregister(curr_cs);
@@ -44,6 +44,7 @@ static int realtek_cpufreq_target(struct cpufreq_policy *policy,
 			     unsigned int relation)
 {
 	struct cpufreq_freqs freqs;
+	int cpu;
 
 	freqs.old	= cpufreq_generic_get(0);
 	freqs.new	= target_freq;
@@ -53,7 +54,10 @@ static int realtek_cpufreq_target(struct cpufreq_policy *policy,
 	clk_set_rate(policy->clk, ((unsigned long)target_freq * 1000ul));
 	reinit_r4k_clocksource();
 	cpufreq_freq_transition_end(policy, &freqs, 0);
-	raw_current_cpu_data.udelay_val = loops_per_jiffy;
+
+	for_each_possible_cpu(cpu){
+		cpu_data[cpu].udelay_val = loops_per_jiffy;
+	}
 
 	return 0;
 }
@@ -103,7 +107,6 @@ static struct cpufreq_driver realtek_cpufreq_driver = {
 	.verify		= realtek_cpufreq_verify,
 	.exit		= realtek_cpufreq_cpu_exit,
 };
-
 
 static int __init realtek_cpufreq_module_init(void)
 {
