@@ -45,10 +45,8 @@
 /*
  * Clock Rate
  */
-//#define BSP_CPU0_FREQ		25000000     /* 25 MHz */
-//#define BSP_CPU0_FREQ		50000000     /* 50 MHz */
-//#define BSP_CPU0_FREQ		66000000     /* 66 MHz */ // switch
-//#define BSP_CPU0_FREQ		33868800     /* 33.8688 MHz */ // USB OTG
+#define BSP_CPUFREQ_SEL_OFFSET	15
+#define BSP_CPUFREQ_DIV_OFFSET	19
 #define BSP_SPIC_FREQ		200000000	/* Sheipa SPI-nor 200 MHz */
 #define BSP_DW_SPI_FREQ		100000000	/* 100 MHz */
 #define BSP_DW_I2C_FREQ		100000000	/* 100MHz */
@@ -310,6 +308,7 @@ IRR3 IP#[31,30,29,28, 27,26,25,24]
 */
 
 #define SYSTEM_REG_BASE 	0xB8000000
+#define BSP_INIT_STATUS		(SYSTEM_REG_BASE + 0x4)
 #define BSP_HW_STRAP		(SYSTEM_REG_BASE + 0x8)
 #define BSP_BOND_OPTION		(SYSTEM_REG_BASE + 0xC)
 #define BSP_CLK_MANAGE1         (SYSTEM_REG_BASE + 0x0010)

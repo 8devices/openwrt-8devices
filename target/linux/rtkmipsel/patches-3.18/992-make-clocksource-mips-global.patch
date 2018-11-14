@@ -1,0 +1,13 @@
+Index: linux-3.18.29/arch/mips/kernel/csrc-r4k.c
+===================================================================
+--- linux-3.18.29.orig/arch/mips/kernel/csrc-r4k.c
++++ linux-3.18.29/arch/mips/kernel/csrc-r4k.c
+@@ -15,7 +15,7 @@ static cycle_t c0_hpt_read(struct clocks
+ 	return read_c0_count();
+ }
+ 
+-static struct clocksource clocksource_mips = {
++struct clocksource clocksource_mips = {
+ 	.name		= "MIPS",
+ 	.read		= c0_hpt_read,
+ 	.mask		= CLOCKSOURCE_MASK(32),

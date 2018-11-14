@@ -1,0 +1,5 @@
+config Realtek_8197F_CPUFREQ
+        tristate "Realtek CPUFreq Driver"
+        help
+          This option adds a CPUFreq driver for realtek processors which
+          support software configurable cpu frequency.

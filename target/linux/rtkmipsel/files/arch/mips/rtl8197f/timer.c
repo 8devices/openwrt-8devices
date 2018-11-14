@@ -77,7 +77,7 @@ unsigned int __cpuinit get_c0_compare_int(void)
 }
 
 //void __init bsp_timer_init(void)
-void __init plat_time_init(void) // mips-ori
+void plat_time_init(void) // mips-ori
 {
 	unsigned int freq, div, hwstrap;
 

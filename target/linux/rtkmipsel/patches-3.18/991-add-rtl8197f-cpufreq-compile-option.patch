@@ -1,0 +1,22 @@
+Index: linux-3.18.71/drivers/cpufreq/Kconfig
+===================================================================
+--- linux-3.18.71.orig/drivers/cpufreq/Kconfig
++++ linux-3.18.71/drivers/cpufreq/Kconfig
+@@ -250,6 +250,7 @@ config LOONGSON2_CPUFREQ
+ 
+ 	  If in doubt, say N.
+ 
++source "drivers/cpufreq/Kconfig.realtek"
+ endmenu
+ 
+ menu "PowerPC CPU frequency scaling drivers"
+Index: linux-3.18.71/drivers/cpufreq/Makefile
+===================================================================
+--- linux-3.18.71.orig/drivers/cpufreq/Makefile
++++ linux-3.18.71/drivers/cpufreq/Makefile
+@@ -102,3 +102,5 @@ obj-$(CONFIG_SH_CPU_FREQ)		+= sh-cpufreq
+ obj-$(CONFIG_SPARC_US2E_CPUFREQ)	+= sparc-us2e-cpufreq.o
+ obj-$(CONFIG_SPARC_US3_CPUFREQ)		+= sparc-us3-cpufreq.o
+ obj-$(CONFIG_UNICORE32)			+= unicore2-cpufreq.o
++obj-$(CONFIG_Realtek_8197F_CPUFREQ)	+= realtek-cpufreq.o
++
