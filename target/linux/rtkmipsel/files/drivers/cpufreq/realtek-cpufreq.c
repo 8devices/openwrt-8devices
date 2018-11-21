@@ -8,6 +8,7 @@
 #include <linux/clk.h>
 #include <linux/clkdev.h>
 #include <linux/clocksource.h>
+#include <linux/cpu.h>
 #include <linux/cpufreq.h>
 #include <linux/delay.h>
 #include <linux/init.h>
@@ -32,8 +33,10 @@ int reinit_r4k_clocksource(void)
 	new_cs->flags	= curr_cs->flags;
 	new_cs->rating	= curr_cs->rating;
 
-        clocksource_register_hz(new_cs, mips_hpt_frequency);
+	clocksource_register_hz(new_cs, mips_hpt_frequency);
 	clocksource_unregister(curr_cs);
+	if(curr_cs != &clocksource_mips)
+		kfree(curr_cs);
 	curr_cs = new_cs;
 
         return 0;
@@ -75,6 +78,7 @@ static int realtek_cpufreq_cpu_init(struct cpufreq_policy *policy)
 	struct clk_lookup *cl;
 
 	cpuclk = clk_get_sys("cpu_clk", NULL);
+	dev = get_cpu_device(policy->cpu);
 
 	if (IS_ERR(cpuclk)) {
 		dev_err(dev, "couldn't get CPU clk\n");
