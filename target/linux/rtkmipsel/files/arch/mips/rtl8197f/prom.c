@@ -73,23 +73,28 @@ void __init prom_free_prom_memory(void) //mips-ori
 {
 }
 
+static __init void prom_init_cmdline(int argc, char **argv)
+{
+	int i;
+
+	if (argc) {
+		for (i = 0; i < argc; i++){
+			strlcat(arcs_cmdline, " ", sizeof(arcs_cmdline));
+			strlcat(arcs_cmdline, argv[i], sizeof(arcs_cmdline));
+		}
+	}
+	else{
+		strcpy(arcs_cmdline, "console=ttyS0,38400");
+	}
+}
+
 /* Do basic initialization */
-//void __init bsp_init(void)
 void __init prom_init(void) // mips-ori
 {
 	u_long mem_size;
-#ifndef CONFIG_CMDLINE_BOOL
-	char *cmdline = (char *)fw_arg0;
-#endif
 
 	bsp_serial_init(); // for debug
-
-#ifndef CONFIG_CMDLINE_BOOL
-	arcs_cmdline[0] = '\0';
-	strcpy(arcs_cmdline, "console=ttyS0,38400");
-
-	strcat(arcs_cmdline, cmdline);
-#endif
+	prom_init_cmdline(fw_arg0, (char **)fw_arg1);
 
 	switch (REG32(0xB800000C) & 0x0F) {
 		case 0x06:
