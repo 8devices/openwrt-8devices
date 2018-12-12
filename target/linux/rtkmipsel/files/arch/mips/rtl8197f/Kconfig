@@ -80,4 +80,10 @@ config RTL8197_MACH_KINKAN
 	help
 	  Say 'Y' here if you want your kernel to support the
 	  8devices Kinkan development board.
+
+config RTL8197_MACH_KOMIKAN
+	bool "8devices Komikan devboard"
+	help
+	  Say 'Y' here if you want your kernel to support the
+	  8devices Komikan development board.
 endmenu

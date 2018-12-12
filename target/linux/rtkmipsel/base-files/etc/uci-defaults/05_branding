@@ -17,6 +17,11 @@ kinkan)
 	uci set system.@system[0].hostname=Kinkan
 	uci set wireless.@wifi-iface[0].ssid=Kinkan
 	;;
+komikan)
+	uci set system.@system[0].hostname=Komikan
+	uci set wireless.@wifi-iface[0].ssid='Komikan 5G'
+	uci set wireless.@wifi-iface[1].ssid='Komikan 2G'
+	;;
 *)
 	;;
 esac

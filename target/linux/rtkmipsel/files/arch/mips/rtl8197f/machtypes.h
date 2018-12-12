@@ -18,6 +18,7 @@ enum ath79_mach_type {
 	RTL8197_MACH_GENERIC_OF = -1,	/* Device tree board */
 	RTL8197_MACH_GENERIC = 0,
 	RTL8197_MACH_KINKAN,			/* 8devices Kinkan devboard*/
+	RTL8197_MACH_KOMIKAN,			/* 8devices Komikan devboard*/
 };
 
 #endif /* _RTL8197_MACHTYPE_H */

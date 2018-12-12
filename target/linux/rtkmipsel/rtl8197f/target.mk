@@ -1,8 +1,8 @@
 SUBTARGET:=rtl8197f
-BOARDNAME:=RTL8197F based boards
+BOARDNAME:=8devices rtk8197fs based boards
 CPU_TYPE:=24kec
 DEFAULT_PACKAGES +=
 
 define Target/Description
-	RTL8197F based boards
+	8devices rtk8197fs based boards
 endef

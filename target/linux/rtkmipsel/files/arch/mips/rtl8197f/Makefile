@@ -29,3 +29,4 @@ obj-$(CONFIG_I2C_DESIGNWARE_PLATFORM)  += i2c.o
 #
 obj-$(CONFIG_RTL8197_MACH_GENERIC)	+= mach_rtl819x.o
 obj-$(CONFIG_RTL8197_MACH_KINKAN)	+= mach-kinkan.o
+obj-$(CONFIG_RTL8197_MACH_KOMIKAN)	+= mach-komikan.o

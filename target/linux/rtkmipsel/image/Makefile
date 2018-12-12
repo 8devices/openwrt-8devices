@@ -8,7 +8,7 @@ include $(TOPDIR)/rules.mk
 include $(INCLUDE_DIR)/image.mk
 
 BlockSize=64k
-RAMFS_MAX_SIZE = 10485760	# 0xA00000
+RAMFS_MAX_SIZE = 67108864	# 0x4000000
 
 define mkcmdline
 board=$(shell echo $(1) | tr a-z A-Z) console=$(2),$(3) hwpart=0x$(4) mtdparts=m25p80:128k(boot),128k(hwpart),256k(config),-(firmware)
@@ -35,10 +35,10 @@ endef
 define Image/Build/Profile/$(1)/squashfs
 	$(call Image/BuildLoader,loader-$(SUBTARGET)-$(1),bin,$(call mkcmdline,$(1),$(2),$(3),$(6)),$(4),vmlinux.bin.lzma)
 
-	cvimg-$(SUBTARGET) linux $(KDIR)/loader-$(SUBTARGET)-$(1).bin $(BIN_DIR)/$(IMG_PREFIX)-$(1)-linux.bin $(4) $(5)
+	cvimg-rtl8197f linux $(KDIR)/loader-$(SUBTARGET)-$(1).bin $(BIN_DIR)/$(IMG_PREFIX)-$(1)-linux.bin $(4) $(5)
 	dd if=$(BIN_DIR)/$(IMG_PREFIX)-$(1)-linux.bin of=$(BIN_DIR)/$(IMG_PREFIX)-$(1)-linux_4k.bin bs=$(BlockSize) conv=sync
 	cat $(BIN_DIR)/$(IMG_PREFIX)-$(1)-linux_4k.bin $(KDIR)/root.squashfs-4k > $(BIN_DIR)/$(IMG_PREFIX)-$(1)-fw_4k_cat.bin
-	cvimg-$(SUBTARGET) fix_chksum  $(BIN_DIR)/$(IMG_PREFIX)-$(1)-fw_4k_cat.bin $(BIN_DIR)/$(IMG_PREFIX)-$(1)-squashfs-sysupgrade.bin
+	cvimg-rtl8197f fix_chksum  $(BIN_DIR)/$(IMG_PREFIX)-$(1)-fw_4k_cat.bin $(BIN_DIR)/$(IMG_PREFIX)-$(1)-squashfs-sysupgrade.bin
 	rm -rf $(BIN_DIR)/$(IMG_PREFIX)-$(1)-linux_4k.bin $(BIN_DIR)/$(IMG_PREFIX)-$(1)-fw_4k_cat.bin $(BIN_DIR)/$(IMG_PREFIX)-$(1)-linux.bin
 endef
 
@@ -89,7 +89,6 @@ define Image/Prepare
 endef
 
 define Image/Prepare/Initramfs
-	$(info $(call compare,$(call filesize,$(KDIR)/vmlinux-initramfs),$(RAMFS_MAX_SIZE)))
 	$(if $(call test,$(call filesize,$(KDIR)/vmlinux-initramfs),-gt,$(RAMFS_MAX_SIZE)),\
 		$(error $(KDIR)/vmlinux-initramfs bigger then $(RAMFS_MAX_SIZE) bytes))
 	lzma e $(KDIR)/vmlinux-initramfs -lc1 -lp2 -pb2 $(KDIR)/vmlinux-initramfs.bin.lzma
@@ -108,8 +107,11 @@ define Image/BuildLoader
 		compile loader.$(2)
 endef
 
-ifeq ($(CONFIG_TARGET_rtkmipsel_rtl8197f),y)
-$(eval $(call SingleProfile,kinkan,ttyS0,115200,0x80A00000,80000,20000))
+ifeq ($(CONFIG_TARGET_rtkmipsel_rtk8197f_kinkan),y)
+$(eval $(call SingleProfile,kinkan,ttyS0,115200,0x84000000,80000,20000))
+endif
+ifeq ($(CONFIG_TARGET_rtkmipsel_rtk8197f_komikan),y)
+$(eval $(call SingleProfile,komikan,ttyS0,115200,0x84000000,80000,20000))
 endif
 
 define Image/Build/Initramfs

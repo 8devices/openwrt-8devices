@@ -5,17 +5,6 @@
 # See /LICENSE for more information.
 #
 
-define Profile/Default
-  NAME:=Default Profile
-  PRIORITY:=1
-  PACKAGES:=-wpad-mini
-endef
-
-define Profile/Default/Description
-	Default package set compatible with most boards.
-endef
-$(eval $(call Profile,Default))
-
 define Profile/kinkan
   NAME:=Kinkan Profile
   PRIORITY:=1

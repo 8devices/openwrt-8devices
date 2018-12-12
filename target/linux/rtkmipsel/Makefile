@@ -10,14 +10,10 @@ ARCH:=mipsel
 BOARD:=rtkmipsel
 BOARDNAME:=Realtek mipsel SOC
 SUBTARGETS:=rtl8197f
-#FEATURES:=squashfs usb
 FEATURES:=squashfs usb
-#LINUX_VERSION:=3.10.49
 KERNEL_PATCHVER:=3.18
 
 include $(INCLUDE_DIR)/target.mk
-
-#DEFAULT_PACKAGES += kmod-gpio-button-hotplug
 
 define Target/Description
 	Build firmware images for Realtek based boards

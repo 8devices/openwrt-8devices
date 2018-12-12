@@ -11,6 +11,9 @@ get_status_led() {
 	kinkan)
 		status_led="kinkan:green:status"
 		;;
+	komikan)
+		status_led="komikan:green:led0"
+		;;
 	esac
 }
 
