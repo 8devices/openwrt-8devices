@@ -1,0 +1,65 @@
+#!/bin/sh /etc/rc.common
+# Copyright (C) 2019 8devices
+
+START=99
+PROG=/usr/sbin/rtk_hciattach
+
+start_btdev() {
+	local cfg="$1"
+
+	config_get_bool hci_enabled $cfg enabled 0
+	[ -z "$hci_enabled" -o "$hci_enabled" = "0" ] && return 0;
+
+	/sbin/lsmod | grep rtk_uart1 > /dev/null || /sbin/modprobe rtk_uart1
+	/usr/sbin/rtk_mux_ctl -c /usr/share/rtk-mux-ctl/examples/komikan/bluetooth.json
+
+	config_get hci_tty $cfg tty ttyS1
+	config_get hci_speed $cfg speed 115200
+	config_get hci_type $cfg type rtk_h5
+	config_get bt_gpio $cfg gpio 33
+
+	if [ ! -d /sys/class/gpio/gpio${bt_gpio} ]; then
+		echo ${bt_gpio} > /sys/class/gpio/export
+		echo out  > /sys/class/gpio/gpio${bt_gpio}/direction
+	fi
+
+	echo 0 > /sys/class/gpio/gpio${bt_gpio}/value
+	/bin/sleep 1
+	echo 1 > /sys/class/gpio/gpio${bt_gpio}/value
+
+	$PROG -s $hci_speed $hci_tty $hci_type
+	/bin/sleep 1
+
+	retries=10
+	while [ "$retries" -gt 0 ]; do
+		/usr/bin/hciconfig $cfg up && break
+		retries=$(($retries - 1))
+		sleep 1
+	done
+}
+
+enable_bt_mux() {
+	[ $BT_MUX_ENABLED = 1 ] && exit 0
+}
+
+stop_btdev() {
+	local cfg="$1"
+	config_get bt_gpio $cfg gpio 33
+	config_get hci_tty $cfg tty ttyS1
+
+	/usr/bin/hciconfig $1 down
+	kill `pgrep -f $hci_tty`
+	echo 0 > /sys/class/gpio/gpio${bt_gpio}/value
+}
+
+start() {
+	config_load bluetooth
+	config_foreach start_btdev bt-device
+}
+stop() {
+	config_load bluetooth
+	config_foreach stop_btdev bt-device
+	/sbin/lsmod | grep rtk_uart1 > /dev/null && /sbin/rmmod rtk_uart1
+	/bin/sleep 1
+	/usr/sbin/rtk_mux_ctl -c /usr/share/rtk-mux-ctl/examples/komikan/mmc.json
+}
