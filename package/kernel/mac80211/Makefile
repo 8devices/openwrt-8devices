@@ -1393,7 +1393,7 @@ endef
 define KernelPackage/rtl8192cd
   $(call KernelPackage/mac80211/Default)
   TITLE:=Realtek 8192cd wireless module support
-  DEPENDS+= @(TARGET_rtkmipsel) +kmod-mac80211 +@DRIVER_11N_SUPPORT
+  DEPENDS+= @(TARGET_rtkmipsel) +kmod-mac80211 +@DRIVER_11N_SUPPORT +@DRIVER_11AC_SUPPORT
   FILES:=$(PKG_BUILD_DIR)/drivers/net/wireless/realtek/rtl8192cd/rtl8192cd.ko
   AUTOLOAD:=$(call AutoProbe,rtl8192cd)
 endef
