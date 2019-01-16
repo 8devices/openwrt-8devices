@@ -42,6 +42,21 @@ define Image/Build/Profile/$(1)/squashfs
 	rm -rf $(BIN_DIR)/$(IMG_PREFIX)-$(1)-linux_4k.bin $(BIN_DIR)/$(IMG_PREFIX)-$(1)-fw_4k_cat.bin $(BIN_DIR)/$(IMG_PREFIX)-$(1)-linux.bin
 endef
 
+define Image/Build/Profile/$(1)/sdcard
+	$(call Image/BuildLoader,loader-$(SUBTARGET)-$(1)-sdcard,bin,$(call mkcmdline,$(1),$(2),$(3),$(6)) root=/dev/mmcblk0p2 rootwait,$(4),vmlinux.bin.lzma)
+
+	cvimg-rtl8197f linux $(KDIR)/loader-$(SUBTARGET)-$(1)-sdcard.bin $(BIN_DIR)/sdboot/linux.bin $(5) $(6)
+
+	rm -f $(KDIR)/sd.boot
+	mkfs.fat $(KDIR)/sd.boot -C 8192
+
+	mcopy -i $(KDIR)/sd.boot $(BIN_DIR)/sdboot/boot.bin ::boot.bin
+	mcopy -i $(KDIR)/sd.boot $(BIN_DIR)/sdboot/boot.img ::boot.img
+	mcopy -i $(KDIR)/sd.boot $(BIN_DIR)/sdboot/linux.bin ::linux.bin
+	./generate_sdcard_img.sh $(KDIR)/sd.img $(KDIR)/sd.boot $(KDIR)/root.squashfs 8 256
+	rm -f $(KDIR)/sd.boot
+endef
+
 SINGLE_PROFILES += $(1)
 
 endef
@@ -57,6 +72,12 @@ define MultiProfile
   define Image/Build/Profile/$(1)/squashfs
 	$(foreach p,$(2),
 		$$(call Image/Build/Profile/$p/squashfs)
+	)
+  endef
+
+  define Image/Build/Profile/$(1)/sdcard
+	$(foreach p,$(2),
+		$$(call Image/Build/Profile/$p/sdcard)
 	)
   endef
 
@@ -99,6 +120,9 @@ define Image/Build
 	dd if=$(KDIR)/root.squashfs of=$(KDIR)/root.squashfs-4k bs=$(BlockSize) conv=sync
 	$(call add_jffs2_mark,$(KDIR)/root.squashfs-4k)
 	$(call Image/Build/Profile/$(PROFILE)/squashfs)
+ifeq ($(CONFIG_TARGET_rtkmipsel_kinkan),y)
+	$(call Image/Build/Profile/$(PROFILE)/sdcard)
+endif
 endef
 
 $(eval $(call BuildImage))
