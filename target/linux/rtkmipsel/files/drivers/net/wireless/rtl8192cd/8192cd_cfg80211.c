@@ -1376,8 +1376,10 @@ void realtek_ap_config_apply(struct rtl8192cd_priv	*priv)
 	if(under_apmode_repeater(priv) && (GET_VXD_PRIV(priv)->pmib->dot11OperationEntry.opmode & WIFI_ASOC_STATE)) {
 		NLINFO("Repeater! STA is alive, skip down-up\n");
 	} else {
+		int prev_flags;
 		NLINFO("[%s][down up]\n",priv->dev->name);
 
+		prev_flags = priv->dev->flags & IFF_UP;
 		rtl8192cd_close(priv->dev);
 		priv->dev->flags &= ~IFF_UP;
 		#if 0 //def P2P_SUPPORT    
@@ -1387,6 +1389,7 @@ void realtek_ap_config_apply(struct rtl8192cd_priv	*priv)
 		}
 		#endif
 		rtl8192cd_open(priv->dev);
+		priv->dev->flags |= prev_flags;
 	}
 
 }
