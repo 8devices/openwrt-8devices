@@ -14,6 +14,9 @@ else
         kinkan)
             config=config_kinkan_minimal
             ;;
+        kinkan_otbr)
+            config=config_kinkan_otbr
+            ;;
         kinkan_full)
             config=config_kinkan_full
             ;;

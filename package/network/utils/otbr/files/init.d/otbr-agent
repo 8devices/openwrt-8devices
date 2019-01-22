@@ -1,0 +1,25 @@
+#!/bin/sh /etc/rc.common
+
+START=67
+
+AGENT_BIN=/usr/sbin/otbr-agent
+AGENT_CONF=/etc/default/otbr-agent
+AGENT_PID_FILE=/var/run/otbr-agent.pid
+
+if [ -f $AGENT_CONF ]; then
+    . $AGENT_CONF
+fi
+
+start()
+{
+    start-stop-daemon -S -q \
+        -p $AGENT_PID_FILE -m \
+        -b -x $AGENT_BIN -- $OTBR_AGENT_OPTS
+}
+
+stop()
+{
+    start-stop-daemon -K -q \
+        -p $AGENT_PID_FILE
+    rm $AGENT_PID_FILE
+}

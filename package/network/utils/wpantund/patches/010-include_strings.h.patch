@@ -1,0 +1,24 @@
+Index: wpantund-2018-11-15/src/util/netif-mgmt.c
+===================================================================
+--- a/src/util/netif-mgmt.c
++++ b/src/util/netif-mgmt.c
+@@ -38,8 +38,10 @@
+ #include <fcntl.h>
+ #include <errno.h>
+ #include <string.h>
++#include <strings.h>
+ #include <netinet/in.h>
+ #include <net/if.h>
++
+ #include <sys/ioctl.h>
+ #include <unistd.h>
+===================================================================
+--- a/src/util/string-utils.h
++++ b/src/util/string-utils.h
+@@ -27,6 +27,7 @@
+ #include <stddef.h>
+ #include <stdint.h>
+ #include <string.h>
++#include <strings.h>
+ #include <stdbool.h>
+ #include <sys/cdefs.h>
