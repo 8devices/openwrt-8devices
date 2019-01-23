@@ -53,7 +53,7 @@ define Image/Build/Profile/$(1)/sdcard
 	mcopy -i $(KDIR)/sd.boot $(BIN_DIR)/sdboot/boot.bin ::boot.bin
 	mcopy -i $(KDIR)/sd.boot $(BIN_DIR)/sdboot/boot.img ::boot.img
 	mcopy -i $(KDIR)/sd.boot $(BIN_DIR)/sdboot/linux.bin ::linux.bin
-	./generate_sdcard_img.sh $(KDIR)/sd.img $(KDIR)/sd.boot $(KDIR)/root.squashfs 8 256
+	./generate_sdcard_img.sh $(BIN_DIR)/$(IMG_PREFIX)-$(1)-sdcard.img $(KDIR)/sd.boot $(KDIR)/root.squashfs 8 256
 	rm -f $(KDIR)/sd.boot
 endef
 
@@ -120,7 +120,7 @@ define Image/Build
 	dd if=$(KDIR)/root.squashfs of=$(KDIR)/root.squashfs-4k bs=$(BlockSize) conv=sync
 	$(call add_jffs2_mark,$(KDIR)/root.squashfs-4k)
 	$(call Image/Build/Profile/$(PROFILE)/squashfs)
-ifeq ($(CONFIG_TARGET_rtkmipsel_kinkan),y)
+ifeq ($(CONFIG_RTK_SDCARD_IMG),y)
 	$(call Image/Build/Profile/$(PROFILE)/sdcard)
 endif
 endef

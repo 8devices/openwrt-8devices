@@ -1,0 +1,6 @@
+config RTK_SDCARD_IMG
+	bool "Generate sdcard image"
+	depends on TARGET_rtkmipsel
+	select PACKAGE_rtk_boot
+	default n
+
