@@ -43,7 +43,7 @@ define Package/wpantund
 	SECTION:=net
 	CATEGORY:=Network
 	TITLE:=Userspace WPAN Network Daemon
-	DEPENDS:=+libreadline +dbus +libstdcpp +libncurses +boost +boost-signals +boost-system +kmod-tun
+	DEPENDS:=+libreadline +dbus +libstdcpp +libncurses +boost +boost-system +kmod-tun
 endef
 
 define Package/wpantund/description
