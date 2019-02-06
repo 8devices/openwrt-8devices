@@ -51,6 +51,7 @@ define Package/otbr/install
 	$(CP) -r $(PKG_INSTALL_DIR)/etc/dbus-1/* $(1)/etc/dbus-1
 	$(CP) -r $(PKG_INSTALL_DIR)/etc/default/* $(1)/etc/default
 	$(CP) -r ./files/init.d/* $(1)/etc/init.d
+	$(CP) -r ./files/default/otbr-web $(1)/etc/default
 endef
 
 $(eval $(call BuildPackage,otbr))
