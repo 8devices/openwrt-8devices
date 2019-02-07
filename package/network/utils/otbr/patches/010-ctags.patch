@@ -1,0 +1,13 @@
+Index: otbr-2018-11-13-9451b53/configure.ac
+===================================================================
+--- otbr-2018-11-13-9451b53.orig/configure.ac
++++ otbr-2018-11-13-9451b53/configure.ac
+@@ -330,7 +330,7 @@ AC_MSG_CHECKING([checking if Exuberant C
+ AC_PATH_PROGS_FEATURE_CHECK([CTAGS], [ctags],
+                             [$ac_path_CTAGS --version | grep -q Exuberant &&
+                              ac_cv_path_CTAGS=$ac_path_CTAGS],
+-                            [AC_MSG_ERROR([could not find ctags])])
++                            [AC_MSG_NOTICE([could not find ctags])])
+ AC_MSG_RESULT([$ac_cv_path_CTAGS])
+ 
+ # Check if the DBus module
