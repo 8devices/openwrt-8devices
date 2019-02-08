@@ -11,7 +11,7 @@ BlockSize=64k
 RAMFS_MAX_SIZE = 10485760	# 0xA00000
 
 define mkcmdline
-board=$(shell echo $(1) | tr a-z A-Z) console=$(2),$(3) hwpart=0x$(4) mtdparts=m25p80:128k(boot),256k(hwpart),128k(cfg),-(firmware)
+board=$(shell echo $(1) | tr a-z A-Z) console=$(2),$(3) hwpart=0x$(4) mtdparts=m25p80:128k(boot),128k(hwpart),256k(config),-(firmware)
 endef
 
 define test
