@@ -1,4 +1,0 @@
-# Default settings for otbr-web. This file is sourced by systemd   
-
-# Options to pass to otbr-web  
-OTBR_WEB_OPTS="-p 8080"
