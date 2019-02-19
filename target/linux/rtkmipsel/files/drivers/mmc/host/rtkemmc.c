@@ -2498,7 +2498,7 @@ static int mmc_Tuning_DDR50(struct rtksd_host *sdport){
 	for(i=0x0; i<0x20; i++){
 		mmc_Phase_Adjust(sdport, i, 0xff);
 		#ifdef MMC_DEBUG
-		MMCPRINTF("phase (%d) - VP=0x%08x\n", i,REG32(PLL_EMMC1));
+		MMCPRINTF("phase (%d) - VP=0x%08x\n", i,  (*(volatile unsigned int *)(PLL_EMMC1)));
 		#endif
 		if (rtkcr_send_cmd25(sdport)!=0)
 		{
@@ -2730,7 +2730,7 @@ int error_handling(struct rtksd_host *sdport, unsigned int cmd_idx, unsigned int
                         MMCPRINTF(KERN_INFO "change mode from %d to %d ---> \n", gCurrentBootMode,MODE_SD20);
                         //flush_cache((unsigned long)g_ext_csd, CSD_ARRAY_SIZE);
                         #ifdef MMC_DEBUG
-                        mmc_show_ext_csd(g_ext_csd);
+                        //mmc_show_ext_csd(g_ext_csd);
                         #endif
 			if (gCurrentBootMode == MODE_SD30)
 			{

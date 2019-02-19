@@ -13,8 +13,7 @@
 #include "../mmc_debug.h"               //liao
 
 //debug
-//#define MMC_DBG
-#ifdef MMC_DBG
+#ifdef MMC_DEBUG
 #define MMCPRINTF(fmt, args...)   printk(fmt,## args)
 #else
 #define MMCPRINTF(fmt, args...)
