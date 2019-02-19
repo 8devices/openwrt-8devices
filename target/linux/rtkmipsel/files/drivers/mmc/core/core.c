@@ -2266,7 +2266,7 @@ static int mmc_rescan_try_freq(struct mmc_host *host, unsigned freq)
 	 * should be ignored by SD/eMMC cards.
 	 */
 	//sdio_reset(host);
-	//mmc_go_idle(host);
+	mmc_go_idle(host);
 
 
 	mmc_send_if_cond(host, host->ocr_avail);
