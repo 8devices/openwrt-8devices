@@ -82,6 +82,7 @@ ramips_setup_interfaces()
 	dir-320-b1|\
 	dir-610-a1|\
 	dir-615-h1|\
+	dir-810l|\
 	dlink,dwr-116-a1|\
 	dlink,dwr-921-c1|\
 	ew1200|\
@@ -372,7 +373,7 @@ ramips_setup_interfaces()
 		;;
 	wizfi630a)
 		ucidef_add_switch "switch0" \
-			"1:lan" "2:lan" "0:wan" "6@eth0"
+			"0:lan" "1:lan" "2:wan" "6@eth0"
 		;;
 	wt3020-4M|\
 	wt3020-8M)

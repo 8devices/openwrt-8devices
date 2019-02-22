@@ -1,5 +1,5 @@
 src-git 8devices_custom https://github.com/8devices/openwrt-8devices-custom-feed.git
-src-git packages https://git.openwrt.org/feed/packages.git^35e0b737ab496f5b51e80079b0d8c9b442e223f5
-src-git luci https://git.openwrt.org/project/luci.git^f64b1523447547032d5280fb0bcdde570f2ca913
-src-git routing https://git.openwrt.org/feed/routing.git^1b9d1c419f0ecefda51922a7845ab2183d6acd76
-src-git telephony https://git.openwrt.org/feed/telephony.git^b9d7b321d15a44c5abb9e5d43a4ec78abfd9031b
+src-git packages https://git.openwrt.org/feed/packages.git^911bbd6bb4856f1e28ae00af37df62e4fa3529e5
+src-git luci https://git.openwrt.org/project/luci.git^6f6641d97de2c85ee5d87beda92ae8437d1dbdf5
+src-git routing https://git.openwrt.org/feed/routing.git^ea345d16a6e27c2a8fdf67bf543cc36a5f189131
+src-git telephony https://git.openwrt.org/feed/telephony.git^cb939d9677d6e38c428f9f297641d07611edeb04

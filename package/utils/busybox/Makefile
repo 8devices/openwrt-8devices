@@ -8,14 +8,14 @@
 include $(TOPDIR)/rules.mk
 
 PKG_NAME:=busybox
-PKG_VERSION:=1.28.3
-PKG_RELEASE:=1
+PKG_VERSION:=1.28.4
+PKG_RELEASE:=2
 PKG_FLAGS:=essential
 
 PKG_SOURCE:=$(PKG_NAME)-$(PKG_VERSION).tar.bz2
 PKG_SOURCE_URL:=https://www.busybox.net/downloads \
 		http://sources.buildroot.net
-PKG_HASH:=ad0d22033f23e696f9a71a4c2f9210194dda39b024a79151f4ac278995332a6e
+PKG_HASH:=e3c14a3699dc7e82fed397392957afc78e37bdf25398ac38ead6e84621b2ae6a
 
 PKG_BUILD_DEPENDS:=BUSYBOX_USE_LIBRPC:librpc BUSYBOX_CONFIG_PAM:libpam
 PKG_BUILD_PARALLEL:=1
@@ -47,6 +47,7 @@ define Package/busybox
   DEPENDS:=+BUSYBOX_USE_LIBRPC:librpc +BUSYBOX_CONFIG_PAM:libpam +BUSYBOX_CONFIG_NTPD:jsonfilter
   MENU:=1
   ALTERNATIVES:=\
+    $(call BUSYBOX_IF_ENABLED,FLOCK,	100:/usr/bin/flock:/bin/busybox) \
     $(call BUSYBOX_IF_ENABLED,FREE,	100:/usr/bin/free:/bin/busybox) \
     $(call BUSYBOX_IF_ENABLED,IP,	100:/sbin/ip:/bin/busybox) \
     $(call BUSYBOX_IF_ENABLED,KILL,	100:/bin/kill:/bin/busybox) \
