@@ -117,7 +117,7 @@
  
 +	if (IS_ENABLED(CONFIG_PROC_STRIPPED))
 +		return 0;
- 	pe = proc_create("timer_list", 0444, NULL, &timer_list_fops);
+ 	pe = proc_create("timer_list", 0400, NULL, &timer_list_fops);
  	if (!pe)
  		return -ENOMEM;
 --- a/mm/vmalloc.c
@@ -173,7 +173,7 @@
  		goto err;
 --- a/net/core/sock.c
 +++ b/net/core/sock.c
-@@ -2941,6 +2941,8 @@ static __net_initdata struct pernet_oper
+@@ -2945,6 +2945,8 @@ static __net_initdata struct pernet_oper
  
  static int __init proto_init(void)
  {
