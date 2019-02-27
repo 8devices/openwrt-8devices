@@ -166,6 +166,12 @@ static void PCIE_Device_PERST(unsigned int portnum)
 
 }
 
+int PCIE_link_ok = 0;
+unsigned int PCIE_dev_id = 0;
+EXPORT_SYMBOL(PCIE_link_ok);
+EXPORT_SYMBOL(PCIE_dev_id);
+
+
 static int PCIE_Check_Link(unsigned int portnum)
 {
 	unsigned int dbgaddr;
@@ -192,12 +198,15 @@ static int PCIE_Check_Link(unsigned int portnum)
 	}
 	else  //already  linkup
 	{
+		PCIE_link_ok = 1;
 		cfgaddr = BSP_PCIE_EP_CFG;
 
 		REG32(BSP_PCIE_RC_CFG + 0x04) = 0x00100007;
 		REG32(BSP_PCIE_EP_CFG + 0x04) = 0x00100007;
 
-		printk("Find PCIE Port, Device:Vender ID=%x\n", REG32(cfgaddr) );
+		PCIE_dev_id = REG32(cfgaddr);
+
+		printk("Find PCIE Port, Device:Vender ID=%x\n", PCIE_dev_id);
 	}
 
 	return 1;
