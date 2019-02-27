@@ -7967,6 +7967,7 @@ void /*__devexit*/MDL_EXIT rtl8192cd_proc_remove (struct net_device *dev)
         remove_proc_entry( "mib_bssdesc", rtl8192cd_proc_root );
         remove_proc_entry( "sta_info", rtl8192cd_proc_root );
         remove_proc_entry( "sta_keyinfo", rtl8192cd_proc_root );
+        remove_proc_entry( "wmm", rtl8192cd_proc_root );
 #if defined(CONFIG_USB_HCI) || defined(CONFIG_SDIO_HCI)
         remove_proc_entry( "sta_queinfo", rtl8192cd_proc_root );
 #endif
@@ -7984,6 +7985,10 @@ void /*__devexit*/MDL_EXIT rtl8192cd_proc_remove (struct net_device *dev)
         remove_proc_entry( "nat25filter", rtl8192cd_proc_root );
 #endif
 
+
+#if (BEAMFORMING_SUPPORT == 1)
+        remove_proc_entry( "mib_txbf", rtl8192cd_proc_root );
+#endif
 
 #ifdef DFS
         remove_proc_entry( "mib_dfs", rtl8192cd_proc_root );
