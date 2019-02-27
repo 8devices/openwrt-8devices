@@ -12248,10 +12248,21 @@ void *rtl8192cd_init_one(struct sdio_func *psdio_func, void *ent, struct _device
 				#ifdef CONFIG_RTL_8197F
 				{
 					extern  int PCIE_reset_procedure_97F(unsigned int PCIeIdx, unsigned int mdioReset);
-					if ((PCIE_reset_procedure_97F(0,1))  != 1) {
+					extern int PCIE_link_ok;
+					extern unsigned int PCIE_dev_id;
+
+					#define RTL_8822B_PCI_DEVID 0xb82210ec
+					if (!PCIE_link_ok || PCIE_dev_id == RTL_8822B_PCI_DEVID) {
+						if ((PCIE_reset_procedure_97F(0,1))  != 1) {
+							rc = -ENODEV;
+							goto err_out_free2;
+						}
+					}
+					else {
 						rc = -ENODEV;
 						goto err_out_free2;
 					}
+
 				}
 				#else
                 #ifdef CONFIG_RTL_8198B //mark_apo
