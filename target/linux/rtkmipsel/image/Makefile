@@ -107,10 +107,10 @@ define Image/BuildLoader
 		compile loader.$(2)
 endef
 
-ifeq ($(CONFIG_TARGET_rtkmipsel_rtk8197f_kinkan),y)
+ifeq ($(CONFIG_TARGET_rtkmipsel_rtl8197f_kinkan),y)
 $(eval $(call SingleProfile,kinkan,ttyS0,115200,0x84000000,80000,20000))
 endif
-ifeq ($(CONFIG_TARGET_rtkmipsel_rtk8197f_komikan),y)
+ifeq ($(CONFIG_TARGET_rtkmipsel_rtl8197f_komikan),y)
 $(eval $(call SingleProfile,komikan,ttyS0,115200,0x84000000,80000,20000))
 endif
 

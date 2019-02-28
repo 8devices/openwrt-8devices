@@ -201,24 +201,24 @@ struct rtl_gpio rtk8197_gpio[] = {
 	RTL_GPIO(35, 0x44, 20, E, 3),
 	RTL_GPIO(36, 0x44, 16, E, 4),
 	RTL_GPIO(37, 0x44, 12, E, 5),
-	RTL_GPIO(38, 0x44,  8, E, 6),
-	RTL_GPIO(39, 0x44,  4, E, 7),
+//	RTL_GPIO(38, 0x44,  8, E, 6), not exist in rtk8197fs soc
+//	RTL_GPIO(39, 0x44,  4, E, 7), not exist in rtk8197fs soc
 	RTL_GPIO(40, 0x44,  0, F, 0),
 	RTL_GPIO(41, 0x48, 28, F, 1),
-	RTL_GPIO(42, 0x48, 24, F, 2),
-	RTL_GPIO(43, 0x48, 20, F, 3),
-	RTL_GPIO(44, 0x48, 16, F, 4),
-	RTL_GPIO(45, 0x48, 12, F, 5),
-	RTL_GPIO(46, 0x20, 24, F, 6),
-	RTL_GPIO(47, 0x20, 28, F, 7),
-	RTL_GPIO(48, 0x20, 20, G, 0),
-	RTL_GPIO(49, 0x20, 16, G, 1),
-	RTL_GPIO(50, 0x20, 12, G, 2),
-	RTL_GPIO(51, 0x24, 28, G, 3),
-	RTL_GPIO(52, 0x24, 24, G, 4),
-	RTL_GPIO(53, 0x24, 20, G, 5),
+//	RTL_GPIO(42, 0x48, 24, F, 2), not exist in rtk8197fs soc
+//	RTL_GPIO(43, 0x48, 20, F, 3), not exist in rtk8197fs soc
+//	RTL_GPIO(44, 0x48, 16, F, 4), not exist in rtk8197fs soc
+//	RTL_GPIO(45, 0x48, 12, F, 5), not exist in rtk8197fs soc
+//	RTL_GPIO(46, 0x20, 24, F, 6), not exist in rtk8197fs soc
+//	RTL_GPIO(47, 0x20, 28, F, 7), not exist in rtk8197fs soc
+//	RTL_GPIO(48, 0x20, 20, G, 0), not exist in rtk8197fs soc
+//	RTL_GPIO(49, 0x20, 16, G, 1), not exist in rtk8197fs soc
+//	RTL_GPIO(50, 0x20, 12, G, 2), not exist in rtk8197fs soc
+//	RTL_GPIO(51, 0x24, 28, G, 3), not exist in rtk8197fs soc
+//	RTL_GPIO(52, 0x24, 24, G, 4), not exist in rtk8197fs soc
+//	RTL_GPIO(53, 0x24, 20, G, 5), not exist in rtk8197fs soc
 	RTL_GPIO(54, 0x34, 28, G, 6),
-	RTL_GPIO(55, 0x34, 24, G, 7),
+//	RTL_GPIO(55, 0x34, 24, G, 7), not exist in rtk8197fs soc
 	RTL_GPIO(56, 0x34, 20, H, 0),
 	RTL_GPIO(57, 0x34, 16, H, 1),
 	RTL_GPIO(58, 0x38, 28, H, 2),

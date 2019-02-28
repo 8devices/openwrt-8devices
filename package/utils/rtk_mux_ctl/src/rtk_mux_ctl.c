@@ -125,11 +125,11 @@ uint32_t **get_regs(struct device_in_out_func *info)
 	int size;
 	int i;
 
-	regs  = calloc(info->reg_mappings_count, sizeof(uint32_t));
+	regs  = calloc(info->reg_mappings_count, sizeof(uint32_t *));
 	for (i = 0; i < info->reg_mappings_count; i++)
 	{
-		size = info->regs[i].reg_count * sizeof(uint32_t);
-		regs[i] = calloc(info->regs[i].reg_count, sizeof(uint32_t));
+		size = info->regs[i].reg_count * sizeof(uint32_t *);
+		regs[i] = calloc(info->regs[i].reg_count, sizeof(uint32_t *));
 
 		if (!regs)
 			return NULL;
@@ -515,6 +515,9 @@ int assign_dev_info(struct config_info *config)
 			if (strncmp(line, "kinkan", 6) == 0) {
 				printf("Board: Kinkan\n");
 				config->dev_info = &dev_kinkan;
+			} else if (strncmp(line, "komikan", 6) == 0) {
+				printf("Board: Komikan\n");
+				config->dev_info = &dev_komikan;
 			} else {
 				printf("Unknown 8devices board\n");
 				return -1;

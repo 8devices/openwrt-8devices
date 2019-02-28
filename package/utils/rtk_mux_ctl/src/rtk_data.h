@@ -63,4 +63,17 @@ struct device_in_out_func dev_kinkan = {
 	.get_gpio_val			= rtk8197_get_gpio_val,
 	.set_gpio_val			= rtk8197_set_gpio_val,
 };
+
+struct device_in_out_func dev_komikan = {
+	.gpio_mux			= rtk8197_gpio,
+	.gpio_mux_count			= ARRAY_SIZE(rtk8197_gpio),
+	.regs				= rtk8197_regs_mapping,
+	.reg_mappings_count		= ARRAY_SIZE(rtk8197_regs_mapping),
+	.reg_defaults			= rtk8197_reg_defaults,
+	.get_gpio_by_name		= rtk8197_gpio_by_name,
+	.get_gpio_dir			= rtk8197_get_gpio_dir,
+	.set_gpio_dir			= rtk8197_set_gpio_dir,
+	.get_gpio_val			= rtk8197_get_gpio_val,
+	.set_gpio_val			= rtk8197_set_gpio_val,
+};
 #endif //RTK_DATA_H

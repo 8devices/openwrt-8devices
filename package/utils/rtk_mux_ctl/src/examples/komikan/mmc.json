@@ -1,0 +1,17 @@
+{
+	"mux_list": [
+		{"gpio" : "GPIO_C4", "mux" : "GPIO", "direction" : "OUT", "value": "HIGH"},
+		{"gpio" : "GPIO_C5", "mux" : "MMC"},
+		{"gpio" : "GPIO_C6", "mux" : "MMC"},
+		{"gpio" : "GPIO_C7", "mux" : "MMC"},
+		{"gpio" : "GPIO_D0", "mux" : "MMC"},
+		{"gpio" : "GPIO_D1", "mux" : "MMC"},
+		{"gpio" : "GPIO_D2", "mux" : "MMC"},
+		{"gpio" : "GPIO_D3", "mux" : "MMC"},
+		{"gpio" : "GPIO_D4", "mux" : "MMC"},
+		{"gpio" : "GPIO_D5", "mux" : "MMC"},
+		{"gpio" : "GPIO_D6", "mux" : "MMC"},
+		{"gpio" : "GPIO_D7", "mux" : "MMC"},
+		{"gpio" : "GPIO_E0", "mux" : "MMC"}
+	]
+}
