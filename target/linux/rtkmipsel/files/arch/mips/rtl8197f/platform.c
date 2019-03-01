@@ -137,7 +137,7 @@ arch_initcall(rtl819x_led_init);
 
 
 /* SD Card */
-#ifdef CONFIG_MMC_RTK_SDMMC
+#if defined(CONFIG_MMC_RTK_SDMMC) || defined(CONFIG_MMC_RTK_SDMMC_MODULE)
 struct platform_device rtk_sd_device = {
 	.name = "rtk-sdmmc",
 	.id   = -1,

@@ -2470,7 +2470,20 @@ static struct platform_driver rtk_sdmmc_driver = {
     },
 };
 
-module_platform_driver(rtk_sdmmc_driver);
+static int __init rtk_sdmmc_init(void)
+{
+        pr_info("%s: " BANNER "\n", DRIVER_NAME);
+
+        return platform_driver_register(&rtk_sdmmc_driver);
+}
+
+static void __exit rtk_sdmmc_cleanup(void)
+{
+        platform_driver_unregister(&rtk_sdmmc_driver);
+}
+
+module_init(rtk_sdmmc_init);
+module_exit(rtk_sdmmc_cleanup);
 
 MODULE_DESCRIPTION("Realtek SD/MMC host driver");
 MODULE_AUTHOR("James Tai");
