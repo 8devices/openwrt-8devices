@@ -342,7 +342,7 @@ define KernelPackage/usb2
 	CONFIG_USB_OCTEON_EHCI=y \
 	CONFIG_USB_EHCI_HCD_ORION=y \
 	CONFIG_USB_EHCI_HCD_AT91=y \
-	CONFIG_USB_EHCI_FSL
+	CONFIG_USB_EHCI_FSL=n
   FILES:= \
 	$(LINUX_DIR)/drivers/usb/host/ehci-platform.ko
   ifneq ($(wildcard $(LINUX_DIR)/drivers/usb/host/ehci-orion.ko),)
