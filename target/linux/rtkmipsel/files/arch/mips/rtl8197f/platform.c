@@ -135,6 +135,24 @@ static int __init rtl819x_led_init(void)
 arch_initcall(rtl819x_led_init);
 #endif
 
+/* UART */
+struct platform_device rtk_uart1_device = {
+	.name = "rtk-uart1",
+	.id   = -1,
+};
+
+static struct platform_device __initdata *rtl_uart_devs[] = {
+		&rtk_uart1_device,
+};
+
+static int __init rtl819x_uart_init(void)
+{
+
+	platform_add_devices(rtl_uart_devs, ARRAY_SIZE(rtl_uart_devs));
+
+	return 0;
+}
+arch_initcall(rtl819x_uart_init);
 
 /* SD Card */
 #if defined(CONFIG_MMC_RTK_SDMMC) || defined(CONFIG_MMC_RTK_SDMMC_MODULE)
