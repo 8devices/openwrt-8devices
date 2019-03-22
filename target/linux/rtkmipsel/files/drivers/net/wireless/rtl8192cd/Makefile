@@ -548,6 +548,10 @@ $(obj)/data_%.c: $(src)/$(RTL_WLAN_DATA_DIR_92E)/%.bin FORCE
 $(obj)/data_%.c: $(src)/$(RTL_WLAN_DATA_DIR_92E)/%.BIN FORCE
 	$(obj)/bin2c.pl $(notdir $(basename $@)) < $< > $@
 
+ifneq ($(TARGET_PROFILE),)
+$(obj)/data_%.c: $(src)/$(RTL_WLAN_DATA_DIR_97F)/%_$(TARGET_PROFILE).override FORCE
+	$(obj)/bin2c.pl $(notdir $(basename $@)) < $< > $@
+endif
 $(obj)/data_%.c: $(src)/$(RTL_WLAN_DATA_DIR_97F)/%.txt FORCE
 	$(obj)/bin2c.pl $(notdir $(basename $@)) < $< > $@
 $(obj)/data_%.c: $(src)/$(RTL_WLAN_DATA_DIR_97F)/%.bin FORCE
@@ -555,6 +559,10 @@ $(obj)/data_%.c: $(src)/$(RTL_WLAN_DATA_DIR_97F)/%.bin FORCE
 $(obj)/data_%.c: $(src)/$(RTL_WLAN_DATA_DIR_97F)/%.BIN FORCE
 	$(obj)/bin2c.pl $(notdir $(basename $@)) < $< > $@
 
+ifneq ($(TARGET_PROFILE),)
+$(obj)/data_%.c: $(src)/$(RTL_WLAN_DATA_DIR_8822B)/%_$(TARGET_PROFILE).override FORCE
+	$(obj)/bin2c.pl $(notdir $(basename $@)) < $< > $@
+endif
 $(obj)/data_%.c: $(src)/$(RTL_WLAN_DATA_DIR_8822B)/%.txt FORCE
 	$(obj)/bin2c.pl $(notdir $(basename $@)) < $< > $@
 $(obj)/data_%.c: $(src)/$(RTL_WLAN_DATA_DIR_8822B)/%.bin FORCE

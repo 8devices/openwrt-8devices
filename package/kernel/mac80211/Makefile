@@ -1667,6 +1667,9 @@ ifeq ($(CONFIG_PACKAGE_kmod-rtl8192cd),y)
 endif
 ifeq ($(CONFIG_TARGET_rtkmipsel_rtl8197f),y)
 MAKE_OPTS += "EXTRA_CFLAGS += -I$(PKG_BUILD_DIR)/drivers/net/wireless/realtek/rtl8192cd/efuse_97f"
+ifneq ($(CONFIG_TARGET_PROFILE),)
+	  MAKE_OPTS += "TARGET_PROFILE=$(CONFIG_TARGET_PROFILE)"
+endif
 endif
 
 define ConfigVars
