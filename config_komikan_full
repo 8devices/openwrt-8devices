@@ -1,6 +1,6 @@
 CONFIG_TARGET_rtkmipsel=y
 CONFIG_TARGET_rtkmipsel_rtl8197f=y
-CONFIG_TARGET_rtkmipsel_rtl8197f_kinkan=y
+CONFIG_TARGET_rtkmipsel_rtl8197f_komikan=y
 CONFIG_ALL_KMODS=y
 CONFIG_ALL_NONSHARED=y
 CONFIG_DEVEL=y
@@ -28,6 +28,7 @@ CONFIG_KERNEL_DEVKMEM=y
 CONFIG_KERNEL_DEVMEM=y
 CONFIG_KERNEL_PERF_EVENTS=y
 # CONFIG_PACKAGE_ath9k-htc-firmware is not set
+CONFIG_PACKAGE_bluez-utils=y
 # CONFIG_PACKAGE_b43legacy-firmware is not set
 # CONFIG_PACKAGE_block-mount is not set
 # CONFIG_PACKAGE_blockd is not set
@@ -77,6 +78,7 @@ CONFIG_PACKAGE_iwinfo=y
 # CONFIG_PACKAGE_kmod-b43 is not set
 # CONFIG_PACKAGE_kmod-b43legacy is not set
 # CONFIG_PACKAGE_kmod-batman-adv is not set
+# CONFIG_PACKAGE_kmod-bluetooth_6lowpan is not set
 # CONFIG_PACKAGE_kmod-brcmfmac is not set
 # CONFIG_PACKAGE_kmod-brcmsmac is not set
 # CONFIG_PACKAGE_kmod-brcmutil is not set
@@ -175,7 +177,6 @@ CONFIG_PACKAGE_kmod-rtl8192cd=y
 # CONFIG_PACKAGE_kmod-rtl8192de is not set
 # CONFIG_PACKAGE_kmod-rtl8192se is not set
 # CONFIG_PACKAGE_kmod-rtl8xxxu is not set
-CONFIG_PACKAGE_kmod-rtk-sdmmc=y
 CONFIG_PACKAGE_kmod-rxrpc=m
 CONFIG_PACKAGE_kmod-scsi-core=y
 CONFIG_PACKAGE_kmod-slhc=m
@@ -232,6 +233,8 @@ CONFIG_PACKAGE_rpcd-mod-rrdns=y
 # CONFIG_PACKAGE_rtl8192de-firmware is not set
 # CONFIG_PACKAGE_rtl8192se-firmware is not set
 # CONFIG_PACKAGE_rtl8192su-firmware is not set
+CONFIG_PACKAGE_rtk_hciattach=y
+CONFIG_PACKAGE_kmod-rtk-sdmmc=y
 # CONFIG_PACKAGE_snapshot-tool is not set
 # CONFIG_PACKAGE_uboot-envtools is not set
 CONFIG_PACKAGE_uhttpd=y
@@ -258,7 +261,7 @@ CONFIG_VERSION_HWREV=""
 CONFIG_VERSION_MANUFACTURER="8devices"
 CONFIG_VERSION_MANUFACTURER_URL="http://www.8devices.com"
 CONFIG_VERSION_NUMBER="v1.1"
-CONFIG_VERSION_PRODUCT="Kinkan"
+CONFIG_VERSION_PRODUCT="Komikan"
 CONFIG_VERSION_REPO="http://pkg.8devices.com/kinkan/%v"
 CONFIG_VERSION_SUPPORT_URL=""
 CONFIG_WPA_SUPPLICANT_INTERNAL=y

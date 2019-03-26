@@ -175,6 +175,7 @@ CONFIG_PACKAGE_kmod-rtl8192cd=y
 # CONFIG_PACKAGE_kmod-rtl8192de is not set
 # CONFIG_PACKAGE_kmod-rtl8192se is not set
 # CONFIG_PACKAGE_kmod-rtl8xxxu is not set
+CONFIG_PACKAGE_kmod-rtk-sdmmc=y
 CONFIG_PACKAGE_kmod-rxrpc=m
 CONFIG_PACKAGE_kmod-scsi-core=y
 CONFIG_PACKAGE_kmod-slhc=m
