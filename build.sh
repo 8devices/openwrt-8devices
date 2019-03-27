@@ -1,8 +1,11 @@
 #!/bin/bash
 
+CONFIGS=$(ls | awk '/config_/{sub(/config_/,""); print}')
+
 help(){
     echo "Usage: $0 [board-name]"
-    echo "valid board names: kinkan kinkan_full"
+    echo "valid config names:"
+    echo  "$CONFIGS"
     exit
 }
 
@@ -10,20 +13,8 @@ if [[ $# -lt 1 ]]
 then
     config=config_kinkan_minimal
 else
-    case $1 in
-        kinkan)
-            config=config_kinkan_minimal
-            ;;
-        kinkan_otbr)
-            config=config_kinkan_otbr
-            ;;
-        kinkan_full)
-            config=config_kinkan_full
-            ;;
-        help|--help|-h|*)
-            help
-            ;;
-    esac
+    echo "$CONFIGS" | grep "^$1\$" > /dev/null && config=config_$1 ||\
+    help
 fi
 
 echo "Building image using config: '$config'"
