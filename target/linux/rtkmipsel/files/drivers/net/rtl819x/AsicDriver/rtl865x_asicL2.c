@@ -25,6 +25,8 @@
 #include "rtl865x_hwPatch.h"
 
 #include <linux/delay.h>
+#include <linux/platform_device.h>
+#include <linux/gpio.h>
 
 #if defined(CONFIG_RTL819X_GPIO) && !defined(CONFIG_OPENWRT_SDK)
 #include <linux/platform_device.h>
@@ -6810,9 +6812,41 @@ void init_8325d(void)
 #if defined(CONFIG_RTL_8197F)
 int gpio_simulate_mdc_mdio = 0;
 
+struct gpio * reset_gpio;
+
+static int rtl819x_phy_reset_pin_probe(struct platform_device *pdev)
+{
+	int ret = 0;
+
+	reset_gpio = pdev->dev.platform_data;
+
+	if(reset_gpio && reset_gpio->gpio)
+		ret = devm_gpio_request_one(&pdev->dev, reset_gpio->gpio, GPIOF_OUT_INIT_HIGH | GPIOF_EXPORT_DIR_FIXED, reset_gpio->label);
+	else
+		ret = devm_gpio_request_one(&pdev->dev, GPIO_RESET, GPIOF_OUT_INIT_HIGH | GPIOF_EXPORT_DIR_FIXED, "reset gpio");
+
+	if(ret < 0)
+		return ret;
+
+	if(reset_gpio->flags & GPIOF_ACTIVE_LOW)
+		gpio_sysfs_set_active_low(reset_gpio->gpio, 1);
+
+	return ret;
+}
+
+static struct platform_driver rtl819x_phy_reset_pin_driver = {
+	.probe          = rtl819x_phy_reset_pin_probe,
+	.driver         = {
+		.name   = "rtl819x_phy_reset_pin",
+		.owner  = THIS_MODULE,
+	},
+};
+
 int init_p0(void)
 {
 	unsigned int data;
+
+	platform_driver_register(&rtl819x_phy_reset_pin_driver);
 
 	REG32(PCRP0) = (REG32(PCRP0) & ~(0x1F << ExtPHYID_OFFSET)) \
 		| ((PORT0_RGMII_PHYID << ExtPHYID_OFFSET) | MIIcfg_RXER |  EnablePHYIf | MacSwReset);
@@ -6841,10 +6875,9 @@ int init_p0(void)
 	} else
 #endif	
 	{
-		gpio_request_one(GPIO_RESET, (GPIOF_DIR_OUT | GPIOF_EXPORT_DIR_FIXED), "reset pin"); 
-		gpio_set_value(GPIO_RESET, 0);
+		gpio_set_value(reset_gpio->gpio, 0);
 		mdelay(500);
-		gpio_set_value(GPIO_RESET, 1);
+		gpio_set_value(reset_gpio->gpio, 1);
 		mdelay(300);
 	}
 

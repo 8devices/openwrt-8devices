@@ -15,6 +15,7 @@
 #include <linux/types.h>
 #include <linux/spinlock.h>
 #include <linux/gpio.h>
+#include <linux/platform_device.h>
 #ifdef CONFIG_RTL819X_GPIO
 #include <linux/device.h>
 #include <linux/platform_device.h>
@@ -177,6 +178,11 @@ int irq_to_gpio(unsigned irq)
 }
 EXPORT_SYMBOL(irq_to_gpio);
 #endif
+
+struct platform_device rtl819x_phy_reset_pin = {
+	.name	= "rtl819x_phy_reset_pin",
+	.id	= -1,
+};
 
 static struct gpio_chip rtl819x_gpio_peripheral = {
 

@@ -10,6 +10,7 @@
 
 #include <linux/module.h>
 #include <linux/leds.h>
+#include <linux/platform_device.h>
 #include <generated/autoconf.h>
 
 #include "gpio.h"
@@ -42,6 +43,17 @@ static struct gpio_keys_button kinkan_buttons[] __initdata = {
 	}
 };
 
+struct gpio kinkan_phy_reset_pin_data = {
+	.gpio           = BSP_GPIO_PIN_H2,
+	.flags          = GPIOF_ACTIVE_LOW,
+	.label          = "GPIO_H2",
+};
+
+static struct platform_device __initdata *kinkan_devs[] = {
+	&rtl819x_phy_reset_pin,
+};
+
+
 #define SET_PINMUX(reg, field, val)\
 	REG32(reg) = (REG32(reg) & (~(0xF << field))) | (val << field)
 
@@ -59,6 +71,10 @@ static void kinkan_set_sd_pinmux(void)
 static void __init kinkan_setup(void)
 {
 	int i;
+
+	rtl819x_phy_reset_pin.dev.platform_data = &kinkan_phy_reset_pin_data;
+
+	platform_add_devices(kinkan_devs, ARRAY_SIZE(kinkan_devs));
 
 	rtl819x_register_leds_gpio(-1, ARRAY_SIZE(kinkan_leds_gpio),
 		kinkan_leds_gpio);

@@ -10,6 +10,7 @@
 
 #include <linux/module.h>
 #include <linux/leds.h>
+#include <linux/platform_device.h>
 #include <generated/autoconf.h>
 
 #include "gpio.h"
@@ -43,7 +44,6 @@ static struct gpio_led komikan_leds_gpio[] __initdata = {
 		.gpio		= BSP_GPIO_PIN_E0,
 		.active_low	= 0,
 	},
-
 };
 
 static struct gpio_keys_button komikan_buttons[] __initdata = {
@@ -55,6 +55,16 @@ static struct gpio_keys_button komikan_buttons[] __initdata = {
 		.gpio		= BSP_GPIO_PIN_H0,
 		.active_low	= 1,
 	}
+};
+
+struct gpio komikan_phy_reset_pin_data = {
+	.gpio		= BSP_GPIO_PIN_H1,
+	.flags          = GPIOF_ACTIVE_LOW,
+	.label		= "GPIO_H1",
+};
+
+static struct platform_device __initdata *komikan_devs[] = {
+	&rtl819x_phy_reset_pin,
 };
 
 #define SET_PINMUX(reg, field, val)\
@@ -74,6 +84,10 @@ static void komikan_set_sd_pinmux(void)
 static void __init komikan_setup(void)
 {
 	int i;
+
+	rtl819x_phy_reset_pin.dev.platform_data = &komikan_phy_reset_pin_data;
+
+	platform_add_devices(komikan_devs, ARRAY_SIZE(komikan_devs));
 
 	rtl819x_register_leds_gpio(-1, ARRAY_SIZE(komikan_leds_gpio),
 		komikan_leds_gpio);
