@@ -26,15 +26,27 @@ SINGLE_PROFILES :=
 
 define SingleProfile
 
-define Image/Build/Profile/$(1)/initramfs
-	$(call Image/BuildLoader,loader-$(SUBTARGET)-$(1)-ramfs,bin,$(call mkcmdline,$(1),$(2),$(3),$(6)),$(4),vmlinux-initramfs.bin.lzma)
+define Image/Prepare/Profile/$(1)/initramfs
+	$$(if $$(call test,$$(call filesize,$(KDIR)/vmlinux-initramfs),-gt,$(RAMFS_MAX_SIZE)),\
+		$$(error $(KDIR)/vmlinux-initramfs bigger then $(RAMFS_MAX_SIZE) bytes))
+	lzma e $(KDIR)/vmlinux-initramfs -lc1 -lp2 -pb2 $(KDIR)/vmlinux-initramfs.bin.lzma
 
+	$(call Image/BuildLoader,loader-$(SUBTARGET)-$(1)-ramfs,bin,$(call mkcmdline,$(1),$(2),$(3),$(6)),$(4),vmlinux-initramfs.bin.lzma)
+endef
+
+define Image/Prepare/Profile/$(1)/squashfs
+	$(call Image/BuildLoader,loader-$(SUBTARGET)-$(1),bin,$(call mkcmdline,$(1),$(2),$(3),$(6)),$(4),vmlinux.bin.lzma)
+endef
+
+define Image/Prepare/Profile/$(1)/sdcard
+	$(call Image/BuildLoader,loader-$(SUBTARGET)-$(1)-sdcard,bin,$(call mkcmdline,$(1),$(2),$(3),$(6)) root=/dev/mmcblk0p2 rootwait,$(4),vmlinux.bin.lzma)
+endef
+
+define Image/Build/Profile/$(1)/initramfs
 	cp $(KDIR)/loader-$(SUBTARGET)-$(1)-ramfs.bin $(BIN_DIR)/$(IMG_PREFIX)-$(1)-nfjrom.bin
 endef
 
 define Image/Build/Profile/$(1)/squashfs
-	$(call Image/BuildLoader,loader-$(SUBTARGET)-$(1),bin,$(call mkcmdline,$(1),$(2),$(3),$(6)),$(4),vmlinux.bin.lzma)
-
 	cvimg-rtl8197f linux $(KDIR)/loader-$(SUBTARGET)-$(1).bin $(BIN_DIR)/$(IMG_PREFIX)-$(1)-linux.bin $(4) $(5)
 	dd if=$(BIN_DIR)/$(IMG_PREFIX)-$(1)-linux.bin of=$(BIN_DIR)/$(IMG_PREFIX)-$(1)-linux_4k.bin bs=$(BlockSize) conv=sync
 	cat $(BIN_DIR)/$(IMG_PREFIX)-$(1)-linux_4k.bin $(KDIR)/root.squashfs-4k > $(BIN_DIR)/$(IMG_PREFIX)-$(1)-fw_4k_cat.bin
@@ -43,8 +55,6 @@ define Image/Build/Profile/$(1)/squashfs
 endef
 
 define Image/Build/Profile/$(1)/sdcard
-	$(call Image/BuildLoader,loader-$(SUBTARGET)-$(1)-sdcard,bin,$(call mkcmdline,$(1),$(2),$(3),$(6)) root=/dev/mmcblk0p2 rootwait,$(4),vmlinux.bin.lzma)
-
 	cvimg-rtl8197f linux $(KDIR)/loader-$(SUBTARGET)-$(1)-sdcard.bin $(BIN_DIR)/sdboot/linux.bin $(5) $(6)
 
 	rm -f $(KDIR)/sd.boot
@@ -85,13 +95,11 @@ endef
 
 define Image/Prepare
 	lzma e $(KDIR)/vmlinux -lc1 -lp2 -pb2 $(KDIR)/vmlinux.bin.lzma
-	$(if $(CONFIG_TARGET_ROOTFS_INITRAMFS), $(call Image/Prepare/Initramfs))
-endef
 
-define Image/Prepare/Initramfs
-	$(if $(call test,$(call filesize,$(KDIR)/vmlinux-initramfs),-gt,$(RAMFS_MAX_SIZE)),\
-		$(error $(KDIR)/vmlinux-initramfs bigger then $(RAMFS_MAX_SIZE) bytes))
-	lzma e $(KDIR)/vmlinux-initramfs -lc1 -lp2 -pb2 $(KDIR)/vmlinux-initramfs.bin.lzma
+	$(call Image/Prepare/Profile/$(PROFILE)/squashfs)
+
+	$(if $(CONFIG_TARGET_ROOTFS_INITRAMFS), $(call Image/Prepare/$(PROFILE)/initramfs))
+	$(if $(CONFIG_RTK_SDCARD_IMG), $(call Image/Prepare/$(PROFILE)/sdcard))
 endef
 
 LOADER_MAKE := $(NO_TRACE_MAKE) -C lzma-loader KDIR=$(KDIR) LINUX_DIR=$(LINUX_DIR)
