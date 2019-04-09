@@ -19,7 +19,7 @@ include $(INCLUDE_DIR)/package.mk
 define Package/rtk_hciattach
   SECTION:=Tool
   CATEGORY:=Utilities
-  DEPENDS:=+rtk-mux-ctl +kmod-rtk-uart1
+  DEPENDS:=+rtk-mux-ctl +kmod-rtk-uart1 +bluez-utils
   TITLE:=Utility for connecting to realtek serial bluetooth
   KCONFIG:=CONFIG_BT=m \
 	CONFIG_BT_BNEP=m \
