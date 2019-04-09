@@ -8,7 +8,37 @@
 define Profile/komikan
   NAME:=Komikan Profile
   PRIORITY:=1
-  PACKAGES:=-wpad-mini
+  PACKAGES:= \
+	  -odhcpd-ipv6only \
+	  -wpad-mini \
+	  hostapd-common \
+	  iw \
+	  iwinfo \
+	  kmod-button-hotplug \
+	  kmod-cfg80211 \
+	  kmod-fs-vfat \
+	  kmod-gpio-button-hotplug \
+	  kmod-input-core \
+	  kmod-input-evdev \
+	  kmod-input-gpio-keys \
+	  kmod-ledtrig-netdev \
+	  kmod-mac80211 \
+	  kmod-mmc \
+	  kmod-rtk-sdmmc \
+	  kmod-rtl8192cd \
+	  kmod-scsi-core \
+	  kmod-usb-core \
+	  kmod-usb-ehci \
+	  kmod-usb-ohci \
+	  kmod-usb-storage \
+	  kmod-usb2 \
+	  rpcd \
+	  rpcd-mod-rrdns \
+	  rtk_hciattach \
+	  wireless-regdb \
+	  wireless-tools \
+	  wpad \
+
 endef
 
 define Profile/komikan/Description
