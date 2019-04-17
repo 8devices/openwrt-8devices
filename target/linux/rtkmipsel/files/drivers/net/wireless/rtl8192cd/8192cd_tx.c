@@ -1115,7 +1115,7 @@ int get_tx_sc_free_entry(struct rtl8192cd_priv *priv, struct stat_info *pstat, u
 #ifdef CONFIG_RTL_KERNEL_MIPS16_WLAN
 __NOMIPS16
 #endif
-static void rtl8192cd_tx_xmitSkbFail(struct rtl8192cd_priv *priv, struct sk_buff *skb, struct net_device *dev,
+static void rtl8192cd_tx_xmitSkbDrop(struct rtl8192cd_priv *priv, struct sk_buff *skb, struct net_device *dev,
 				struct net_device *wdsDev, struct tx_insn *txcfg)
 {
 /*
@@ -1161,6 +1161,16 @@ if(txcfg->pstat)
 	return;
 }
 
+static void rtl8192cd_tx_xmitSkbFail(struct rtl8192cd_priv *priv, struct sk_buff *skb, struct net_device *dev,
+				struct net_device *wdsDev, struct tx_insn *txcfg)
+{
+	if (wdsDev)
+		netif_stop_queue(wdsDev);
+	else
+		netif_stop_queue(dev);
+
+	rtl8192cd_tx_xmitSkbDrop(priv, skb, dev, wdsDev, txcfg);
+}
 
 int rtl8192cd_tx_slowPath(struct rtl8192cd_priv *priv, struct sk_buff *skb, struct stat_info *pstat,
 				struct net_device *dev, struct net_device *wdsDev, struct tx_insn *txcfg)
@@ -1196,7 +1206,7 @@ int rtl8192cd_tx_slowPath(struct rtl8192cd_priv *priv, struct sk_buff *skb, stru
     )
     {
         //DEBUG_ERR("TX DROP: control port not authorized!\n");
-        rtl8192cd_tx_xmitSkbFail(priv, skb, dev, wdsDev, txcfg);
+	rtl8192cd_tx_xmitSkbDrop(priv, skb, dev, wdsDev, txcfg);
         goto stop_proc;
     }
 
@@ -1223,7 +1233,7 @@ int rtl8192cd_tx_slowPath(struct rtl8192cd_priv *priv, struct sk_buff *skb, stru
 
         if (txcfg->phdr == NULL) {
             DEBUG_ERR("Can't alloc wlan header!\n");
-            rtl8192cd_tx_xmitSkbFail(priv, skb, dev, wdsDev, txcfg);
+            rtl8192cd_tx_xmitSkbDrop(priv, skb, dev, wdsDev, txcfg);
             goto stop_proc;
         }
 
@@ -8235,8 +8245,10 @@ __inline__ static int rtl8192cd_swq_dequeue(struct rtl8192cd_priv *priv, struct 
     while (1)
     {
 
-		if(!releaseALL && rtl8192cd_swq_bdfull(priv, 0, qnum)) 
+		if(!releaseALL && rtl8192cd_swq_bdfull(priv, 0, qnum)){
+			netif_stop_queue(priv->dev);
 			break;
+		}
 		
         struct sk_buff *tmpskb;
         tmpskb = skb_dequeue(&pstat->swq.swq_queue[qnum]);
