@@ -10,7 +10,7 @@ include $(INCLUDE_DIR)/package.mk
 define KernelPackage/rtk-sdmmc
   SUBMENU:=Other modules
   TITLE:=Realtek SD card driver
-  DEPENDS:=+kmod-mmc
+  DEPENDS:=@!KERNEL_MMC +kmod-mmc
   FILES:=$(LINUX_DIR)/drivers/mmc/host/rtk-sdmmc.ko
   AUTOLOAD:=$(call AutoLoad,30,rtk-sdmmc,1)
   KCONFIG:=CONFIG_MMC_RTK_SDMMC=m

@@ -2,5 +2,16 @@ config RTK_SDCARD_IMG
 	bool "Generate sdcard image"
 	depends on TARGET_rtkmipsel
 	select PACKAGE_rtk_boot
+	select KERNEL_MMC
+	select KERNEL_MMC_BLOCK
+	select KERNEL_MMC_RTK_SDMMC
 	default n
 
+config KERNEL_MMC_RTK_SDMMC
+	tristate
+
+config KERNEL_MMC
+	tristate
+
+config KERNEL_MMC_BLOCK
+	tristate
