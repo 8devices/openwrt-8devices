@@ -1,3 +1,4 @@
+src-git 8devices_custom https://github.com/8devices/openwrt-8devices-custom-feed.git
 src-git packages https://git.openwrt.org/feed/packages.git
 src-git luci https://git.openwrt.org/project/luci.git
 src-git routing https://git.openwrt.org/feed/routing.git
