@@ -382,6 +382,22 @@ endef
 
 $(eval $(call KernelPackage,sdhci))
 
+define KernelPackage/sdhci-msm
+  SUBMENU:=$(OTHER_MENU)
+  TITLE:=SDHCI support for MSM hardware
+  DEPENDS:=+kmod-sdhci
+  KCONFIG:= CONFIG_MMC_SDHCI_MSM
+  FILES:= $(LINUX_DIR)/drivers/mmc/host/sdhci-msm.ko
+
+  AUTOLOAD:=$(call AutoProbe,sdhci-msm,1)
+endef
+
+define KernelPackage/sdhci/description
+ Kernel support for SDHCI MSM Hosts
+endef
+
+$(eval $(call KernelPackage,sdhci-msm))
+
 
 define KernelPackage/rfkill
   SUBMENU:=$(OTHER_MENU)
