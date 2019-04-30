@@ -1,8 +1,8 @@
-src-git 8devices_custom https://github.com/8devices/openwrt-8devices-custom-feed.git
-src-git packages https://git.openwrt.org/feed/packages.git
-src-git luci https://git.openwrt.org/project/luci.git
-src-git routing https://git.openwrt.org/feed/routing.git
-src-git telephony https://git.openwrt.org/feed/telephony.git
+src-git 8devices_custom https://github.com/8devices/openwrt-8devices-custom-feed.git^5c06c17e33ced6fe4705dfed86645ebb2a031863
+src-git packages https://git.openwrt.org/feed/packages.git^fedc5cf5a45cd1cd6a4440724729c46d61ac3523
+src-git luci https://git.openwrt.org/project/luci.git^1b79446fdf2a384e2fe16b64890fee09d3824101
+src-git routing https://git.openwrt.org/feed/routing.git^e40f6891e510b5ad0396620a34b99448b2f24e5f
+src-git telephony https://git.openwrt.org/feed/telephony.git^10439bc6ca36727cdd1d383fc5e39cf2d4c4040a
 #src-git video https://github.com/openwrt/video.git
 #src-git targets https://github.com/openwrt/targets.git
 #src-git management https://github.com/openwrt-management/packages.git
