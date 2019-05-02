@@ -58,7 +58,7 @@ define Device/8dev_habanero-dvk-c1
 	IMAGE_SIZE := 30976k
 	IMAGES := sysupgrade.bin
 	IMAGE/sysupgrade.bin := append-kernel | pad-to 64k | append-rootfs | pad-rootfs | append-metadata | check-size $$$$(IMAGE_SIZE)
-	SUPPORTED_DEVICES += 8dev,habanero-dvk-c2
+	SUPPORTED_DEVICES += 8dev,habanero-dvk-c2 8dev,habanero
 	DEVICE_PACKAGES := ipq-wifi-8dev_habanero kmod-sdhci-msm
 endef
 TARGET_DEVICES += 8dev_habanero-dvk-c1
@@ -70,8 +70,8 @@ define Device/8dev_habanero-dvk-c2
 	IMAGE_SIZE := 30976k
 	IMAGES := sysupgrade.bin
 	IMAGE/sysupgrade.bin := append-kernel | pad-to 64k | append-rootfs | pad-rootfs | append-metadata | check-size $$$$(IMAGE_SIZE)
-	SUPPORTED_DEVICES += 8dev,habanero-dvk-c1
-	DEVICE_PACKAGES := ipq-wifi-8dev_habanero kmod-sdhci-msm kmod-spi-dev spi-tools spidev-test
+	SUPPORTED_DEVICES += 8dev,habanero-dvk-c1 8dev,habanero
+	DEVICE_PACKAGES := ipq-wifi-8dev_habanero kmod-sdhci-msm kmod-i2c-core kmod-spi-dev spi-tools spidev-test
 endef
 TARGET_DEVICES += 8dev_habanero-dvk-c2
 
