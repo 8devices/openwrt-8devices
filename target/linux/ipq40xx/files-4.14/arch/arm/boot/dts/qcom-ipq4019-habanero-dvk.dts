@@ -3,8 +3,16 @@
 #include "qcom-ipq4019-habanero.dtsi"
 
 / {
-	model = "8devices Habanero DVK-C2";
-	compatible = "8dev,habanero-dvk-c2", "8dev,habanero", "qcom,ipq4019";
+	model = "8devices Habanero DVK";
+	compatible = "8dev,habanero-dvk", "8dev,habanero-dvk-c1",
+		"8dev,habanero-dvk-c2", "8dev,habanero", "qcom,ipq4019";
+
+	aliases {
+		led-boot = &led_status;
+		led-failsafe = &led_status;
+		led-running = &led_status;
+		led-upgrade = &led_upgrade;
+	};
 
 	soc {
 		usb2@60f8800 {
@@ -41,22 +49,25 @@
 	gpio-leds {
 		compatible = "gpio-leds";
 
-		io37 {
-			label = "habanero_dvk:green:io37";
+		led_status: status {
+			label = "habanero-dvk:green:status";
 			gpios = <&tlmm 37 GPIO_ACTIVE_HIGH>;
+			panic-indicator;
 		};
-		io40 {
-			label = "habanero_dvk:green:io40";
+		led_upgrade: upgrade {
+			label = "habanero-dvk:green:upgrade";
 			gpios = <&tlmm 40 GPIO_ACTIVE_HIGH>;
 		};
-		// Disabled in this config, due to clash with SPI1_MOSI
-		//io46 {
-		//	label = "habanero_dvk:green:io46";
-		//	gpios = <&tlmm 46 GPIO_ACTIVE_HIGH>;
-		//};
-		io48 {
-			label = "habanero_dvk:green:io48";
+		// Disable to use GPIO46 as SPI1_MOSI
+		wlan2g {
+			label = "habanero-dvk:green:wlan2g";
+			gpios = <&tlmm 46 GPIO_ACTIVE_HIGH>;
+			linux,default-trigger = "phy0tpt";
+		};
+		wlan5g {
+			label = "habanero-dvk:green:wlan5g";
 			gpios = <&tlmm 48 GPIO_ACTIVE_HIGH>;
+			linux,default-trigger = "phy1tpt";
 		};
 	};
 };
@@ -69,6 +80,8 @@
 	status = "okay";
 };
 
+// Disable wlan2g LED to use SPI
+/*
 &blsp1_spi2 {
 	pinctrl-0 = <&spi_1_pins>;
 	pinctrl-names = "default";
@@ -86,6 +99,7 @@
 		reg = <1>;
 	};
 };
+*/
 
 &blsp1_i2c3 {
 	pinctrl-0 = <&i2c_0_pins>;
@@ -103,6 +117,14 @@
 	perst-gpio = <&tlmm 38 GPIO_ACTIVE_LOW>;
 	wake-gpio = <&tlmm 50 GPIO_ACTIVE_LOW>;
 	status = "okay";
+
+	/* Free slot for use */
+	bridge@0,0 {
+		reg = <0x00000000 0 0 0 0>;
+		#address-cells = <3>;
+		#size-cells = <2>;
+		ranges;
+	};
 };
 
 &tlmm {

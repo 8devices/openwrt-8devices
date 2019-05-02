@@ -60,29 +60,17 @@ define Build/SenaoFW
 	@cp $@.new $@
 endef
 
-define Device/8dev_habanero-dvk-c1
+define Device/8dev_habanero-dvk
 	$(call Device/FitImageLzma)
-	DEVICE_DTS := qcom-ipq4019-habanero-dvk-c1
-	DEVICE_TITLE := 8devices Habanero DVK-C1
+	DEVICE_DTS := qcom-ipq4019-habanero-dvk
+	DEVICE_TITLE := 8devices Habanero DVK
 	IMAGE_SIZE := 30976k
 	IMAGES := sysupgrade.bin
 	IMAGE/sysupgrade.bin := append-kernel | pad-to 64k | append-rootfs | pad-rootfs | append-metadata | check-size $$$$(IMAGE_SIZE)
-	SUPPORTED_DEVICES += 8dev,habanero-dvk-c2
-	DEVICE_PACKAGES := ipq-wifi-8dev_habanero kmod-sdhci-msm
+	SUPPORTED_DEVICES += 8dev,habanero-dvk-c1 8dev,habanero-dvk-c2 8dev,habanero
+	DEVICE_PACKAGES := ipq-wifi-8dev_habanero kmod-sdhci-msm kmod-i2c-core kmod-spi-dev
 endef
-TARGET_DEVICES += 8dev_habanero-dvk-c1
-
-define Device/8dev_habanero-dvk-c2
-	$(call Device/FitImageLzma)
-	DEVICE_DTS := qcom-ipq4019-habanero-dvk-c2
-	DEVICE_TITLE := 8devices Habanero DVK-C2
-	IMAGE_SIZE := 30976k
-	IMAGES := sysupgrade.bin
-	IMAGE/sysupgrade.bin := append-kernel | pad-to 64k | append-rootfs | pad-rootfs | append-metadata | check-size $$$$(IMAGE_SIZE)
-	SUPPORTED_DEVICES += 8dev,habanero-dvk-c1
-	DEVICE_PACKAGES := ipq-wifi-8dev_habanero kmod-sdhci-msm kmod-spi-dev spi-tools spidev-test
-endef
-TARGET_DEVICES += 8dev_habanero-dvk-c2
+TARGET_DEVICES += 8dev_habanero-dvk
 
 define Device/8dev_jalapeno
 	$(call Device/FitImage)
@@ -90,6 +78,7 @@ define Device/8dev_jalapeno
 	DEVICE_DTS := qcom-ipq4018-jalapeno
 	BLOCKSIZE := 128k
 	PAGESIZE := 2048
+	SUPPORTED_DEVICES += 8dev,habanero-dvk 8dev,habanero-dvk-c1 8dev,habanero-dvk-c2 8dev,habanero
 	DEVICE_TITLE := 8devices Jalapeno
 endef
 TARGET_DEVICES += 8dev_jalapeno
