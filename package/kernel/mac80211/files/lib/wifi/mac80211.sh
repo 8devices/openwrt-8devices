@@ -114,6 +114,7 @@ detect_mac80211() {
 			set wireless.radio${devidx}.type=mac80211
 			set wireless.radio${devidx}.channel=${channel}
 			set wireless.radio${devidx}.hwmode=11${mode_band}
+			set wireless.radio${devidx}.country=US
 			${dev_id}
 			${ht_capab}
 			set wireless.radio${devidx}.disabled=1
