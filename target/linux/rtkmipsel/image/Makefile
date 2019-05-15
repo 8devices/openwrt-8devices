@@ -98,8 +98,8 @@ define Image/Prepare
 
 	$(call Image/Prepare/Profile/$(PROFILE)/squashfs)
 
-	$(if $(CONFIG_TARGET_ROOTFS_INITRAMFS), $(call Image/Prepare/$(PROFILE)/initramfs))
-	$(if $(CONFIG_RTK_SDCARD_IMG), $(call Image/Prepare/$(PROFILE)/sdcard))
+	$(if $(CONFIG_TARGET_ROOTFS_INITRAMFS), $(call Image/Prepare/Profile/$(PROFILE)/initramfs))
+	$(if $(CONFIG_RTK_SDCARD_IMG), $(call Image/Prepare/Profile/$(PROFILE)/sdcard))
 endef
 
 LOADER_MAKE := $(NO_TRACE_MAKE) -C lzma-loader KDIR=$(KDIR) LINUX_DIR=$(LINUX_DIR)
