@@ -11,6 +11,7 @@
 #include <linux/module.h>
 #include <linux/leds.h>
 #include <linux/platform_device.h>
+#include <linux/string.h>
 #include <generated/autoconf.h>
 
 #include "gpio.h"
@@ -80,6 +81,26 @@ static void komikan_set_sd_pinmux(void)
 	SET_PINMUX(BSP_PIN_MUX_SEL16,  4, 0); // MMC_CLK
 	SET_PINMUX(BSP_PIN_MUX_SEL16,  0, 0); // MMC_CMD
 }
+
+static int parse_devkit_version(char *str)
+{
+	if(!strncmp(&str, "KOM_200", 7))
+		return -1;
+
+	return ((str[8] - 48)* 10 + str[9] - 48);
+}
+
+static int __init set_phy_reset_pin(char *str)
+{
+	if(parse_devkit_version(str) > 3)
+	{
+		komikan_phy_reset_pin_data.gpio = BSP_GPIO_PIN_A5;
+		komikan_phy_reset_pin_data.label = "GPIO_A5";
+	}
+
+	return 0;
+}
+__setup("devkit_rev=", set_phy_reset_pin);
 
 static void __init komikan_setup(void)
 {

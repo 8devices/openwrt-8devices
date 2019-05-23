@@ -72,15 +72,6 @@ static unsigned long lzma_datasize;
 static unsigned long lzma_outsize;
 static unsigned long kernel_la;
 
-#ifdef CONFIG_KERNEL_CMDLINE
-#define kernel_argc	1
-static const char kernel_cmdline[] = CONFIG_KERNEL_CMDLINE;
-static const char *kernel_argv[] = {
-	kernel_cmdline,
-	NULL,
-};
-#endif /* CONFIG_KERNEL_CMDLINE */
-
 static void halt(void)
 {
 	printf("\nSystem halted!\n");
@@ -212,6 +203,7 @@ static void lzma_init_data(void)
 
 void loader_main(unsigned long reg_a0, unsigned long reg_a1,
 		 unsigned long reg_a2, unsigned long reg_a3)
+
 {
 	void (*kernel_entry) (unsigned long, unsigned long, unsigned long,
 			      unsigned long);
@@ -252,12 +244,11 @@ void loader_main(unsigned long reg_a0, unsigned long reg_a1,
 	printf("Starting kernel at %08x...\n\n", kernel_la);
 
 #ifdef CONFIG_KERNEL_CMDLINE
-	reg_a0 = kernel_argc;
-	reg_a1 = (unsigned long) kernel_argv;
+	((char **)reg_a1)[reg_a0] = CONFIG_KERNEL_CMDLINE;
+	reg_a0++;
 	reg_a2 = 0;
 	reg_a3 = 0;
 #endif
-
 	kernel_entry = (void *) kernel_la;
 	kernel_entry(reg_a0, reg_a1, reg_a2, reg_a3);
 }
