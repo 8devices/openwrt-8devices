@@ -142,7 +142,7 @@ wifi_reload_legacy() {
 
 wifi_reload() {
 	ubus call network reload
-	wifi_reload_legacy
+	wifi_updown "enable" "$1"
 }
 
 wifi_detect_notice() {
