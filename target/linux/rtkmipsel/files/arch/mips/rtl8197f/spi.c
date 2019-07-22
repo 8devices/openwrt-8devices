@@ -14,23 +14,31 @@ static struct resource rtl819x_spi1_resource[] = {
 	[1] = DEFINE_RES_IRQ(BSP_DW_SSI_1_IRQ),
 };
 
+#ifdef CONFIG_RTL819X_DW_SPI0
 struct platform_device rtl819x_device_spi0 = {
 	.name			= "dw_spi_mmio",
 	.id				= 1,
 	.num_resources	= ARRAY_SIZE(rtl819x_spi0_resource),
 	.resource		= rtl819x_spi0_resource,
 };
+#endif
 
+#ifdef CONFIG_RTL819X_DW_SPI1
 struct platform_device rtl819x_device_spi1 = {
 	.name			= "dw_spi_mmio",
 	.id				= 2,
 	.num_resources	= ARRAY_SIZE(rtl819x_spi1_resource),
 	.resource		= rtl819x_spi1_resource,
 };
+#endif
 
 static struct platform_device __initdata *rtl_spi_devs[] = {
+#ifdef CONFIG_RTL819X_DW_SPI0
 	&rtl819x_device_spi0,
+#endif
+#ifdef CONFIG_RTL819X_DW_SPI1
 	&rtl819x_device_spi1
+#endif
 };
 
 static int __init rtl819x_spi_peripheral_init(void)
@@ -47,10 +55,6 @@ static int __init rtl819x_spi_peripheral_init(void)
 
 #ifdef CONFIG_RTL819X_DW_SPI0
 	/*Enable SPIC0*/
-	__raw_writel((__raw_readl((void __iomem*) BSP_PIN_MUX_SEL0) & (~0x0fff0000)) | 0x02220000
-			, (void __iomem*)BSP_PIN_MUX_SEL0);
-	__raw_writel((__raw_readl((void __iomem*) BSP_PIN_MUX_SEL2) & (~0x000f0000)) | 0x00030000
-			, (void __iomem*)BSP_PIN_MUX_SEL2);
 	__raw_writel(__raw_readl((void __iomem*) BSP_ENABLE_IP) | 0x00000140
 			, (void __iomem*)BSP_ENABLE_IP);
 	__raw_writel(__raw_readl((void __iomem*) BSP_CLK_MANAGE2) | 0x00010000
@@ -59,10 +63,6 @@ static int __init rtl819x_spi_peripheral_init(void)
 
 #ifdef CONFIG_RTL819X_DW_SPI1
 	/*Enable SPIC1*/
-	__raw_writel((__raw_readl((void __iomem*) BSP_PIN_MUX_SEL0) & (~0xf0000000)) | 0x30000000
-			, (void __iomem*)BSP_PIN_MUX_SEL0);
-	__raw_writel((__raw_readl((void __iomem*) BSP_PIN_MUX_SEL2) & (~0x0ff0f000)) | 0x02202000
-			, (void __iomem*)BSP_PIN_MUX_SEL2);
 	__raw_writel(__raw_readl((void __iomem*) BSP_ENABLE_IP) | 0x000000a0
 			, (void __iomem*)BSP_ENABLE_IP);
 	__raw_writel(__raw_readl((void __iomem*) BSP_CLK_MANAGE2) | 0x00004000

@@ -203,6 +203,7 @@ int __init plat_spi_init(void)
 	rtk_init_flash_proc();
 	spi_register_board_info(sheipa_spi_devs, ARRAY_SIZE(sheipa_spi_devs));
 	platform_device_register(&sheipa_spi_device);
+
 	return 0;
 }
 subsys_initcall(plat_spi_init);

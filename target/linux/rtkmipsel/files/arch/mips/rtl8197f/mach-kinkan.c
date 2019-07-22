@@ -8,16 +8,18 @@
  *  by the Free Software Foundation.
  */
 
-#include <linux/module.h>
-#include <linux/leds.h>
-#include <linux/platform_device.h>
 #include <generated/autoconf.h>
+#include <linux/leds.h>
+#include <linux/module.h>
+#include <linux/platform_device.h>
+#include <linux/spi/spi.h>
 
-#include "gpio.h"
 #include "bspchip.h"
-#include "machtypes.h"
-#include "dev_leds_gpio.h"
 #include "dev-gpio-buttons.h"
+#include "dev_leds_gpio.h"
+#include "gpio.h"
+#include "machtypes.h"
+#include "spi.h"
 
 
 #define KINKAN_BUTTONS_POLL_INTERVAL		100
@@ -68,6 +70,52 @@ static void kinkan_set_sd_pinmux(void)
 	SET_PINMUX(BSP_PIN_MUX_SEL16,  0, 0); // MMC_CMD
 }
 
+#ifdef CONFIG_RTL819X_DW_SPI0
+static struct spi_board_info dw_spi_devices[] __initdata = {
+	{
+		.modalias = "m25p80",
+		.max_speed_hz = 500000,//48000000,
+		.bus_num = 1,
+		.chip_select = 0,
+		.mode = SPI_MODE_3,
+		.irq = -1,
+	}
+};
+
+struct dw_spi_pdata {
+        int num_cs;
+        int *cs_gpios;
+};
+
+int dw_spi0_cs_gpios[] = {
+	24,	//GPIOD[0]
+	20,	//GPIOC[4]
+};
+
+struct dw_spi_pdata dw_spi0_pdata = {
+	.num_cs = 2,
+	.cs_gpios = &dw_spi0_cs_gpios,
+};
+
+static void kinkan_set_spi_pinmux(void)
+{
+	int i;
+
+	rtl819x_device_spi0.dev.platform_data= &dw_spi0_pdata;
+
+//	SET_PINMUX(BSP_PIN_MUX_SEL16, 16, 1); // GPIOC[4] SPI0_CS1N
+	SET_PINMUX(BSP_PIN_MUX_SEL16, 12, 1); // GPIOC[5] SPI0_TXD
+	SET_PINMUX(BSP_PIN_MUX_SEL16,  8, 1); // GPIOC[6] SPI0_RXD
+	SET_PINMUX(BSP_PIN_MUX_SEL16,  4, 1); // GPIOC[7] SPI0_CLK
+//	SET_PINMUX(BSP_PIN_MUX_SEL16,  0, 1); // GPIOD[0] SPI0_CS0N
+
+	for(i = 0; i < ARRAY_SIZE(dw_spi0_cs_gpios); i++){
+		rtl819x_gpio_pin_enable(dw_spi0_cs_gpios[i]);
+		rtl819x_gpio_direction_out(dw_spi0_cs_gpios[i], 1);
+	}
+}
+#endif //CONFIG_RTL819X_DW_SPI0
+
 static void __init kinkan_setup(void)
 {
 	int i;
@@ -90,7 +138,12 @@ static void __init kinkan_setup(void)
 				       ARRAY_SIZE(kinkan_buttons),
 				       kinkan_buttons);
 
+#ifdef CONFIG_RTL819X_DW_SPI0
+	kinkan_set_spi_pinmux();
+	spi_register_board_info(dw_spi_devices, ARRAY_SIZE(dw_spi_devices));
+#else
 	kinkan_set_sd_pinmux();
+#endif
 }
 
 MIPS_MACHINE(RTL8197_MACH_KINKAN, "KINKAN", "8devices Kinkan devboard",

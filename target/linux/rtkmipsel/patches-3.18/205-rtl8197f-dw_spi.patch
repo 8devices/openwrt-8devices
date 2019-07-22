@@ -1,0 +1,69 @@
+Index: linux-3.18.134/drivers/spi/spi-dw-mmio.c
+===================================================================
+--- linux-3.18.134.orig/drivers/spi/spi-dw-mmio.c
++++ linux-3.18.134/drivers/spi/spi-dw-mmio.c
+@@ -78,15 +78,25 @@ static int dw_spi_mmio_probe(struct plat
+ 
+ 	if (pdev->dev.of_node)
+ 		of_property_read_u32(pdev->dev.of_node, "num-cs", &num_cs);
++	else if (pdev->dev.platform_data){
++                struct dw_spi_pdata *pdata = (struct dw_spi_pdata *)pdev->dev.platform_data;
++
++		num_cs = pdata->num_cs;
++		dws->cs_gpios = pdata->cs_gpios;
++	}
+ 
+ 	dws->num_cs = num_cs;
+ 
+-	if (pdev->dev.of_node) {
++	if (pdev->dev.of_node || pdev->dev.platform_data) {
+ 		int i;
+ 
+ 		for (i = 0; i < dws->num_cs; i++) {
+-			int cs_gpio = of_get_named_gpio(pdev->dev.of_node,
+-					"cs-gpios", i);
++			int cs_gpio;
++			if(pdev->dev.of_node)
++				cs_gpio = of_get_named_gpio(pdev->dev.of_node,
++								"cs-gpios", i);
++			else
++				cs_gpio = dws->cs_gpios[i];
+ 
+ 			if (cs_gpio == -EPROBE_DEFER) {
+ 				ret = cs_gpio;
+Index: linux-3.18.134/drivers/spi/spi-dw.h
+===================================================================
+--- linux-3.18.134.orig/drivers/spi/spi-dw.h
++++ linux-3.18.134/drivers/spi/spi-dw.h
+@@ -108,6 +108,7 @@ struct dw_spi {
+ 
+ 	u16			bus_num;
+ 	u16			num_cs;		/* supported slave numbers */
++	int			*cs_gpios;
+ 
+ 	/* Message Transfer pump */
+ 	struct tasklet_struct	pump_transfers;
+@@ -229,6 +230,11 @@ struct dw_spi_chip {
+ 	void (*cs_control)(u32 command);
+ };
+ 
++struct dw_spi_pdata {
++        int num_cs;
++        int *cs_gpios;
++};
++
+ extern int dw_spi_add_host(struct device *dev, struct dw_spi *dws);
+ extern void dw_spi_remove_host(struct dw_spi *dws);
+ extern int dw_spi_suspend_host(struct dw_spi *dws);
+Index: linux-3.18.134/drivers/spi/spi-dw.c
+===================================================================
+--- linux-3.18.134.orig/drivers/spi/spi-dw.c
++++ linux-3.18.134/drivers/spi/spi-dw.c
+@@ -664,6 +664,7 @@ int dw_spi_add_host(struct device *dev,
+ 	master->bits_per_word_mask = SPI_BPW_MASK(8) | SPI_BPW_MASK(16);
+ 	master->bus_num = dws->bus_num;
+ 	master->num_chipselect = dws->num_cs;
++	master->cs_gpios = dws->cs_gpios;
+ 	master->setup = dw_spi_setup;
+ 	master->cleanup = dw_spi_cleanup;
+ 	master->transfer_one_message = dw_spi_transfer_one_message;
