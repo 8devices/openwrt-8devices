@@ -15,6 +15,7 @@
 
 void rtl819x_gpio_pin_enable(u32 pin);
 void rtl819x_gpio_pin_set_val(u32 pin, unsigned val);
+int rtl819x_gpio_direction_out(unsigned pin, int value);
 
 extern struct platform_device rtl819x_phy_reset_pin;
 #endif /* _RTL819X_GPIO_H */

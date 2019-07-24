@@ -147,9 +147,15 @@ static int rtl819x_gpio_direction_output(struct gpio_chip *chip,
 			| (1 << BSP_GPIO_BIT(pin)),
 			(void __iomem*)BSP_GPIO_DIR_REG(pin) );
 
+	rtl819x_gpio_set_value(0,pin, value);
+
 	spin_unlock_irqrestore(&rtl819x_gpio_lock, flags);
 
 	return 0;
+}
+int rtl819x_gpio_direction_out(unsigned pin, int value)
+{
+	return rtl819x_gpio_direction_output(0, pin, value);
 }
 
 static int rtl819x_gpio_get_direction(struct gpio_chip *chip, unsigned pin)
