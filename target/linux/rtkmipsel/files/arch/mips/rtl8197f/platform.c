@@ -141,8 +141,14 @@ struct platform_device rtk_uart1_device = {
 	.id   = -1,
 };
 
+struct platform_device rtk_uart2_device = {
+	.name = "rtk-uart2",
+	.id   = -1,
+};
+
 static struct platform_device __initdata *rtl_uart_devs[] = {
 		&rtk_uart1_device,
+		&rtk_uart2_device,
 };
 
 static int __init rtl819x_uart_init(void)
