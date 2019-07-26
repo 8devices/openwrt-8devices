@@ -1,0 +1,7 @@
+{
+	"mux_list": [
+		{"gpio" : "GPIO_H2", "mux" : "GPIO", "direction" : "OUT", "value": "LOW"},
+		{"gpio" : "GPIO_B3", "mux" : "UART2"},
+		{"gpio" : "GPIO_B4", "mux" : "UART2"}
+	]
+}

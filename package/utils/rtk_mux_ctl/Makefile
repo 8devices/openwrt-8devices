@@ -34,7 +34,9 @@ define Package/rtk-mux-ctl/install
 	$(INSTALL_BIN) $(PKG_BUILD_DIR)/rtk_mux_ctl $(1)/usr/sbin/
 	$(INSTALL_DIR) $(1)/usr/share/rtk-mux-ctl/examples/
 	$(INSTALL_DATA) $(PKG_BUILD_DIR)/examples/empty-rtk-mux.json $(1)/usr/share/rtk-mux-ctl/examples/
+	$(INSTALL_DIR) $(1)/usr/share/rtk-mux-ctl/examples/kinkan/
 	$(INSTALL_DIR) $(1)/usr/share/rtk-mux-ctl/examples/komikan/
+	$(INSTALL_DATA) $(PKG_BUILD_DIR)/examples/kinkan/* $(1)/usr/share/rtk-mux-ctl/examples/kinkan/
 	$(INSTALL_DATA) $(PKG_BUILD_DIR)/examples/komikan/* $(1)/usr/share/rtk-mux-ctl/examples/komikan/
 	$(INSTALL_DIR) $(1)/etc
 	$(INSTALL_DATA) $(PKG_BUILD_DIR)/examples/empty-rtk-mux.json $(1)/etc/rtk_mux_conf.json
