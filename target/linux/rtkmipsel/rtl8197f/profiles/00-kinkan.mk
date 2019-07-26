@@ -34,6 +34,7 @@ define Profile/kinkan
 	  kmod-usb2 \
 	  rpcd \
 	  rpcd-mod-rrdns \
+	  rtk-mux-ctl \
 	  wireless-regdb \
 	  wireless-tools \
 	  wpad \
