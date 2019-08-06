@@ -221,10 +221,11 @@ int	rtl_wpas_join(struct rtl8192cd_priv *priv, int bss_num)
 
 	//mod_timer(&priv->WPAS_timer, jiffies + 300);
 
+	extern int is_support_ac(struct rtl8192cd_priv *priv);
 #ifdef RTK_NL80211
 	if(priv->pmib->dot11Bss.channel >=36)
 	{
-		if(GET_CHIP_VER(priv)==VERSION_8812E || GET_CHIP_VER(priv)==VERSION_8881A || GET_CHIP_VER(priv)==VERSION_8814A)
+		if(is_support_ac(priv))
 			priv->pmib->dot11BssType.net_work_type = WIRELESS_11A|WIRELESS_11N|WIRELESS_11AC;
 		else
 			priv->pmib->dot11BssType.net_work_type = WIRELESS_11A|WIRELESS_11N;
@@ -244,8 +245,6 @@ int	rtl_wpas_join(struct rtl8192cd_priv *priv, int bss_num)
 	priv->pmib->dot11nConfigEntry.dot11nShortGIfor20M = 1;
 	priv->pmib->dot11nConfigEntry.dot11nShortGIfor40M = 1;
 
-	extern int is_support_ac(struct rtl8192cd_priv *priv);
-    
 	if(is_support_ac(priv))
 		priv->pmib->dot11nConfigEntry.dot11nShortGIfor80M = 1;
 

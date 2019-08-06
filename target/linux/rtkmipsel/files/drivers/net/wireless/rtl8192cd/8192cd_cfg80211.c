@@ -1240,6 +1240,7 @@ int is_support_ac(struct rtl8192cd_priv *priv)
 	switch(GET_CHIP_VER(priv)) {
 		case VERSION_8812E:
 		case VERSION_8881A:
+		case VERSION_8822B:
 			ret=1;
 			break;
 #if defined(CONFIG_WLAN_HAL_8814AE)
