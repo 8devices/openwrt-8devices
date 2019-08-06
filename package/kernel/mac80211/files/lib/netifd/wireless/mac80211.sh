@@ -469,7 +469,8 @@ mac80211_prepare_vif() {
 		sta)
 			local wdsflag=
 			staidx="$(($staidx + 1))"
-			[ "$wds" -gt 0 ] && wdsflag="4addr on"
+			#workaround: currently rtl8192cd driver does not support setting 4addr mode over iw commands
+			#[ "$wds" -gt 0 ] && wdsflag="4addr on"
 			iw phy "$phy" interface add "$ifname" type managed $wdsflag
 			[ "$powersave" -gt 0 ] && powersave="on" || powersave="off"
 			iw "$ifname" set power_save "$powersave"
