@@ -1513,7 +1513,11 @@ void realtek_set_security(struct rtl8192cd_priv *priv, struct rtknl *rtk, struct
 #if 1
 	switch (crypto.cipher_group) {
 		case WLAN_CIPHER_SUITE_WEP40:
+			realtek_auth_wep(priv, _WEP_40_PRIVACY_);
+			NDEBUG3("WEP GROUP\n");
+			break;
 		case WLAN_CIPHER_SUITE_WEP104:
+			realtek_auth_wep(priv, _WEP_104_PRIVACY_);
 			NDEBUG3("WEP GROUP\n");
 			break;
 		case WLAN_CIPHER_SUITE_TKIP:
