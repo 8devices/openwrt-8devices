@@ -32,6 +32,7 @@ endif
 
 obj-y += rtl865xc_swNic.o
 obj-y += rtl_nic.o
+obj-y += ethtool.o
 obj-$(CONFIG_RTL_ROMEPERF_24K) += m24kctrl.o
 
 

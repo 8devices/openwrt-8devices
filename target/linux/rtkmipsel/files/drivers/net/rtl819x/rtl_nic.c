@@ -80,6 +80,7 @@
 #include <net/rtl/rtl_queue.h>
 #include "common/rtl_errno.h"
 #include "rtl865xc_swNic.h"
+#include "ethtool.h"
 
 /*common*/
 #include "common/rtl865x_vlan.h"
@@ -14127,6 +14128,7 @@ struct proc_dir_entry *rtl_8367r_vlan;
 		#endif
 			dev->netdev_ops = &rtl819x_netdev_ops;
 #endif
+		dev->ethtool_ops = &rtl865x_ethtool_ops;
 		dev->watchdog_timeo = TX_TIMEOUT;
 #if 0
 		dev->features |= NETIF_F_SG | NETIF_F_IP_CSUM;
