@@ -113,21 +113,12 @@ endif
 
 define Package/procd/install
 	$(INSTALL_DIR) $(1)/sbin $(1)/etc $(1)/lib/functions
-	$(INSTALL_DIR) $(1)/etc/init.d $(1)/lib/preinit $(1)/usr/libexec
 
 	$(INSTALL_BIN) $(PKG_INSTALL_DIR)/usr/sbin/{init,procd,askfirst,udevtrigger} $(1)/sbin/
 	$(INSTALL_DATA) $(PKG_INSTALL_DIR)/usr/lib/libsetlbf.so $(1)/lib
 	$(INSTALL_BIN) ./files/reload_config $(1)/sbin/
 	$(INSTALL_DATA) ./files/hotplug*.json $(1)/etc/
 	$(INSTALL_DATA) ./files/procd.sh $(1)/lib/functions/
-	$(INSTALL_BIN) ./files/login.sh $(1)/usr/libexec/
-	$(INSTALL_DATA) ./files/diag.sh $(1)/etc/
-	$(INSTALL_DATA) ./files/inittab $(1)/etc/
-	$(INSTALL_DATA) ./files/rc.common $(1)/etc/
-	$(INSTALL_BIN) ./files/rc.local $(1)/etc/
-	$(INSTALL_BIN) ./files/preinit $(1)/etc/
-	$(INSTALL_BIN) ./files/init.d/* $(1)/etc/init.d/
-	$(INSTALL_DATA) ./files/preinit.d/* $(1)/lib/preinit/
 endef
 
 define Package/procd-ujail/install
