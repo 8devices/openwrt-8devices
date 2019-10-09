@@ -14061,6 +14061,7 @@ struct proc_dir_entry *rtl_8367r_vlan;
 			printk("failed to allocate dev %d", i);
 			return -1;
 		}
+		netif_carrier_off(dev);
 		SET_MODULE_OWNER(dev);
 		dp = NETDRV_PRIV(dev);
 		memset(dp,0,sizeof(*dp));
