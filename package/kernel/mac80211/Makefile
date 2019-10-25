@@ -1688,7 +1688,7 @@ define Build/Prepare
 	$(PKG_UNPACK)
 #rtk workaround
 	mkdir -p $(PKG_BUILD_DIR)/drivers/net/wireless
-	$(CP) -r $(PLATFORM_DIR)/files/drivers/net/wireless/rtl8192cd $(PKG_BUILD_DIR)/drivers/net/wireless/realtek
+	$(CP) -r $(PLATFORM_DIR)/out-of-tree-drivers/net/wireless/rtl8192cd $(PKG_BUILD_DIR)/drivers/net/wireless/realtek
 #--------------
 	$(Build/Patch)
 	$(TAR) -C $(PKG_BUILD_DIR) -xzf $(DL_DIR)/$(IPW2100_NAME)-$(IPW2100_VERSION).tgz
