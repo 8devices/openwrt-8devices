@@ -24,7 +24,7 @@
 
 #if !defined(CONFIG_RTL_NO_BR_SHORTCUT)
 #if !defined(CONFIG_RTL_FASTBRIDGE)//&&!defined(CONFIG_RPS)
-#define BR_SHORTCUT         1
+//#define BR_SHORTCUT         1
 #endif
 #endif
 

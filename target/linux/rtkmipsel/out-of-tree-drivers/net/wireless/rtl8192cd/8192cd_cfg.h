@@ -631,7 +631,7 @@
 #else
 #if !defined(CONFIG_RTL_NO_BR_SHORTCUT)
 //#ifndef CONFIG_RPS
-#define BR_SHORTCUT //mark_apo
+//#define BR_SHORTCUT //mark_apo
 //#endif
 #endif   
 #if 0	//jwj
