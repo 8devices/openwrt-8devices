@@ -15,6 +15,7 @@
 
 /* PWM */
 #ifdef CONFIG_PWM_RTK
+#define RTK_PWM_PERIOD 256*60000
 struct platform_device rtk_pwm_device = {
 	.name = "rtk-pwm",
 	.id   = -1,
@@ -25,16 +26,19 @@ static struct platform_device __initdata *rtl_pwm_devs[] = {
 };
 
 static struct pwm_lookup rtk_pwm_lookup[] = {
-	PWM_LOOKUP("rtk-pwm", 0, "leds_pwm.0", NULL,80000,PWM_POLARITY_NORMAL), //mark_cc
-	PWM_LOOKUP("rtk-pwm", 1, "leds_pwm.1", NULL,80000,PWM_POLARITY_NORMAL),
-	PWM_LOOKUP("rtk-pwm", 2, "leds_pwm.2", NULL,80000,PWM_POLARITY_NORMAL),
-	PWM_LOOKUP("rtk-pwm", 3, "leds_pwm.3", NULL,80000,PWM_POLARITY_NORMAL),
+	PWM_LOOKUP("rtk-pwm", 0, "leds_pwm.0", NULL, RTK_PWM_PERIOD, PWM_POLARITY_NORMAL),
+	PWM_LOOKUP("rtk-pwm", 1, "leds_pwm.1", NULL, RTK_PWM_PERIOD, PWM_POLARITY_NORMAL),
+	PWM_LOOKUP("rtk-pwm", 2, "leds_pwm.2", NULL, RTK_PWM_PERIOD, PWM_POLARITY_NORMAL),
+	PWM_LOOKUP("rtk-pwm", 3, "leds_pwm.3", NULL, RTK_PWM_PERIOD, PWM_POLARITY_NORMAL),
 };
 void set_pwm_pin_mux(void)
 {
-	//97FN QA board pin MUX
-	REG32(0xb8000808)  =   (REG32(0xb8000808)  & (~(0xF << 16))) |  (0x9 << 16); //set RXC
-	REG32(0xb8000800)  =   (REG32(0xb8000800)  & (~(0xFFF << 16))) |  (0x754 << 16); //set TXD1, TXD2, TXD3
+	// You can here hardcode pinmux'es or set it with rtk_mux_ctl
+
+//	REG32(0xb8000808)  =   (REG32(0xb8000808)  & (~(0xF << 16))) |  (0x9 << 16); //set RXC
+//	REG32(0xb8000800)  =   (REG32(0xb8000800)  & (~(0xFFF << 16))) |  (0x754 << 16); //set TXD1, TXD2, TXD3
+//	REG32(0xb8000834)  =   (REG32(0xb8000834)  & (~(0xF << 28)) | ( 1 << 16));
+
 	REG32(0xb8000010)  =   (REG32(0xb8000010)  & (~0xFFFFFFFF )) |  (0x80003800);
 	REG32(0xb8000014)  =   (REG32(0xb8000014)  & (~(0x1F << 4))) |  (0x13 << 4); //enable timer
 
@@ -55,7 +59,7 @@ arch_initcall(rtl819x_pwm_init);
 /* LED PWM */
 static struct led_pwm rtk_led_pwm1 = {
 	.name = "rtk-led.0",
-	.pwm_period_ns = 60000*10,
+	.pwm_period_ns = RTK_PWM_PERIOD,
 };
 static struct led_pwm_platform_data rtk_led_data1 = {
 	.num_leds = 1,
@@ -72,7 +76,7 @@ struct platform_device rtk_led_device1 = {
 
 static struct led_pwm rtk_led_pwm2 = {
 	.name = "rtk-led.1",
-	.pwm_period_ns = 60000*10,
+	.pwm_period_ns = RTK_PWM_PERIOD,
 };
 static struct led_pwm_platform_data rtk_led_data2 = {
 	.num_leds = 1,
@@ -89,7 +93,7 @@ struct platform_device rtk_led_device2 = {
 
 static struct led_pwm rtk_led_pwm3 = {
 	.name = "rtk-led.2",
-	.pwm_period_ns = 60000*10,
+	.pwm_period_ns = RTK_PWM_PERIOD,
 };
 static struct led_pwm_platform_data rtk_led_data3 = {
 	.num_leds = 1,
@@ -106,7 +110,7 @@ struct platform_device rtk_led_device3 = {
 
 static struct led_pwm rtk_led_pwm4 = {
 	.name = "rtk-led.3",
-	.pwm_period_ns = 60000*10,
+	.pwm_period_ns = RTK_PWM_PERIOD,
 };
 static struct led_pwm_platform_data rtk_led_data4 = {
 	.num_leds = 1,
