@@ -68,10 +68,10 @@ const uint32_t rtk8197_default_gpio_register[] = {
 	{ reg,  shift, gpio, xstr(GPIO_ ## bank ## id), ARRAY_SIZE(rtl_mux_ ## bank ## id ## _x), rtl_mux_ ## bank ## id ## _x }
 
 //RTK_MUX_00
-RTL_MUX(B, 6, "RGMII", "JTAG", "NAND", "SPI1", "UART1", "II2C1", "XOUT", "PWM", "GPIO", "DBG");
-RTL_MUX(B, 0, "RGMII", "NAND", "SPI0", "I2C1", "IIS", "IISA", "XOUT", "PWM", "GPIO", "DBG");
-RTL_MUX(A, 7, "RGMII", "NAND", "SPI0", "IIS", "XOUT", "PWM", "GPIO", "DBG");
-RTL_MUX(A, 6, "RGMII", "NAND", "SPI0", "IIS", "PWM", "GPIO", "DBG");
+RTL_MUX(B, 6, "RGMII", "JTAG", "NAND", "SPI1", "UART1", "II2C1", "XOUT", "PWM0", "GPIO", "DBG");
+RTL_MUX(B, 0, "RGMII", "NAND", "SPI0", "I2C1", "IIS", "IISA", "XOUT", "PWM2", "GPIO", "DBG");
+RTL_MUX(A, 7, "RGMII", "NAND", "SPI0", "IIS", "XOUT", "PWM1", "GPIO", "DBG");
+RTL_MUX(A, 6, "RGMII", "NAND", "SPI0", "IIS", "PWM0", "GPIO", "DBG");
 
 //RTK_MUX_01
 RTL_MUX(B, 5, "RGMII", "NAND", "SPI0", "UART2", "IIS", "PCM", "EVENT", "GPIO", "DBG");
@@ -81,9 +81,9 @@ RTL_MUX(B, 2, "RGMII", "JTAG", "NAND", "SPI0", "UART2", "IIS", "PCM", "EVENT", "
 
 //RTK_MUX_02
 RTL_MUX(B, 7, "RGMII", "NAND", "SPI1", "UART1", "IIS", "I2C1", "I2C0", "EVENT", "GPIO", "DBG");
-RTL_MUX(C, 0, "RGMII", "NAND", "SPI1", "UART1", "I2C0", "PWM", "GPIO", "DBG");
-RTL_MUX(B, 1, "RGMII", "JTAG", "NAND", "SPI0", "SPI0_3W", "I2C1", "IISV", "IIS", "IISA", "PWM", "GPIO", "DBG");
-RTL_MUX(C, 1, "RGMII", "NAND", "SPI1", "SPI1_3W", "UART1", "I2C0", "PWM", "GPIO", "DBG");
+RTL_MUX(C, 0, "RGMII", "NAND", "SPI1", "UART1", "I2C0", "PWM2", "GPIO", "DBG");
+RTL_MUX(B, 1, "RGMII", "JTAG", "NAND", "SPI0", "SPI0_3W", "I2C1", "IISV", "IIS", "IISA", "PWM3", "GPIO", "DBG");
+RTL_MUX(C, 1, "RGMII", "NAND", "SPI1", "SPI1_3W", "UART1", "I2C0", "PWM3", "GPIO", "DBG");
 RTL_MUX(C, 2, "RGMII", "SPI0", "SPI1", "I2C0", "I2C1", "UART1", "GPIO", "DBG");
 RTL_MUX(C, 3, "RGMII", "SPI0", "SPI1", "I2C0", "I2C1", "UART1", "GPIO", "DBG");
 
@@ -120,10 +120,10 @@ RTL_MUX(H, 4, "UART", "GPIO");
 RTL_MUX(H, 3, "UART", "GPIO");
 
 //RTK_MUX_13
-RTL_MUX(G, 6, "LED", "PWM", "VP", "GPIO", "DBG");
+RTL_MUX(G, 6, "LED", "PWM0", "VP", "GPIO", "DBG");
 RTL_MUX(G, 7, "LED", "PWM", "VP", "GPIO", "DBG");
-RTL_MUX(H, 0, "LED", "PWM", "XOUT", "GPIO");
-RTL_MUX(H, 1, "LED", "PWM", "GPIO", "DBG");
+RTL_MUX(H, 0, "LED", "PWM2", "XOUT", "GPIO");
+RTL_MUX(H, 1, "LED", "PWM3", "GPIO", "DBG");
 
 //RTK_MUX_14
 RTL_MUX(H, 2, "LED", "MIIM", "GPIO", "DBG");
@@ -133,10 +133,10 @@ RTL_MUX(D, 1, "MMC", "IIS", "UART1", "UART2", "NAND", "GPIO", "DBG");
 RTL_MUX(D, 2, "MMC", "IIS", "UART1", "UART2", "NAND", "GPIO", "DBG");
 RTL_MUX(D, 3, "MMC", "IIS", "UART1", "UART2", "NAND", "GPIO", "DBG");
 RTL_MUX(D, 4, "MMC", "IIS", "UART1", "UART2", "NAND", "GPIO", "DBG");
-RTL_MUX(D, 5, "MMC", "SPI1", "IISV", "IISA", "UART1", "PCM", "PWM", "GPIO", "DBG");
-RTL_MUX(D, 6, "MMC", "SPI1", "IIS", "UART1", "PCM", "PWM", "GPIO", "DBG");
-RTL_MUX(D, 7, "MMC", "SPI1", "I2C0", "I2C0_S", "UART1", "PCM", "PWM", "GPIO", "DBG");
-RTL_MUX(E, 0, "MMC", "SPI1", "SPI1_3W", "I2C0", "UART1", "PCM", "PWM", "GPIO", "DBG");
+RTL_MUX(D, 5, "MMC", "SPI1", "IISV", "IISA", "UART1", "PCM", "PWM0", "GPIO", "DBG");
+RTL_MUX(D, 6, "MMC", "SPI1", "IIS", "UART1", "PCM", "PWM1", "GPIO", "DBG");
+RTL_MUX(D, 7, "MMC", "SPI1", "I2C0", "I2C0_S", "UART1", "PCM", "PWM2", "GPIO", "DBG");
+RTL_MUX(E, 0, "MMC", "SPI1", "SPI1_3W", "I2C0", "UART1", "PCM", "PWM3", "GPIO", "DBG");
 
 //RTK_MUX_16
 RTL_MUX(C, 4, "MMC", "SPI0", "GPIO", "DBG");

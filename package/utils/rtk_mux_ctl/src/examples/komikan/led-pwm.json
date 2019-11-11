@@ -1,0 +1,6 @@
+{
+	"mux_list": [
+		{"gpio" : "GPIO_G6", "mux" : "PWM0"},
+		{"gpio" : "GPIO_E0", "mux" : "PWM3"}
+	]
+}
