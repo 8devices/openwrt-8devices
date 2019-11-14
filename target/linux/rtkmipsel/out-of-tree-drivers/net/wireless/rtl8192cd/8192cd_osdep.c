@@ -4732,7 +4732,7 @@ int rtl8192cd_open(struct net_device *dev)
 		rtl8192cd_init_vxd_mib(priv);
 
 // check phyband and channel match or not
-#ifdef MP_TEST
+#if 0 //def MP_TEST
 	if(priv->pshare->rf_ft_var.mp_specific) //For MP nfjrom to open WLAN0 successfully
 	{
 		if ((priv->pmib->dot11RFEntry.dot11channel <= 14) && (priv->pmib->dot11RFEntry.phyBandSelect != PHY_BAND_2G))
@@ -6427,10 +6427,18 @@ static void MDL_DEVINIT set_mib_default(struct rtl8192cd_priv *priv)
 	}
 #endif //CONFIG_SOC_WIFI
 
-	if(is_11AC_Chips(priv))
+	if (is_11AC_Chips(priv)){
 		AMSDU_ENABLE = 2;
-	else
+		priv->pmib->dot11BssType.net_work_type = WIRELESS_11A | WIRELESS_11N | WIRELESS_11AC;
+		priv->pmib->dot11RFEntry.phyBandSelect = PHY_BAND_5G;
+		priv->pmib->dot11RFEntry.dot11channel = 36;
+	}
+	else {
 		AMSDU_ENABLE = 0;
+		priv->pmib->dot11BssType.net_work_type = WIRELESS_11B | WIRELESS_11G | WIRELESS_11N;
+		priv->pmib->dot11RFEntry.phyBandSelect = PHY_BAND_2G;
+		priv->pmib->dot11RFEntry.dot11channel = 1;
+	}
 
 #if defined(CONFIG_SHARE_XCAP_SUPPORT)
 	priv->pmib->dot11RFEntry.share_xcap = 1;
