@@ -9075,6 +9075,7 @@ static void power_save_timer(unsigned long task_priv)
 #endif
 
 
+static int rtl865x_set_link(struct net_device *dev, int enable);
 static int re865x_open (struct net_device *dev)
 {
 	struct dev_priv *cp;
@@ -9182,6 +9183,7 @@ static int re865x_open (struct net_device *dev)
 		atomic_inc(&rtl_devOpened);
 	}
 	cp->opened = 1;
+	rtl865x_set_link(dev, 1);
 
 #ifdef CONFIG_RTL_HARDWARE_NAT
 	reset_hw_mib_counter(dev);
@@ -9294,6 +9296,7 @@ static int re865x_close (struct net_device *dev)
 		return SUCCESS;
 
 	netif_stop_queue(dev);
+	rtl865x_set_link(dev, 0);
 	cp->opened = 0;
 	/* The last opened device	*/
 	if (atomic_read(&rtl_devOpened)==1)
@@ -12097,7 +12100,7 @@ out:
 	return SUCCESS;
 }
 
-#if defined(CONFIG_RTL8186_LINK_CHANGE)
+#if 1 //defined(CONFIG_RTL8186_LINK_CHANGE)
 static int rtl865x_set_link(struct net_device *dev, int enable)
 {
 	int32 i;
