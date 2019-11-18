@@ -2763,7 +2763,8 @@ static int realtek_cfg80211_set_tx_power(struct wiphy *wiphy,
 	}
 
 	//Apply config immediately for AP mode
-	if(OPMODE & WIFI_AP_STATE)
+	//setting channel in realtek_cfg80211_set_tx_power functions makes no sence
+	if(0) //OPMODE & WIFI_AP_STATE)
 	{
 		if(priv->pmib->dot11RFEntry.dot11channel)
 			SwChnl(priv, priv->pmib->dot11RFEntry.dot11channel, priv->pmib->dot11nConfigEntry.dot11n2ndChOffset);
