@@ -4451,7 +4451,6 @@ int rtl8192cd_open(struct net_device *dev)
 	if(!is_iface_ready_nl80211(dev, priv))
 		return 0;
 
-	prepare_iface_nl80211(dev, priv);
 #if defined (CONFIG_AUTH_RESULT)
 	priv->authRes = 0;
 #endif
@@ -7092,7 +7091,8 @@ register_driver:
 		OPMODE = WIFI_STATION_STATE;
 	}
 
-    nat25_filter_default(priv);
+	nat25_filter_default(priv);
+	prepare_iface_nl80211(dev, priv);
 
 
 	if (IS_ROOT_INTERFACE(priv))  // is root interface
