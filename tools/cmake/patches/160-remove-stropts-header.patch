@@ -1,0 +1,13 @@
+Index: cmake-3.11.4/Utilities/cmcurl/lib/curl_config.h.cmake
+===================================================================
+--- cmake-3.11.4.orig/Utilities/cmcurl/lib/curl_config.h.cmake
++++ cmake-3.11.4/Utilities/cmcurl/lib/curl_config.h.cmake
+@@ -618,7 +618,7 @@
+ #cmakedefine HAVE_STRNICMP 1
+ 
+ /* Define to 1 if you have the <stropts.h> header file. */
+-#cmakedefine HAVE_STROPTS_H 1
++#cmakedefine HAVE_STROPTS_H 0
+ 
+ /* Define to 1 if you have the strstr function. */
+ #cmakedefine HAVE_STRSTR 1
