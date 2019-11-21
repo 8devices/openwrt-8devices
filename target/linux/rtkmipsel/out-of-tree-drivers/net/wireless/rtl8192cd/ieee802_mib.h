@@ -18,13 +18,7 @@
 #ifndef _IEEE802_MIB_H_
 #define _IEEE802_MIB_H_
 
-#ifdef __ECOS
-#include <pkgconf/system.h>
-#include <pkgconf/devs_eth_rltk_819x_wlan.h>
-#endif
-#if defined(RTK_NL80211)
 #include "wifi.h"
-#endif
 #define MIB_VERSION				32
 
 #define MAX_2G_CHANNEL_NUM		14
@@ -43,33 +37,13 @@
 #ifdef D_ACL
 #define NUM_ACL					128
 #else
-#ifdef CONFIG_RTL8196B_TLD
-#define NUM_ACL					64
-#else
 #define NUM_ACL					32
-#endif
 #endif
 
 #define NUM_GBWC				64
 #define NUM_SBWC				64
 
-#ifdef __ECOS
-#ifdef CONFIG_RTL_WDS_SUPPORT
-#define NUM_WDS					RTLPKG_DEVS_ETH_RLTK_819X_WLAN_WDS_NUM
-#else
-#define NUM_WDS					0
-#endif
-#else
-#if defined(CONFIG_RTL8196C_EC) //no WDS or only one WDS
-#define NUM_WDS					1
-#else
-#if defined(CONFIG_RTL8196B_GW_8M) || defined(CONFIG_RTL8196C_AP_ROOT) || defined(CONFIG_RTL8198_AP_ROOT)
-#define NUM_WDS					4
-#else
 #define NUM_WDS					8
-#endif
-#endif
-#endif
 
 #define MESH_ID_LEN				32
 
@@ -107,7 +81,7 @@ struct Dot11StationConfigEntry {
 	unsigned int	fixedTxRate;			// fix tx rate
 	int				swTkipMic;
 	int				protectionDisabled;		// force disable protection
-	int				olbcDetectDisabled;		// david, force disable olbc dection	
+	int				olbcDetectDisabled;		// david, force disable olbc dection
 	int				nmlscDetectDisabled;		// hf, force disable no member legacy station condition detection
 	int				legacySTADeny;			// deny association from legacy (11B) STA
 
@@ -115,11 +89,11 @@ struct Dot11StationConfigEntry {
 	int				fastRoaming;			// 1: enable fast-roaming, 0: disable
 	unsigned int	lowestMlcstRate;		// 1: use lowest basic rate to send multicast
 	unsigned int	supportedStaNum;		// limit supported station number
-	unsigned int	staAssociateRSSIThreshold;  
+	unsigned int	staAssociateRSSIThreshold;
 	unsigned int	staRoamingRSSIGap;
 	unsigned int	staRoamingTimeGap;
-	unsigned int	RmStaRSSIThreshold;			
-	unsigned int	probe_info_enable;		// proc probe_info 
+	unsigned int	RmStaRSSIThreshold;
+	unsigned int	probe_info_enable;		// proc probe_info
 	unsigned int sc_enabled;	//0 is disable, 1 is enable
 	int sc_duration_time;				//-1 is always parse, 0 stop parse, >0 parse all packets.
 	int sc_get_sync_time;					//unit is second
@@ -144,21 +118,21 @@ struct Dot11StationConfigEntry {
 	int sc_security_type;
 	int sc_fix_channel;					//0, don't fix channel; others, the remote AP's channel
 	int sc_fix_encrypt;					//0, not fix; >0, fix
-	int sc_config_type;					
-	
+	int sc_config_type;
+
 	int sc_fix_bw;
 	int sc_fix_offset;
-	
+
 	unsigned int	limit_rxloop;
-	unsigned char wnmtest;				    
+	unsigned char wnmtest;
 	unsigned char	deauth_mac[MACADDRLEN]; //CONFIG_IEEE80211W
 	unsigned char	sa_req_mac[MACADDRLEN]; //CONFIG_IEEE80211W_CLI
 	unsigned char   pmf_cli_test;			// CONFIG_IEEE80211W_CLI
 	unsigned char   pmftest;	// CONFIG_IEEE80211W
 	unsigned int	bcastSSID_inherit;
 	unsigned int	beacon_rate;
-	unsigned int	prsp_rate;	
-	unsigned int	disable_prsp;	
+	unsigned int	prsp_rate;
+	unsigned int	disable_prsp;
 	//unsigned int    channel_utili_beaconIntval;
 
     /* below is for 802.11k radio measurement*/
@@ -172,7 +146,7 @@ struct Dot11StationConfigEntry {
     unsigned int    dot11RMNeighborReportExpireTime;
 
 	/*below is for BT Config*/
-	unsigned int   rtkBtconfig; 
+	unsigned int   rtkBtconfig;
 	unsigned char           cu_enable; /*[CLM, channel loading measurement] channel utilization calculated enable/disable*/
 
 };
@@ -328,8 +302,8 @@ struct Dot11OperationEntry {
 	unsigned int	disable_brsc;
 	int				keep_rsnie;
 	int				guest_access;
-	unsigned char 	tdls_prohibited;				
-	unsigned char 	tdls_cs_prohibited; 
+	unsigned char 	tdls_prohibited;
+	unsigned char 	tdls_cs_prohibited;
 //#ifdef CONFIG_POWER_SAVE
 	unsigned int	ps_level;
 	unsigned int	ps_timeout;
@@ -361,76 +335,76 @@ struct Dot11RFEntry {
 	unsigned char	pwrdiff5GHT20[MAX_5G_CHANNEL_NUM];
 	unsigned char	pwrdiff5GOFDM[MAX_5G_CHANNEL_NUM];
 // RTK_AC_SUPPORT
-	unsigned char	pwrdiff_20BW1S_OFDM1T_A[MAX_2G_CHANNEL_NUM];	
-	unsigned char	pwrdiff_40BW2S_20BW2S_A[MAX_2G_CHANNEL_NUM];	
+	unsigned char	pwrdiff_20BW1S_OFDM1T_A[MAX_2G_CHANNEL_NUM];
+	unsigned char	pwrdiff_40BW2S_20BW2S_A[MAX_2G_CHANNEL_NUM];
 	unsigned char	pwrdiff_OFDM2T_CCK2T_A[MAX_2G_CHANNEL_NUM];
-	unsigned char	pwrdiff_40BW3S_20BW3S_A[MAX_2G_CHANNEL_NUM];	
-	unsigned char	pwrdiff_4OFDM3T_CCK3T_A[MAX_2G_CHANNEL_NUM];	
-	unsigned char	pwrdiff_40BW4S_20BW4S_A[MAX_2G_CHANNEL_NUM];	
+	unsigned char	pwrdiff_40BW3S_20BW3S_A[MAX_2G_CHANNEL_NUM];
+	unsigned char	pwrdiff_4OFDM3T_CCK3T_A[MAX_2G_CHANNEL_NUM];
+	unsigned char	pwrdiff_40BW4S_20BW4S_A[MAX_2G_CHANNEL_NUM];
 	unsigned char	pwrdiff_OFDM4T_CCK4T_A[MAX_2G_CHANNEL_NUM];
 
-	unsigned char	pwrdiff_5G_20BW1S_OFDM1T_A[MAX_5G_CHANNEL_NUM];	
-	unsigned char	pwrdiff_5G_40BW2S_20BW2S_A[MAX_5G_CHANNEL_NUM];	
-	unsigned char	pwrdiff_5G_40BW3S_20BW3S_A[MAX_5G_CHANNEL_NUM];	
-	unsigned char	pwrdiff_5G_40BW4S_20BW4S_A[MAX_5G_CHANNEL_NUM];	
-	unsigned char	pwrdiff_5G_RSVD_OFDM4T_A[MAX_5G_CHANNEL_NUM];	
-	unsigned char	pwrdiff_5G_80BW1S_160BW1S_A[MAX_5G_CHANNEL_NUM];	
-	unsigned char	pwrdiff_5G_80BW2S_160BW2S_A[MAX_5G_CHANNEL_NUM];	
-	unsigned char	pwrdiff_5G_80BW3S_160BW3S_A[MAX_5G_CHANNEL_NUM];	
-	unsigned char	pwrdiff_5G_80BW4S_160BW4S_A[MAX_5G_CHANNEL_NUM];	
+	unsigned char	pwrdiff_5G_20BW1S_OFDM1T_A[MAX_5G_CHANNEL_NUM];
+	unsigned char	pwrdiff_5G_40BW2S_20BW2S_A[MAX_5G_CHANNEL_NUM];
+	unsigned char	pwrdiff_5G_40BW3S_20BW3S_A[MAX_5G_CHANNEL_NUM];
+	unsigned char	pwrdiff_5G_40BW4S_20BW4S_A[MAX_5G_CHANNEL_NUM];
+	unsigned char	pwrdiff_5G_RSVD_OFDM4T_A[MAX_5G_CHANNEL_NUM];
+	unsigned char	pwrdiff_5G_80BW1S_160BW1S_A[MAX_5G_CHANNEL_NUM];
+	unsigned char	pwrdiff_5G_80BW2S_160BW2S_A[MAX_5G_CHANNEL_NUM];
+	unsigned char	pwrdiff_5G_80BW3S_160BW3S_A[MAX_5G_CHANNEL_NUM];
+	unsigned char	pwrdiff_5G_80BW4S_160BW4S_A[MAX_5G_CHANNEL_NUM];
 
-	unsigned char	pwrdiff_20BW1S_OFDM1T_B[MAX_2G_CHANNEL_NUM];	
-	unsigned char	pwrdiff_40BW2S_20BW2S_B[MAX_2G_CHANNEL_NUM];	
+	unsigned char	pwrdiff_20BW1S_OFDM1T_B[MAX_2G_CHANNEL_NUM];
+	unsigned char	pwrdiff_40BW2S_20BW2S_B[MAX_2G_CHANNEL_NUM];
 	unsigned char	pwrdiff_OFDM2T_CCK2T_B[MAX_2G_CHANNEL_NUM];
-	unsigned char	pwrdiff_40BW3S_20BW3S_B[MAX_2G_CHANNEL_NUM];	
+	unsigned char	pwrdiff_40BW3S_20BW3S_B[MAX_2G_CHANNEL_NUM];
 	unsigned char	pwrdiff_OFDM3T_CCK3T_B[MAX_2G_CHANNEL_NUM];
-	unsigned char	pwrdiff_40BW4S_20BW4S_B[MAX_2G_CHANNEL_NUM];	
+	unsigned char	pwrdiff_40BW4S_20BW4S_B[MAX_2G_CHANNEL_NUM];
 	unsigned char	pwrdiff_OFDM4T_CCK4T_B[MAX_2G_CHANNEL_NUM];
 
-	unsigned char	pwrdiff_5G_20BW1S_OFDM1T_B[MAX_5G_CHANNEL_NUM];	
-	unsigned char	pwrdiff_5G_40BW2S_20BW2S_B[MAX_5G_CHANNEL_NUM];	
-	unsigned char	pwrdiff_5G_40BW3S_20BW3S_B[MAX_5G_CHANNEL_NUM];	
-	unsigned char	pwrdiff_5G_40BW4S_20BW4S_B[MAX_5G_CHANNEL_NUM];	
-	unsigned char	pwrdiff_5G_RSVD_OFDM4T_B[MAX_5G_CHANNEL_NUM];	
-	unsigned char	pwrdiff_5G_80BW1S_160BW1S_B[MAX_5G_CHANNEL_NUM];	
-	unsigned char	pwrdiff_5G_80BW2S_160BW2S_B[MAX_5G_CHANNEL_NUM];	
-	unsigned char	pwrdiff_5G_80BW3S_160BW3S_B[MAX_5G_CHANNEL_NUM];	
-	unsigned char	pwrdiff_5G_80BW4S_160BW4S_B[MAX_5G_CHANNEL_NUM];	
+	unsigned char	pwrdiff_5G_20BW1S_OFDM1T_B[MAX_5G_CHANNEL_NUM];
+	unsigned char	pwrdiff_5G_40BW2S_20BW2S_B[MAX_5G_CHANNEL_NUM];
+	unsigned char	pwrdiff_5G_40BW3S_20BW3S_B[MAX_5G_CHANNEL_NUM];
+	unsigned char	pwrdiff_5G_40BW4S_20BW4S_B[MAX_5G_CHANNEL_NUM];
+	unsigned char	pwrdiff_5G_RSVD_OFDM4T_B[MAX_5G_CHANNEL_NUM];
+	unsigned char	pwrdiff_5G_80BW1S_160BW1S_B[MAX_5G_CHANNEL_NUM];
+	unsigned char	pwrdiff_5G_80BW2S_160BW2S_B[MAX_5G_CHANNEL_NUM];
+	unsigned char	pwrdiff_5G_80BW3S_160BW3S_B[MAX_5G_CHANNEL_NUM];
+	unsigned char	pwrdiff_5G_80BW4S_160BW4S_B[MAX_5G_CHANNEL_NUM];
 
-	unsigned char	pwrdiff_20BW1S_OFDM1T_C[MAX_2G_CHANNEL_NUM];  
-	unsigned char	pwrdiff_40BW2S_20BW2S_C[MAX_2G_CHANNEL_NUM];  
+	unsigned char	pwrdiff_20BW1S_OFDM1T_C[MAX_2G_CHANNEL_NUM];
+	unsigned char	pwrdiff_40BW2S_20BW2S_C[MAX_2G_CHANNEL_NUM];
 	unsigned char	pwrdiff_OFDM2T_CCK2T_C[MAX_2G_CHANNEL_NUM];
-	unsigned char	pwrdiff_40BW3S_20BW3S_C[MAX_2G_CHANNEL_NUM];  
-	unsigned char	pwrdiff_4OFDM3T_CCK3T_C[MAX_2G_CHANNEL_NUM];  
-	unsigned char	pwrdiff_40BW4S_20BW4S_C[MAX_2G_CHANNEL_NUM];  
+	unsigned char	pwrdiff_40BW3S_20BW3S_C[MAX_2G_CHANNEL_NUM];
+	unsigned char	pwrdiff_4OFDM3T_CCK3T_C[MAX_2G_CHANNEL_NUM];
+	unsigned char	pwrdiff_40BW4S_20BW4S_C[MAX_2G_CHANNEL_NUM];
 	unsigned char	pwrdiff_OFDM4T_CCK4T_C[MAX_2G_CHANNEL_NUM];
 
-	unsigned char	pwrdiff_5G_20BW1S_OFDM1T_C[MAX_5G_CHANNEL_NUM];   
-	unsigned char	pwrdiff_5G_40BW2S_20BW2S_C[MAX_5G_CHANNEL_NUM];   
-	unsigned char	pwrdiff_5G_40BW3S_20BW3S_C[MAX_5G_CHANNEL_NUM];   
-	unsigned char	pwrdiff_5G_40BW4S_20BW4S_C[MAX_5G_CHANNEL_NUM];   
-	unsigned char	pwrdiff_5G_RSVD_OFDM4T_C[MAX_5G_CHANNEL_NUM]; 
-	unsigned char	pwrdiff_5G_80BW1S_160BW1S_C[MAX_5G_CHANNEL_NUM];  
-	unsigned char	pwrdiff_5G_80BW2S_160BW2S_C[MAX_5G_CHANNEL_NUM];  
-	unsigned char	pwrdiff_5G_80BW3S_160BW3S_C[MAX_5G_CHANNEL_NUM];  
+	unsigned char	pwrdiff_5G_20BW1S_OFDM1T_C[MAX_5G_CHANNEL_NUM];
+	unsigned char	pwrdiff_5G_40BW2S_20BW2S_C[MAX_5G_CHANNEL_NUM];
+	unsigned char	pwrdiff_5G_40BW3S_20BW3S_C[MAX_5G_CHANNEL_NUM];
+	unsigned char	pwrdiff_5G_40BW4S_20BW4S_C[MAX_5G_CHANNEL_NUM];
+	unsigned char	pwrdiff_5G_RSVD_OFDM4T_C[MAX_5G_CHANNEL_NUM];
+	unsigned char	pwrdiff_5G_80BW1S_160BW1S_C[MAX_5G_CHANNEL_NUM];
+	unsigned char	pwrdiff_5G_80BW2S_160BW2S_C[MAX_5G_CHANNEL_NUM];
+	unsigned char	pwrdiff_5G_80BW3S_160BW3S_C[MAX_5G_CHANNEL_NUM];
 	unsigned char	pwrdiff_5G_80BW4S_160BW4S_C[MAX_5G_CHANNEL_NUM];
 
-	unsigned char	pwrdiff_20BW1S_OFDM1T_D[MAX_2G_CHANNEL_NUM];  
-	unsigned char	pwrdiff_40BW2S_20BW2S_D[MAX_2G_CHANNEL_NUM];  
+	unsigned char	pwrdiff_20BW1S_OFDM1T_D[MAX_2G_CHANNEL_NUM];
+	unsigned char	pwrdiff_40BW2S_20BW2S_D[MAX_2G_CHANNEL_NUM];
 	unsigned char	pwrdiff_OFDM2T_CCK2T_D[MAX_2G_CHANNEL_NUM];
-	unsigned char	pwrdiff_40BW3S_20BW3S_D[MAX_2G_CHANNEL_NUM];  
-	unsigned char	pwrdiff_4OFDM3T_CCK3T_D[MAX_2G_CHANNEL_NUM];  
-	unsigned char	pwrdiff_40BW4S_20BW4S_D[MAX_2G_CHANNEL_NUM];  
+	unsigned char	pwrdiff_40BW3S_20BW3S_D[MAX_2G_CHANNEL_NUM];
+	unsigned char	pwrdiff_4OFDM3T_CCK3T_D[MAX_2G_CHANNEL_NUM];
+	unsigned char	pwrdiff_40BW4S_20BW4S_D[MAX_2G_CHANNEL_NUM];
 	unsigned char	pwrdiff_OFDM4T_CCK4T_D[MAX_2G_CHANNEL_NUM];
 
-	unsigned char	pwrdiff_5G_20BW1S_OFDM1T_D[MAX_5G_CHANNEL_NUM];   
-	unsigned char	pwrdiff_5G_40BW2S_20BW2S_D[MAX_5G_CHANNEL_NUM];   
-	unsigned char	pwrdiff_5G_40BW3S_20BW3S_D[MAX_5G_CHANNEL_NUM];   
-	unsigned char	pwrdiff_5G_40BW4S_20BW4S_D[MAX_5G_CHANNEL_NUM];   
-	unsigned char	pwrdiff_5G_RSVD_OFDM4T_D[MAX_5G_CHANNEL_NUM]; 
-	unsigned char	pwrdiff_5G_80BW1S_160BW1S_D[MAX_5G_CHANNEL_NUM];  
-	unsigned char	pwrdiff_5G_80BW2S_160BW2S_D[MAX_5G_CHANNEL_NUM];  
-	unsigned char	pwrdiff_5G_80BW3S_160BW3S_D[MAX_5G_CHANNEL_NUM];  
+	unsigned char	pwrdiff_5G_20BW1S_OFDM1T_D[MAX_5G_CHANNEL_NUM];
+	unsigned char	pwrdiff_5G_40BW2S_20BW2S_D[MAX_5G_CHANNEL_NUM];
+	unsigned char	pwrdiff_5G_40BW3S_20BW3S_D[MAX_5G_CHANNEL_NUM];
+	unsigned char	pwrdiff_5G_40BW4S_20BW4S_D[MAX_5G_CHANNEL_NUM];
+	unsigned char	pwrdiff_5G_RSVD_OFDM4T_D[MAX_5G_CHANNEL_NUM];
+	unsigned char	pwrdiff_5G_80BW1S_160BW1S_D[MAX_5G_CHANNEL_NUM];
+	unsigned char	pwrdiff_5G_80BW2S_160BW2S_D[MAX_5G_CHANNEL_NUM];
+	unsigned char	pwrdiff_5G_80BW3S_160BW3S_D[MAX_5G_CHANNEL_NUM];
 	unsigned char	pwrdiff_5G_80BW4S_160BW4S_D[MAX_5G_CHANNEL_NUM];
 
 	unsigned int	defaultAntennaB;
@@ -466,7 +440,7 @@ struct Dot11RFEntry {
 	unsigned int	txbf_mu;
 	unsigned int	target_pwr;
 	unsigned char	bcn2path;
-	unsigned char	bcnagc;	
+	unsigned char	bcnagc;
 	unsigned char	add_cck1M_pwr;
 	unsigned int	pa_type;
 	unsigned char	txpwr_reduction;
@@ -475,7 +449,7 @@ struct Dot11RFEntry {
 	unsigned int	acs2_dis_clean_channel;
 	unsigned int	acs2_round; // 200ms per round <SS_AUTO_CHNL_ACS2_TO>
 	unsigned int	acs2_clm_weighting_mode;
-	unsigned int	acs2_cca_cap_db;	
+	unsigned int	acs2_cca_cap_db;
 	unsigned char	power_percent;
 	unsigned char   kfree_enable;
 	unsigned int	periodicAutochannel;
@@ -487,9 +461,6 @@ struct ibss_priv {
 	unsigned short	atim_win;
 };
 
-#if defined(CONFIG_RTL_WAPI_SUPPORT)
-#define	SECURITY_INFO_WAPI		0xa5a56789
-#endif
 struct bss_desc {
 	unsigned char	bssid[MACADDRLEN];
 	unsigned char	ssid[32];
@@ -517,24 +488,20 @@ struct bss_desc {
 	unsigned short	p2pwscconfig;
 	unsigned char	p2paddress[MACADDRLEN];
 	/* multi-stage 2.3.0 */
-	unsigned char	stage;	
-    /*cfg p2p cfg p2p*/	
-    #if	defined(WIFI_WPAS) || defined(RTK_NL80211)
+	unsigned char	stage;
+    /*cfg p2p cfg p2p*/
 	#if 0
     unsigned char	    p2p_ie_len;
-    unsigned char	    p2p_ie[256];    
+    unsigned char	    p2p_ie[256];
 	unsigned char	    wscie_len;
 	unsigned char	    wscie[256];
 	#endif
 	struct ht_info_elmt ht_info;
 	struct ht_cap_elmt ht_cap;
-	#endif
-	#if	defined(WIFI_WPAS) || defined(RTK_NL80211) || defined(CONFIG_RTL_COMAPI_WLTOOLS)
     unsigned char	    wpa_ie_len;
     unsigned char	    wpa_ie[256];
-    unsigned char	    rsn_ie_len;    
+    unsigned char	    rsn_ie_len;
     unsigned char	    rsn_ie[256];
-    #endif    
     /*cfg p2p cfg p2p*/
 };
 
@@ -588,7 +555,7 @@ struct Dot11DFSEntry {
 	unsigned int	DFS_timeout;	// set to 10 ms
 	unsigned int	DFS_detected;	// 1 or 0
 	unsigned int	NOP_timeout;	// set to 30 mins
-	unsigned int	DFS_TXPAUSE_timeout; 
+	unsigned int	DFS_TXPAUSE_timeout;
 	unsigned int	CAC_enable;		// 1 or 0
 	unsigned int	CAC_ss_counter;
 	unsigned int	reserved1;
@@ -625,10 +592,10 @@ struct MiscEntry {
 	unsigned int	use_txq;
 	unsigned int	func_off;
 	unsigned int	auto_rts_mode;
-	unsigned int	raku_only;    
+	unsigned int	raku_only;
 	unsigned int	tv_mode;               // 0: disable, 1: enable,  2: auto
-	unsigned int	stage;              
-	unsigned int	forward_streaming;     // 0: disable, 1: enable	
+	unsigned int	stage;
+	unsigned int	forward_streaming;     // 0: disable, 1: enable
 	unsigned int	passive_ss_int;
 	unsigned int	ss_delay;
 	unsigned int	ss_loop_delay;
@@ -700,7 +667,7 @@ struct GroupBandWidthControl {
 	unsigned char	GBWCAddr[NUM_GBWC][MACADDRLEN];
 	unsigned int	GBWCNum;		// GBWC entry number, this field should be followed to GBWCAddr
 	unsigned int	GBWCThrd_tx;		// Tx Threshold, in unit of kbps
-	unsigned int	GBWCThrd_rx;		// Rx Threshold, in unit of kbps	
+	unsigned int	GBWCThrd_rx;		// Rx Threshold, in unit of kbps
 };
 
 struct SBWC_ENTRY {
@@ -723,7 +690,7 @@ struct Dot11nConfigEntry {
 	unsigned int	dot11nShortGIfor40M;
 	unsigned int	dot11nShortGIfor80M;
 	unsigned int	dot11nSTBC;
-	unsigned int	dot11nLDPC;	
+	unsigned int	dot11nLDPC;
 	unsigned int	dot11nAMPDU;
 	unsigned int	dot11nAMSDU;
 	unsigned int	dot11nAMPDUSendSz;		// 8: 8K, 16: 16K, 32: 32K, 64: 64K, other: auto
@@ -738,7 +705,7 @@ struct Dot11nConfigEntry {
 	unsigned int	dot11nCoexist_obss_scan;// 0: disable, 1: active scan, 2: passive scan
 	unsigned int	dot11nBGAPRssiChkTh;
 	unsigned int	dot11nTxNoAck;
-	unsigned int	dot11nAddBAreject;		//add for support sigma test	
+	unsigned int	dot11nAddBAreject;		//add for support sigma test
 	unsigned int	dot11nDisable2RCCA;
 };
 
@@ -918,7 +885,7 @@ struct P2P_Direct {
 };
 
 
-#define PROFILE_NUM		5 	// must reserve one for root profile. 
+#define PROFILE_NUM		5 	// must reserve one for root profile.
 
 struct ap_profile {
 	char ssid[33];		// desired SSID in string
@@ -930,33 +897,33 @@ struct ap_profile {
 	unsigned char wep_key1[13]; // WEP key1 in hex
 	unsigned char wep_key2[13]; // WEP key2 in hex
 	unsigned char wep_key3[13]; // WEP key3 in hex
-	unsigned char wep_key4[13]; // WEP key4 in hex	
-    int MulticastCipher;	    
-	unsigned char bss_PMF;	
+	unsigned char wep_key4[13]; // WEP key4 in hex
+    int MulticastCipher;
+	unsigned char bss_PMF;
 };
 
 struct ap_conn_profile { // ap connection profile
 	int	enable_profile;
 	int	profile_num;		// profile number, except root profile.
-    int sortbyprofile;	
+    int sortbyprofile;
 	struct ap_profile profile[PROFILE_NUM];
 };
 
 struct StaControl {
-    unsigned char stactrl_enable; //0:disable, 1:enable   
-    unsigned char stactrl_groupID;    
+    unsigned char stactrl_enable; //0:disable, 1:enable
+    unsigned char stactrl_groupID;
     unsigned char stactrl_prefer_band;    //0: disable, 1: enable
-    unsigned int  stactrl_param_1;    // rssi threshold   
+    unsigned int  stactrl_param_1;    // rssi threshold
     unsigned int  stactrl_param_2;    // rssi threshold tolerance
-    unsigned int  stactrl_param_3;    // timer X    
-    unsigned int  stactrl_param_4;    // retry Y         
-    unsigned int  stactrl_param_5;    // timer Z    
-    unsigned int  stactrl_param_6;    // rssi threshold for non-prefer band   
+    unsigned int  stactrl_param_3;    // timer X
+    unsigned int  stactrl_param_4;    // retry Y
+    unsigned int  stactrl_param_5;    // timer Z
+    unsigned int  stactrl_param_6;    // rssi threshold for non-prefer band
     unsigned int  stactrl_param_7;    // kickoff times //20170103
     unsigned int  stactrl_param_8;    // kickoff times //20170106
     unsigned int  stactrl_param_9;
 };
-    
+
 struct SmartRoamingProfile {
 	unsigned char	block_aging;
 	unsigned int	tp_max;
@@ -1020,9 +987,9 @@ struct ATMConfigEntry {
 };
 
 struct Dot11WNMEntry {
-	unsigned char dot11vBssTransEnable; 		
-	unsigned char dot11vReqMode;	   
-	unsigned char dot11vDiassocImminent;   		
+	unsigned char dot11vBssTransEnable;
+	unsigned char dot11vReqMode;
+	unsigned char dot11vDiassocImminent;
 	unsigned char sta_mac[MACADDRLEN];
 	unsigned short dot11vDiassocDeadline;
 	unsigned char bssTransExpiredTime;
@@ -1032,8 +999,8 @@ struct Dot11WNMEntry {
 };
 
 struct HalQcDebug {
-	unsigned int HalDbgCom; 		
-	unsigned int HalDbgLev;	   
+	unsigned int HalDbgCom;
+	unsigned int HalDbgLev;
 };
 
 struct Dot11RFDPKEntry {
@@ -1084,7 +1051,7 @@ struct wifi_mib {
 	struct GroupBandWidthControl	gbwcEntry;
 	struct StaBandwidthControl 		sbwcEntry;
 	struct Dot11nConfigEntry		dot11nConfigEntry;
-	struct Dot11acConfigEntry		dot11acConfigEntry;	
+	struct Dot11acConfigEntry		dot11acConfigEntry;
 	struct ReorderControlEntry		reorderCtrlEntry;
 	struct VlanConfig 				vlan;
 	struct Dot1180211sInfo			dot1180211sInfo;
@@ -1101,7 +1068,7 @@ struct wifi_mib {
 	struct SmartRoamingProfile		sr_profile;	//add for smart roaming
 	struct MeshPathsel				meshPathsel;
 	struct CrossBand				crossBand; //add for crossband - keith
-	struct Dot11WNMEntry 		    wnmEntry;	
+	struct Dot11WNMEntry 		    wnmEntry;
     struct HalQcDebug               qc_debug;   // add for qc debug
 	struct Dot11RFDPKEntry				dot11RFDPKEntry;
 };

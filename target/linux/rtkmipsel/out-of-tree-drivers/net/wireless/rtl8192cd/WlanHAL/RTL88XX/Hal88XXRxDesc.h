@@ -25,7 +25,7 @@ typedef enum _HCI_RX_DMA_QUEUE_88XX_
     HCI_RX_DMA_QUEUE_MAX_NUM
 } HCI_RX_DMA_QUEUE_88XX, *PHCI_RX_DMA_QUEUE_88XX;
 
-typedef struct _RX_BUFFER_DESCRIPTOR_ 
+typedef struct _RX_BUFFER_DESCRIPTOR_
 {
     u4Byte                  Dword0;
     u4Byte                  Dword1;
@@ -38,14 +38,11 @@ typedef struct _RX_BUFFER_DESCRIPTOR_
 typedef struct _HCI_RX_DMA_QUEUE_STRUCT_88XX_
 {
     PRX_BUFFER_DESCRIPTOR   pRXBD_head;
-#ifdef CONFIG_NET_PCI
-    unsigned long rxbd_dma_addr;
-#endif
 
     u2Byte                  hw_idx;         //Mapping to HW register
-    u2Byte	                host_idx;       //Mapping to HW register 
-    //Special case:                                                   
-    //      If we can't allocate a new SKB(RXDESC+Payload) to mapping RXBD, 
+    u2Byte	                host_idx;       //Mapping to HW register
+    //Special case:
+    //      If we can't allocate a new SKB(RXDESC+Payload) to mapping RXBD,
     //      we still need to maintain a pointer in order to recieve RxPkt continuously
     u2Byte	                cur_host_idx;      // the index to indicate the next location that we have received RxPkt
 
@@ -81,7 +78,7 @@ typedef struct _RX_DESC_STATUS_88XX_
     u2Byte      pktNum;
 #endif
 
-    //4  Note: value below Only valid in FS=1 
+    //4  Note: value below Only valid in FS=1
     // Dword0
     u2Byte      PKT_LEN;
     BOOLEAN     CRC32;
@@ -91,7 +88,7 @@ typedef struct _RX_DESC_STATUS_88XX_
     u1Byte      SHIFT;
     BOOLEAN     PHYST;
     BOOLEAN     SWDEC;
-    BOOLEAN     EOR;    
+    BOOLEAN     EOR;
 
     // Dword 1
     BOOLEAN     PAGGR;
@@ -131,18 +128,18 @@ QueryRxDesc88XX_V1 (
     OUT     PVOID           pRxDescStatus
 );
 HAL_IMEM
-RT_STATUS 
+RT_STATUS
 UpdateRXBDInfo88XX(
     IN      HAL_PADAPTER    Adapter,
     IN      u4Byte          queueIndex,  //HCI_RX_DMA_QUEUE_88XX
     IN      u2Byte          rxbd_idx,
     IN      pu1Byte         pBuf,
-    IN      PVOID           Callback,    // callback function    
-    IN      BOOLEAN         bInit    
+    IN      PVOID           Callback,    // callback function
+    IN      BOOLEAN         bInit
 );
 
 HAL_IMEM
-u2Byte	
+u2Byte
 UpdateRXBDHWIdx88XX(
     IN      HAL_PADAPTER            Adapter,
 	IN      u4Byte		            queueIndex
@@ -165,10 +162,8 @@ PrepareRXBD88XX(
 
 void DumpRxBDesc88XX(
     IN      HAL_PADAPTER    Adapter,
-#ifdef CONFIG_RTL_PROC_NEW
     IN      struct seq_file *s,
-#endif
-    IN      u4Byte          q_num 
+    IN      u4Byte          q_num
 );
 
 #endif  //#ifndef __HAL88XXRXDESC_H__

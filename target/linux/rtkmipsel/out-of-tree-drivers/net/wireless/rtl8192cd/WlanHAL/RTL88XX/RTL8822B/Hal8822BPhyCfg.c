@@ -3,19 +3,19 @@ Copyright (c) Realtek Semiconductor Corp. All rights reserved.
 
 Module Name:
 	Hal8822BPhyCfg.c
-	
+
 Abstract:
 	Defined HAL 8822B PHY BB setting functions
-	    
+
 Major Change History:
 	When       Who               What
 	---------- ---------------   -------------------------------
-	2015-06-25 Eric               Create.	
+	2015-06-25 Eric               Create.
 --*/
 #include "HalPrecomp.h"
 
 // TODO: this function should be modified
-void 
+void
 TXPowerTracking_ThermalMeter_Tmp8822B(
     IN  HAL_PADAPTER    Adapter
 )
@@ -59,8 +59,8 @@ PHY_QueryRFReg_8822(
 	HAL_SAVE_INT_AND_CLI(flags);
 
 	u4Byte	DataAndAddr = 0;
-	u4Byte	Direct_Addr;	
-	
+	u4Byte	Direct_Addr;
+
 	RegAddr &= 0xff;
 	switch(eRFPath){
 		case RF88XX_PATH_A:
@@ -70,11 +70,11 @@ PHY_QueryRFReg_8822(
 			Direct_Addr = 0x2c00+RegAddr*4;
 		break;
 	}
-	
+
 
 	BitMask &= bRFRegOffsetMask;
-	
-	Readback_Value = PHY_QueryBBReg(Adapter, Direct_Addr, BitMask);		
+
+	Readback_Value = PHY_QueryBBReg(Adapter, Direct_Addr, BitMask);
 
 	HAL_RESTORE_INT(flags);
 
@@ -103,7 +103,7 @@ PHY_Set_SecCCATH_by_RXANT_8822B(
 		break;
 		case ANTENNA_AB: // xT2R
 		case ANTENNA_AC:
-		//case ANTENNA_AD:        
+		//case ANTENNA_AD:
 		case ANTENNA_BC:
 		case ANTENNA_BD:
 		case ANTENNA_CD:
@@ -147,7 +147,7 @@ phy_SpurCalibration_8822B(
 )
 {
 	BOOLEAN         Reset_NBI_CSI = TRUE;
-	
+
 	if(HAL_RFE_TYPE == 0 || HAL_RFE_TYPE == 1 || HAL_RFE_TYPE == 2 || HAL_RFE_TYPE == 3 || HAL_RFE_TYPE == 4){
 		if(HAL_VAR_CURRENTCHANNELBW == HT_CHANNEL_WIDTH_20 && HAL_VAR_WORKING_CHANNEL == 153){
 			PHY_SetBBReg(Adapter, rNBI_Setting_Jaguar, 0x000fe000, 0xf);

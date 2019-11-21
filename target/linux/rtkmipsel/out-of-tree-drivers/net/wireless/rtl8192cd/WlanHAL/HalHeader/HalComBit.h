@@ -48,7 +48,7 @@ Default: 00b.
 #define	MSR_AP					0x03
 
 //----------------------------------------------------------------------------
-//      (PBP) Packet Buffer Page Register	(Offset 0x104[7:4], 4 bits)  
+//      (PBP) Packet Buffer Page Register	(Offset 0x104[7:4], 4 bits)
 //----------------------------------------------------------------------------
 #define PBP_UNIT                128
 

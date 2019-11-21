@@ -1,7 +1,7 @@
 /******************************************************************************
  *
  * Copyright(c) 2007 - 2011 Realtek Corporation. All rights reserved.
- *                                        
+ *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of version 2 of the GNU General Public License as
  * published by the Free Software Foundation.
@@ -27,10 +27,10 @@
 
 #if (RTL8197F_SUPPORT == 1)
 
-s1Byte 
+s1Byte
 odm_CCKRSSI_8197F(
 	IN		PDM_ODM_T		pDM_Odm,
-	IN		u1Byte	LNA_idx, 
+	IN		u1Byte	LNA_idx,
 	IN		u1Byte	VGA_idx
 	)
 {
@@ -41,26 +41,26 @@ odm_CCKRSSI_8197F(
 		diff_para = -7;
 	else
 		diff_para = 7;
-	
+
 	switch (LNA_idx) {
 	case 7:
 		rx_pwr_all = -52 + diff_para  - 2*(VGA_idx);
 		break;
 
 	case 6:
-		rx_pwr_all = -42 + diff_para - 2*(VGA_idx); 
+		rx_pwr_all = -42 + diff_para - 2*(VGA_idx);
 		break;
 
 	case 5:
-		rx_pwr_all = -32 + diff_para - 2*(VGA_idx); 
+		rx_pwr_all = -32 + diff_para - 2*(VGA_idx);
 		break;
 
 	case 4:
-		rx_pwr_all = -26 + diff_para - 2*(VGA_idx); 
+		rx_pwr_all = -26 + diff_para - 2*(VGA_idx);
 		break;
 
 	case 3:
-		rx_pwr_all = -18 + diff_para - 2*(VGA_idx); 
+		rx_pwr_all = -18 + diff_para - 2*(VGA_idx);
 		break;
 
 	case 2:
@@ -70,13 +70,13 @@ odm_CCKRSSI_8197F(
 	case 1:
 		rx_pwr_all = -2 + diff_para - 2*(VGA_idx);
 		break;
-		
+
 	case 0:
 		rx_pwr_all = 2 + diff_para - 2*(VGA_idx);
 		break;
 
 	default:
-	break;			
+	break;
 
 	}
 
@@ -122,7 +122,7 @@ phydm_dynamic_disable_ecs(
 
 	if ((pDM_Odm->is_disable_dym_ecs == TRUE) || (pDM_Odm->mp_mode == TRUE))			/*use mib to disable this dym function*/
 		return;
-	
+
 	if ((pDM_Odm->RSSI_Min < 30) || (FalseAlmCnt->Cnt_all * 4 >= FalseAlmCnt->Cnt_CCA_all))
 		ODM_SetBBReg(pDM_Odm, 0x9ac, BIT17, 0);
 	else if ((pDM_Odm->RSSI_Min >= 34) && (FalseAlmCnt->Cnt_all * 5 <= FalseAlmCnt->Cnt_CCA_all))
@@ -164,7 +164,7 @@ phydm_dynamic_ant_weighting(
 	} else {
 		/*fix sec_min_wgt = 1/2*/
 		ODM_SetBBReg(p_dm_odm, 0xd5c, BIT31, 0);
-		ODM_SetBBReg(p_dm_odm, 0xd5c, BIT30, 1);		
+		ODM_SetBBReg(p_dm_odm, 0xd5c, BIT30, 1);
 		ODM_RT_TRACE(p_dm_odm, ODM_COMP_DYNAMIC_ANT_WEIGHTING, ODM_DBG_LOUD, ("RSSI_Min_ByPath = %d, adapt AGC weighting\n",
 			p_dm_odm->RSSI_Min_ByPath));
 	}
@@ -188,7 +188,7 @@ phydm_api_primary_cca(
 	)
 {
 	u32	dsc_lsc_usc;
-	
+
 	if(pDM_Odm->is_disable_primary_cca == TRUE)
 		return;
 
@@ -198,7 +198,7 @@ phydm_api_primary_cca(
 		pDM_Odm->original_pd_threshold = ODM_GetBBReg(pDM_Odm, 0xc84, BIT31|BIT30|BIT29|BIT28);
 
 	ODM_SetBBReg(pDM_Odm, 0xc6c, BIT8|BIT7, DSC_LSC_USC);
-	
+
 	if((DSC_LSC_USC == 0) | (DSC_LSC_USC == 3))
 		ODM_SetBBReg(pDM_Odm, 0xc84, BIT31|BIT30|BIT29|BIT28, pDM_Odm->original_pd_threshold);
 	else

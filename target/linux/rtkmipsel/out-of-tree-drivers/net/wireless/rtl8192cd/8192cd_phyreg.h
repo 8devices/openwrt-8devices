@@ -106,11 +106,7 @@
 #define		rFPGA0_XCD_RFParameter		0x87c
 #define		rFPGA0_AnalogParameter1		0x880	// Crystal cap setting RF-R/W protection for parameter4??
 #define		rFPGA0_AnalogParameter2		0x884
-#if defined(CONFIG_RTL_92D_SUPPORT)
-#define		rFPGA0_AdDaClockEn				0x888	// enable ad/da clock1 for dual-phy
-#else
 #define		rFPGA0_AnalogParameter3		0x888	// Useless now
-#endif
 #define		rFPGA0_AnalogParameter4		0x88c
 #define		rFPGA0_XA_LSSIReadBack		0x8a0	// Tranceiver LSSI Readback
 #define		rFPGA0_XB_LSSIReadBack		0x8a4
@@ -295,8 +291,8 @@
 #define		rRTL8258_RxLPF				0x13
 
 
-#define		RF_RX_G1					0x1A	// 
-#define		RF_RX_G2					0x1B	// 
+#define		RF_RX_G1					0x1A	//
+#define		RF_RX_G2					0x1B	//
 
 
 //
@@ -944,7 +940,7 @@
 #define		bMaskL3Byte					0x00ffffff
 #define		bMaskH4Bits					0xf0000000
 #define		bMaskH12Bits				0xfff00000
-#define		bMaskH3Bytes			  	0xffffff00	
+#define		bMaskH3Bytes			  	0xffffff00
 #define 	bMaskOFDM_D					0xffc00000
 #define		bMaskCCK				  	0x3f3f3f3f
 #define		bMask4to7Bits				0x000000f0
@@ -1000,7 +996,7 @@
 #define 	REG_RF_CTRL					0x1f
 #define 	REG_LDOHCI12_CTRL				0x22
 #define 	REG_AFE_XTAL_CTRL				0x24
-#define		RF_T_METER					0x24	
+#define		RF_T_METER					0x24
 #define 	REG_MCUFWDL					0x80
 #define 	REG_HMETFR					0x01CC
 

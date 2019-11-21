@@ -37,11 +37,11 @@
 #endif
 
 typedef enum _BEAMFORMING_ENTRY_STATE {
-	BEAMFORMING_ENTRY_STATE_UNINITIALIZE, 
-	BEAMFORMING_ENTRY_STATE_INITIALIZEING, 
-	BEAMFORMING_ENTRY_STATE_INITIALIZED, 
-	BEAMFORMING_ENTRY_STATE_PROGRESSING, 
-	BEAMFORMING_ENTRY_STATE_PROGRESSED 
+	BEAMFORMING_ENTRY_STATE_UNINITIALIZE,
+	BEAMFORMING_ENTRY_STATE_INITIALIZEING,
+	BEAMFORMING_ENTRY_STATE_INITIALIZED,
+	BEAMFORMING_ENTRY_STATE_PROGRESSING,
+	BEAMFORMING_ENTRY_STATE_PROGRESSED
 } BEAMFORMING_ENTRY_STATE, *PBEAMFORMING_ENTRY_STATE;
 
 
@@ -58,8 +58,8 @@ typedef enum _BEAMFORMING_NOTIFY_STATE {
 
 typedef enum _BEAMFORMING_CAP {
 	BEAMFORMING_CAP_NONE = 0x0,
-	BEAMFORMER_CAP_HT_EXPLICIT = BIT1, 
-	BEAMFORMEE_CAP_HT_EXPLICIT = BIT2, 
+	BEAMFORMER_CAP_HT_EXPLICIT = BIT1,
+	BEAMFORMEE_CAP_HT_EXPLICIT = BIT2,
 	BEAMFORMER_CAP_VHT_SU = BIT5,			/* Self has er Cap, because Reg er  & peer ee */
 	BEAMFORMEE_CAP_VHT_SU = BIT6,			/* Self has ee Cap, because Reg ee & peer er */
 	BEAMFORMER_CAP_VHT_MU = BIT7,			/* Self has er Cap, because Reg er  & peer ee */
@@ -71,11 +71,11 @@ typedef enum _BEAMFORMING_CAP {
 
 typedef enum _SOUNDING_MODE {
 	SOUNDING_SW_VHT_TIMER = 0x0,
-	SOUNDING_SW_HT_TIMER = 0x1, 
-	SOUNDING_STOP_All_TIMER = 0x2, 
-	SOUNDING_HW_VHT_TIMER = 0x3,			
+	SOUNDING_SW_HT_TIMER = 0x1,
+	SOUNDING_STOP_All_TIMER = 0x2,
+	SOUNDING_HW_VHT_TIMER = 0x3,
 	SOUNDING_HW_HT_TIMER = 0x4,
-	SOUNDING_STOP_OID_TIMER = 0x5, 
+	SOUNDING_STOP_OID_TIMER = 0x5,
 	SOUNDING_AUTO_VHT_TIMER = 0x6,
 	SOUNDING_AUTO_HT_TIMER = 0x7,
 	SOUNDING_FW_VHT_TIMER = 0x8,
@@ -83,8 +83,8 @@ typedef enum _SOUNDING_MODE {
 }SOUNDING_MODE, *PSOUNDING_MODE;
 
 typedef struct _RT_BEAMFORM_STAINFO {
-	pu1Byte						RA; 
-	u2Byte						AID; 
+	pu1Byte						RA;
+	u2Byte						AID;
 	u2Byte						MacID;
 	u1Byte						MyMacAddr[6];
 	WIRELESS_MODE				WirelessMode;
@@ -92,7 +92,7 @@ typedef struct _RT_BEAMFORM_STAINFO {
 	BEAMFORMING_CAP			BeamformCap;
 	u1Byte						HtBeamformCap;
 	u2Byte						VhtBeamformCap;
-	u1Byte						CurBeamform; 
+	u1Byte						CurBeamform;
 	u2Byte						CurBeamformVHT;
 } RT_BEAMFORM_STAINFO, *PRT_BEAMFORM_STAINFO;
 
@@ -110,7 +110,7 @@ typedef struct _RT_BEAMFORMEE_ENTRY {
 	CHANNEL_WIDTH			SoundBW;		/*Sounding BandWidth*/
 	u2Byte					SoundPeriod;
 	BEAMFORMING_CAP			BeamformEntryCap;
-	BEAMFORMING_ENTRY_STATE	BeamformEntryState;	
+	BEAMFORMING_ENTRY_STATE	BeamformEntryState;
 	BOOLEAN						bBeamformingInProgress;
 	/*u1Byte	LogSeq;									// Move to _RT_BEAMFORMER_ENTRY*/
 	/*u2Byte	LogRetryCnt:3;		// 0~4				// Move to _RT_BEAMFORMER_ENTRY*/
@@ -122,13 +122,13 @@ typedef struct _RT_BEAMFORMEE_ENTRY {
 	u1Byte	NumofSoundingDim;
 	u1Byte	CompSteeringNumofBFer;
 	u1Byte	su_reg_index;
-#if (MU_BEAMFORMING_SUPPORT == 1)	
+#if (MU_BEAMFORMING_SUPPORT == 1)
 	/*For MU-MIMO*/
 	BOOLEAN	is_mu_sta;
 	u1Byte	mu_reg_index;
 	u1Byte	gid_valid[8];
 	u1Byte	user_position[16];
-#endif	
+#endif
 } RT_BEAMFORMEE_ENTRY, *PRT_BEAMFORMEE_ENTRY;
 
 typedef struct _RT_BEAMFORMER_ENTRY {
@@ -146,19 +146,19 @@ typedef struct _RT_BEAMFORMER_ENTRY {
 	u2Byte				LogRetryCnt:3;			/*Modified by Jeffery @2014-10-29*/
 	u2Byte				LogSuccess:2;			/*Modified by Jeffery @2014-10-29*/
 	u1Byte				su_reg_index;
-#if (MU_BEAMFORMING_SUPPORT == 1)	
+#if (MU_BEAMFORMING_SUPPORT == 1)
 	 /*For MU-MIMO*/
 	BOOLEAN				is_mu_ap;
 	u1Byte				gid_valid[8];
 	u1Byte				user_position[16];
 	u2Byte				AID;
-#endif	
+#endif
 } RT_BEAMFORMER_ENTRY, *PRT_BEAMFORMER_ENTRY;
 
 typedef struct _RT_SOUNDING_INFO {
 	u1Byte			SoundIdx;
 	CHANNEL_WIDTH	SoundBW;
-	SOUNDING_MODE	SoundMode; 
+	SOUNDING_MODE	SoundMode;
 	u2Byte			SoundPeriod;
 } RT_SOUNDING_INFO, *PRT_SOUNDING_INFO;
 
@@ -166,7 +166,7 @@ typedef struct _RT_SOUNDING_INFO {
 
 typedef struct _RT_BEAMFORMING_OID_INFO {
 	u1Byte			SoundOidIdx;
-	CHANNEL_WIDTH	SoundOidBW;	
+	CHANNEL_WIDTH	SoundOidBW;
 	SOUNDING_MODE	SoundOidMode;
 	u2Byte			SoundOidPeriod;
 } RT_BEAMFORMING_OID_INFO, *PRT_BEAMFORMING_OID_INFO;
@@ -208,9 +208,9 @@ typedef struct _RT_BEAMFORMING_INFO {
 
 
 typedef struct _RT_NDPA_STA_INFO {
-	u2Byte	AID:12;	
+	u2Byte	AID:12;
 	u2Byte	FeedbackType:1;
-	u2Byte	NcIndex:3;	
+	u2Byte	NcIndex:3;
 } RT_NDPA_STA_INFO, *PRT_NDPA_STA_INFO;
 
 typedef enum _PHYDM_ACTING_TYPE {
@@ -283,13 +283,13 @@ BeamformingStart_FW(
 VOID
 Beamforming_CheckSoundingSuccess(
 	IN PVOID			pDM_VOID,
-	BOOLEAN			Status	
+	BOOLEAN			Status
 );
 
 VOID
 phydm_Beamforming_End_SW(
 	IN PVOID		pDM_VOID,
-	BOOLEAN			Status	
+	BOOLEAN			Status
 	);
 
 VOID
@@ -326,7 +326,7 @@ BOOLEAN
 phydm_BeamformingControl_V2(
 	IN	PVOID		pDM_VOID,
 	u1Byte			Idx,
-	u1Byte			Mode, 
+	u1Byte			Mode,
 	CHANNEL_WIDTH	BW,
 	u2Byte			Period
 	);
@@ -349,7 +349,7 @@ BOOLEAN
 Beamforming_SendHTNDPAPacket(
 	IN	PVOID			pDM_VOID,
 	IN	pu1Byte			RA,
-	IN	CHANNEL_WIDTH	BW, 
+	IN	CHANNEL_WIDTH	BW,
 	IN	u1Byte			QIdx
 	);
 

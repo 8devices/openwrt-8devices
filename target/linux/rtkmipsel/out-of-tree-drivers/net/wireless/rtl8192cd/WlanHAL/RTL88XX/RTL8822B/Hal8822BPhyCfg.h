@@ -6,17 +6,17 @@ Copyright (c) Realtek Semiconductor Corp. All rights reserved.
 
 Module Name:
 	Hal8822BPhyCfg.h
-	
+
 Abstract:
 	Defined HAL 8822B PHY BB setting functions
-	    
+
 Major Change History:
 	When       Who               What
 	---------- ---------------   -------------------------------
-	2015-06-25 Eric               Create.	
+	2015-06-25 Eric               Create.
 --*/
 
-void 
+void
 TXPowerTracking_ThermalMeter_Tmp8822B(
     IN  HAL_PADAPTER    Adapter
 );

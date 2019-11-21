@@ -29,14 +29,14 @@
 #ifndef TRUE
     #define TRUE                1
 #endif
-#ifndef FALSE	
+#ifndef FALSE
     #define FALSE               0
 #endif
 
 #ifndef _TRUE
     #define _TRUE               1
 #endif
-#ifndef _FALSE	
+#ifndef _FALSE
     #define _FALSE              0
 #endif
 
@@ -55,28 +55,28 @@
 #define BIT7		0x00000080
 #define BIT8		0x00000100
 #define BIT9		0x00000200
-#define BIT10		0x00000400								
-#define BIT11		0x00000800								
-#define BIT12		0x00001000								
-#define BIT13		0x00002000								
-#define BIT14		0x00004000								
-#define BIT15		0x00008000								
-#define BIT16		0x00010000								
-#define BIT17		0x00020000								
-#define BIT18		0x00040000								
-#define BIT19		0x00080000								
-#define BIT20		0x00100000								
-#define BIT21		0x00200000								
-#define BIT22		0x00400000								
-#define BIT23		0x00800000								
-#define BIT24		0x01000000								
-#define BIT25		0x02000000								
-#define BIT26		0x04000000								
-#define BIT27		0x08000000								
-#define BIT28		0x10000000								
-#define BIT29		0x20000000								
-#define BIT30		0x40000000								
-#define BIT31		0x80000000								
+#define BIT10		0x00000400
+#define BIT11		0x00000800
+#define BIT12		0x00001000
+#define BIT13		0x00002000
+#define BIT14		0x00004000
+#define BIT15		0x00008000
+#define BIT16		0x00010000
+#define BIT17		0x00020000
+#define BIT18		0x00040000
+#define BIT19		0x00080000
+#define BIT20		0x00100000
+#define BIT21		0x00200000
+#define BIT22		0x00400000
+#define BIT23		0x00800000
+#define BIT24		0x01000000
+#define BIT25		0x02000000
+#define BIT26		0x04000000
+#define BIT27		0x08000000
+#define BIT28		0x10000000
+#define BIT29		0x20000000
+#define BIT30		0x40000000
+#define BIT31		0x80000000
 #endif
 
 #ifndef BIT32
@@ -146,8 +146,8 @@
 
 //-----------------------------------------------------------------------
 //  Note : 8881A,8192E , First generation MAC using TXBD architecture
-//  Note : After 8814A, Some Register define re-allocate. 
-//         And increase page.10 ~ page.17 for MAC register, 
+//  Note : After 8814A, Some Register define re-allocate.
+//         And increase page.10 ~ page.17 for MAC register,
 //         so we diff to MAC version 2
 //-----------------------------------------------------------------------
 

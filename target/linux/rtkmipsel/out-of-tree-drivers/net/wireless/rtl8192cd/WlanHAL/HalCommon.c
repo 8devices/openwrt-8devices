@@ -3,14 +3,14 @@ Copyright (c) Realtek Semiconductor Corp. All rights reserved.
 
 Module Name:
 	HalCommon.c
-	
+
 Abstract:
 	Defined HAL common Function
-	    
+
 Major Change History:
 	When       Who               What
 	---------- ---------------   -------------------------------
-	2012-03-27 Filen            Create.	
+	2012-03-27 Filen            Create.
 --*/
 
 #include "HalPrecomp.h"
@@ -26,7 +26,7 @@ HalGeneralDummy(
 {
 }
 
-RT_STATUS 
+RT_STATUS
 HAL_ReadTypeID(
 	IN	HAL_PADAPTER	Adapter
 	)
@@ -40,7 +40,7 @@ HAL_ReadTypeID(
     HCI    = PlatformEFIORead1Byte(Adapter, REG_SYS_STATUS1);
 
     RT_TRACE(COMP_INIT, DBG_LOUD, ("REG_SYS_CFG2(0xFC): 0x%x \n, REG_SYS_STATUS1(0xF4): 0x%x\n", value8, HCI));
-    
+
     switch(value8)
     {
 #if     IS_EXIST_RTL8881AEM
@@ -48,7 +48,7 @@ HAL_ReadTypeID(
             _GET_HAL_DATA(Adapter)->HardwareType = HARDWARE_TYPE_RTL8881AEM;
             rtResult = RT_STATUS_SUCCESS;
             break;
-#endif            
+#endif
 
 #if     (IS_EXIST_RTL8192EE || IS_EXIST_RTL8192EU)
         case HAL_HW_TYPE_ID_8192E:
@@ -58,18 +58,18 @@ HAL_ReadTypeID(
                 //  2'b10: PCIE-MF
                 //  2'b11: MIX mode, BT-USB1.1, WFIF-PCIE
                 //  2'b00: SDIO_UART
-                
+
                 case 0x2:
                 case 0x3:
                 _GET_HAL_DATA(Adapter)->HardwareType = HARDWARE_TYPE_RTL8192EE;
                     rtResult = RT_STATUS_SUCCESS;
                     break;
-                    
+
                 case 0x1:
                 _GET_HAL_DATA(Adapter)->HardwareType = HARDWARE_TYPE_RTL8192EU;
                     rtResult = RT_STATUS_SUCCESS;
                     break;
-                    
+
                 default:
                     RT_TRACE(COMP_INIT, DBG_SERIOUS, (" 92E HCI_SEL Error(0x%x) \n", HCI));
                     break;
@@ -97,18 +97,18 @@ HAL_ReadTypeID(
                     _GET_HAL_DATA(Adapter)->HardwareType = HARDWARE_TYPE_RTL8814AE;
                     rtResult = RT_STATUS_SUCCESS;
                     break;
-                    
+
                 case 0x1:
                     _GET_HAL_DATA(Adapter)->HardwareType = HARDWARE_TYPE_RTL8814AU;
             rtResult = RT_STATUS_SUCCESS;
             break;
-                    
+
                 default:
                     RT_TRACE(COMP_INIT, DBG_SERIOUS, (" 8814A HCI_SEL Error(0x%x) \n", HCI));
                     break;
             }
             break;
-#endif            
+#endif
 
 #if IS_RTL8197F_SERIES
         case HAL_HW_TYPE_ID_8197F:
@@ -120,10 +120,10 @@ HAL_ReadTypeID(
         case HAL_HW_TYPE_ID_8822B:
             printk("IS_RTL8822B_SERIES value8 = %x \n",value8);
 
-            // TODO : if need other interface, need to read HCI 
+            // TODO : if need other interface, need to read HCI
             _GET_HAL_DATA(Adapter)->HardwareType = HARDWARE_TYPE_RTL8822BE;
             rtResult = RT_STATUS_SUCCESS;
-        break;    
+        break;
 #endif // #if IS_RTL8822B_SERIES
 
         default:
@@ -144,9 +144,9 @@ HAL_ReadTypeID(
 
     //3 Check CutVersion
     _GET_HAL_DATA(Adapter)->cutVersion = GET_BIT_CHIP_VER(value32);
-    
-// recognize 92E b /c cut 	
-#if  IS_EXIST_RTL8192EE 
+
+// recognize 92E b /c cut
+#if  IS_EXIST_RTL8192EE
 	if(_GET_HAL_DATA(Adapter)->bTestChip) {
 		if( _GET_HAL_DATA(Adapter)->HardwareType == HARDWARE_TYPE_RTL8192EE) {
 			if(((value32>>12)& 0xf) == 0x0)
@@ -163,7 +163,7 @@ HAL_ReadTypeID(
 			else if(((value32>>12)& 0xf) == 0x2)
 				_GET_HAL_DATA(Adapter)->cutVersion	= ODM_CUT_C;
 			else if(((value32>>12)& 0xf) == 0x3)
-				_GET_HAL_DATA(Adapter)->cutVersion	= ODM_CUT_D;		
+				_GET_HAL_DATA(Adapter)->cutVersion	= ODM_CUT_D;
 		}
 	}
 #endif
@@ -181,7 +181,7 @@ GetHALIndex(
     u1Byte  CurrentIndex = hal_idx;
 
     hal_idx++;
-    
+
     return CurrentIndex;
 }
 
@@ -205,7 +205,7 @@ DecreaseHALIndex(
 RT_STATUS
 HalAssociateNic(
     HAL_PADAPTER        Adapter,
-    BOOLEAN			    IsDefaultAdapter    
+    BOOLEAN			    IsDefaultAdapter
 )
 {
     RT_STATUS       status  = RT_STATUS_FAILURE;
@@ -245,7 +245,7 @@ HalAssociateNic(
 #if IS_EXIST_RTL8192EE
         if ( IS_HARDWARE_TYPE_8192EE(Adapter) ) {
             RT_TRACE(COMP_INIT, DBG_LOUD, (" IS_HARDWARE_TYPE_8192EE\n"));
-            status = hal_Associate_8192EE(Adapter, TRUE);    
+            status = hal_Associate_8192EE(Adapter, TRUE);
             if (RT_STATUS_SUCCESS != status) {
                 return status;
             }
@@ -254,7 +254,7 @@ HalAssociateNic(
 
 #if IS_EXIST_RTL8192ES
 	if ( IS_HARDWARE_TYPE_8192ES(Adapter) ) {
-		status = hal_Associate_8192ES(Adapter, TRUE);    
+		status = hal_Associate_8192ES(Adapter, TRUE);
 		if (RT_STATUS_SUCCESS != status) {
 			return status;
 		}
@@ -311,14 +311,14 @@ HalAssociateNic(
     else {
         // Virtual Adapter
     }
-    
+
     return  status;
 }
 
 RT_STATUS
 HalDisAssociateNic(
     HAL_PADAPTER        Adapter,
-    BOOLEAN			    IsDefaultAdapter    
+    BOOLEAN			    IsDefaultAdapter
 )
 {
 
@@ -331,12 +331,12 @@ HalDisAssociateNic(
         }
 
         if ( Adapter->HalData ) {
-            HAL_free(Adapter->HalData);            
+            HAL_free(Adapter->HalData);
         }
 #endif //  IS_RTL88XX_GENERATION
     }
     else {
-        // Virtual Adapter        
+        // Virtual Adapter
     }
 
     return RT_STATUS_SUCCESS;
@@ -376,7 +376,7 @@ VOID SoftwareCRC32 (
 
 VOID SoftwareCRC32_RXBuffGather (
     IN  pu1Byte     pPktBufAddr,
-    IN  pu2Byte     pPktBufLen,  
+    IN  pu2Byte     pPktBufLen,
     IN  u2Byte      pktNum,
     OUT pu4Byte     pCRC32
 )
@@ -390,7 +390,7 @@ VOID SoftwareCRC32_RXBuffGather (
 
     smask = 0x01;
 
-    for (num = 0; num < pktNum; num++) 
+    for (num = 0; num < pktNum; num++)
     {
         for(i=0; i< pPktBufLen[num]; i++)
         {
@@ -408,7 +408,7 @@ VOID SoftwareCRC32_RXBuffGather (
             }
         }
     }
-    
+
     *(pCRC32) = CRC_32 ^ 0xffffffff;
     *(pCRC32) = HAL_cpu_to_le32(*(pCRC32));
 }
@@ -426,20 +426,20 @@ VOID DumpTxPktBuf(
 
     addr = HAL_RTL_R8(REG_BCNQ_INFO) * 256 / 8;
 
-    #if (IS_EXIST_RTL8881AEM || IS_EXIST_RTL8192EE || IS_EXIST_RTL8814AE )    
-    if ( IS_HARDWARE_TYPE_8881A(Adapter) || IS_HARDWARE_TYPE_8192EE(Adapter) || IS_HARDWARE_TYPE_8814AE(Adapter) ) 
+    #if (IS_EXIST_RTL8881AEM || IS_EXIST_RTL8192EE || IS_EXIST_RTL8814AE )
+    if ( IS_HARDWARE_TYPE_8881A(Adapter) || IS_HARDWARE_TYPE_8192EE(Adapter) || IS_HARDWARE_TYPE_8814AE(Adapter) )
         HAL_RTL_W8(REG_PKT_BUFF_ACCESS_CTRL,0x69);
     #endif
 
     RT_TRACE_F(COMP_SEND, DBG_TRACE, ("Addr:%lx \n", addr));
 
-    do 
+    do
     {
         HAL_RTL_W32(REG_PKTBUF_DBG_CTRL, addr);
-        value = 0;        
+        value = 0;
         do
         {
-            value = HAL_RTL_R32(REG_PKTBUF_DBG_CTRL) & BIT23;        
+            value = HAL_RTL_R32(REG_PKTBUF_DBG_CTRL) & BIT23;
 			if (++round > 10000) {
 				panic_printk("%s[%d] while (1) goes too many\n", __FUNCTION__, __LINE__);
 				break;
@@ -458,7 +458,7 @@ VOID DumpTxPktBuf(
     } while(cnt < num);
 }
 
-u1Byte 
+u1Byte
 GetXorWithCRC(
     IN u1Byte a,
     IN u1Byte b
@@ -469,15 +469,15 @@ GetXorWithCRC(
 	else
 		return 0;
 }
-	
 
-u1Byte 
+
+u1Byte
 CRC5(
     IN pu1Byte dwInput,
     IN u1Byte len
 )
 {
-    u1Byte poly5 = 0x05;  
+    u1Byte poly5 = 0x05;
     u1Byte crc5  = 0x1f;
     u1Byte i  = 0x0 ;
     u1Byte udata;
@@ -489,9 +489,9 @@ CRC5(
 		udata = *(dwInput+i);
 		BitCount = 0;
 		while(BitCount!=8)
-		{        
-	        if (GetXorWithCRC(udata>>(BitCount),crc5 >> 4)) // bit4 != bit4?			
-	        {				
+		{
+	        if (GetXorWithCRC(udata>>(BitCount),crc5 >> 4)) // bit4 != bit4?
+	        {
 	            crc5 <<= 1;
 	            crc5 ^= poly5;
 	        }
@@ -505,9 +505,9 @@ CRC5(
     }
 
     crc5 ^= 0x1f;
-  
+
     return (crc5 & 0x1f);
-} 
+}
 
 
 
@@ -522,37 +522,37 @@ CheckAddrRange(
     IN      u4Byte          qNum,
     IN      u4Byte          offset
 )
-{   
+{
     u4Byte lowAddr, hiAddr, TXBDBeaconOffset;
 
 #if IS_RTL8192E_SERIES
     if ( IS_HARDWARE_TYPE_8192EE(Adapter) ) {
-        TXBDBeaconOffset = TXBD_BEACON_OFFSET_V1;        
+        TXBDBeaconOffset = TXBD_BEACON_OFFSET_V1;
     }
 #endif  //IS_RTL8192E_SERIES
-    
+
 #if IS_RTL8881A_SERIES
     if ( IS_HARDWARE_TYPE_8881A(Adapter) ) {
-        TXBDBeaconOffset = TXBD_BEACON_OFFSET_V2;        
+        TXBDBeaconOffset = TXBD_BEACON_OFFSET_V2;
     }
 #endif  //IS_RTL8881A_SERIES
 
     if (type == 0) {
         // TXBD
         lowAddr = txBaseAddr[qNum] + offset * sizeof(TX_BUFFER_DESCRIPTOR);
-        hiAddr  = lowAddr + sizeof(TX_BUFFER_DESCRIPTOR);            
+        hiAddr  = lowAddr + sizeof(TX_BUFFER_DESCRIPTOR);
     } else if (type == 1) {
         // TX DESC
         lowAddr = HAL_VIRT_TO_BUS(txDescBaseAddr[qNum] + offset * sizeof(TX_DESC_88XX));
-        hiAddr  = HAL_VIRT_TO_BUS(lowAddr + sizeof(TX_DESC_88XX));        
-    } else if (type == 2) {    
+        hiAddr  = HAL_VIRT_TO_BUS(lowAddr + sizeof(TX_DESC_88XX));
+    } else if (type == 2) {
         // RXBD
         lowAddr = rxBaseAddr[qNum] + offset * sizeof(RX_BUFFER_DESCRIPTOR);
         hiAddr  = lowAddr + sizeof(RX_BUFFER_DESCRIPTOR);
     } else if (type == 3) {
         // TXBD Beacon
         lowAddr = txBaseAddr[HCI_TX_DMA_QUEUE_BCN] + offset * TXBDBeaconOffset;
-        hiAddr  = lowAddr + sizeof(TX_BUFFER_DESCRIPTOR);            
+        hiAddr  = lowAddr + sizeof(TX_BUFFER_DESCRIPTOR);
     } else {
         RT_TRACE_F(COMP_INIT, DBG_TRACE, ("Error: Unknown type \n"));
     }
@@ -586,7 +586,7 @@ DumpTRXBDAddr(
     for (idx = 0; idx < prx_dma->rx_queue[0].total_rxbd_num; idx++) {
         RT_TRACE(COMP_SEND, DBG_TRACE, \
             ("RX DW1: 0x%08lx\n", (u4Byte)(prx_dma->rx_queue[0].pRXBD_head[idx].Dword1)) );
-    }   
+    }
 
     // TXBD
     for (q_num = 0; q_num <= HCI_TX_DMA_QUEUE_HI7; q_num++) {
@@ -601,7 +601,7 @@ DumpTRXBDAddr(
         for (idx = 0; idx < ptx_dma->tx_queue[q_num].total_txbd_num; idx++) {
             RT_TRACE(COMP_SEND, DBG_TRACE, \
                 ("TXDESC: 0x%08lx\n", (u4Byte)((PTX_DESC_88XX)ptx_dma->tx_queue[q_num].ptx_desc_head + idx)) );
-        }        
+        }
     }
 
     // TX DESC in Dword1
@@ -610,8 +610,8 @@ DumpTRXBDAddr(
             RT_TRACE(COMP_SEND, DBG_TRACE, \
                 ("TX DW1: 0x%08lx\n", (u4Byte)GET_DESC(ptx_dma->tx_queue[q_num].pTXBD_head[idx].TXBD_ELE[0].Dword1)) );
         }
-    }   
-    
+    }
+
 }
 #endif // IS_EXIST_PCI || IS_EXIST_EMBEDDED
 
@@ -649,9 +649,9 @@ CheckSKBPtrOk(
     if (!CHECK_ADDR_VALID(pskb->end)) {
         printk("Error:pskb->end address is invalid(0x%x)\n", pskb);
         return FALSE;
-    }    
+    }
 
-    return TRUE;    
+    return TRUE;
 }
 #endif
 
@@ -675,7 +675,7 @@ LoadFileToIORegTable(
         next_head = get_line(&line_head);
         if (line_head == NULL)
             break;
-        
+
         if (line_head[0] == '/')
             continue;
 
@@ -721,7 +721,7 @@ LoadFileToOneParaTable(
         next_head = get_line(&line_head);
         if (line_head == NULL)
             break;
-        
+
         if (line_head[0] == '/')
             continue;
 

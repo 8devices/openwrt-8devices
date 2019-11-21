@@ -17,7 +17,7 @@
  *
  *
  ******************************************************************************/
- 
+
  #ifndef __HAL_PHY_RF_H__
  #define __HAL_PHY_RF_H__
 
@@ -51,13 +51,13 @@ typedef VOID	(*FuncAllSwing)(PVOID, pu1Byte*, pu1Byte*, pu1Byte*, pu1Byte*, pu1B
 
 
 typedef struct _TXPWRTRACK_CFG {
-	u1Byte 		SwingTableSize_CCK;	
+	u1Byte 		SwingTableSize_CCK;
 	u1Byte 		SwingTableSize_OFDM;
 	u1Byte 		Threshold_IQK;
-	u1Byte 		Threshold_DPK;	
+	u1Byte 		Threshold_DPK;
 	u1Byte 		AverageThermalNum;
 	u1Byte 		RfPathCount;
-	u4Byte 		ThermalRegAddr;	
+	u4Byte 		ThermalRegAddr;
 	FuncSetPwr 	ODM_TxPwrTrackSetPwr;
 	FuncIQK 	DoIQK;
 	FuncLCK		PHY_LCCalibrate;
@@ -66,7 +66,7 @@ typedef struct _TXPWRTRACK_CFG {
 	FuncAllSwing	GetDeltaAllSwingTable;
 } TXPWRTRACK_CFG, *PTXPWRTRACK_CFG;
 
-VOID 
+VOID
 ConfigureTxpowerTrack(
 	IN	PVOID		pDM_VOID,
 	OUT	PTXPWRTRACK_CFG	pConfig
@@ -82,7 +82,7 @@ ODM_TXPowerTrackingCallback_ThermalMeter(
 #endif
 	);
 
-#if (RTL8192E_SUPPORT==1) 
+#if (RTL8192E_SUPPORT==1)
 VOID
 ODM_TXPowerTrackingCallback_ThermalMeter_92E(
 #if (DM_ODM_SUPPORT_TYPE & ODM_AP)
@@ -138,24 +138,24 @@ ODM_TXPowerTrackingCallback_ThermalMeter_JaguarSeries3(
 
 void	PHY_SetMonitorMode8192C(IN	PADAPTER	pAdapter,
 										IN	BOOLEAN		bEnableMonitorMode	);
-										
+
 //
 // IQ calibrate
 //
-void	
-PHY_IQCalibrate_8192C(		IN	PADAPTER	pAdapter,	
+void
+PHY_IQCalibrate_8192C(		IN	PADAPTER	pAdapter,
 							IN	BOOLEAN 	bReCovery);
-							
+
 //
 // LC calibrate
 //
-void	
+void
 PHY_LCCalibrate_8192C(		IN	PADAPTER	pAdapter);
 
 //
 // AP calibrate
 //
-void	
+void
 PHY_APCalibrate_8192C(		IN	PADAPTER	pAdapter,
 								IN 	s1Byte		delta);
 #endif
@@ -167,13 +167,13 @@ VOID
 ODM_ResetIQKResult(
 	IN	PVOID		pDM_VOID
 );
-u1Byte 
+u1Byte
 ODM_GetRightChnlPlaceforIQK(
     IN u1Byte chnl
 );
 
 void phydm_rf_init(IN	PVOID		pDM_VOID);
 void phydm_rf_watchdog(IN	PVOID		pDM_VOID);
-								
+
 #endif	// #ifndef __HAL_PHY_RF_H__
 

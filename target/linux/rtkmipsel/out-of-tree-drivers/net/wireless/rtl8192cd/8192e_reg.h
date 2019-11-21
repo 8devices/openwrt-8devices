@@ -125,29 +125,29 @@
 //----------------------------------------------------------------------------
 //       8192E REG_92E_HISR bits				(Offset 0xB4-B7, 32 bits)
 //----------------------------------------------------------------------------
-#define	HIMR_92E_TXCCK					BIT(30)		// TXRPT interrupt when CCX bit of the packet is set	
+#define	HIMR_92E_TXCCK					BIT(30)		// TXRPT interrupt when CCX bit of the packet is set
 #define	HIMR_92E_PSTIMEOUT				BIT(29)		// Power Save Time Out Interrupt
-#define	HIMR_92E_GTINT4					BIT(28)		// When GTIMER4 expires, this bit is set to 1	
-#define	HIMR_92E_GTINT3					BIT(27)		// When GTIMER3 expires, this bit is set to 1	
-#define	HIMR_92E_TBDER					BIT(26)		// Transmit Beacon0 Error			
+#define	HIMR_92E_GTINT4					BIT(28)		// When GTIMER4 expires, this bit is set to 1
+#define	HIMR_92E_GTINT3					BIT(27)		// When GTIMER3 expires, this bit is set to 1
+#define	HIMR_92E_TBDER					BIT(26)		// Transmit Beacon0 Error
 #define	HIMR_92E_TBDOK					BIT(25)		// Transmit Beacon0 OK, ad hoc only
-#define	HIMR_92E_TSF_BIT32_TOGGLE		BIT(24)		// TSF Timer BIT32 toggle indication interrupt			
-#define	HIMR_92E_BcnInt					BIT(20)		// Beacon DMA Interrupt 0			
-#define	HIMR_92E_BDERR0					BIT(16)		// Beacon Queue DMA OK0			
-#define	HIMR_92E_HSISR_IND_ON_INT		BIT(15)		// HSISR Indicator (HSIMR & HSISR is true, this bit is set to 1)			
-#define	HIMR_92E_BCNDMAINT_E			BIT(14)		// Beacon DMA Interrupt Extension for Win7			
+#define	HIMR_92E_TSF_BIT32_TOGGLE		BIT(24)		// TSF Timer BIT32 toggle indication interrupt
+#define	HIMR_92E_BcnInt					BIT(20)		// Beacon DMA Interrupt 0
+#define	HIMR_92E_BDERR0					BIT(16)		// Beacon Queue DMA OK0
+#define	HIMR_92E_HSISR_IND_ON_INT		BIT(15)		// HSISR Indicator (HSIMR & HSISR is true, this bit is set to 1)
+#define	HIMR_92E_BCNDMAINT_E			BIT(14)		// Beacon DMA Interrupt Extension for Win7
 #define	HIMR_92E_ATIMEND				BIT(12)		// CTWidnow End or ATIM Window End
 #define	HIMR_92E_HISR1_IND_INT			BIT(11)		// HISR1 Indicator (HISR1 & HIMR1 is true, this bit is set to 1)
-#define	HIMR_92E_C2HCMD					BIT(10)		// CPU to Host Command INT Status, Write 1 clear	
-#define	HIMR_92E_CPWM2					BIT(9)		// CPU power Mode exchange INT Status, Write 1 clear	
-#define	HIMR_92E_CPWM					BIT(8)		// CPU power Mode exchange INT Status, Write 1 clear	
-#define	HIMR_92E_HIGHDOK				BIT(7)		// High Queue DMA OK	
-#define	HIMR_92E_MGNTDOK				BIT(6)		// Management Queue DMA OK	
-#define	HIMR_92E_BKDOK					BIT(5)		// AC_BK DMA OK		
-#define	HIMR_92E_BEDOK					BIT(4)		// AC_BE DMA OK	
-#define	HIMR_92E_VIDOK					BIT(3)		// AC_VI DMA OK		
-#define	HIMR_92E_VODOK					BIT(2)		// AC_VO DMA OK	
-#define	HIMR_92E_RDU					BIT(1)		// Rx Descriptor Unavailable	
+#define	HIMR_92E_C2HCMD					BIT(10)		// CPU to Host Command INT Status, Write 1 clear
+#define	HIMR_92E_CPWM2					BIT(9)		// CPU power Mode exchange INT Status, Write 1 clear
+#define	HIMR_92E_CPWM					BIT(8)		// CPU power Mode exchange INT Status, Write 1 clear
+#define	HIMR_92E_HIGHDOK				BIT(7)		// High Queue DMA OK
+#define	HIMR_92E_MGNTDOK				BIT(6)		// Management Queue DMA OK
+#define	HIMR_92E_BKDOK					BIT(5)		// AC_BK DMA OK
+#define	HIMR_92E_BEDOK					BIT(4)		// AC_BE DMA OK
+#define	HIMR_92E_VIDOK					BIT(3)		// AC_VI DMA OK
+#define	HIMR_92E_VODOK					BIT(2)		// AC_VO DMA OK
+#define	HIMR_92E_RDU					BIT(1)		// Rx Descriptor Unavailable
 #define	HIMR_92E_ROK					BIT(0)		// Receive DMA OK
 
 //----------------------------------------------------------------------------
@@ -179,40 +179,40 @@
 //----------------------------------------------------------------------------
 //       8192E REG_92E_HQ_DES_NUM0 bits		(Offset 0x3A0-3A3, 32 bits)
 //----------------------------------------------------------------------------
-#define	ACQ_92E_H1Q_DESCS_MODE_8SEG		BIT(31)	
+#define	ACQ_92E_H1Q_DESCS_MODE_8SEG		BIT(31)
 #define ACQ_92E_H1Q_DESC_NUM_MASK		0xfff
 #define ACQ_92E_H1Q_DESC_NUM_SHIFT		16
-#define	ACQ_92E_H0Q_DESCS_MODE_8SEG		BIT(15)	
+#define	ACQ_92E_H0Q_DESCS_MODE_8SEG		BIT(15)
 #define ACQ_92E_H0Q_DESC_NUM_MASK		0xfff
 #define ACQ_92E_H0Q_DESC_NUM_SHIFT		0
 
 //----------------------------------------------------------------------------
 //       8192E REG_92E_HQ_DES_NUM1 bits		(Offset 0x3A4-3A7, 32 bits)
 //----------------------------------------------------------------------------
-#define	ACQ_92E_H3Q_DESCS_MODE_8SEG		BIT(31)	
+#define	ACQ_92E_H3Q_DESCS_MODE_8SEG		BIT(31)
 #define ACQ_92E_H3Q_DESC_NUM_MASK		0xfff
 #define ACQ_92E_H3Q_DESC_NUM_SHIFT		16
-#define	ACQ_92E_H2Q_DESCS_MODE_8SEG		BIT(15)	
+#define	ACQ_92E_H2Q_DESCS_MODE_8SEG		BIT(15)
 #define ACQ_92E_H2Q_DESC_NUM_MASK		0xfff
 #define ACQ_92E_H2Q_DESC_NUM_SHIFT		0
 
 //----------------------------------------------------------------------------
 //       8192E REG_92E_HQ_DES_NUM2 bits		(Offset 0x3A8-3AB, 32 bits)
 //----------------------------------------------------------------------------
-#define	ACQ_92E_H5Q_DESCS_MODE_8SEG		BIT(31)	
+#define	ACQ_92E_H5Q_DESCS_MODE_8SEG		BIT(31)
 #define ACQ_92E_H5Q_DESC_NUM_MASK		0xfff
 #define ACQ_92E_H5Q_DESC_NUM_SHIFT		16
-#define	ACQ_92E_H4Q_DESCS_MODE_8SEG		BIT(15)	
+#define	ACQ_92E_H4Q_DESCS_MODE_8SEG		BIT(15)
 #define ACQ_92E_H4Q_DESC_NUM_MASK		0xfff
 #define ACQ_92E_H4Q_DESC_NUM_SHIFT		0
 
 //----------------------------------------------------------------------------
 //       8192E REG_92E_HQ_DES_NUM3 bits		(Offset 0x3AC-3AF, 32 bits)
 //----------------------------------------------------------------------------
-#define	ACQ_92E_H7Q_DESCS_MODE_8SEG		BIT(31)	
+#define	ACQ_92E_H7Q_DESCS_MODE_8SEG		BIT(31)
 #define ACQ_92E_H7Q_DESC_NUM_MASK		0xfff
 #define ACQ_92E_H7Q_DESC_NUM_SHIFT		16
-#define	ACQ_92E_H6Q_DESCS_MODE_8SEG		BIT(15)	
+#define	ACQ_92E_H6Q_DESCS_MODE_8SEG		BIT(15)
 #define ACQ_92E_H6Q_DESC_NUM_MASK		0xfff
 #define ACQ_92E_H6Q_DESC_NUM_SHIFT		0
 
@@ -252,20 +252,20 @@
 //----------------------------------------------------------------------------
 //       8192E REG_92E_ACQ_DES_NUM0 bits		(Offset 0x3B4-3B7, 32 bits)
 //----------------------------------------------------------------------------
-#define	ACQ_92E_VIQ_DESCS_MODE_8SEG		BIT(31)	
+#define	ACQ_92E_VIQ_DESCS_MODE_8SEG		BIT(31)
 #define ACQ_92E_VIQ_DESC_NUM_MASK		0xfff
 #define ACQ_92E_VIQ_DESC_NUM_SHIFT		16
-#define	ACQ_92E_VOQ_DESCS_MODE_8SEG		BIT(15)	
+#define	ACQ_92E_VOQ_DESCS_MODE_8SEG		BIT(15)
 #define ACQ_92E_VOQ_DESC_NUM_MASK		0xfff
 #define ACQ_92E_VOQ_DESC_NUM_SHIFT		0
 
 //----------------------------------------------------------------------------
 //       8192E REG_92E_ACQ_DES_NUM1 bits		(Offset 0x3B8-3BB, 32 bits)
 //----------------------------------------------------------------------------
-#define	ACQ_92E_BKQ_DESCS_MODE_8SEG		BIT(31)	
+#define	ACQ_92E_BKQ_DESCS_MODE_8SEG		BIT(31)
 #define ACQ_92E_BKQ_DESC_NUM_MASK		0xfff
 #define ACQ_92E_BKQ_DESC_NUM_SHIFT		16
-#define	ACQ_92E_BEQ_DESCS_MODE_8SEG		BIT(15)	
+#define	ACQ_92E_BEQ_DESCS_MODE_8SEG		BIT(15)
 #define ACQ_92E_BEQ_DESC_NUM_MASK		0xfff
 #define ACQ_92E_BEQ_DESC_NUM_SHIFT		0
 
@@ -274,87 +274,26 @@
 //----------------------------------------------------------------------------
 #define ACQ_92E_RXQ_DESC_NUM_MASK		0xfff
 #define ACQ_92E_RXQ_DESC_NUM_SHIFT		16
-#define	ACQ_92E_MGQ_DESCS_MODE_8SEG		BIT(15)	
+#define	ACQ_92E_MGQ_DESCS_MODE_8SEG		BIT(15)
 #define ACQ_92E_MGQ_DESC_NUM_MASK		0xfff
 #define ACQ_92E_MGQ_DESC_NUM_SHIFT		0
 
 //----------------------------------------------------------------------------
 //       8192E MBID_NUM bits					(Offset 0x552, 8 bits)
 //----------------------------------------------------------------------------
-#define	MBID_NUM_92E_EN_PREDOWN_BCN		BIT(3)	
+#define	MBID_NUM_92E_EN_PREDOWN_BCN		BIT(3)
 
 //----------------------------------------------------------------------------
 //       8192E REG_EFUSE_ACCESS			(Offset 0xCF, 8 bits)
 //----------------------------------------------------------------------------
-#define EFUSE_ACCESS_ON_8192E			0x69	
-#define EFUSE_ACCESS_OFF_8192E			0x00	
+#define EFUSE_ACCESS_ON_8192E			0x69
+#define EFUSE_ACCESS_OFF_8192E			0x00
 
 
 //====================================================
 //			EEPROM/Efuse PG Offset for 8192EE/8192EU/8192ES
 //====================================================
 
-#if defined(EN_EFUSE)
-#define PATHA_OFFSET 0x10
-#define PATHB_OFFSET 0x3A
-#define PATHC_OFFSET 0x64
-#define PATHD_OFFSET 0x8E
-/*2.4 GHz, PATH A, 1T*/
-#define EEPROM_2G_CCK1T_TxPower			0x0 // CCK Tx Power base
-#define EEPROM_2G_HT401S_TxPower		0x6 // HT40 Tx Power base
-#define EEPROM_2G_HT201S_TxPowerDiff	0xB // HT20 Tx Power Diff [7:4]
-#define EEPROM_2G_OFDM1T_TxPowerDiff    0xB // OFDM Tx Power Diff [3:0]
-/*2.4 GHz, PATH A, 2T*/
-#define EEPROM_2G_HT402S_TxPowerDiff	0xC // HT40 Tx Power Diff [7:4]
-#define EEPROM_2G_HT202S_TxPowerDiff	0xC // HT20 Tx Power Diff [3:0]
-#define EEPROM_2G_OFDM2T_TxPowerDiff	0xD // OFDM Tx Power Diff [7:4]
-#define EEPROM_2G_CCK2T_TxPowerDiff		0xD // CCK Tx Power Diff [3:0]
-/*2.4 GHz, PATH A, 3T*/
-#define EEPROM_2G_HT403S_TxPowerDiff	0xE // HT40 Tx Power Diff [7:4]
-#define EEPROM_2G_HT203S_TxPowerDiff	0xE // HT40 Tx Power Diff [3:0]
-#define EEPROM_2G_OFDM3T_TxPowerDiff	0xF // OFDM Tx Power Diff [7:4]
-#define EEPROM_2G_CCK3T_TxPowerDiff		0xF // CCK Tx Power Diff [3:0]
-/*2.4 GHz, PATH A, 4T*/
-#define EEPROM_2G_HT404S_TxPowerDiff    0x10 // HT40 Tx Power Diff [7:4]
-#define EEPROM_2G_HT204S_TxPowerDiff    0x10 // HT20 Tx Power Diff [0:3]
-#define EEPROM_2G_OFDM4T_TxPowerDiff    0x11 // OFDM Tx Power Diff [7:4]
-#define EEPROM_2G_CCK4T_TxPowerDiff		0x11 // CCK Tx Power Diff [3:0]
-/*5 GHz, PATH A, 1T*/
-#define EEPROM_5G_HT401S_TxPower		0x12 // HT40 Tx Power Base
-#define EEPROM_5G_HT201S_TxPowerDiff    0x20 // HT20 Tx Power Diff [7:4]
-#define EEPROM_5G_OFDM1T_TxPowerDiff    0x20 // OFDM Tx Power Diff [3:0]
-#define EEPROM_5G_HT801S_TxPowerDiff    0x26 // HT80 Tx Power Diff [7:4]
-#define EEPROM_5G_HT1601S_TxPowerDiff   0x26 // HT160 Tx Power Diff [3:0]
-/*5 GHz, PATH A, 2T*/
-#define EEPROM_5G_HT402S_TxPowerDiff    0x21 // HT40 Tx Power Diff [7:4]
-#define EEPROM_5G_HT202S_TxPowerDiff    0x21 // HT20 Tx Power Diff [3:0]
-#define EEPROM_5G_OFDM2T_TxPowerDiff    0x24 // OFDM Tx Power Diff [7:4]
-#define EEPROM_5G_HT802S_TxPowerDiff    0x27 // HT80 Tx Power Diff [7:4]
-/*5 GHz, PATH A, 3T*/
-#define EEPROM_5G_OFDM3T_TxPowerDiff    0x24 // OFDM Tx Power Diff [3:0]
-#define EEPROM_5G_HT403S_TxPowerDiff    0x22 // HT40 Tx Power Diff [7:4]
-#define EEPROM_5G_HT203S_TxPowerDiff    0x22 // HT20 Tx Power Diff [3:0]
-#define EEPROM_5G_HT803S_TxPowerDiff    0x28 // HT80 Tx Power Diff [7:4]
-#define EEPROM_5G_HT1603S_TxPowerDiff   0x28 // HT160 Tx Power Diff [3:0]
-/*5 GHz, PATH A, 4T*/
-#define EEPROM_5G_HT404S_TxPowerDiff    0x23 // HT40 Tx Power Diff [7:4]
-#define EEPROM_5G_HT204S_TxPowerDiff    0x23 // HT20 Tx Power Diff [3:0]
-#define EEPROM_5G_OFDM4T_TxPowerDiff    0x25 // OFDM Tx Power Diff [3:0]
-#define EEPROM_5G_HT804S_TxPowerDiff    0x29 // HT80 Tx Power Diff [7:4]
-#define EEPROM_5G_HT1604S_TxPowerDiff   0x29 // HT160 Tx Power Diff [3:0]
-
-#define EEPROM_92E_CHANNEL_PLAN		0xB8
-#define EEPROM_92E_XTAL_K 				0xB9 //Crystal Calibration [5:0]
-#define EEPROM_92E_THERMAL_METER		0xBA //Thermal meter
-#ifdef CONFIG_SDIO_HCI
-#define EEPROM_92E_SDIOTYPE             0xD0
-#define EEPROM_92E_MACADDRESS		0x11A // MAC Address
-#else
-#define EEPROM_92E_MACADDRESS		0xD0 // MAC Address
-#endif
-#define EEPROM_RFE_OPTION_8192E			0xCA // 0xCA[6:4]: LNA Type ; 0xCA[3:2]:PA/LNA ; 0xCA[1:0]:RFE Type
-
-#endif
 
 #if 0
 

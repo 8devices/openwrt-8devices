@@ -67,12 +67,12 @@ void ConfigureTxpowerTrack(
 #if RTL8188E_SUPPORT
 	if(pDM_Odm->SupportICType==ODM_RTL8188E)
 		ConfigureTxpowerTrack_8188E(pConfig);
-#endif 
+#endif
 
 #if RTL8197F_SUPPORT
 	if (pDM_Odm->SupportICType == ODM_RTL8197F)
 		ConfigureTxpowerTrack_8197F(pConfig);
-#endif 
+#endif
 
 #if RTL8822B_SUPPORT
 	if (pDM_Odm->SupportICType == ODM_RTL8822B)
@@ -82,7 +82,7 @@ void ConfigureTxpowerTrack(
 
 }
 
-#if (RTL8192E_SUPPORT==1) 
+#if (RTL8192E_SUPPORT==1)
 VOID
 ODM_TXPowerTrackingCallback_ThermalMeter_92E(
 #if (DM_ODM_SUPPORT_TYPE & ODM_AP)
@@ -122,7 +122,7 @@ ODM_TXPowerTrackingCallback_ThermalMeter_92E(
 
 	switch (rf_mimo_mode) {
 		case MIMO_1T1R:
-			rf = 1;      
+			rf = 1;
 			break;
 		case MIMO_2T2R:
 			rf = 2;
@@ -182,25 +182,25 @@ ODM_TXPowerTrackingCallback_ThermalMeter_92E(
 	}
 
 	if (ThermalValue != priv->pshare->ThermalValue) {
-		ODM_RT_TRACE(pDM_Odm,ODM_COMP_TX_PWR_TRACK, ODM_DBG_LOUD,("\n******** START POWER TRACKING ********\n")); 					
-		ODM_RT_TRACE(pDM_Odm,ODM_COMP_TX_PWR_TRACK, ODM_DBG_LOUD,("\nReadback Thermal Meter = 0x%x pre thermal meter 0x%x EEPROMthermalmeter 0x%x\n", ThermalValue, priv->pshare->ThermalValue, priv->pmib->dot11RFEntry.ther)); 			
+		ODM_RT_TRACE(pDM_Odm,ODM_COMP_TX_PWR_TRACK, ODM_DBG_LOUD,("\n******** START POWER TRACKING ********\n"));
+		ODM_RT_TRACE(pDM_Odm,ODM_COMP_TX_PWR_TRACK, ODM_DBG_LOUD,("\nReadback Thermal Meter = 0x%x pre thermal meter 0x%x EEPROMthermalmeter 0x%x\n", ThermalValue, priv->pshare->ThermalValue, priv->pmib->dot11RFEntry.ther));
 
 		delta = RTL_ABS(ThermalValue, priv->pmib->dot11RFEntry.ther);
 		delta_IQK = RTL_ABS(ThermalValue, priv->pshare->ThermalValue_IQK);
 		delta_LCK = RTL_ABS(ThermalValue, priv->pshare->ThermalValue_LCK);
 		is_decrease = ((ThermalValue < priv->pmib->dot11RFEntry.ther) ? 1 : 0);
-		
+
 #ifdef _TRACKING_TABLE_FILE
-		if (priv->pshare->rf_ft_var.pwr_track_file) {				
+		if (priv->pshare->rf_ft_var.pwr_track_file) {
 		ODM_RT_TRACE(pDM_Odm,ODM_COMP_TX_PWR_TRACK, ODM_DBG_LOUD,("Diff: (%s)%d ==> get index from table : %d)\n", (is_decrease?"-":"+"), delta, get_tx_tracking_index(priv, channel, i, delta, is_decrease, 0)));
-        
-            	if (is_decrease) {					
+
+            	if (is_decrease) {
                 	for (i = 0; i < rf; i++) {
 				OFDM_index[i] = priv->pshare->OFDM_index0[i] + get_tx_tracking_index(priv, channel, i, delta, is_decrease, 0);
 				OFDM_index[i] = ((OFDM_index[i] > (OFDM_TABLE_SIZE_92E- 1)) ? (OFDM_TABLE_SIZE_92E - 1) : OFDM_index[i]);
 				ODM_RT_TRACE(pDM_Odm,ODM_COMP_TX_PWR_TRACK, ODM_DBG_LOUD,(">>> decrese power ---> new OFDM_INDEX:%d (%d + %d)\n", OFDM_index[i], priv->pshare->OFDM_index0[i], get_tx_tracking_index(priv, channel, i, delta, is_decrease, 0)));
-	                        CCK_index = priv->pshare->CCK_index0 + get_tx_tracking_index(priv, channel, i, delta, is_decrease, 1);                        
-				CCK_index = ((CCK_index > (CCK_TABLE_SIZE_92E - 1)) ? (CCK_TABLE_SIZE_92E - 1) : CCK_index);				
+	                        CCK_index = priv->pshare->CCK_index0 + get_tx_tracking_index(priv, channel, i, delta, is_decrease, 1);
+				CCK_index = ((CCK_index > (CCK_TABLE_SIZE_92E - 1)) ? (CCK_TABLE_SIZE_92E - 1) : CCK_index);
 				ODM_RT_TRACE(pDM_Odm,ODM_COMP_TX_PWR_TRACK, ODM_DBG_LOUD,(">>> Decrese power ---> new CCK_INDEX:%d (%d + %d)\n",  CCK_index, priv->pshare->CCK_index0, get_tx_tracking_index(priv, channel, i, delta, is_decrease, 1)));
 			}
 		} else {
@@ -208,8 +208,8 @@ ODM_TXPowerTrackingCallback_ThermalMeter_92E(
 				OFDM_index[i] = priv->pshare->OFDM_index0[i] - get_tx_tracking_index(priv, channel, i, delta, is_decrease, 0);
 				OFDM_index[i] = ((OFDM_index[i] < OFDM_min_index) ?  OFDM_min_index : OFDM_index[i]);
 				ODM_RT_TRACE(pDM_Odm,ODM_COMP_TX_PWR_TRACK, ODM_DBG_LOUD,(">>> Increse power ---> new OFDM_INDEX:%d (%d - %d)\n", OFDM_index[i], priv->pshare->OFDM_index0[i], get_tx_tracking_index(priv, channel, i, delta, is_decrease, 0)));
-				CCK_index = priv->pshare->CCK_index0 - get_tx_tracking_index(priv, channel, i, delta, is_decrease, 1);						  
-	                        CCK_index = ((CCK_index < 0 )? 0 : CCK_index);  
+				CCK_index = priv->pshare->CCK_index0 - get_tx_tracking_index(priv, channel, i, delta, is_decrease, 1);
+	                        CCK_index = ((CCK_index < 0 )? 0 : CCK_index);
 				ODM_RT_TRACE(pDM_Odm,ODM_COMP_TX_PWR_TRACK, ODM_DBG_LOUD,(">>> Increse power ---> new CCK_INDEX:%d (%d - %d)\n", CCK_index, priv->pshare->CCK_index0, get_tx_tracking_index(priv, channel, i, delta, is_decrease, 1)));
 			}
 		}
@@ -240,7 +240,7 @@ ODM_TXPowerTrackingCallback_ThermalMeter_92E(
 
 			value32 = (ele_C&0x000003C0)>>6;
 			PHY_SetBBReg(priv, rOFDM0_XCTxAFE, bMaskH4Bits, value32);
-			
+
 			value32 = ((X * ele_D)>>7)&0x01;
 			PHY_SetBBReg(priv, rOFDM0_ECCAThreshold, BIT(24), value32);
 		} else {
@@ -269,7 +269,7 @@ ODM_TXPowerTrackingCallback_ThermalMeter_92E(
 				//wirte new elements A, C, D to regC88 and regC9C, element B is always 0
 				value32 = (ele_D << 22) | ((ele_C & 0x3F) << 16) | ele_A;
 				PHY_SetBBReg(priv, rOFDM0_XBTxIQImbalance, bMaskDWord, value32);
-				
+
 				value32 = (ele_C & 0x000003C0) >> 6;
 				PHY_SetBBReg(priv, rOFDM0_XDTxAFE, bMaskH4Bits, value32);
 
@@ -290,21 +290,21 @@ ODM_TXPowerTrackingCallback_ThermalMeter_92E(
 			priv->pshare->ThermalValue_IQK = ThermalValue;
 #ifdef MP_TEST
 			if (!(priv->pshare->rf_ft_var.mp_specific && (OPMODE & (WIFI_MP_CTX_BACKGROUND | WIFI_MP_CTX_PACKET))))
-#endif	
+#endif
 				PHY_IQCalibrate_8192E(pDM_Odm,false);
 		}
 
 		if (delta_LCK > 8) {
 			RTL_W8(0x522, 0xff);
 			Reg0x18 = PHY_QueryRFReg(priv, RF_PATH_A, 0x18, bMask20Bits, 1);
-			PHY_SetRFReg(priv, RF_PATH_A, 0xB4, BIT(14), 1);			
+			PHY_SetRFReg(priv, RF_PATH_A, 0xB4, BIT(14), 1);
 			PHY_SetRFReg(priv, RF_PATH_A, 0x18, BIT(15), 1);
 			delay_ms(1);
 			PHY_SetRFReg(priv, RF_PATH_A, 0xB4, BIT(14), 0);
-			PHY_SetRFReg(priv, RF_PATH_A, 0x18, bMask20Bits, Reg0x18);		
+			PHY_SetRFReg(priv, RF_PATH_A, 0x18, bMask20Bits, Reg0x18);
 			RTL_W8(0x522, 0x0);
 			priv->pshare->ThermalValue_LCK = ThermalValue;
-		}	
+		}
 	}
 
 	//update thermal meter value
@@ -313,13 +313,13 @@ ODM_TXPowerTrackingCallback_ThermalMeter_92E(
 		priv->pshare->OFDM_index[i] = OFDM_index[i];
 	priv->pshare->CCK_index = CCK_index;
 
-	ODM_RT_TRACE(pDM_Odm,ODM_COMP_TX_PWR_TRACK, ODM_DBG_LOUD,  ("\n******** END:%s() ********\n", __FUNCTION__));	
+	ODM_RT_TRACE(pDM_Odm,ODM_COMP_TX_PWR_TRACK, ODM_DBG_LOUD,  ("\n******** END:%s() ********\n", __FUNCTION__));
 }
 #endif
 
 
 
-#if (RTL8197F_SUPPORT == 1 || RTL8822B_SUPPORT == 1)					
+#if (RTL8197F_SUPPORT == 1 || RTL8822B_SUPPORT == 1)
 VOID
 ODM_TXPowerTrackingCallback_ThermalMeter_JaguarSeries3(
 #if (DM_ODM_SUPPORT_TYPE & ODM_AP)
@@ -361,20 +361,20 @@ ODM_TXPowerTrackingCallback_ThermalMeter_JaguarSeries3(
 	}
 
 	ConfigureTxpowerTrack(pDM_Odm, &c);
-	
+
 	(*c.GetDeltaAllSwingTable)(pDM_Odm, (pu1Byte *)&deltaSwingTableIdx_TUP_A, (pu1Byte *)&deltaSwingTableIdx_TDOWN_A,
 									  (pu1Byte *)&deltaSwingTableIdx_TUP_B, (pu1Byte *)&deltaSwingTableIdx_TDOWN_B,
 									  (pu1Byte *)&deltaSwingTableIdx_TUP_CCK_A, (pu1Byte *)&deltaSwingTableIdx_TDOWN_CCK_A,
 									  (pu1Byte *)&deltaSwingTableIdx_TUP_CCK_B, (pu1Byte *)&deltaSwingTableIdx_TDOWN_CCK_B);
-	
+
 	ThermalValue = (u1Byte)ODM_GetRFReg(pDM_Odm, ODM_RF_PATH_A, c.ThermalRegAddr, 0xfc00); /*0x42: RF Reg[15:10] 88E*/
 #ifdef THER_TRIM
-	if(GET_CHIP_VER(priv) == VERSION_8197F){	
+	if(GET_CHIP_VER(priv) == VERSION_8197F){
 		printk("Orig ThermalValue=%d, ther_trim_val=%d\n",ThermalValue, priv->pshare->rf_ft_var.ther_trim_val);
 		ThermalValue += priv->pshare->rf_ft_var.ther_trim_val;
 		printk("After thermal trim, ThermalValue=%d\n", ThermalValue);
 	}
-#endif				
+#endif
 
 	ODM_RT_TRACE(pDM_Odm, ODM_COMP_TX_PWR_TRACK, ODM_DBG_LOUD,
 		("Readback Thermal Meter = 0x%x(%d) EEPROMthermalmeter 0x%x(%d)\n"
@@ -383,7 +383,7 @@ ODM_TXPowerTrackingCallback_ThermalMeter_JaguarSeries3(
 	/* Initialize */
 	if (!pDM_Odm->RFCalibrateInfo.ThermalValue)
 		pDM_Odm->RFCalibrateInfo.ThermalValue = priv->pmib->dot11RFEntry.ther;
-	
+
 	if (!pDM_Odm->RFCalibrateInfo.ThermalValue_LCK)
 		pDM_Odm->RFCalibrateInfo.ThermalValue_LCK = priv->pmib->dot11RFEntry.ther;
 
@@ -393,7 +393,7 @@ ODM_TXPowerTrackingCallback_ThermalMeter_JaguarSeries3(
 	/* calculate average thermal meter */
 	pDM_Odm->RFCalibrateInfo.ThermalValue_AVG[pDM_Odm->RFCalibrateInfo.ThermalValue_AVG_index] = ThermalValue;
 	pDM_Odm->RFCalibrateInfo.ThermalValue_AVG_index++;
-	
+
 	if (pDM_Odm->RFCalibrateInfo.ThermalValue_AVG_index == c.AverageThermalNum)   /*Average times =  c.AverageThermalNum*/
 		pDM_Odm->RFCalibrateInfo.ThermalValue_AVG_index = 0;
 
@@ -408,7 +408,7 @@ ODM_TXPowerTrackingCallback_ThermalMeter_JaguarSeries3(
 		ODM_RT_TRACE(pDM_Odm, ODM_COMP_TX_PWR_TRACK, ODM_DBG_LOUD,
 			("ThermalValue_AVG=0x%x(%d)  ThermalValue_AVG_count = %d\n"
 			, ThermalValue_AVG, ThermalValue_AVG, ThermalValue_AVG_count));
-		
+
 		ThermalValue = (u1Byte)(ThermalValue_AVG / ThermalValue_AVG_count);
 
 		ODM_RT_TRACE(pDM_Odm, ODM_COMP_TX_PWR_TRACK, ODM_DBG_LOUD,
@@ -416,7 +416,7 @@ ODM_TXPowerTrackingCallback_ThermalMeter_JaguarSeries3(
 	}
 
 	/*4 Calculate delta, delta_LCK, delta_IQK.*/
-	delta = RTL_ABS(ThermalValue, priv->pmib->dot11RFEntry.ther);	
+	delta = RTL_ABS(ThermalValue, priv->pmib->dot11RFEntry.ther);
 	delta_LCK = RTL_ABS(ThermalValue, pDM_Odm->RFCalibrateInfo.ThermalValue_LCK);
 	delta_IQK = RTL_ABS(ThermalValue, pDM_Odm->RFCalibrateInfo.ThermalValue_IQK);
 	is_increase = ((ThermalValue < priv->pmib->dot11RFEntry.ther) ? 0 : 1);
@@ -428,13 +428,13 @@ ODM_TXPowerTrackingCallback_ThermalMeter_JaguarSeries3(
 
 
 	/*4 if necessary, do LCK.*/
-	
+
 	if (delta_LCK >= c.Threshold_IQK) {
 		ODM_RT_TRACE(pDM_Odm, ODM_COMP_TX_PWR_TRACK, ODM_DBG_LOUD, ("delta_LCK(%d) >= Threshold_IQK(%d)\n", delta_LCK, c.Threshold_IQK));
 		pDM_Odm->RFCalibrateInfo.ThermalValue_LCK = ThermalValue;
 		if (c.PHY_LCCalibrate)
 			(*c.PHY_LCCalibrate)(pDM_Odm);
-	} 
+	}
 
 	if (GET_CHIP_VER(priv) != VERSION_8197F) {
 		if (delta_IQK >= c.Threshold_IQK) {
@@ -442,12 +442,12 @@ ODM_TXPowerTrackingCallback_ThermalMeter_JaguarSeries3(
 			pDM_Odm->RFCalibrateInfo.ThermalValue_IQK = ThermalValue;
 			if (c.DoIQK)
 				(*c.DoIQK)(pDM_Odm, FALSE, 0, 0);
-		} 
+		}
 	}
 
 	if (!priv->pmib->dot11RFEntry.ther)	/*Don't do power tracking since no calibrated thermal value*/
 		return;
-	
+
 	/*4 Do Power Tracking*/
 
 	if (ThermalValue != pDM_Odm->RFCalibrateInfo.ThermalValue) {
@@ -456,9 +456,9 @@ ODM_TXPowerTrackingCallback_ThermalMeter_JaguarSeries3(
 		ODM_RT_TRACE(pDM_Odm, ODM_COMP_TX_PWR_TRACK, ODM_DBG_LOUD,
 			("Readback Thermal Meter = 0x%x pre thermal meter 0x%x EEPROMthermalmeter 0x%x\n",
 			ThermalValue, pDM_Odm->RFCalibrateInfo.ThermalValue, priv->pmib->dot11RFEntry.ther));
-				
+
 #ifdef _TRACKING_TABLE_FILE
-		if (priv->pshare->rf_ft_var.pwr_track_file) {				
+		if (priv->pshare->rf_ft_var.pwr_track_file) {
 			if (is_increase) {			/*thermal is higher than base*/
 				for (p = ODM_RF_PATH_A; p < c.RfPathCount; p++) {
 					switch (p) {
@@ -466,7 +466,7 @@ ODM_TXPowerTrackingCallback_ThermalMeter_JaguarSeries3(
 						ODM_RT_TRACE(pDM_Odm, ODM_COMP_TX_PWR_TRACK, ODM_DBG_LOUD,
 							("deltaSwingTableIdx_TUP_B[%d] = %d deltaSwingTableIdx_TUP_CCK_B[%d] = %d\n", delta, deltaSwingTableIdx_TUP_B[delta], delta, deltaSwingTableIdx_TUP_CCK_B[delta]));
 						pRFCalibrateInfo->Absolute_OFDMSwingIdx[p] = deltaSwingTableIdx_TUP_B[delta];
-						pRFCalibrateInfo->Absolute_CCKSwingIdx[p] = deltaSwingTableIdx_TUP_CCK_B[delta]; 
+						pRFCalibrateInfo->Absolute_CCKSwingIdx[p] = deltaSwingTableIdx_TUP_CCK_B[delta];
 						ODM_RT_TRACE(pDM_Odm, ODM_COMP_TX_PWR_TRACK, ODM_DBG_LOUD,
 							("******Temp is higher and pRF->Absolute_OFDMSwingIdx[ODM_RF_PATH_B] = %d pRF->Absolute_CCKSwingIdx[ODM_RF_PATH_B] = %d\n", pRFCalibrateInfo->Absolute_OFDMSwingIdx[p], pRFCalibrateInfo->Absolute_CCKSwingIdx[p]));
 					break;
@@ -484,7 +484,7 @@ ODM_TXPowerTrackingCallback_ThermalMeter_JaguarSeries3(
 						ODM_RT_TRACE(pDM_Odm, ODM_COMP_TX_PWR_TRACK, ODM_DBG_LOUD,
 							("deltaSwingTableIdx_TUP_D[%d] = %d deltaSwingTableIdx_TUP_CCK_D[%d] = %d\n", delta, deltaSwingTableIdx_TUP_D[delta], delta, deltaSwingTableIdx_TUP_CCK_D[delta]));
 						pRFCalibrateInfo->Absolute_OFDMSwingIdx[p] = deltaSwingTableIdx_TUP_D[delta];
-						pRFCalibrateInfo->Absolute_CCKSwingIdx[p] = deltaSwingTableIdx_TUP_CCK_D[delta]; 
+						pRFCalibrateInfo->Absolute_CCKSwingIdx[p] = deltaSwingTableIdx_TUP_CCK_D[delta];
 						ODM_RT_TRACE(pDM_Odm, ODM_COMP_TX_PWR_TRACK, ODM_DBG_LOUD,
 							("******Temp is higher and pRF->Absolute_OFDMSwingIdx[ODM_RF_PATH_D] = %d pRF->Absolute_CCKSwingIdx[ODM_RF_PATH_D] = %d\n", pRFCalibrateInfo->Absolute_OFDMSwingIdx[p], pRFCalibrateInfo->Absolute_CCKSwingIdx[p]));
 						break;
@@ -492,9 +492,9 @@ ODM_TXPowerTrackingCallback_ThermalMeter_JaguarSeries3(
 						ODM_RT_TRACE(pDM_Odm, ODM_COMP_TX_PWR_TRACK, ODM_DBG_LOUD,
 							("deltaSwingTableIdx_TUP_A[%d] = %d deltaSwingTableIdx_TUP_CCK_A[%d] = %d\n", delta, deltaSwingTableIdx_TUP_A[delta], delta, deltaSwingTableIdx_TUP_CCK_A[delta]));
 						pRFCalibrateInfo->Absolute_OFDMSwingIdx[p] = deltaSwingTableIdx_TUP_A[delta];
-						pRFCalibrateInfo->Absolute_CCKSwingIdx[p] = deltaSwingTableIdx_TUP_CCK_A[delta]; 
+						pRFCalibrateInfo->Absolute_CCKSwingIdx[p] = deltaSwingTableIdx_TUP_CCK_A[delta];
 						ODM_RT_TRACE(pDM_Odm, ODM_COMP_TX_PWR_TRACK, ODM_DBG_LOUD,
-							("******Temp is higher and pRF->Absolute_OFDMSwingIdx[ODM_RF_PATH_A] = %d pRF->Absolute_CCKSwingIdx[ODM_RF_PATH_A] = %d\n", pRFCalibrateInfo->Absolute_OFDMSwingIdx[p], pRFCalibrateInfo->Absolute_CCKSwingIdx[p])); 
+							("******Temp is higher and pRF->Absolute_OFDMSwingIdx[ODM_RF_PATH_A] = %d pRF->Absolute_CCKSwingIdx[ODM_RF_PATH_A] = %d\n", pRFCalibrateInfo->Absolute_OFDMSwingIdx[p], pRFCalibrateInfo->Absolute_CCKSwingIdx[p]));
 					break;
 					}
 				}
@@ -503,64 +503,64 @@ ODM_TXPowerTrackingCallback_ThermalMeter_JaguarSeries3(
 					switch (p) {
 					case ODM_RF_PATH_B:
 						ODM_RT_TRACE(pDM_Odm, ODM_COMP_TX_PWR_TRACK, ODM_DBG_LOUD,
-							("deltaSwingTableIdx_TDOWN_B[%d] = %d   deltaSwingTableIdx_TDOWN_CCK_B[%d] = %d\n", delta, deltaSwingTableIdx_TDOWN_B[delta], delta, deltaSwingTableIdx_TDOWN_CCK_B[delta]));  
+							("deltaSwingTableIdx_TDOWN_B[%d] = %d   deltaSwingTableIdx_TDOWN_CCK_B[%d] = %d\n", delta, deltaSwingTableIdx_TDOWN_B[delta], delta, deltaSwingTableIdx_TDOWN_CCK_B[delta]));
 						pRFCalibrateInfo->Absolute_OFDMSwingIdx[p] = -1 * deltaSwingTableIdx_TDOWN_B[delta];
 						pRFCalibrateInfo->Absolute_CCKSwingIdx[p] = -1 * deltaSwingTableIdx_TDOWN_CCK_B[delta];
 						ODM_RT_TRACE(pDM_Odm, ODM_COMP_TX_PWR_TRACK, ODM_DBG_LOUD,
-							("******Temp is lower and pRF->Absolute_OFDMSwingIdx[ODM_RF_PATH_B] = %d   pRF->Absolute_CCKSwingIdx[ODM_RF_PATH_B] = %d\n", pRFCalibrateInfo->Absolute_OFDMSwingIdx[p], pRFCalibrateInfo->Absolute_CCKSwingIdx[p])); 
+							("******Temp is lower and pRF->Absolute_OFDMSwingIdx[ODM_RF_PATH_B] = %d   pRF->Absolute_CCKSwingIdx[ODM_RF_PATH_B] = %d\n", pRFCalibrateInfo->Absolute_OFDMSwingIdx[p], pRFCalibrateInfo->Absolute_CCKSwingIdx[p]));
 					break;
 
 					case ODM_RF_PATH_C:
 						ODM_RT_TRACE(pDM_Odm, ODM_COMP_TX_PWR_TRACK, ODM_DBG_LOUD,
-							("deltaSwingTableIdx_TDOWN_C[%d] = %d   deltaSwingTableIdx_TDOWN_CCK_C[%d] = %d\n", delta, deltaSwingTableIdx_TDOWN_C[delta], delta, deltaSwingTableIdx_TDOWN_CCK_C[delta]));  
+							("deltaSwingTableIdx_TDOWN_C[%d] = %d   deltaSwingTableIdx_TDOWN_CCK_C[%d] = %d\n", delta, deltaSwingTableIdx_TDOWN_C[delta], delta, deltaSwingTableIdx_TDOWN_CCK_C[delta]));
 						pRFCalibrateInfo->Absolute_OFDMSwingIdx[p] = -1 * deltaSwingTableIdx_TDOWN_C[delta];
 						pRFCalibrateInfo->Absolute_CCKSwingIdx[p] = -1 * deltaSwingTableIdx_TDOWN_CCK_C[delta];
 						ODM_RT_TRACE(pDM_Odm, ODM_COMP_TX_PWR_TRACK, ODM_DBG_LOUD,
-							("******Temp is lower and pRF->Absolute_OFDMSwingIdx[ODM_RF_PATH_C] = %d   pRF->Absolute_CCKSwingIdx[ODM_RF_PATH_C] = %d\n", pRFCalibrateInfo->Absolute_OFDMSwingIdx[p], pRFCalibrateInfo->Absolute_CCKSwingIdx[p])); 
+							("******Temp is lower and pRF->Absolute_OFDMSwingIdx[ODM_RF_PATH_C] = %d   pRF->Absolute_CCKSwingIdx[ODM_RF_PATH_C] = %d\n", pRFCalibrateInfo->Absolute_OFDMSwingIdx[p], pRFCalibrateInfo->Absolute_CCKSwingIdx[p]));
 					break;
 
 					case ODM_RF_PATH_D:
 						ODM_RT_TRACE(pDM_Odm, ODM_COMP_TX_PWR_TRACK, ODM_DBG_LOUD,
-							("deltaSwingTableIdx_TDOWN_D[%d] = %d   deltaSwingTableIdx_TDOWN_CCK_D[%d] = %d\n", delta, deltaSwingTableIdx_TDOWN_D[delta], delta, deltaSwingTableIdx_TDOWN_CCK_D[delta]));  
+							("deltaSwingTableIdx_TDOWN_D[%d] = %d   deltaSwingTableIdx_TDOWN_CCK_D[%d] = %d\n", delta, deltaSwingTableIdx_TDOWN_D[delta], delta, deltaSwingTableIdx_TDOWN_CCK_D[delta]));
 						pRFCalibrateInfo->Absolute_OFDMSwingIdx[p] = -1 * deltaSwingTableIdx_TDOWN_D[delta];
 						pRFCalibrateInfo->Absolute_CCKSwingIdx[p] = -1 * deltaSwingTableIdx_TDOWN_CCK_D[delta];
 						ODM_RT_TRACE(pDM_Odm, ODM_COMP_TX_PWR_TRACK, ODM_DBG_LOUD,
-							("******Temp is lower and pRF->Absolute_OFDMSwingIdx[ODM_RF_PATH_D] = %d   pRF->Absolute_CCKSwingIdx[ODM_RF_PATH_D] = %d\n", pRFCalibrateInfo->Absolute_OFDMSwingIdx[p], pRFCalibrateInfo->Absolute_CCKSwingIdx[p])); 
+							("******Temp is lower and pRF->Absolute_OFDMSwingIdx[ODM_RF_PATH_D] = %d   pRF->Absolute_CCKSwingIdx[ODM_RF_PATH_D] = %d\n", pRFCalibrateInfo->Absolute_OFDMSwingIdx[p], pRFCalibrateInfo->Absolute_CCKSwingIdx[p]));
 					break;
 
 					default:
 						ODM_RT_TRACE(pDM_Odm, ODM_COMP_TX_PWR_TRACK, ODM_DBG_LOUD,
-							("deltaSwingTableIdx_TDOWN_A[%d] = %d   deltaSwingTableIdx_TDOWN_CCK_A[%d] = %d\n", delta, deltaSwingTableIdx_TDOWN_A[delta], delta, deltaSwingTableIdx_TDOWN_CCK_A[delta]));  
+							("deltaSwingTableIdx_TDOWN_A[%d] = %d   deltaSwingTableIdx_TDOWN_CCK_A[%d] = %d\n", delta, deltaSwingTableIdx_TDOWN_A[delta], delta, deltaSwingTableIdx_TDOWN_CCK_A[delta]));
 						pRFCalibrateInfo->Absolute_OFDMSwingIdx[p] = -1 * deltaSwingTableIdx_TDOWN_A[delta];
 						pRFCalibrateInfo->Absolute_CCKSwingIdx[p] = -1 * deltaSwingTableIdx_TDOWN_CCK_A[delta];
 						ODM_RT_TRACE(pDM_Odm, ODM_COMP_TX_PWR_TRACK, ODM_DBG_LOUD,
-							("******Temp is lower and pRF->Absolute_OFDMSwingIdx[ODM_RF_PATH_A] = %d   pRF->Absolute_CCKSwingIdx[ODM_RF_PATH_A] = %d\n", pRFCalibrateInfo->Absolute_OFDMSwingIdx[p], pRFCalibrateInfo->Absolute_CCKSwingIdx[p])); 
+							("******Temp is lower and pRF->Absolute_OFDMSwingIdx[ODM_RF_PATH_A] = %d   pRF->Absolute_CCKSwingIdx[ODM_RF_PATH_A] = %d\n", pRFCalibrateInfo->Absolute_OFDMSwingIdx[p], pRFCalibrateInfo->Absolute_CCKSwingIdx[p]));
 					break;
-					}		
+					}
 				}
 			}
-				
+
 			if (is_increase) {
 				ODM_RT_TRACE(pDM_Odm, ODM_COMP_TX_PWR_TRACK, ODM_DBG_LOUD, (">>> increse power --->\n"));
 					if (GET_CHIP_VER(priv) == VERSION_8197F) {
-				for (p = ODM_RF_PATH_A; p < c.RfPathCount; p++) 
+				for (p = ODM_RF_PATH_A; p < c.RfPathCount; p++)
 					(*c.ODM_TxPwrTrackSetPwr)(pDM_Odm, BBSWING, p, 0);
 					} else if (GET_CHIP_VER(priv) == VERSION_8822B) {
-						for (p = ODM_RF_PATH_A; p < c.RfPathCount; p++) 
+						for (p = ODM_RF_PATH_A; p < c.RfPathCount; p++)
 							(*c.ODM_TxPwrTrackSetPwr)(pDM_Odm, MIX_MODE, p, 0);
 					}
 			} else {
 				ODM_RT_TRACE(pDM_Odm, ODM_COMP_TX_PWR_TRACK, ODM_DBG_LOUD, (">>> decrese power --->\n"));
 					if (GET_CHIP_VER(priv) == VERSION_8197F) {
-				for (p = ODM_RF_PATH_A; p < c.RfPathCount; p++) 
+				for (p = ODM_RF_PATH_A; p < c.RfPathCount; p++)
 					(*c.ODM_TxPwrTrackSetPwr)(pDM_Odm, BBSWING, p, 0);
 					} else if (GET_CHIP_VER(priv) == VERSION_8822B) {
-						for (p = ODM_RF_PATH_A; p < c.RfPathCount; p++) 
+						for (p = ODM_RF_PATH_A; p < c.RfPathCount; p++)
 							(*c.ODM_TxPwrTrackSetPwr)(pDM_Odm, MIX_MODE, p, 0);
 					}
 			}
 		}
-#endif		
+#endif
 
 	ODM_RT_TRACE(pDM_Odm, ODM_COMP_TX_PWR_TRACK, ODM_DBG_LOUD, ("\n******** END:%s() ********\n\n", __func__));
 	/*update thermal meter value*/
@@ -574,7 +574,7 @@ ODM_TXPowerTrackingCallback_ThermalMeter_JaguarSeries3(
 
 /*#if (RTL8814A_SUPPORT == 1)*/
 #if (RTL8814A_SUPPORT == 1)
-		
+
 VOID
 ODM_TXPowerTrackingCallback_ThermalMeter_JaguarSeries2(
 #if (DM_ODM_SUPPORT_TYPE & ODM_AP)
@@ -623,7 +623,7 @@ ODM_TXPowerTrackingCallback_ThermalMeter_JaguarSeries2(
 	if(pDM_Odm->SupportICType & ODM_RTL8814A)	// for 8814 path C & D
 	(*c.GetDeltaSwingTable8814only)(pDM_Odm, (pu1Byte*)&deltaSwingTableIdx_TUP_C, (pu1Byte*)&deltaSwingTableIdx_TDOWN_C,
 									  (pu1Byte*)&deltaSwingTableIdx_TUP_D, (pu1Byte*)&deltaSwingTableIdx_TDOWN_D);
-	
+
 	ThermalValue = (u1Byte)ODM_GetRFReg(pDM_Odm, ODM_RF_PATH_A, c.ThermalRegAddr, 0xfc00); //0x42: RF Reg[15:10] 88E
 	ODM_RT_TRACE(pDM_Odm,ODM_COMP_TX_PWR_TRACK, ODM_DBG_LOUD,
 		("\nReadback Thermal Meter = 0x%x, pre thermal meter 0x%x, EEPROMthermalmeter 0x%x\n", ThermalValue, pDM_Odm->RFCalibrateInfo.ThermalValue, priv->pmib->dot11RFEntry.ther));
@@ -632,7 +632,7 @@ ODM_TXPowerTrackingCallback_ThermalMeter_JaguarSeries2(
 	if (!pDM_Odm->RFCalibrateInfo.ThermalValue) {
 		pDM_Odm->RFCalibrateInfo.ThermalValue = priv->pmib->dot11RFEntry.ther;
 	}
-	
+
 	if (!pDM_Odm->RFCalibrateInfo.ThermalValue_LCK) {
 		pDM_Odm->RFCalibrateInfo.ThermalValue_LCK = priv->pmib->dot11RFEntry.ther;
 	}
@@ -640,26 +640,26 @@ ODM_TXPowerTrackingCallback_ThermalMeter_JaguarSeries2(
 	if (!pDM_Odm->RFCalibrateInfo.ThermalValue_IQK) {
 		pDM_Odm->RFCalibrateInfo.ThermalValue_IQK = priv->pmib->dot11RFEntry.ther;
 	}
-	
+
 	bTSSIenable = (BOOLEAN)ODM_GetRFReg(pDM_Odm, ODM_RF_PATH_A, rRF_TxGainOffset, BIT7);	// check TSSI enable
-	
-	//4 Query OFDM BB swing default setting 	Bit[31:21]	
+
+	//4 Query OFDM BB swing default setting 	Bit[31:21]
 	for(p = ODM_RF_PATH_A ; p < c.RfPathCount ; p++)
 	{
-		ele_D = ODM_GetBBReg(pDM_Odm, BBSwingReg[p], 0xffe00000);	
+		ele_D = ODM_GetBBReg(pDM_Odm, BBSwingReg[p], 0xffe00000);
 		ODM_RT_TRACE(pDM_Odm,ODM_COMP_TX_PWR_TRACK, ODM_DBG_LOUD,
 			("0x%x:0x%x ([31:21] = 0x%x)\n", BBSwingReg[p], ODM_GetBBReg(pDM_Odm, BBSwingReg[p], bMaskDWord), ele_D));
-		
-		for (BBswingIdx = 0; BBswingIdx < TXSCALE_TABLE_SIZE; BBswingIdx++) {//4 
+
+		for (BBswingIdx = 0; BBswingIdx < TXSCALE_TABLE_SIZE; BBswingIdx++) {//4
 			if (ele_D == TxScalingTable_Jaguar[BBswingIdx]) {
 				pDM_Odm->RFCalibrateInfo.OFDM_index[p] = (u1Byte)BBswingIdx;
 				ODM_RT_TRACE(pDM_Odm,ODM_COMP_TX_PWR_TRACK, ODM_DBG_LOUD,
-					("OFDM_index[%d]=%d\n",p, pDM_Odm->RFCalibrateInfo.OFDM_index[p]));				
+					("OFDM_index[%d]=%d\n",p, pDM_Odm->RFCalibrateInfo.OFDM_index[p]));
 				break;
 			}
 		}
 		ODM_RT_TRACE(pDM_Odm,ODM_COMP_TX_PWR_TRACK, ODM_DBG_LOUD, ("KfreeOffset[%d]=%d\n",p, pRFCalibrateInfo->KfreeOffset[p]));
-		
+
 	}
 
 	/* calculate average thermal meter */
@@ -681,11 +681,11 @@ ODM_TXPowerTrackingCallback_ThermalMeter_JaguarSeries2(
 	{
 		ThermalValue = (u1Byte)(ThermalValue_AVG / ThermalValue_AVG_count);
 		ODM_RT_TRACE(pDM_Odm,ODM_COMP_TX_PWR_TRACK, ODM_DBG_LOUD,
-			("AVG Thermal Meter = 0x%X, EEPROMthermalmeter = 0x%X\n", ThermalValue, priv->pmib->dot11RFEntry.ther));					
+			("AVG Thermal Meter = 0x%X, EEPROMthermalmeter = 0x%X\n", ThermalValue, priv->pmib->dot11RFEntry.ther));
 	}
 
 	//4 Calculate delta, delta_LCK, delta_IQK.
-	delta = RTL_ABS(ThermalValue, priv->pmib->dot11RFEntry.ther);	
+	delta = RTL_ABS(ThermalValue, priv->pmib->dot11RFEntry.ther);
 	delta_LCK = RTL_ABS(ThermalValue, pDM_Odm->RFCalibrateInfo.ThermalValue_LCK);
 	delta_IQK = RTL_ABS(ThermalValue, pDM_Odm->RFCalibrateInfo.ThermalValue_IQK);
 	is_increase = ((ThermalValue < priv->pmib->dot11RFEntry.ther) ? 0 : 1);
@@ -706,17 +706,17 @@ ODM_TXPowerTrackingCallback_ThermalMeter_JaguarSeries2(
 		}
 	}
 
-	if (delta_IQK > c.Threshold_IQK) 
+	if (delta_IQK > c.Threshold_IQK)
 	{
 		ODM_RT_TRACE(pDM_Odm, ODM_COMP_TX_PWR_TRACK, ODM_DBG_LOUD, ("delta_IQK(%d) >= Threshold_IQK(%d)\n", delta_IQK, c.Threshold_IQK));
 		pDM_Odm->RFCalibrateInfo.ThermalValue_IQK = ThermalValue;
 		if(c.DoIQK)
 			(*c.DoIQK)(pDM_Odm, TRUE, 0, 0);
-	} 
+	}
 
 	if(!priv->pmib->dot11RFEntry.ther)	/*Don't do power tracking since no calibrated thermal value*/
 		return;
-	
+
 	 //4 Do Power Tracking
 
 	 if(bTSSIenable == TRUE)
@@ -728,108 +728,108 @@ ODM_TXPowerTrackingCallback_ThermalMeter_JaguarSeries2(
 	else if (ThermalValue != pDM_Odm->RFCalibrateInfo.ThermalValue)
 	{
 		ODM_RT_TRACE(pDM_Odm,ODM_COMP_TX_PWR_TRACK, ODM_DBG_LOUD,
-			("\n******** START POWER TRACKING ********\n")); 					
+			("\n******** START POWER TRACKING ********\n"));
 		ODM_RT_TRACE(pDM_Odm,ODM_COMP_TX_PWR_TRACK, ODM_DBG_LOUD,
-			("\nReadback Thermal Meter = 0x%x pre thermal meter 0x%x EEPROMthermalmeter 0x%x\n", ThermalValue, pDM_Odm->RFCalibrateInfo.ThermalValue, priv->pmib->dot11RFEntry.ther)); 			
-				
+			("\nReadback Thermal Meter = 0x%x pre thermal meter 0x%x EEPROMthermalmeter 0x%x\n", ThermalValue, pDM_Odm->RFCalibrateInfo.ThermalValue, priv->pmib->dot11RFEntry.ther));
+
 #ifdef _TRACKING_TABLE_FILE
 		if (priv->pshare->rf_ft_var.pwr_track_file)
-		{				
+		{
 			if (is_increase)			// thermal is higher than base
 			{
-				for (p = ODM_RF_PATH_A; p < c.RfPathCount; p++) 
+				for (p = ODM_RF_PATH_A; p < c.RfPathCount; p++)
 				{
 					switch(p)
 					{
 					case ODM_RF_PATH_B:
 						ODM_RT_TRACE(pDM_Odm, ODM_COMP_TX_PWR_TRACK, ODM_DBG_LOUD,
-							("deltaSwingTableIdx_TUP_B[%d] = %d\n", delta, deltaSwingTableIdx_TUP_B[delta])); 						
+							("deltaSwingTableIdx_TUP_B[%d] = %d\n", delta, deltaSwingTableIdx_TUP_B[delta]));
 						pRFCalibrateInfo->Absolute_OFDMSwingIdx[p] = deltaSwingTableIdx_TUP_B[delta];       // Record delta swing for mix mode power tracking
 						ODM_RT_TRACE(pDM_Odm, ODM_COMP_TX_PWR_TRACK, ODM_DBG_LOUD,
-							("******Temp is higher and pDM_Odm->Absolute_OFDMSwingIdx[ODM_RF_PATH_B] = %d\n", pRFCalibrateInfo->Absolute_OFDMSwingIdx[p]));  
+							("******Temp is higher and pDM_Odm->Absolute_OFDMSwingIdx[ODM_RF_PATH_B] = %d\n", pRFCalibrateInfo->Absolute_OFDMSwingIdx[p]));
 					break;
 
 					case ODM_RF_PATH_C:
 						ODM_RT_TRACE(pDM_Odm, ODM_COMP_TX_PWR_TRACK, ODM_DBG_LOUD,
-							("deltaSwingTableIdx_TUP_C[%d] = %d\n", delta, deltaSwingTableIdx_TUP_C[delta]));								
+							("deltaSwingTableIdx_TUP_C[%d] = %d\n", delta, deltaSwingTableIdx_TUP_C[delta]));
 						pRFCalibrateInfo->Absolute_OFDMSwingIdx[p] = deltaSwingTableIdx_TUP_C[delta];       // Record delta swing for mix mode power tracking
 						ODM_RT_TRACE(pDM_Odm, ODM_COMP_TX_PWR_TRACK, ODM_DBG_LOUD,
-							("******Temp is higher and pDM_Odm->Absolute_OFDMSwingIdx[ODM_RF_PATH_C] = %d\n", pRFCalibrateInfo->Absolute_OFDMSwingIdx[p]));  
+							("******Temp is higher and pDM_Odm->Absolute_OFDMSwingIdx[ODM_RF_PATH_C] = %d\n", pRFCalibrateInfo->Absolute_OFDMSwingIdx[p]));
 					break;
 
 					case ODM_RF_PATH_D:
 						ODM_RT_TRACE(pDM_Odm, ODM_COMP_TX_PWR_TRACK, ODM_DBG_LOUD,
-							("deltaSwingTableIdx_TUP_D[%d] = %d\n", delta, deltaSwingTableIdx_TUP_D[delta]));							
+							("deltaSwingTableIdx_TUP_D[%d] = %d\n", delta, deltaSwingTableIdx_TUP_D[delta]));
 						pRFCalibrateInfo->Absolute_OFDMSwingIdx[p] = deltaSwingTableIdx_TUP_D[delta];       // Record delta swing for mix mode power tracking
 						ODM_RT_TRACE(pDM_Odm, ODM_COMP_TX_PWR_TRACK, ODM_DBG_LOUD,
-							("******Temp is higher and pDM_Odm->Absolute_OFDMSwingIdx[ODM_RF_PATH_D] = %d\n", pRFCalibrateInfo->Absolute_OFDMSwingIdx[p]));  
+							("******Temp is higher and pDM_Odm->Absolute_OFDMSwingIdx[ODM_RF_PATH_D] = %d\n", pRFCalibrateInfo->Absolute_OFDMSwingIdx[p]));
 					break;
 
 					default:
-						ODM_RT_TRACE(pDM_Odm, ODM_COMP_TX_PWR_TRACK, ODM_DBG_LOUD, 
-							("deltaSwingTableIdx_TUP_A[%d] = %d\n", delta, deltaSwingTableIdx_TUP_A[delta]));						
+						ODM_RT_TRACE(pDM_Odm, ODM_COMP_TX_PWR_TRACK, ODM_DBG_LOUD,
+							("deltaSwingTableIdx_TUP_A[%d] = %d\n", delta, deltaSwingTableIdx_TUP_A[delta]));
 						pRFCalibrateInfo->Absolute_OFDMSwingIdx[p] = deltaSwingTableIdx_TUP_A[delta];        // Record delta swing for mix mode power tracking
 						ODM_RT_TRACE(pDM_Odm, ODM_COMP_TX_PWR_TRACK, ODM_DBG_LOUD,
-							("******Temp is higher and pDM_Odm->Absolute_OFDMSwingIdx[ODM_RF_PATH_A] = %d\n", pRFCalibrateInfo->Absolute_OFDMSwingIdx[p]));  
+							("******Temp is higher and pDM_Odm->Absolute_OFDMSwingIdx[ODM_RF_PATH_A] = %d\n", pRFCalibrateInfo->Absolute_OFDMSwingIdx[p]));
 					break;
-					}		
+					}
 				}
 			}
 			else					// thermal is lower than base
 			{
-				for (p = ODM_RF_PATH_A; p < c.RfPathCount; p++) 
+				for (p = ODM_RF_PATH_A; p < c.RfPathCount; p++)
 				{
 					switch(p)
 					{
 					case ODM_RF_PATH_B:
 						ODM_RT_TRACE(pDM_Odm, ODM_COMP_TX_PWR_TRACK, ODM_DBG_LOUD,
-							("deltaSwingTableIdx_TDOWN_B[%d] = %d\n", delta, deltaSwingTableIdx_TDOWN_B[delta]));  
+							("deltaSwingTableIdx_TDOWN_B[%d] = %d\n", delta, deltaSwingTableIdx_TDOWN_B[delta]));
 						pRFCalibrateInfo->Absolute_OFDMSwingIdx[p] = -1 * deltaSwingTableIdx_TDOWN_B[delta];        // Record delta swing for mix mode power tracking
 						ODM_RT_TRACE(pDM_Odm, ODM_COMP_TX_PWR_TRACK, ODM_DBG_LOUD,
-							("******Temp is lower and pDM_Odm->Absolute_OFDMSwingIdx[ODM_RF_PATH_B] = %d\n", pRFCalibrateInfo->Absolute_OFDMSwingIdx[p])); 
+							("******Temp is lower and pDM_Odm->Absolute_OFDMSwingIdx[ODM_RF_PATH_B] = %d\n", pRFCalibrateInfo->Absolute_OFDMSwingIdx[p]));
 					break;
 
 					case ODM_RF_PATH_C:
 						ODM_RT_TRACE(pDM_Odm, ODM_COMP_TX_PWR_TRACK, ODM_DBG_LOUD,
-							("deltaSwingTableIdx_TDOWN_C[%d] = %d\n", delta, deltaSwingTableIdx_TDOWN_C[delta]));  
+							("deltaSwingTableIdx_TDOWN_C[%d] = %d\n", delta, deltaSwingTableIdx_TDOWN_C[delta]));
 						pRFCalibrateInfo->Absolute_OFDMSwingIdx[p] = -1 * deltaSwingTableIdx_TDOWN_C[delta];        // Record delta swing for mix mode power tracking
 						ODM_RT_TRACE(pDM_Odm, ODM_COMP_TX_PWR_TRACK, ODM_DBG_LOUD,
-							("******Temp is lower and pDM_Odm->Absolute_OFDMSwingIdx[ODM_RF_PATH_C] = %d\n", pRFCalibrateInfo->Absolute_OFDMSwingIdx[p]));   
+							("******Temp is lower and pDM_Odm->Absolute_OFDMSwingIdx[ODM_RF_PATH_C] = %d\n", pRFCalibrateInfo->Absolute_OFDMSwingIdx[p]));
 					break;
 
 					case ODM_RF_PATH_D:
 						ODM_RT_TRACE(pDM_Odm, ODM_COMP_TX_PWR_TRACK, ODM_DBG_LOUD,
-							("deltaSwingTableIdx_TDOWN_D[%d] = %d\n", delta, deltaSwingTableIdx_TDOWN_D[delta]));  
+							("deltaSwingTableIdx_TDOWN_D[%d] = %d\n", delta, deltaSwingTableIdx_TDOWN_D[delta]));
 						pRFCalibrateInfo->Absolute_OFDMSwingIdx[p] = -1 * deltaSwingTableIdx_TDOWN_D[delta];        // Record delta swing for mix mode power tracking
 						ODM_RT_TRACE(pDM_Odm, ODM_COMP_TX_PWR_TRACK, ODM_DBG_LOUD,
-							("******Temp is lower and pDM_Odm->Absolute_OFDMSwingIdx[ODM_RF_PATH_D] = %d\n", pRFCalibrateInfo->Absolute_OFDMSwingIdx[p]));  
+							("******Temp is lower and pDM_Odm->Absolute_OFDMSwingIdx[ODM_RF_PATH_D] = %d\n", pRFCalibrateInfo->Absolute_OFDMSwingIdx[p]));
 					break;
 
 					default:
 						ODM_RT_TRACE(pDM_Odm, ODM_COMP_TX_PWR_TRACK, ODM_DBG_LOUD,
-							("deltaSwingTableIdx_TDOWN_A[%d] = %d\n", delta, deltaSwingTableIdx_TDOWN_A[delta]));  
+							("deltaSwingTableIdx_TDOWN_A[%d] = %d\n", delta, deltaSwingTableIdx_TDOWN_A[delta]));
 						pRFCalibrateInfo->Absolute_OFDMSwingIdx[p] = -1 * deltaSwingTableIdx_TDOWN_A[delta];        // Record delta swing for mix mode power tracking
 						ODM_RT_TRACE(pDM_Odm, ODM_COMP_TX_PWR_TRACK, ODM_DBG_LOUD,
-							("******Temp is lower and pDM_Odm->Absolute_OFDMSwingIdx[ODM_RF_PATH_A] = %d\n", pRFCalibrateInfo->Absolute_OFDMSwingIdx[p]));  
+							("******Temp is lower and pDM_Odm->Absolute_OFDMSwingIdx[ODM_RF_PATH_A] = %d\n", pRFCalibrateInfo->Absolute_OFDMSwingIdx[p]));
 					break;
-					}		
+					}
 				}
 			}
-				
+
 			if (is_increase)
 			{
 				ODM_RT_TRACE(pDM_Odm,ODM_COMP_TX_PWR_TRACK, ODM_DBG_LOUD,(">>> increse power ---> \n"));
-				for (p = ODM_RF_PATH_A; p < c.RfPathCount; p++) 
+				for (p = ODM_RF_PATH_A; p < c.RfPathCount; p++)
 				(*c.ODM_TxPwrTrackSetPwr)(pDM_Odm, MIX_MODE, p, 0);
-			} 
+			}
 			else
 			{
 				ODM_RT_TRACE(pDM_Odm,ODM_COMP_TX_PWR_TRACK, ODM_DBG_LOUD,(">>> decrese power --->\n"));
-				for (p = ODM_RF_PATH_A; p < c.RfPathCount; p++) 
+				for (p = ODM_RF_PATH_A; p < c.RfPathCount; p++)
 				(*c.ODM_TxPwrTrackSetPwr)(pDM_Odm, MIX_MODE, p, 0);
 			}
 		}
-#endif		
+#endif
 
 	ODM_RT_TRACE(pDM_Odm,ODM_COMP_TX_PWR_TRACK, ODM_DBG_LOUD,("\n******** END:%s() ********\n", __FUNCTION__));
 	//update thermal meter value
@@ -876,8 +876,8 @@ ODM_TXPowerTrackingCallback_ThermalMeter_JaguarSeries(
 #if RTL8881A_SUPPORT
 	if (pDM_Odm->SupportICType == ODM_RTL8881A) {
 		max_rf_path = 1;
-		if ((get_bonding_type_8881A() == BOND_8881AM ||get_bonding_type_8881A() == BOND_8881AN) 			
-			&& priv->pshare->rf_ft_var.use_intpa8881A && (priv->pmib->dot11RFEntry.phyBandSelect == PHY_BAND_2G))			
+		if ((get_bonding_type_8881A() == BOND_8881AM ||get_bonding_type_8881A() == BOND_8881AN)
+			&& priv->pshare->rf_ft_var.use_intpa8881A && (priv->pmib->dot11RFEntry.phyBandSelect == PHY_BAND_2G))
 			OFDM_min_index = 6;		// intPA - upper bond set to +3 dB (base: -2 dB)ot11RFEntry.phyBandSelect == PHY_BAND_2G))
 		else
 			OFDM_min_index = 10;		//OFDM BB Swing should be less than +1dB, which is required by Arthur and Mimic
@@ -891,35 +891,35 @@ ODM_TXPowerTrackingCallback_ThermalMeter_JaguarSeries(
 
 	//4 Query OFDM BB swing default setting 	Bit[31:21]
 	for(rf_path = 0 ; rf_path < max_rf_path ; rf_path++){
-		ele_D = PHY_QueryBBReg(priv, BBSwingReg[rf_path], 0xffe00000);	
-		ODM_RT_TRACE(pDM_Odm,ODM_COMP_TX_PWR_TRACK, ODM_DBG_LOUD,("0x%x:0x%x ([31:21] = 0x%x)\n",BBSwingReg[rf_path], PHY_QueryBBReg(priv, BBSwingReg[rf_path], bMaskDWord),ele_D)); 			
-		for (i = 0; i < OFDM_TABLE_SIZE_8812; i++) {//4 
+		ele_D = PHY_QueryBBReg(priv, BBSwingReg[rf_path], 0xffe00000);
+		ODM_RT_TRACE(pDM_Odm,ODM_COMP_TX_PWR_TRACK, ODM_DBG_LOUD,("0x%x:0x%x ([31:21] = 0x%x)\n",BBSwingReg[rf_path], PHY_QueryBBReg(priv, BBSwingReg[rf_path], bMaskDWord),ele_D));
+		for (i = 0; i < OFDM_TABLE_SIZE_8812; i++) {//4
 			if (ele_D == OFDMSwingTable_8812[i]) {
 				OFDM_index[rf_path] = (unsigned char)i;
-				ODM_RT_TRACE(pDM_Odm,ODM_COMP_TX_PWR_TRACK, ODM_DBG_LOUD,("OFDM_index[%d]=%d\n",rf_path, OFDM_index[rf_path]));				
+				ODM_RT_TRACE(pDM_Odm,ODM_COMP_TX_PWR_TRACK, ODM_DBG_LOUD,("OFDM_index[%d]=%d\n",rf_path, OFDM_index[rf_path]));
 				break;
 			}
 		}
 	}
-#if 0	
+#if 0
 	//Query OFDM path A default setting 	Bit[31:21]
-	ele_D = PHY_QueryBBReg(priv, 0xc1c, 0xffe00000);	
-	ODM_RT_TRACE(pDM_Odm,ODM_COMP_TX_PWR_TRACK, ODM_DBG_LOUD,("0xc1c:0x%x ([31:21] = 0x%x)\n", PHY_QueryBBReg(priv, 0xc1c, bMaskDWord),ele_D)); 			
-	for (i = 0; i < OFDM_TABLE_SIZE_8812; i++) {//4 
+	ele_D = PHY_QueryBBReg(priv, 0xc1c, 0xffe00000);
+	ODM_RT_TRACE(pDM_Odm,ODM_COMP_TX_PWR_TRACK, ODM_DBG_LOUD,("0xc1c:0x%x ([31:21] = 0x%x)\n", PHY_QueryBBReg(priv, 0xc1c, bMaskDWord),ele_D));
+	for (i = 0; i < OFDM_TABLE_SIZE_8812; i++) {//4
 		if (ele_D == OFDMSwingTable_8812[i]) {
 			OFDM_index[0] = (unsigned char)i;
-			ODM_RT_TRACE(pDM_Odm,ODM_COMP_TX_PWR_TRACK, ODM_DBG_LOUD,("OFDM_index[0]=%d\n", OFDM_index[0]));				
+			ODM_RT_TRACE(pDM_Odm,ODM_COMP_TX_PWR_TRACK, ODM_DBG_LOUD,("OFDM_index[0]=%d\n", OFDM_index[0]));
 			break;
 		}
 	}
 	//Query OFDM path B default setting
 	if (rf == 2) {
-		ele_D = PHY_QueryBBReg(priv, 0xe1c, 0xffe00000);		
-		ODM_RT_TRACE(pDM_Odm,ODM_COMP_TX_PWR_TRACK, ODM_DBG_LOUD,("0xe1c:0x%x ([32:21] = 0x%x)\n", PHY_QueryBBReg(priv, 0xe1c, bMaskDWord),ele_D)); 			
+		ele_D = PHY_QueryBBReg(priv, 0xe1c, 0xffe00000);
+		ODM_RT_TRACE(pDM_Odm,ODM_COMP_TX_PWR_TRACK, ODM_DBG_LOUD,("0xe1c:0x%x ([32:21] = 0x%x)\n", PHY_QueryBBReg(priv, 0xe1c, bMaskDWord),ele_D));
 		for (i = 0; i < OFDM_TABLE_SIZE_8812; i++) {
 			if (ele_D == OFDMSwingTable_8812[i]) {
 				OFDM_index[1] = (unsigned char)i;
-				ODM_RT_TRACE(pDM_Odm,ODM_COMP_TX_PWR_TRACK, ODM_DBG_LOUD,("OFDM_index[1]=%d\n", OFDM_index[1])); 			
+				ODM_RT_TRACE(pDM_Odm,ODM_COMP_TX_PWR_TRACK, ODM_DBG_LOUD,("OFDM_index[1]=%d\n", OFDM_index[1]));
 				break;
 			}
 		}
@@ -950,23 +950,23 @@ ODM_TXPowerTrackingCallback_ThermalMeter_JaguarSeries(
 			//printk("AVG Thermal Meter = 0x%x \n", ThermalValue);
 		}
 	}
-	
+
 
 	//4 If necessary,  do power tracking
 
 	if(!priv->pmib->dot11RFEntry.ther) /*Don't do power tracking since no calibrated thermal value*/
-		return;  
+		return;
 
 	if (ThermalValue != priv->pshare->ThermalValue) {
-		ODM_RT_TRACE(pDM_Odm,ODM_COMP_TX_PWR_TRACK, ODM_DBG_LOUD,("\n******** START POWER TRACKING ********\n")); 					
-		ODM_RT_TRACE(pDM_Odm,ODM_COMP_TX_PWR_TRACK, ODM_DBG_LOUD,("\nReadback Thermal Meter = 0x%x pre thermal meter 0x%x EEPROMthermalmeter 0x%x\n", ThermalValue, priv->pshare->ThermalValue, priv->pmib->dot11RFEntry.ther)); 			
+		ODM_RT_TRACE(pDM_Odm,ODM_COMP_TX_PWR_TRACK, ODM_DBG_LOUD,("\n******** START POWER TRACKING ********\n"));
+		ODM_RT_TRACE(pDM_Odm,ODM_COMP_TX_PWR_TRACK, ODM_DBG_LOUD,("\nReadback Thermal Meter = 0x%x pre thermal meter 0x%x EEPROMthermalmeter 0x%x\n", ThermalValue, priv->pshare->ThermalValue, priv->pmib->dot11RFEntry.ther));
 		delta = RTL_ABS(ThermalValue, priv->pmib->dot11RFEntry.ther);
 		delta_LCK = RTL_ABS(ThermalValue, priv->pshare->ThermalValue_LCK);
 		is_decrease = ((ThermalValue < priv->pmib->dot11RFEntry.ther) ? 1 : 0);
-		//if (priv->pmib->dot11RFEntry.phyBandSelect == PHY_BAND_5G) 
+		//if (priv->pmib->dot11RFEntry.phyBandSelect == PHY_BAND_5G)
 		{
 #ifdef _TRACKING_TABLE_FILE
-			if (priv->pshare->rf_ft_var.pwr_track_file) {				
+			if (priv->pshare->rf_ft_var.pwr_track_file) {
 				for (rf_path = 0; rf_path < max_rf_path; rf_path++) {
 					ODM_RT_TRACE(pDM_Odm,ODM_COMP_TX_PWR_TRACK, ODM_DBG_LOUD,("Diff: (%s)%d ==> get index from table : %d)\n", (is_decrease?"-":"+"), delta, get_tx_tracking_index(priv, channel, rf_path, delta, is_decrease, 0)));
 					if (is_decrease) {
@@ -977,21 +977,21 @@ ODM_TXPowerTrackingCallback_ThermalMeter_JaguarSeries(
 						if (pDM_Odm->SupportICType == ODM_RTL8881A){
 							if(priv->pshare->rf_ft_var.pwrtrk_TxAGC_enable){
 								if(priv->pshare->AddTxAGC){//TxAGC has been added
-									AddTxPower88XX_AC(priv,0); 
+									AddTxPower88XX_AC(priv,0);
 									priv->pshare->AddTxAGC = 0;
 									priv->pshare->AddTxAGC_index = 0;
 								}
 							}
 						}
-#endif				
+#endif
 					} else {
 
 						OFDM_index[rf_path] = priv->pshare->OFDM_index0[rf_path] - get_tx_tracking_index(priv, channel, rf_path, delta, is_decrease, 0);
 #if 0// RTL8881A_SUPPORT
-						if(pDM_Odm->SupportICType == ODM_RTL8881A){ 
+						if(pDM_Odm->SupportICType == ODM_RTL8881A){
 							if(priv->pshare->rf_ft_var.pwrtrk_TxAGC_enable){
 								if(OFDM_index[i] < OFDM_min_index){
-									priv->pshare->AddTxAGC_index = (OFDM_min_index - OFDM_index[i])/2;  // Calculate Remnant TxAGC Value,  2 index for 1 TxAGC 
+									priv->pshare->AddTxAGC_index = (OFDM_min_index - OFDM_index[i])/2;  // Calculate Remnant TxAGC Value,  2 index for 1 TxAGC
 									AddTxPower88XX_AC(priv,priv->pshare->AddTxAGC_index);
 									priv->pshare->AddTxAGC = 1;     //AddTxAGC Flag = 1
 									OFDM_index[i] = OFDM_min_index;
@@ -1016,25 +1016,21 @@ ODM_TXPowerTrackingCallback_ThermalMeter_JaguarSeries(
 			//4 Set new BB swing index
 			for (rf_path = 0; rf_path < max_rf_path; rf_path++) {
 				PHY_SetBBReg(priv, BBSwingReg[rf_path], 0xffe00000, OFDMSwingTable_8812[(unsigned int)OFDM_index[rf_path]]);
-				ODM_RT_TRACE(pDM_Odm,ODM_COMP_TX_PWR_TRACK, ODM_DBG_LOUD,("Readback 0x%x[31:21] = 0x%x, OFDM_index:%d\n",BBSwingReg[rf_path], PHY_QueryBBReg(priv, BBSwingReg[rf_path], 0xffe00000), OFDM_index[rf_path]));				
+				ODM_RT_TRACE(pDM_Odm,ODM_COMP_TX_PWR_TRACK, ODM_DBG_LOUD,("Readback 0x%x[31:21] = 0x%x, OFDM_index:%d\n",BBSwingReg[rf_path], PHY_QueryBBReg(priv, BBSwingReg[rf_path], 0xffe00000), OFDM_index[rf_path]));
 			}
 
 		}
 		if (delta_LCK > 8) {
 			RTL_W8(0x522, 0xff);
 			Reg0x18 = PHY_QueryRFReg(priv, RF_PATH_A, 0x18, bMask20Bits, 1);
-			PHY_SetRFReg(priv, RF_PATH_A, 0xB4, BIT(14), 1);			
+			PHY_SetRFReg(priv, RF_PATH_A, 0xB4, BIT(14), 1);
 			PHY_SetRFReg(priv, RF_PATH_A, 0x18, BIT(15), 1);
             delay_ms(200); // frequency deviation
 			PHY_SetRFReg(priv, RF_PATH_A, 0xB4, BIT(14), 0);
 			PHY_SetRFReg(priv, RF_PATH_A, 0x18, bMask20Bits, Reg0x18);
-			#ifdef CONFIG_RTL_8812_SUPPORT
-			if (GET_CHIP_VER(priv)== VERSION_8812E)			
-				UpdateBBRFVal8812(priv, priv->pmib->dot11RFEntry.dot11channel);	
-			#endif
 			RTL_W8(0x522, 0x0);
 			priv->pshare->ThermalValue_LCK = ThermalValue;
-		}	
+		}
 		ODM_RT_TRACE(pDM_Odm,ODM_COMP_TX_PWR_TRACK, ODM_DBG_LOUD,("\n******** END:%s() ********\n", __FUNCTION__));
 
 		//update thermal meter value
@@ -1058,21 +1054,21 @@ ODM_TXPowerTrackingCallback_ThermalMeter(
 {
 	PDM_ODM_T		pDM_Odm = (PDM_ODM_T)pDM_VOID;
 	PODM_RF_CAL_T	pRFCalibrateInfo = &(pDM_Odm->RFCalibrateInfo);
-	
+
 
 #if (RTL8197F_SUPPORT == 1 || RTL8822B_SUPPORT == 1)
 	if (pDM_Odm->SupportICType == ODM_RTL8197F || pDM_Odm->SupportICType == ODM_RTL8822B) {
 		ODM_TXPowerTrackingCallback_ThermalMeter_JaguarSeries3(pDM_Odm);
 		return;
 	}
-#endif    
+#endif
 #if (RTL8814A_SUPPORT == 1)		/*use this function to do power tracking after 8814 by YuChen*/
 	if (pDM_Odm->SupportICType & ODM_RTL8814A) {
 		ODM_TXPowerTrackingCallback_ThermalMeter_JaguarSeries2(pDM_Odm);
 		return;
 		}
-#endif    
-#if (RTL8881A_SUPPORT || RTL8812A_SUPPORT == 1)    
+#endif
+#if (RTL8881A_SUPPORT || RTL8812A_SUPPORT == 1)
 	if (pDM_Odm->SupportICType & ODM_RTL8812 || pDM_Odm->SupportICType & ODM_RTL8881A) {
 		ODM_TXPowerTrackingCallback_ThermalMeter_JaguarSeries(pDM_Odm);
 		return;
@@ -1090,11 +1086,11 @@ ODM_TXPowerTrackingCallback_ThermalMeter(
 	HAL_DATA_TYPE	*pHalData = GET_HAL_DATA(Adapter);
 	//PMGNT_INFO      		pMgntInfo = &Adapter->MgntInfo;
 #endif
-	
+
 
 	u1Byte			ThermalValue = 0, delta, delta_LCK, delta_IQK, offset;
 	u1Byte			ThermalValue_AVG_count = 0;
-	u4Byte			ThermalValue_AVG = 0;	
+	u4Byte			ThermalValue_AVG = 0;
 //	s4Byte			ele_A=0, ele_D, TempCCk, X, value32;
 //	s4Byte			Y, ele_C=0;
 //	s1Byte			OFDM_index[2], CCK_index=0, OFDM_index_old[2]={0,0}, CCK_index_old=0, index;
@@ -1117,30 +1113,30 @@ ODM_TXPowerTrackingCallback_ThermalMeter(
 
 
 	//4 1. The following TWO tables decide the final index of OFDM/CCK swing table.
-	s1Byte			deltaSwingTableIdx[2][index_mapping_NUM_88E] = { 
+	s1Byte			deltaSwingTableIdx[2][index_mapping_NUM_88E] = {
                         // {{Power decreasing(lower temperature)}, {Power increasing(higher temperature)}}
                         {0,0,2,3,4,4,5,6,7,7,8,9,10,10,11}, {0,0,1,2,3,4,4,4,4,5,7,8,9,9,10}
-                    };	
+                    };
 	u1Byte			thermalThreshold[2][index_mapping_NUM_88E]={
                         // {{Power decreasing(lower temperature)}, {Power increasing(higher temperature)}}
 					    {0,2,4,6,8,10,12,14,16,18,20,22,24,26,27}, {0,2,4,6,8,10,12,14,16,18,20,22,25,25,25}
-                    };		
+                    };
 
 #if (DM_ODM_SUPPORT_TYPE & ODM_AP)
 	prtl8192cd_priv	priv = pDM_Odm->priv;
-#endif	
+#endif
 
 	//4 2. Initilization ( 7 steps in total )
 
 	ConfigureTxpowerTrack(pDM_Odm, &c);
-	
+
 	pDM_Odm->RFCalibrateInfo.TXPowerTrackingCallbackCnt++; //cosa add for debug
 	pDM_Odm->RFCalibrateInfo.bTXPowerTrackingInit = TRUE;
-    
-#if (MP_DRIVER == 1)      
+
+#if (MP_DRIVER == 1)
     pDM_Odm->RFCalibrateInfo.TxPowerTrackControl = pHalData->TxPowerTrackControl; // <Kordan> We should keep updating the control variable according to HalData.
     // <Kordan> RFCalibrateInfo.RegA24 will be initialized when ODM HW configuring, but MP configures with para files.
-    pDM_Odm->RFCalibrateInfo.RegA24 = 0x090e1317; 
+    pDM_Odm->RFCalibrateInfo.RegA24 = 0x090e1317;
 #endif
 
 #if (DM_ODM_SUPPORT_TYPE == ODM_AP) && defined(MP_TEST)
@@ -1156,30 +1152,30 @@ ODM_TXPowerTrackingCallback_ThermalMeter(
 		pDM_Odm->RFCalibrateInfo.TM_Trigger = 1;
 		return;
 	}
-*/	
+*/
 	ThermalValue = (u1Byte)ODM_GetRFReg(pDM_Odm, RF_PATH_A, c.ThermalRegAddr, 0xfc00);	//0x42: RF Reg[15:10] 88E
 #if !(DM_ODM_SUPPORT_TYPE & ODM_AP)
 	if( ! ThermalValue || ! pDM_Odm->RFCalibrateInfo.TxPowerTrackControl)
 #else
 	if( ! pDM_Odm->RFCalibrateInfo.TxPowerTrackControl)
-#endif		
+#endif
         return;
 
 	//4 3. Initialize ThermalValues of RFCalibrateInfo
-	
+
 	if( ! pDM_Odm->RFCalibrateInfo.ThermalValue)
 	{
-		pDM_Odm->RFCalibrateInfo.ThermalValue_LCK = ThermalValue;				
-		pDM_Odm->RFCalibrateInfo.ThermalValue_IQK = ThermalValue;										
-	}			
+		pDM_Odm->RFCalibrateInfo.ThermalValue_LCK = ThermalValue;
+		pDM_Odm->RFCalibrateInfo.ThermalValue_IQK = ThermalValue;
+	}
 
 	if(pDM_Odm->RFCalibrateInfo.bReloadtxpowerindex)
 	{
-		ODM_RT_TRACE(pDM_Odm,ODM_COMP_TX_PWR_TRACK, ODM_DBG_LOUD,("reload ofdm index for band switch\n"));				
+		ODM_RT_TRACE(pDM_Odm,ODM_COMP_TX_PWR_TRACK, ODM_DBG_LOUD,("reload ofdm index for band switch\n"));
 	}
 
 	//4 4. Calculate average thermal meter
-	
+
 	pDM_Odm->RFCalibrateInfo.ThermalValue_AVG[pDM_Odm->RFCalibrateInfo.ThermalValue_AVG_index] = ThermalValue;
 	pDM_Odm->RFCalibrateInfo.ThermalValue_AVG_index++;
 	if(pDM_Odm->RFCalibrateInfo.ThermalValue_AVG_index == c.AverageThermalNum)
@@ -1198,41 +1194,41 @@ ODM_TXPowerTrackingCallback_ThermalMeter(
 	{
 		// Give the new thermo value a weighting
 		ThermalValue_AVG += (ThermalValue*4);
-		
+
 		ThermalValue = (u1Byte)(ThermalValue_AVG / (ThermalValue_AVG_count+4));
-		ODM_RT_TRACE(pDM_Odm,ODM_COMP_TX_PWR_TRACK, ODM_DBG_LOUD,("AVG Thermal Meter = 0x%x \n", ThermalValue));					
+		ODM_RT_TRACE(pDM_Odm,ODM_COMP_TX_PWR_TRACK, ODM_DBG_LOUD,("AVG Thermal Meter = 0x%x \n", ThermalValue));
 	}
-			
+
 	//4 5. Calculate delta, delta_LCK, delta_IQK.
-	
+
 	delta 	  = (ThermalValue > pDM_Odm->RFCalibrateInfo.ThermalValue)?(ThermalValue - pDM_Odm->RFCalibrateInfo.ThermalValue):(pDM_Odm->RFCalibrateInfo.ThermalValue - ThermalValue);
 	delta_LCK = (ThermalValue > pDM_Odm->RFCalibrateInfo.ThermalValue_LCK)?(ThermalValue - pDM_Odm->RFCalibrateInfo.ThermalValue_LCK):(pDM_Odm->RFCalibrateInfo.ThermalValue_LCK - ThermalValue);
 	delta_IQK = (ThermalValue > pDM_Odm->RFCalibrateInfo.ThermalValue_IQK)?(ThermalValue - pDM_Odm->RFCalibrateInfo.ThermalValue_IQK):(pDM_Odm->RFCalibrateInfo.ThermalValue_IQK - ThermalValue);
-		
-	//4 6. If necessary, do LCK.	
+
+	//4 6. If necessary, do LCK.
 	if (!(pDM_Odm->SupportICType & ODM_RTL8821)) {
 	/*if((delta_LCK > pHalData->Delta_LCK) && (pHalData->Delta_LCK != 0))*/
-		if (delta_LCK >= c.Threshold_IQK) { 
+		if (delta_LCK >= c.Threshold_IQK) {
 			/*Delta temperature is equal to or larger than 20 centigrade.*/
 			pDM_Odm->RFCalibrateInfo.ThermalValue_LCK = ThermalValue;
 			(*c.PHY_LCCalibrate)(pDM_Odm);
 		}
 	}
 
-	//3 7. If necessary, move the index of swing table to adjust Tx power.	
-	
+	//3 7. If necessary, move the index of swing table to adjust Tx power.
+
 	if (delta > 0 && pDM_Odm->RFCalibrateInfo.TxPowerTrackControl)
 	{
-#if (DM_ODM_SUPPORT_TYPE & (ODM_WIN|ODM_CE))			
-	    delta = ThermalValue > pHalData->EEPROMThermalMeter?(ThermalValue - pHalData->EEPROMThermalMeter):(pHalData->EEPROMThermalMeter - ThermalValue);		
+#if (DM_ODM_SUPPORT_TYPE & (ODM_WIN|ODM_CE))
+	    delta = ThermalValue > pHalData->EEPROMThermalMeter?(ThermalValue - pHalData->EEPROMThermalMeter):(pHalData->EEPROMThermalMeter - ThermalValue);
 #else
-	    delta = (ThermalValue > pDM_Odm->priv->pmib->dot11RFEntry.ther)?(ThermalValue - pDM_Odm->priv->pmib->dot11RFEntry.ther):(pDM_Odm->priv->pmib->dot11RFEntry.ther - ThermalValue);		
+	    delta = (ThermalValue > pDM_Odm->priv->pmib->dot11RFEntry.ther)?(ThermalValue - pDM_Odm->priv->pmib->dot11RFEntry.ther):(pDM_Odm->priv->pmib->dot11RFEntry.ther - ThermalValue);
 #endif
 
 
 		//4 7.1 The Final Power Index = BaseIndex + PowerIndexOffset
-		
-#if (DM_ODM_SUPPORT_TYPE & (ODM_WIN|ODM_CE))				
+
+#if (DM_ODM_SUPPORT_TYPE & (ODM_WIN|ODM_CE))
 		if(ThermalValue > pHalData->EEPROMThermalMeter) {
 #else
 		if(ThermalValue > pDM_Odm->priv->pmib->dot11RFEntry.ther) {
@@ -1242,30 +1238,30 @@ ODM_TXPowerTrackingCallback_ThermalMeter(
 			pDM_Odm->RFCalibrateInfo.DeltaPowerIndex =  deltaSwingTableIdx[POWER_INC][offset];
 
         } else {
-        
+
 			CALCULATE_SWINGTALBE_OFFSET(offset, POWER_DEC, index_mapping_NUM_88E, delta);
 			pDM_Odm->RFCalibrateInfo.DeltaPowerIndexLast = pDM_Odm->RFCalibrateInfo.DeltaPowerIndex;
 			pDM_Odm->RFCalibrateInfo.DeltaPowerIndex = (-1)*deltaSwingTableIdx[POWER_DEC][offset];
         }
-		
+
 		if (pDM_Odm->RFCalibrateInfo.DeltaPowerIndex == pDM_Odm->RFCalibrateInfo.DeltaPowerIndexLast)
 			pDM_Odm->RFCalibrateInfo.PowerIndexOffset = 0;
 		else
 			pDM_Odm->RFCalibrateInfo.PowerIndexOffset = pDM_Odm->RFCalibrateInfo.DeltaPowerIndex - pDM_Odm->RFCalibrateInfo.DeltaPowerIndexLast;
-		
-	    for(i = 0; i < rf; i++) 		
+
+	    for(i = 0; i < rf; i++)
 	    	pDM_Odm->RFCalibrateInfo.OFDM_index[i] = pRFCalibrateInfo->BbSwingIdxOfdmBase + pDM_Odm->RFCalibrateInfo.PowerIndexOffset;
 		pDM_Odm->RFCalibrateInfo.CCK_index = pRFCalibrateInfo->BbSwingIdxCckBase + pDM_Odm->RFCalibrateInfo.PowerIndexOffset;
 
-		pRFCalibrateInfo->BbSwingIdxCck = pDM_Odm->RFCalibrateInfo.CCK_index;	
-		pRFCalibrateInfo->BbSwingIdxOfdm[RF_PATH_A] = pDM_Odm->RFCalibrateInfo.OFDM_index[RF_PATH_A];	
+		pRFCalibrateInfo->BbSwingIdxCck = pDM_Odm->RFCalibrateInfo.CCK_index;
+		pRFCalibrateInfo->BbSwingIdxOfdm[RF_PATH_A] = pDM_Odm->RFCalibrateInfo.OFDM_index[RF_PATH_A];
 
 		ODM_RT_TRACE(pDM_Odm,ODM_COMP_TX_PWR_TRACK, ODM_DBG_LOUD,("The 'CCK' final index(%d) = BaseIndex(%d) + PowerIndexOffset(%d)\n", pRFCalibrateInfo->BbSwingIdxCck, pRFCalibrateInfo->BbSwingIdxCckBase, pDM_Odm->RFCalibrateInfo.PowerIndexOffset));
 		ODM_RT_TRACE(pDM_Odm,ODM_COMP_TX_PWR_TRACK, ODM_DBG_LOUD,("The 'OFDM' final index(%d) = BaseIndex(%d) + PowerIndexOffset(%d)\n", pRFCalibrateInfo->BbSwingIdxOfdm[RF_PATH_A], pRFCalibrateInfo->BbSwingIdxOfdmBase, pDM_Odm->RFCalibrateInfo.PowerIndexOffset));
 
 		//4 7.1 Handle boundary conditions of index.
-		
-		
+
+
 		for(i = 0; i < rf; i++)
 		{
 			if(pDM_Odm->RFCalibrateInfo.OFDM_index[i] > OFDM_max_index)
@@ -1291,15 +1287,15 @@ ODM_TXPowerTrackingCallback_ThermalMeter(
 	}
 	ODM_RT_TRACE(pDM_Odm,ODM_COMP_TX_PWR_TRACK, ODM_DBG_LOUD,
 		("TxPowerTracking: [CCK] Swing Current Index: %d, Swing Base Index: %d\n", pDM_Odm->RFCalibrateInfo.CCK_index, pRFCalibrateInfo->BbSwingIdxCckBase));
-				
+
 	ODM_RT_TRACE(pDM_Odm,ODM_COMP_TX_PWR_TRACK, ODM_DBG_LOUD,
 		("TxPowerTracking: [OFDM] Swing Current Index: %d, Swing Base Index: %d\n", pDM_Odm->RFCalibrateInfo.OFDM_index[RF_PATH_A], pRFCalibrateInfo->BbSwingIdxOfdmBase));
-	
+
 	if (pDM_Odm->RFCalibrateInfo.PowerIndexOffset != 0 && pDM_Odm->RFCalibrateInfo.TxPowerTrackControl)
 	{
 		//4 7.2 Configure the Swing Table to adjust Tx Power.
-		
-			pDM_Odm->RFCalibrateInfo.bTxPowerChanged = TRUE; // Always TRUE after Tx Power is adjusted by power tracking.			
+
+			pDM_Odm->RFCalibrateInfo.bTxPowerChanged = TRUE; // Always TRUE after Tx Power is adjusted by power tracking.
 			//
 			// 2012/04/23 MH According to Luke's suggestion, we can not write BB digital
 			// to increase TX power. Otherwise, EVM will be bad.
@@ -1308,14 +1304,14 @@ ODM_TXPowerTrackingCallback_ThermalMeter(
 			if (ThermalValue > pDM_Odm->RFCalibrateInfo.ThermalValue)
 			{
 				//ODM_RT_TRACE(pDM_Odm,ODM_COMP_TX_PWR_TRACK, ODM_DBG_LOUD,
-				//	("Temperature Increasing: delta_pi: %d , delta_t: %d, Now_t: %d, EFUSE_t: %d, Last_t: %d\n", 
-				//	pDM_Odm->RFCalibrateInfo.PowerIndexOffset, delta, ThermalValue, pHalData->EEPROMThermalMeter, pDM_Odm->RFCalibrateInfo.ThermalValue));	
+				//	("Temperature Increasing: delta_pi: %d , delta_t: %d, Now_t: %d, EFUSE_t: %d, Last_t: %d\n",
+				//	pDM_Odm->RFCalibrateInfo.PowerIndexOffset, delta, ThermalValue, pHalData->EEPROMThermalMeter, pDM_Odm->RFCalibrateInfo.ThermalValue));
 			}
 			else if (ThermalValue < pDM_Odm->RFCalibrateInfo.ThermalValue)// Low temperature
 			{
 				//ODM_RT_TRACE(pDM_Odm,ODM_COMP_TX_PWR_TRACK, ODM_DBG_LOUD,
 				//	("Temperature Decreasing: delta_pi: %d , delta_t: %d, Now_t: %d, EFUSE_t: %d, Last_t: %d\n",
-				//		pDM_Odm->RFCalibrateInfo.PowerIndexOffset, delta, ThermalValue, pHalData->EEPROMThermalMeter, pDM_Odm->RFCalibrateInfo.ThermalValue));				
+				//		pDM_Odm->RFCalibrateInfo.PowerIndexOffset, delta, ThermalValue, pHalData->EEPROMThermalMeter, pDM_Odm->RFCalibrateInfo.ThermalValue));
 			}
 #if !(DM_ODM_SUPPORT_TYPE & ODM_AP)
 			if (ThermalValue > pHalData->EEPROMThermalMeter)
@@ -1324,28 +1320,28 @@ ODM_TXPowerTrackingCallback_ThermalMeter(
 #endif
 			{
 //				ODM_RT_TRACE(pDM_Odm,ODM_COMP_TX_PWR_TRACK, ODM_DBG_LOUD,("Temperature(%d) hugher than PG value(%d), increases the power by TxAGC\n", ThermalValue, pHalData->EEPROMThermalMeter));
-				(*c.ODM_TxPwrTrackSetPwr)(pDM_Odm, TXAGC, 0, 0);							
+				(*c.ODM_TxPwrTrackSetPwr)(pDM_Odm, TXAGC, 0, 0);
 			}
 			else
 			{
 	//			ODM_RT_TRACE(pDM_Odm,ODM_COMP_TX_PWR_TRACK, ODM_DBG_LOUD,("Temperature(%d) lower than PG value(%d), increases the power by TxAGC\n", ThermalValue, pHalData->EEPROMThermalMeter));
-				(*c.ODM_TxPwrTrackSetPwr)(pDM_Odm, BBSWING, RF_PATH_A, Indexforchannel);	
+				(*c.ODM_TxPwrTrackSetPwr)(pDM_Odm, BBSWING, RF_PATH_A, Indexforchannel);
 				if(is2T)
-					(*c.ODM_TxPwrTrackSetPwr)(pDM_Odm, BBSWING, RF_PATH_B, Indexforchannel);				
+					(*c.ODM_TxPwrTrackSetPwr)(pDM_Odm, BBSWING, RF_PATH_B, Indexforchannel);
 			}
-			
+
 			pRFCalibrateInfo->BbSwingIdxCckBase = pRFCalibrateInfo->BbSwingIdxCck;
 			pRFCalibrateInfo->BbSwingIdxOfdmBase = pRFCalibrateInfo->BbSwingIdxOfdm[RF_PATH_A];
 			pDM_Odm->RFCalibrateInfo.ThermalValue = ThermalValue;
 
 	}
-		
+
 #if !(DM_ODM_SUPPORT_TYPE & ODM_AP)
 	// if((delta_IQK > pHalData->Delta_IQK) && (pHalData->Delta_IQK != 0))
 	if ((delta_IQK >= 8)) // Delta temperature is equal to or larger than 20 centigrade.
 		(*c.DoIQK)(pDM_Odm, delta_IQK, ThermalValue, 8);
-#endif		
-			
+#endif
+
 	ODM_RT_TRACE(pDM_Odm,ODM_COMP_TX_PWR_TRACK, ODM_DBG_LOUD,("<===dm_TXPowerTrackingCallback_ThermalMeter_8188E\n"));
 
 	pDM_Odm->RFCalibrateInfo.TXPowercount = 0;
@@ -1393,12 +1389,12 @@ phy_PathA_IQK_8192C(
 	else
 	{
 		PHY_SetBBReg(pAdapter, rTx_IQK_Tone_A, bMaskDWord, 0x10008c22);
-		PHY_SetBBReg(pAdapter, rRx_IQK_Tone_A, bMaskDWord, 0x10008c22);	
+		PHY_SetBBReg(pAdapter, rRx_IQK_Tone_A, bMaskDWord, 0x10008c22);
 	}
 
 	PHY_SetBBReg(pAdapter, rTx_IQK_PI_A, bMaskDWord, 0x82140102);
 
-	PHY_SetBBReg(pAdapter, rRx_IQK_PI_A, bMaskDWord, configPathB ? 0x28160202 : 
+	PHY_SetBBReg(pAdapter, rRx_IQK_PI_A, bMaskDWord, configPathB ? 0x28160202 :
 		IS_81xxC_VENDOR_UMC_B_CUT(pHalData->VersionID)?0x28160202:0x28160502);
 
 	//path-B IQK setting
@@ -1418,7 +1414,7 @@ phy_PathA_IQK_8192C(
 	RTPRINT(FINIT, INIT_IQK, ("One shot, path A LOK & IQK!\n"));
 	PHY_SetBBReg(pAdapter, rIQK_AGC_Pts, bMaskDWord, 0xf9000000);
 	PHY_SetBBReg(pAdapter, rIQK_AGC_Pts, bMaskDWord, 0xf8000000);
-	
+
 	// delay x ms
 	RTPRINT(FINIT, INIT_IQK, ("Delay %d ms for One shot, path A LOK & IQK.\n", IQK_DELAY_TIME));
 	PlatformStallExecution(IQK_DELAY_TIME*1000);
@@ -1433,7 +1429,7 @@ phy_PathA_IQK_8192C(
 	regEA4= PHY_QueryBBReg(pAdapter, rRx_Power_Before_IQK_A_2, bMaskDWord);
 	RTPRINT(FINIT, INIT_IQK, ("0xea4 = 0x%x\n", regEA4));
 
-	if(!(regEAC & BIT28) &&		
+	if(!(regEAC & BIT28) &&
 		(((regE94 & 0x03FF0000)>>16) != 0x142) &&
 		(((regE9C & 0x03FF0000)>>16) != 0x42) )
 		result |= 0x01;
@@ -1446,7 +1442,7 @@ phy_PathA_IQK_8192C(
 		result |= 0x02;
 	else
 		RTPRINT(FINIT, INIT_IQK, ("Path A Rx IQK fail!!\n"));
-	
+
 	return result;
 
 
@@ -1495,7 +1491,7 @@ phy_PathB_IQK_8192C(
 		result |= 0x02;
 	else
 		RTPRINT(FINIT, INIT_IQK, ("Path B Rx IQK fail!!\n"));
-	
+
 
 	return result;
 
@@ -1512,8 +1508,8 @@ phy_PathAFillIQKMatrix(
 {
 	u4Byte	Oldval_0, X, TX0_A, reg;
 	s4Byte	Y, TX0_C;
-	HAL_DATA_TYPE	*pHalData = GET_HAL_DATA(pAdapter);	
-	
+	HAL_DATA_TYPE	*pHalData = GET_HAL_DATA(pAdapter);
+
 	RTPRINT(FINIT, INIT_IQK, ("Path A IQ Calibration %s !\n",(bIQKOK)?"Success":"Failed"));
 
 	if(final_candidate == 0xFF)
@@ -1525,20 +1521,20 @@ phy_PathAFillIQKMatrix(
 
 		X = result[final_candidate][0];
 		if ((X & 0x00000200) != 0)
-			X = X | 0xFFFFFC00;				
+			X = X | 0xFFFFFC00;
 		TX0_A = (X * Oldval_0) >> 8;
 		RTPRINT(FINIT, INIT_IQK, ("X = 0x%x, TX0_A = 0x%x, Oldval_0 0x%x\n", X, TX0_A, Oldval_0));
 		PHY_SetBBReg(pAdapter, rOFDM0_XATxIQImbalance, 0x3FF, TX0_A);
 		PHY_SetBBReg(pAdapter, rOFDM0_ECCAThreshold, BIT(31), ((X * Oldval_0>>7) & 0x1));
-     
+
 		Y = result[final_candidate][1];
 		if ((Y & 0x00000200) != 0)
-			Y = Y | 0xFFFFFC00;		
+			Y = Y | 0xFFFFFC00;
 
 		//path B IQK result + 3
 		if(pAdapter->interfaceIndex == 1 && pHalData->CurrentBandType == BAND_ON_5G)
 			Y += 3;
-		
+
 		TX0_C = (Y * Oldval_0) >> 8;
 		RTPRINT(FINIT, INIT_IQK, ("Y = 0x%x, TX = 0x%x\n", Y, TX0_C));
 		PHY_SetBBReg(pAdapter, rOFDM0_XCTxAFE, 0xF0000000, ((TX0_C&0x3C0)>>6));
@@ -1547,13 +1543,13 @@ phy_PathAFillIQKMatrix(
 
 		if(bTxOnly)
 		{
-			RTPRINT(FINIT, INIT_IQK, ("phy_PathAFillIQKMatrix only Tx OK\n"));		
+			RTPRINT(FINIT, INIT_IQK, ("phy_PathAFillIQKMatrix only Tx OK\n"));
 			return;
 		}
 
 		reg = result[final_candidate][2];
 		PHY_SetBBReg(pAdapter, rOFDM0_XARxIQImbalance, 0x3FF, reg);
-	
+
 		reg = result[final_candidate][3] & 0x3F;
 		PHY_SetBBReg(pAdapter, rOFDM0_XARxIQImbalance, 0xFC00, reg);
 
@@ -1573,8 +1569,8 @@ phy_PathBFillIQKMatrix(
 {
 	u4Byte	Oldval_1, X, TX1_A, reg;
 	s4Byte	Y, TX1_C;
-	HAL_DATA_TYPE	*pHalData = GET_HAL_DATA(pAdapter);	
-	
+	HAL_DATA_TYPE	*pHalData = GET_HAL_DATA(pAdapter);
+
 	RTPRINT(FINIT, INIT_IQK, ("Path B IQ Calibration %s !\n",(bIQKOK)?"Success":"Failed"));
 
 	if(final_candidate == 0xFF)
@@ -1586,7 +1582,7 @@ phy_PathBFillIQKMatrix(
 
 		X = result[final_candidate][4];
 		if ((X & 0x00000200) != 0)
-			X = X | 0xFFFFFC00;		
+			X = X | 0xFFFFFC00;
 		TX1_A = (X * Oldval_1) >> 8;
 		RTPRINT(FINIT, INIT_IQK, ("X = 0x%x, TX1_A = 0x%x\n", X, TX1_A));
 		PHY_SetBBReg(pAdapter, rOFDM0_XBTxIQImbalance, 0x3FF, TX1_A);
@@ -1594,8 +1590,8 @@ phy_PathBFillIQKMatrix(
 
 		Y = result[final_candidate][5];
 		if ((Y & 0x00000200) != 0)
-			Y = Y | 0xFFFFFC00;		
-		if(pHalData->CurrentBandType == BAND_ON_5G)		
+			Y = Y | 0xFFFFFC00;
+		if(pHalData->CurrentBandType == BAND_ON_5G)
 			Y += 3;		//temp modify for preformance
 		TX1_C = (Y * Oldval_1) >> 8;
 		RTPRINT(FINIT, INIT_IQK, ("Y = 0x%x, TX1_C = 0x%x\n", Y, TX1_C));
@@ -1608,7 +1604,7 @@ phy_PathBFillIQKMatrix(
 
 		reg = result[final_candidate][6];
 		PHY_SetBBReg(pAdapter, rOFDM0_XBRxIQImbalance, 0x3FF, reg);
-	
+
 		reg = result[final_candidate][7] & 0x3F;
 		PHY_SetBBReg(pAdapter, rOFDM0_XBRxIQImbalance, 0xFC00, reg);
 
@@ -1618,7 +1614,7 @@ phy_PathBFillIQKMatrix(
 }
 
 
-BOOLEAN							
+BOOLEAN
 phy_SimularityCompare_92C(
 	IN	PADAPTER	pAdapter,
 	IN	s4Byte 		result[][8],
@@ -1627,17 +1623,17 @@ phy_SimularityCompare_92C(
 	)
 {
 	u4Byte		i, j, diff, SimularityBitMap, bound = 0;
-	HAL_DATA_TYPE	*pHalData = GET_HAL_DATA(pAdapter);	
+	HAL_DATA_TYPE	*pHalData = GET_HAL_DATA(pAdapter);
 	u1Byte		final_candidate[2] = {0xFF, 0xFF};	//for path A and path B
 	BOOLEAN		bResult = TRUE, is2T = IS_92C_SERIAL( pHalData->VersionID);
-	
+
 	if(is2T)
 		bound = 8;
 	else
 		bound = 4;
 
 	SimularityBitMap = 0;
-	
+
 	for( i = 0; i < bound; i++ )
 	{
 		diff = (result[c1][i] > result[c2][i]) ? (result[c1][i] - result[c2][i]) : (result[c2][i] - result[c1][i]);
@@ -1650,13 +1646,13 @@ phy_SimularityCompare_92C(
 				else if (result[c2][i]+result[c2][i+1] == 0)
 					final_candidate[(i/4)] = c1;
 				else
-					SimularityBitMap = SimularityBitMap|(1<<i);					
+					SimularityBitMap = SimularityBitMap|(1<<i);
 			}
 			else
 				SimularityBitMap = SimularityBitMap|(1<<i);
 		}
 	}
-	
+
 	if ( SimularityBitMap == 0)
 	{
 		for( i = 0; i < (bound/4); i++ )
@@ -1681,28 +1677,28 @@ phy_SimularityCompare_92C(
 		for(i = 4; i < 8; i++)
 			result[3][i] = result[c1][i];
 		return FALSE;
-	}	
-	else		
+	}
+	else
 		return FALSE;
-	
+
 }
 
 /*
 return FALSE => do IQK again
 */
-BOOLEAN							
+BOOLEAN
 phy_SimularityCompare(
 	IN	PADAPTER	pAdapter,
 	IN	s4Byte 		result[][8],
 	IN	u1Byte		 c1,
 	IN	u1Byte		 c2
 	)
-{	
-	return phy_SimularityCompare_92C(pAdapter, result, c1, c2);	
+{
+	return phy_SimularityCompare_92C(pAdapter, result, c1, c2);
 
 }
 
-VOID	
+VOID
 phy_IQCalibrate_8192C(
 	IN	PADAPTER	pAdapter,
 	IN	s4Byte 		result[][8],
@@ -1713,46 +1709,46 @@ phy_IQCalibrate_8192C(
 	HAL_DATA_TYPE	*pHalData = GET_HAL_DATA(pAdapter);
 	u4Byte			i;
 	u1Byte			PathAOK, PathBOK;
-	u4Byte			ADDA_REG[IQK_ADDA_REG_NUM] = {	
-						rFPGA0_XCD_SwitchControl, 	rBlue_Tooth, 	
+	u4Byte			ADDA_REG[IQK_ADDA_REG_NUM] = {
+						rFPGA0_XCD_SwitchControl, 	rBlue_Tooth,
 						rRx_Wait_CCA, 		rTx_CCK_RFON,
-						rTx_CCK_BBON, 	rTx_OFDM_RFON, 	
+						rTx_CCK_BBON, 	rTx_OFDM_RFON,
 						rTx_OFDM_BBON, 	rTx_To_Rx,
-						rTx_To_Tx, 		rRx_CCK, 	
+						rTx_To_Tx, 		rRx_CCK,
 						rRx_OFDM, 		rRx_Wait_RIFS,
-						rRx_TO_Rx, 		rStandby, 	
+						rRx_TO_Rx, 		rStandby,
 						rSleep, 			rPMPD_ANAEN };
 	u4Byte			IQK_MAC_REG[IQK_MAC_REG_NUM] = {
-						REG_TXPAUSE, 		REG_BCN_CTRL,	
+						REG_TXPAUSE, 		REG_BCN_CTRL,
 						REG_BCN_CTRL_1,	REG_GPIO_MUXCFG};
-					
-	//since 92C & 92D have the different define in IQK_BB_REG	
+
+	//since 92C & 92D have the different define in IQK_BB_REG
 	u4Byte	IQK_BB_REG_92C[IQK_BB_REG_NUM] = {
-							rOFDM0_TRxPathEnable, 		rOFDM0_TRMuxPar,	
+							rOFDM0_TRxPathEnable, 		rOFDM0_TRMuxPar,
 							rFPGA0_XCD_RFInterfaceSW,	rConfig_AntA,	rConfig_AntB,
-							rFPGA0_XAB_RFInterfaceSW,	rFPGA0_XA_RFInterfaceOE,	
-							rFPGA0_XB_RFInterfaceOE,	/*rFPGA0_RFMOD*/ rCCK0_AFESetting	
-							};	
+							rFPGA0_XAB_RFInterfaceSW,	rFPGA0_XA_RFInterfaceOE,
+							rFPGA0_XB_RFInterfaceOE,	/*rFPGA0_RFMOD*/ rCCK0_AFESetting
+							};
 
 	u4Byte	IQK_BB_REG_92D[IQK_BB_REG_NUM_92D] = {	//for normal
-							rFPGA0_XAB_RFInterfaceSW,	rFPGA0_XA_RFInterfaceOE,	
+							rFPGA0_XAB_RFInterfaceSW,	rFPGA0_XA_RFInterfaceOE,
 							rFPGA0_XB_RFInterfaceOE,	rOFDM0_TRMuxPar,
-							rFPGA0_XCD_RFInterfaceSW,	rOFDM0_TRxPathEnable,	
+							rFPGA0_XCD_RFInterfaceSW,	rOFDM0_TRxPathEnable,
 							/*rFPGA0_RFMOD*/ rCCK0_AFESetting,			rFPGA0_AnalogParameter4,
-							rOFDM0_XAAGCCore1,		rOFDM0_XBAGCCore1						
-						};		
+							rOFDM0_XAAGCCore1,		rOFDM0_XBAGCCore1
+						};
 #if MP_DRIVER
 	const u4Byte	retryCount = 9;
 #else
 	const u4Byte	retryCount = 2;
 #endif
 	//Neil Chen--2011--05--19--
-       //3 Path Div	
+       //3 Path Div
 	u1Byte                 rfPathSwitch=0x0;
 
-	// Note: IQ calibration must be performed after loading 
-	// 		PHY_REG.txt , and radio_a, radio_b.txt	
-	
+	// Note: IQ calibration must be performed after loading
+	// 		PHY_REG.txt , and radio_a, radio_b.txt
+
 	u4Byte bbvalue;
 
 	if(t==0)
@@ -1761,38 +1757,38 @@ phy_IQCalibrate_8192C(
 		//	RTPRINT(FINIT, INIT_IQK, ("phy_IQCalibrate_8192C()==>0x%08x\n",bbvalue));
 
 			RTPRINT(FINIT, INIT_IQK, ("IQ Calibration for %s\n", (is2T ? "2T2R" : "1T1R")));
-	
+
 	 	// Save ADDA parameters, turn Path A ADDA on
 	 	phy_SaveADDARegisters(pAdapter, ADDA_REG, pHalData->ADDA_backup, IQK_ADDA_REG_NUM);
 		phy_SaveMACRegisters(pAdapter, IQK_MAC_REG, pHalData->IQK_MAC_backup);
 		phy_SaveADDARegisters(pAdapter, IQK_BB_REG_92C, pHalData->IQK_BB_backup, IQK_BB_REG_NUM);
 	}
-	
+
  	phy_PathADDAOn(pAdapter, ADDA_REG, TRUE, is2T);
-	
+
 	if(t==0)
 	{
 		pHalData->bRfPiEnable = (u1Byte)PHY_QueryBBReg(pAdapter, rFPGA0_XA_HSSIParameter1, BIT(8));
 	}
-	
+
 	if(!pHalData->bRfPiEnable){
 		// Switch BB to PI mode to do IQ Calibration.
 		phy_PIModeSwitch(pAdapter, TRUE);
 	}
-	
+
 	//MAC settings
 	phy_MACSettingCalibration(pAdapter, IQK_MAC_REG, pHalData->IQK_MAC_backup);
-	
-	//PHY_SetBBReg(pAdapter, rFPGA0_RFMOD, BIT24, 0x00);		
+
+	//PHY_SetBBReg(pAdapter, rFPGA0_RFMOD, BIT24, 0x00);
 	PHY_SetBBReg(pAdapter, rCCK0_AFESetting, bMaskDWord, (0x0f000000 | (PHY_QueryBBReg(pAdapter, rCCK0_AFESetting, bMaskDWord))) );
 	PHY_SetBBReg(pAdapter, rOFDM0_TRxPathEnable, bMaskDWord, 0x03a05600);
 	PHY_SetBBReg(pAdapter, rOFDM0_TRMuxPar, bMaskDWord, 0x000800e4);
 	PHY_SetBBReg(pAdapter, rFPGA0_XCD_RFInterfaceSW, bMaskDWord, 0x22204000);
 	{
 		PHY_SetBBReg(pAdapter, rFPGA0_XAB_RFInterfaceSW, BIT10, 0x01);
-		PHY_SetBBReg(pAdapter, rFPGA0_XAB_RFInterfaceSW, BIT26, 0x01);	
+		PHY_SetBBReg(pAdapter, rFPGA0_XAB_RFInterfaceSW, BIT26, 0x01);
 		PHY_SetBBReg(pAdapter, rFPGA0_XA_RFInterfaceOE, BIT10, 0x00);
-		PHY_SetBBReg(pAdapter, rFPGA0_XB_RFInterfaceOE, BIT10, 0x00);	
+		PHY_SetBBReg(pAdapter, rFPGA0_XB_RFInterfaceOE, BIT10, 0x00);
 	}
 
 	if(is2T)
@@ -1804,14 +1800,14 @@ phy_IQCalibrate_8192C(
 	{
 		//Page B init
 		PHY_SetBBReg(pAdapter, rConfig_AntA, bMaskDWord, 0x00080000);
-		
+
 		if(is2T)
 		{
 			PHY_SetBBReg(pAdapter, rConfig_AntB, bMaskDWord, 0x00080000);
 		}
 	}
 	// IQ calibration setting
-	RTPRINT(FINIT, INIT_IQK, ("IQK setting!\n"));		
+	RTPRINT(FINIT, INIT_IQK, ("IQK setting!\n"));
 	PHY_SetBBReg(pAdapter, rFPGA0_IQK, 0xffffff00, 0x808000);
 	PHY_SetBBReg(pAdapter, rTx_IQK, bMaskDWord, 0x01007c00);
 	PHY_SetBBReg(pAdapter, rRx_IQK, bMaskDWord, 0x01004800);
@@ -1829,14 +1825,14 @@ phy_IQCalibrate_8192C(
 		else if (i == (retryCount-1) && PathAOK == 0x01)	//Tx IQK OK
 		{
 			RTPRINT(FINIT, INIT_IQK, ("Path A IQK Only  Tx Success!!\n"));
-			
+
 			result[t][0] = (PHY_QueryBBReg(pAdapter, rTx_Power_Before_IQK_A, bMaskDWord)&0x3FF0000)>>16;
-			result[t][1] = (PHY_QueryBBReg(pAdapter, rTx_Power_After_IQK_A, bMaskDWord)&0x3FF0000)>>16;			
+			result[t][1] = (PHY_QueryBBReg(pAdapter, rTx_Power_After_IQK_A, bMaskDWord)&0x3FF0000)>>16;
 		}
 	}
 
-	if(0x00 == PathAOK){		
-		RTPRINT(FINIT, INIT_IQK, ("Path A IQK failed!!\n"));		
+	if(0x00 == PathAOK){
+		RTPRINT(FINIT, INIT_IQK, ("Path A IQK failed!!\n"));
 	}
 
 	if(is2T){
@@ -1859,12 +1855,12 @@ phy_IQCalibrate_8192C(
 			{
 				RTPRINT(FINIT, INIT_IQK, ("Path B Only Tx IQK Success!!\n"));
 				result[t][4] = (PHY_QueryBBReg(pAdapter, rTx_Power_Before_IQK_B, bMaskDWord)&0x3FF0000)>>16;
-				result[t][5] = (PHY_QueryBBReg(pAdapter, rTx_Power_After_IQK_B, bMaskDWord)&0x3FF0000)>>16;				
+				result[t][5] = (PHY_QueryBBReg(pAdapter, rTx_Power_After_IQK_B, bMaskDWord)&0x3FF0000)>>16;
 			}
 		}
 
-		if(0x00 == PathBOK){		
-			RTPRINT(FINIT, INIT_IQK, ("Path B IQK failed!!\n"));		
+		if(0x00 == PathBOK){
+			RTPRINT(FINIT, INIT_IQK, ("Path B IQK failed!!\n"));
 		}
 	}
 
@@ -1884,25 +1880,25 @@ phy_IQCalibrate_8192C(
 
 		// Reload MAC parameters
 		phy_ReloadMACRegisters(pAdapter, IQK_MAC_REG, pHalData->IQK_MAC_backup);
-		
+
 	 	// Reload BB parameters
 		phy_ReloadADDARegisters(pAdapter, IQK_BB_REG_92C, pHalData->IQK_BB_backup, IQK_BB_REG_NUM);
-		
+
 		/*Restore RX initial gain*/
 		PHY_SetBBReg(pAdapter, rFPGA0_XA_LSSIParameter, bMaskDWord, 0x00032ed3);
 		if (is2T)
 			PHY_SetBBReg(pAdapter, rFPGA0_XB_LSSIParameter, bMaskDWord, 0x00032ed3);
 		//load 0xe30 IQC default value
-		PHY_SetBBReg(pAdapter, rTx_IQK_Tone_A, bMaskDWord, 0x01008c00);		
-		PHY_SetBBReg(pAdapter, rRx_IQK_Tone_A, bMaskDWord, 0x01008c00);				
-		
+		PHY_SetBBReg(pAdapter, rTx_IQK_Tone_A, bMaskDWord, 0x01008c00);
+		PHY_SetBBReg(pAdapter, rRx_IQK_Tone_A, bMaskDWord, 0x01008c00);
+
 	}
 	RTPRINT(FINIT, INIT_IQK, ("phy_IQCalibrate_8192C() <==\n"));
-	
+
 }
 
 
-VOID	
+VOID
 phy_LCCalibrate92C(
 	IN	PADAPTER	pAdapter,
 	IN	BOOLEAN		is2T
@@ -1928,7 +1924,7 @@ phy_LCCalibrate92C(
 
 		//Path-B
 		if(is2T)
-			RF_Bmode = PHY_QueryRFReg(pAdapter, RF_PATH_B, RF_AC, bMask12Bits);	
+			RF_Bmode = PHY_QueryRFReg(pAdapter, RF_PATH_B, RF_AC, bMask12Bits);
 
 		//2. Set RF mode = standby mode
 		//Path-A
@@ -1936,37 +1932,37 @@ phy_LCCalibrate92C(
 
 		//Path-B
 		if(is2T)
-			PHY_SetRFReg(pAdapter, RF_PATH_B, RF_AC, bMask12Bits, (RF_Bmode&0x8FFFF)|0x10000);			
+			PHY_SetRFReg(pAdapter, RF_PATH_B, RF_AC, bMask12Bits, (RF_Bmode&0x8FFFF)|0x10000);
 	}
-	
+
 	//3. Read RF reg18
 	LC_Cal = PHY_QueryRFReg(pAdapter, RF_PATH_A, RF_CHNLBW, bMask12Bits);
-	
+
 	//4. Set LC calibration begin	bit15
 	PHY_SetRFReg(pAdapter, RF_PATH_A, RF_CHNLBW, bMask12Bits, LC_Cal|0x08000);
 
-	delay_ms(100);		
+	delay_ms(100);
 
 
 	//Restore original situation
-	if((tmpReg&0x70) != 0)	//Deal with contisuous TX case 
-	{  
+	if((tmpReg&0x70) != 0)	//Deal with contisuous TX case
+	{
 		//Path-A
 		PlatformEFIOWrite1Byte(pAdapter, 0xd03, tmpReg);
 		PHY_SetRFReg(pAdapter, RF_PATH_A, RF_AC, bMask12Bits, RF_Amode);
-		
+
 		//Path-B
 		if(is2T)
 			PHY_SetRFReg(pAdapter, RF_PATH_B, RF_AC, bMask12Bits, RF_Bmode);
 	}
 	else // Deal with Packet TX case
 	{
-		PlatformEFIOWrite1Byte(pAdapter, REG_TXPAUSE, 0x00);	
+		PlatformEFIOWrite1Byte(pAdapter, REG_TXPAUSE, 0x00);
 	}
 }
 
 
-VOID	
+VOID
 phy_LCCalibrate(
 	IN	PADAPTER	pAdapter,
 	IN	BOOLEAN		is2T
@@ -1982,7 +1978,7 @@ phy_LCCalibrate(
 #define		APK_CURVE_REG_NUM 4
 #define		PATH_NUM		2
 
-VOID	
+VOID
 phy_APCalibrate_8192C(
 	IN	PADAPTER	pAdapter,
 	IN	s1Byte 		delta,
@@ -1995,44 +1991,44 @@ phy_APCalibrate_8192C(
 	u4Byte			tmpReg, index, offset, i, apkbound;
 	u1Byte			path, pathbound = PATH_NUM;
 	u4Byte			BB_backup[APK_BB_REG_NUM];
-	u4Byte			BB_REG[APK_BB_REG_NUM] = {	
-						rFPGA1_TxBlock, 	rOFDM0_TRxPathEnable, 
-						rFPGA0_RFMOD, 	rOFDM0_TRMuxPar, 
-						rFPGA0_XCD_RFInterfaceSW,	rFPGA0_XAB_RFInterfaceSW, 
+	u4Byte			BB_REG[APK_BB_REG_NUM] = {
+						rFPGA1_TxBlock, 	rOFDM0_TRxPathEnable,
+						rFPGA0_RFMOD, 	rOFDM0_TRMuxPar,
+						rFPGA0_XCD_RFInterfaceSW,	rFPGA0_XAB_RFInterfaceSW,
 						rFPGA0_XA_RFInterfaceOE, 	rFPGA0_XB_RFInterfaceOE	};
-	u4Byte			BB_AP_MODE[APK_BB_REG_NUM] = {	
-						0x00000020, 0x00a05430, 0x02040000, 
+	u4Byte			BB_AP_MODE[APK_BB_REG_NUM] = {
+						0x00000020, 0x00a05430, 0x02040000,
 						0x000800e4, 0x00204000 };
-	u4Byte			BB_normal_AP_MODE[APK_BB_REG_NUM] = {	
-						0x00000020, 0x00a05430, 0x02040000, 
-						0x000800e4, 0x22204000 };						
+	u4Byte			BB_normal_AP_MODE[APK_BB_REG_NUM] = {
+						0x00000020, 0x00a05430, 0x02040000,
+						0x000800e4, 0x22204000 };
 
 	u4Byte			AFE_backup[IQK_ADDA_REG_NUM];
-	u4Byte			AFE_REG[IQK_ADDA_REG_NUM] = {	
-						rFPGA0_XCD_SwitchControl, 	rBlue_Tooth, 	
+	u4Byte			AFE_REG[IQK_ADDA_REG_NUM] = {
+						rFPGA0_XCD_SwitchControl, 	rBlue_Tooth,
 						rRx_Wait_CCA, 		rTx_CCK_RFON,
-						rTx_CCK_BBON, 	rTx_OFDM_RFON, 	
+						rTx_CCK_BBON, 	rTx_OFDM_RFON,
 						rTx_OFDM_BBON, 	rTx_To_Rx,
-						rTx_To_Tx, 		rRx_CCK, 	
+						rTx_To_Tx, 		rRx_CCK,
 						rRx_OFDM, 		rRx_Wait_RIFS,
-						rRx_TO_Rx, 		rStandby, 	
+						rRx_TO_Rx, 		rStandby,
 						rSleep, 			rPMPD_ANAEN };
 
 	u4Byte			MAC_backup[IQK_MAC_REG_NUM];
 	u4Byte			MAC_REG[IQK_MAC_REG_NUM] = {
-						REG_TXPAUSE, 		REG_BCN_CTRL,	
+						REG_TXPAUSE, 		REG_BCN_CTRL,
 						REG_BCN_CTRL_1,	REG_GPIO_MUXCFG};
 
 	u4Byte			APK_RF_init_value[PATH_NUM][APK_BB_REG_NUM] = {
 					{0x0852c, 0x1852c, 0x5852c, 0x1852c, 0x5852c},
 					{0x2852e, 0x0852e, 0x3852e, 0x0852e, 0x0852e}
-					};	
+					};
 
 	u4Byte			APK_normal_RF_init_value[PATH_NUM][APK_BB_REG_NUM] = {
 					{0x0852c, 0x0a52c, 0x3a52c, 0x5a52c, 0x5a52c},	//path settings equal to path b settings
 					{0x0852c, 0x0a52c, 0x5a52c, 0x5a52c, 0x5a52c}
 					};
-	
+
 	u4Byte			APK_RF_value_0[PATH_NUM][APK_BB_REG_NUM] = {
 					{0x52019, 0x52014, 0x52013, 0x5200f, 0x5208d},
 					{0x5201a, 0x52019, 0x52016, 0x52033, 0x52050}
@@ -2042,10 +2038,10 @@ phy_APCalibrate_8192C(
 					{0x52019, 0x52017, 0x52010, 0x5200d, 0x5206a},	//path settings equal to path b settings
 					{0x52019, 0x52017, 0x52010, 0x5200d, 0x5206a}
 					};
-#if 0	
+#if 0
 	u4Byte			APK_RF_value_A[PATH_NUM][APK_BB_REG_NUM] = {
-					{0x1adb0, 0x1adb0, 0x1ada0, 0x1ad90, 0x1ad80},		
-					{0x00fb0, 0x00fb0, 0x00fa0, 0x00f90, 0x00f80}						
+					{0x1adb0, 0x1adb0, 0x1ada0, 0x1ad90, 0x1ad80},
+					{0x00fb0, 0x00fb0, 0x00fa0, 0x00f90, 0x00f80}
 					};
 #endif
 	u4Byte			AFE_on_off[PATH_NUM] = {
@@ -2056,21 +2052,21 @@ phy_APCalibrate_8192C(
 
 	u4Byte			APK_normal_offset[PATH_NUM] = {
 					rConfig_Pmpd_AntA, rConfig_Pmpd_AntB};
-					
+
 	u4Byte			APK_value[PATH_NUM] = {
-					0x92fc0000, 0x12fc0000};					
+					0x92fc0000, 0x12fc0000};
 
 	u4Byte			APK_normal_value[PATH_NUM] = {
-					0x92680000, 0x12680000};					
+					0x92680000, 0x12680000};
 
 	s1Byte			APK_delta_mapping[APK_BB_REG_NUM][13] = {
 					{-4, -3, -2, -2, -1, -1, 0, 1, 2, 3, 4, 5, 6},
-					{-4, -3, -2, -2, -1, -1, 0, 1, 2, 3, 4, 5, 6},											
+					{-4, -3, -2, -2, -1, -1, 0, 1, 2, 3, 4, 5, 6},
 					{-6, -4, -2, -2, -1, -1, 0, 1, 2, 3, 4, 5, 6},
 					{-1, -1, -1, -1, -1, -1, 0, 1, 2, 3, 4, 5, 6},
 					{-11, -9, -7, -5, -3, -1, 0, 0, 0, 0, 0, 0, 0}
 					};
-	
+
 	u4Byte			APK_normal_setting_value_1[13] = {
 					0x01017018, 0xf7ed8f84, 0x1b1a1816, 0x2522201e, 0x322e2b28,
 					0x433f3a36, 0x5b544e49, 0x7b726a62, 0xa69a8f84, 0xdfcfc0b3,
@@ -2083,17 +2079,17 @@ phy_APCalibrate_8192C(
 					0x0017001b, 0x00110014, 0x000c000f, 0x0009000b, 0x00070008,
 					0x00050006
 					};
-	
+
 	u4Byte			APK_result[PATH_NUM][APK_BB_REG_NUM];	//val_1_1a, val_1_2a, val_2a, val_3a, val_4a
 //	u4Byte			AP_curve[PATH_NUM][APK_CURVE_REG_NUM];
 
 	s4Byte			BB_offset, delta_V, delta_offset;
 
 #if MP_DRIVER == 1
-	PMPT_CONTEXT	pMptCtx = &(pAdapter->MptCtx);	
+	PMPT_CONTEXT	pMptCtx = &(pAdapter->MptCtx);
 
 	pMptCtx->APK_bound[0] = 45;
-	pMptCtx->APK_bound[1] = 52;		
+	pMptCtx->APK_bound[1] = 52;
 #endif
 
 	RTPRINT(FINIT, INIT_IQK, ("==>phy_APCalibrate_8192C() delta %d\n", delta));
@@ -2126,21 +2122,21 @@ phy_APCalibrate_8192C(
 			APK_RF_value_0[path][index] = APK_normal_RF_value_0[path][index];
 		}
 		BB_AP_MODE[index] = BB_normal_AP_MODE[index];
-	}			
+	}
 
 	apkbound = 6;
-	
+
 	//save BB default value
 	for(index = 0; index < APK_BB_REG_NUM ; index++)
 	{
-		if(index == 0)		//skip 
-			continue;				
+		if(index == 0)		//skip
+			continue;
 		BB_backup[index] = PHY_QueryBBReg(pAdapter, BB_REG[index], bMaskDWord);
 	}
-	
-	//save MAC default value													
+
+	//save MAC default value
 	phy_SaveMACRegisters(pAdapter, MAC_REG, MAC_backup);
-	
+
 	//save AFE default value
 	phy_SaveADDARegisters(pAdapter, AFE_REG, AFE_backup, IQK_ADDA_REG_NUM);
 
@@ -2152,131 +2148,131 @@ phy_APCalibrate_8192C(
 		{
 			//path A APK
 			//load APK setting
-			//path-A		
+			//path-A
 			offset = rPdp_AntA;
-			for(index = 0; index < 11; index ++)			
+			for(index = 0; index < 11; index ++)
 			{
 				PHY_SetBBReg(pAdapter, offset, bMaskDWord, APK_normal_setting_value_1[index]);
-				RTPRINT(FINIT, INIT_IQK, ("phy_APCalibrate_8192C() offset 0x%x value 0x%x\n", offset, PHY_QueryBBReg(pAdapter, offset, bMaskDWord))); 	
-				
+				RTPRINT(FINIT, INIT_IQK, ("phy_APCalibrate_8192C() offset 0x%x value 0x%x\n", offset, PHY_QueryBBReg(pAdapter, offset, bMaskDWord)));
+
 				offset += 0x04;
 			}
-			
+
 			PHY_SetBBReg(pAdapter, rConfig_Pmpd_AntB, bMaskDWord, 0x12680000);
-			
+
 			offset = rConfig_AntA;
-			for(; index < 13; index ++) 		
+			for(; index < 13; index ++)
 			{
 				PHY_SetBBReg(pAdapter, offset, bMaskDWord, APK_normal_setting_value_1[index]);
-				RTPRINT(FINIT, INIT_IQK, ("phy_APCalibrate_8192C() offset 0x%x value 0x%x\n", offset, PHY_QueryBBReg(pAdapter, offset, bMaskDWord))); 	
-				
+				RTPRINT(FINIT, INIT_IQK, ("phy_APCalibrate_8192C() offset 0x%x value 0x%x\n", offset, PHY_QueryBBReg(pAdapter, offset, bMaskDWord)));
+
 				offset += 0x04;
-			}	
-			
+			}
+
 			//page-B1
 			PHY_SetBBReg(pAdapter, rFPGA0_IQK, 0xffffff00, 0x400000);
-		
+
 			//path A
 			offset = rPdp_AntA;
 			for(index = 0; index < 16; index++)
 			{
-				PHY_SetBBReg(pAdapter, offset, bMaskDWord, APK_normal_setting_value_2[index]);		
-				RTPRINT(FINIT, INIT_IQK, ("phy_APCalibrate_8192C() offset 0x%x value 0x%x\n", offset, PHY_QueryBBReg(pAdapter, offset, bMaskDWord))); 	
-				
+				PHY_SetBBReg(pAdapter, offset, bMaskDWord, APK_normal_setting_value_2[index]);
+				RTPRINT(FINIT, INIT_IQK, ("phy_APCalibrate_8192C() offset 0x%x value 0x%x\n", offset, PHY_QueryBBReg(pAdapter, offset, bMaskDWord)));
+
 				offset += 0x04;
-			}				
-			PHY_SetBBReg(pAdapter, rFPGA0_IQK, 0xffffff00, 0);							
+			}
+			PHY_SetBBReg(pAdapter, rFPGA0_IQK, 0xffffff00, 0);
 		}
 		else if(path == RF_PATH_B)
 		{
 			//path B APK
 			//load APK setting
-			//path-B		
+			//path-B
 			offset = rPdp_AntB;
-			for(index = 0; index < 10; index ++)			
+			for(index = 0; index < 10; index ++)
 			{
 				PHY_SetBBReg(pAdapter, offset, bMaskDWord, APK_normal_setting_value_1[index]);
-				RTPRINT(FINIT, INIT_IQK, ("phy_APCalibrate_8192C() offset 0x%x value 0x%x\n", offset, PHY_QueryBBReg(pAdapter, offset, bMaskDWord))); 	
-				
+				RTPRINT(FINIT, INIT_IQK, ("phy_APCalibrate_8192C() offset 0x%x value 0x%x\n", offset, PHY_QueryBBReg(pAdapter, offset, bMaskDWord)));
+
 				offset += 0x04;
 			}
 			PHY_SetBBReg(pAdapter, rConfig_Pmpd_AntA, bMaskDWord, 0x12680000);
-			
+
 			PHY_SetBBReg(pAdapter, rConfig_Pmpd_AntB, bMaskDWord, 0x12680000);
-			
+
 			offset = rConfig_AntA;
 			index = 11;
-			for(; index < 13; index ++) //offset 0xb68, 0xb6c		
+			for(; index < 13; index ++) //offset 0xb68, 0xb6c
 			{
 				PHY_SetBBReg(pAdapter, offset, bMaskDWord, APK_normal_setting_value_1[index]);
-				RTPRINT(FINIT, INIT_IQK, ("phy_APCalibrate_8192C() offset 0x%x value 0x%x\n", offset, PHY_QueryBBReg(pAdapter, offset, bMaskDWord))); 	
-				
+				RTPRINT(FINIT, INIT_IQK, ("phy_APCalibrate_8192C() offset 0x%x value 0x%x\n", offset, PHY_QueryBBReg(pAdapter, offset, bMaskDWord)));
+
 				offset += 0x04;
-			}	
-			
+			}
+
 			//page-B1
 			PHY_SetBBReg(pAdapter, rFPGA0_IQK, 0xffffff00, 0x400000);
-			
+
 			//path B
 			offset = 0xb60;
 			for(index = 0; index < 16; index++)
 			{
-				PHY_SetBBReg(pAdapter, offset, bMaskDWord, APK_normal_setting_value_2[index]);		
-				RTPRINT(FINIT, INIT_IQK, ("phy_APCalibrate_8192C() offset 0x%x value 0x%x\n", offset, PHY_QueryBBReg(pAdapter, offset, bMaskDWord))); 	
-				
+				PHY_SetBBReg(pAdapter, offset, bMaskDWord, APK_normal_setting_value_2[index]);
+				RTPRINT(FINIT, INIT_IQK, ("phy_APCalibrate_8192C() offset 0x%x value 0x%x\n", offset, PHY_QueryBBReg(pAdapter, offset, bMaskDWord)));
+
 				offset += 0x04;
-			}				
-			PHY_SetBBReg(pAdapter, rFPGA0_IQK, 0xffffff00, 0);							
+			}
+			PHY_SetBBReg(pAdapter, rFPGA0_IQK, 0xffffff00, 0);
 		}
-	
+
 		//save RF default value
 		regD[path] = PHY_QueryRFReg(pAdapter, path, RF_TXBIAS_A, bRFRegOffsetMask);
-		
+
 		//Path A AFE all on, path B AFE All off or vise versa
 		for(index = 0; index < IQK_ADDA_REG_NUM ; index++)
 			PHY_SetBBReg(pAdapter, AFE_REG[index], bMaskDWord, AFE_on_off[path]);
-		RTPRINT(FINIT, INIT_IQK, ("phy_APCalibrate_8192C() offset 0xe70 %x\n", PHY_QueryBBReg(pAdapter, rRx_Wait_CCA, bMaskDWord)));		
+		RTPRINT(FINIT, INIT_IQK, ("phy_APCalibrate_8192C() offset 0xe70 %x\n", PHY_QueryBBReg(pAdapter, rRx_Wait_CCA, bMaskDWord)));
 
 		//BB to AP mode
 		if(path == 0)
-		{				
+		{
 			for(index = 0; index < APK_BB_REG_NUM ; index++)
 			{
 
-				if(index == 0)		//skip 
-					continue;			
+				if(index == 0)		//skip
+					continue;
 				else if (index < 5)
 				PHY_SetBBReg(pAdapter, BB_REG[index], bMaskDWord, BB_AP_MODE[index]);
 				else if (BB_REG[index] == 0x870)
 					PHY_SetBBReg(pAdapter, BB_REG[index], bMaskDWord, BB_backup[index]|BIT10|BIT26);
 				else
-					PHY_SetBBReg(pAdapter, BB_REG[index], BIT10, 0x0);					
+					PHY_SetBBReg(pAdapter, BB_REG[index], BIT10, 0x0);
 			}
 
-			PHY_SetBBReg(pAdapter, rTx_IQK_Tone_A, bMaskDWord, 0x01008c00);			
-			PHY_SetBBReg(pAdapter, rRx_IQK_Tone_A, bMaskDWord, 0x01008c00);					
+			PHY_SetBBReg(pAdapter, rTx_IQK_Tone_A, bMaskDWord, 0x01008c00);
+			PHY_SetBBReg(pAdapter, rRx_IQK_Tone_A, bMaskDWord, 0x01008c00);
 		}
 		else		//path B
 		{
-			PHY_SetBBReg(pAdapter, rTx_IQK_Tone_B, bMaskDWord, 0x01008c00);			
-			PHY_SetBBReg(pAdapter, rRx_IQK_Tone_B, bMaskDWord, 0x01008c00);					
-		
+			PHY_SetBBReg(pAdapter, rTx_IQK_Tone_B, bMaskDWord, 0x01008c00);
+			PHY_SetBBReg(pAdapter, rRx_IQK_Tone_B, bMaskDWord, 0x01008c00);
+
 		}
 
-		RTPRINT(FINIT, INIT_IQK, ("phy_APCalibrate_8192C() offset 0x800 %x\n", PHY_QueryBBReg(pAdapter, 0x800, bMaskDWord)));				
+		RTPRINT(FINIT, INIT_IQK, ("phy_APCalibrate_8192C() offset 0x800 %x\n", PHY_QueryBBReg(pAdapter, 0x800, bMaskDWord)));
 
 		//MAC settings
 		phy_MACSettingCalibration(pAdapter, MAC_REG, MAC_backup);
-		
+
 		if(path == RF_PATH_A)	//Path B to standby mode
 		{
-			PHY_SetRFReg(pAdapter, RF_PATH_B, RF_AC, bRFRegOffsetMask, 0x10000);			
+			PHY_SetRFReg(pAdapter, RF_PATH_B, RF_AC, bRFRegOffsetMask, 0x10000);
 		}
 		else			//Path A to standby mode
 		{
-			PHY_SetRFReg(pAdapter, RF_PATH_A, RF_AC, bRFRegOffsetMask, 0x10000);			
-			PHY_SetRFReg(pAdapter, RF_PATH_A, RF_MODE1, bRFRegOffsetMask, 0x1000f);			
-			PHY_SetRFReg(pAdapter, RF_PATH_A, RF_MODE2, bRFRegOffsetMask, 0x20103);						
+			PHY_SetRFReg(pAdapter, RF_PATH_A, RF_AC, bRFRegOffsetMask, 0x10000);
+			PHY_SetRFReg(pAdapter, RF_PATH_A, RF_MODE1, bRFRegOffsetMask, 0x1000f);
+			PHY_SetRFReg(pAdapter, RF_PATH_A, RF_MODE2, bRFRegOffsetMask, 0x20103);
 		}
 
 		delta_offset = ((delta+14)/2);
@@ -2284,15 +2280,15 @@ phy_APCalibrate_8192C(
 			delta_offset = 0;
 		else if (delta_offset > 12)
 			delta_offset = 12;
-			
+
 		//AP calibration
 		for(index = 0; index < APK_BB_REG_NUM; index++)
 		{
 			if(index != 1)	//only DO PA11+PAD01001, AP RF setting
 				continue;
-					
+
 			tmpReg = APK_RF_init_value[path][index];
-#if 1			
+#if 1
 			if(!pHalData->bAPKThermalMeterIgnore)
 			{
 				BB_offset = (tmpReg & 0xF0000) >> 16;
@@ -2303,11 +2299,11 @@ phy_APCalibrate_8192C(
 				}
 
 				delta_V = APK_delta_mapping[index][delta_offset];
-				
+
 				BB_offset += delta_V;
 
-				RTPRINT(FINIT, INIT_IQK, ("phy_APCalibrate_8192C() APK index %d tmpReg 0x%x delta_V %d delta_offset %d\n", index, tmpReg, delta_V, delta_offset));		
-				
+				RTPRINT(FINIT, INIT_IQK, ("phy_APCalibrate_8192C() APK index %d tmpReg 0x%x delta_V %d delta_offset %d\n", index, tmpReg, delta_V, delta_offset));
+
 				if(BB_offset < 0)
 				{
 					tmpReg = tmpReg & (~BIT15);
@@ -2325,23 +2321,23 @@ phy_APCalibrate_8192C(
 			if(IS_81xxC_VENDOR_UMC_B_CUT(pHalData->VersionID))
 				PHY_SetRFReg(pAdapter, path, RF_IPA_A, bRFRegOffsetMask, 0x894ae);
 			else
-#endif	
+#endif
 				PHY_SetRFReg(pAdapter, path, RF_IPA_A, bRFRegOffsetMask, 0x8992e);
-			RTPRINT(FINIT, INIT_IQK, ("phy_APCalibrate_8192C() offset 0xc %x\n", PHY_QueryRFReg(pAdapter, path, RF_IPA_A, bRFRegOffsetMask)));		
+			RTPRINT(FINIT, INIT_IQK, ("phy_APCalibrate_8192C() offset 0xc %x\n", PHY_QueryRFReg(pAdapter, path, RF_IPA_A, bRFRegOffsetMask)));
 			PHY_SetRFReg(pAdapter, path, RF_AC, bRFRegOffsetMask, APK_RF_value_0[path][index]);
-			RTPRINT(FINIT, INIT_IQK, ("phy_APCalibrate_8192C() offset 0x0 %x\n", PHY_QueryRFReg(pAdapter, path, RF_AC, bRFRegOffsetMask)));		
+			RTPRINT(FINIT, INIT_IQK, ("phy_APCalibrate_8192C() offset 0x0 %x\n", PHY_QueryRFReg(pAdapter, path, RF_AC, bRFRegOffsetMask)));
 			PHY_SetRFReg(pAdapter, path, RF_TXBIAS_A, bRFRegOffsetMask, tmpReg);
-			RTPRINT(FINIT, INIT_IQK, ("phy_APCalibrate_8192C() offset 0xd %x\n", PHY_QueryRFReg(pAdapter, path, RF_TXBIAS_A, bRFRegOffsetMask)));					
-			
-			// PA11+PAD01111, one shot	
+			RTPRINT(FINIT, INIT_IQK, ("phy_APCalibrate_8192C() offset 0xd %x\n", PHY_QueryRFReg(pAdapter, path, RF_TXBIAS_A, bRFRegOffsetMask)));
+
+			// PA11+PAD01111, one shot
 			i = 0;
 			do
 			{
 				PHY_SetBBReg(pAdapter, rFPGA0_IQK, 0xffffff00, 0x800000);
 				{
-					PHY_SetBBReg(pAdapter, APK_offset[path], bMaskDWord, APK_value[0]);		
+					PHY_SetBBReg(pAdapter, APK_offset[path], bMaskDWord, APK_value[0]);
 					RTPRINT(FINIT, INIT_IQK, ("phy_APCalibrate_8192C() offset 0x%x value 0x%x\n", APK_offset[path], PHY_QueryBBReg(pAdapter, APK_offset[path], bMaskDWord)));
-					delay_ms(3);				
+					delay_ms(3);
 					PHY_SetBBReg(pAdapter, APK_offset[path], bMaskDWord, APK_value[1]);
 					RTPRINT(FINIT, INIT_IQK, ("phy_APCalibrate_8192C() offset 0x%x value 0x%x\n", APK_offset[path], PHY_QueryBBReg(pAdapter, APK_offset[path], bMaskDWord)));
 
@@ -2353,8 +2349,8 @@ phy_APCalibrate_8192C(
 					tmpReg = PHY_QueryBBReg(pAdapter, rAPK, 0x03E00000);
 				else
 					tmpReg = PHY_QueryBBReg(pAdapter, rAPK, 0xF8000000);
-				RTPRINT(FINIT, INIT_IQK, ("phy_APCalibrate_8192C() offset 0xbd8[25:21] %x\n", tmpReg));		
-				
+				RTPRINT(FINIT, INIT_IQK, ("phy_APCalibrate_8192C() offset 0xbd8[25:21] %x\n", tmpReg));
+
 
 				i++;
 			}
@@ -2364,15 +2360,15 @@ phy_APCalibrate_8192C(
 		}
 	}
 
-	//reload MAC default value	
+	//reload MAC default value
 	phy_ReloadMACRegisters(pAdapter, MAC_REG, MAC_backup);
-	
-	//reload BB default value	
+
+	//reload BB default value
 	for(index = 0; index < APK_BB_REG_NUM ; index++)
 	{
 
-		if(index == 0)		//skip 
-			continue;					
+		if(index == 0)		//skip
+			continue;
 		PHY_SetBBReg(pAdapter, BB_REG[index], bMaskDWord, BB_backup[index]);
 	}
 
@@ -2385,31 +2381,31 @@ phy_APCalibrate_8192C(
 		PHY_SetRFReg(pAdapter, path, RF_TXBIAS_A, bRFRegOffsetMask, regD[path]);
 		if(path == RF_PATH_B)
 		{
-			PHY_SetRFReg(pAdapter, RF_PATH_A, RF_MODE1, bRFRegOffsetMask, 0x1000f);			
-			PHY_SetRFReg(pAdapter, RF_PATH_A, RF_MODE2, bRFRegOffsetMask, 0x20101);						
+			PHY_SetRFReg(pAdapter, RF_PATH_A, RF_MODE1, bRFRegOffsetMask, 0x1000f);
+			PHY_SetRFReg(pAdapter, RF_PATH_A, RF_MODE2, bRFRegOffsetMask, 0x20101);
 		}
 
 		//note no index == 0
 		if (APK_result[path][1] > 6)
 			APK_result[path][1] = 6;
-		RTPRINT(FINIT, INIT_IQK, ("apk path %d result %d 0x%x \t", path, 1, APK_result[path][1]));					
+		RTPRINT(FINIT, INIT_IQK, ("apk path %d result %d 0x%x \t", path, 1, APK_result[path][1]));
 	}
 
 	RTPRINT(FINIT, INIT_IQK, ("\n"));
-	
+
 
 	for(path = 0; path < pathbound; path++)
 	{
-		PHY_SetRFReg(pAdapter, path, RF_BS_PA_APSET_G1_G4, bRFRegOffsetMask, 
+		PHY_SetRFReg(pAdapter, path, RF_BS_PA_APSET_G1_G4, bRFRegOffsetMask,
 		((APK_result[path][1] << 15) | (APK_result[path][1] << 10) | (APK_result[path][1] << 5) | APK_result[path][1]));
 		if(path == RF_PATH_A)
-			PHY_SetRFReg(pAdapter, path, RF_BS_PA_APSET_G5_G8, bRFRegOffsetMask, 
-			((APK_result[path][1] << 15) | (APK_result[path][1] << 10) | (0x00 << 5) | 0x05));		
+			PHY_SetRFReg(pAdapter, path, RF_BS_PA_APSET_G5_G8, bRFRegOffsetMask,
+			((APK_result[path][1] << 15) | (APK_result[path][1] << 10) | (0x00 << 5) | 0x05));
 		else
-		PHY_SetRFReg(pAdapter, path, RF_BS_PA_APSET_G5_G8, bRFRegOffsetMask, 
-			((APK_result[path][1] << 15) | (APK_result[path][1] << 10) | (0x02 << 5) | 0x05));						
-			
-		PHY_SetRFReg(pAdapter, path, RF_BS_PA_APSET_G9_G11, bRFRegOffsetMask, ((0x08 << 15) | (0x08 << 10) | (0x08 << 5) | 0x08));			
+		PHY_SetRFReg(pAdapter, path, RF_BS_PA_APSET_G5_G8, bRFRegOffsetMask,
+			((APK_result[path][1] << 15) | (APK_result[path][1] << 10) | (0x02 << 5) | 0x05));
+
+		PHY_SetRFReg(pAdapter, path, RF_BS_PA_APSET_G9_G11, bRFRegOffsetMask, ((0x08 << 15) | (0x08 << 10) | (0x08 << 5) | 0x08));
 	}
 
 	pHalData->bAPKdone = TRUE;
@@ -2429,24 +2425,24 @@ PHY_IQCalibrate_8192C(
 	u1Byte			i, final_candidate, Indexforchannel;
 	BOOLEAN			bPathAOK, bPathBOK;
 	s4Byte			RegE94, RegE9C, RegEA4, RegEAC, RegEB4, RegEBC, RegEC4, RegECC, RegTmp = 0;
-	BOOLEAN			is12simular, is13simular, is23simular;	
+	BOOLEAN			is12simular, is13simular, is23simular;
 	BOOLEAN 		bStartContTx = FALSE, bSingleTone = FALSE, bCarrierSuppression = FALSE;
 	u4Byte			IQK_BB_REG_92C[IQK_BB_REG_NUM] = {
-					rOFDM0_XARxIQImbalance, 	rOFDM0_XBRxIQImbalance, 
+					rOFDM0_XARxIQImbalance, 	rOFDM0_XBRxIQImbalance,
 					rOFDM0_ECCAThreshold, 	rOFDM0_AGCRSSITable,
-					rOFDM0_XATxIQImbalance, 	rOFDM0_XBTxIQImbalance, 
-					rOFDM0_XCTxAFE, 			rOFDM0_XDTxAFE, 
+					rOFDM0_XATxIQImbalance, 	rOFDM0_XBTxIQImbalance,
+					rOFDM0_XCTxAFE, 			rOFDM0_XDTxAFE,
 					rOFDM0_RxIQExtAnta};
 
 	if (ODM_CheckPowerStatus(pAdapter) == FALSE)
 		return;
-	
-#if MP_DRIVER == 1	
+
+#if MP_DRIVER == 1
 	bStartContTx = pAdapter->MptCtx.bStartContTx;
 	bSingleTone = pAdapter->MptCtx.bSingleTone;
-	bCarrierSuppression = pAdapter->MptCtx.bCarrierSuppression;	
+	bCarrierSuppression = pAdapter->MptCtx.bCarrierSuppression;
 #endif
-	
+
 	//ignore IQK when continuous Tx
 	if(bStartContTx || bSingleTone || bCarrierSuppression)
 		return;
@@ -2460,7 +2456,7 @@ PHY_IQCalibrate_8192C(
 	if (bReCovery)
 		{
 			phy_ReloadADDARegisters(pAdapter, IQK_BB_REG_92C, pHalData->IQK_BB_backup_recover, 9);
-			return;		
+			return;
 
 		}
 
@@ -2486,7 +2482,7 @@ PHY_IQCalibrate_8192C(
 	{
 		/*For 88C 1T1R*/
 		phy_IQCalibrate_8192C(pAdapter, result, i, FALSE);
-		
+
 		if(i == 1)
 		{
 			is12simular = phy_SimularityCompare(pAdapter, result, 0, 1);
@@ -2496,16 +2492,16 @@ PHY_IQCalibrate_8192C(
 				break;
 			}
 		}
-		
+
 		if(i == 2)
 		{
 			is13simular = phy_SimularityCompare(pAdapter, result, 0, 2);
 			if(is13simular)
 			{
-				final_candidate = 0;			
+				final_candidate = 0;
 				break;
 			}
-			
+
 			is23simular = phy_SimularityCompare(pAdapter, result, 1, 2);
 			if(is23simular)
 				final_candidate = 1;
@@ -2515,7 +2511,7 @@ PHY_IQCalibrate_8192C(
 					RegTmp += result[3][i];
 
 				if(RegTmp != 0)
-					final_candidate = 3;			
+					final_candidate = 3;
 				else
 					final_candidate = 0xFF;
 			}
@@ -2536,7 +2532,7 @@ PHY_IQCalibrate_8192C(
 		RegECC = result[i][7];
 		RTPRINT(FINIT, INIT_IQK, ("IQK: RegE94=%x RegE9C=%x RegEA4=%x RegEAC=%x RegEB4=%x RegEBC=%x RegEC4=%x RegECC=%x\n ", RegE94, RegE9C, RegEA4, RegEAC, RegEB4, RegEBC, RegEC4, RegECC));
 	}
-	
+
 	if(final_candidate != 0xff)
 	{
 		pHalData->RegE94 = RegE94 = result[final_candidate][0];
@@ -2556,27 +2552,27 @@ PHY_IQCalibrate_8192C(
 		RegE94 = RegEB4 = pHalData->RegE94 = pHalData->RegEB4 = 0x100;	//X default value
 		RegE9C = RegEBC = pHalData->RegE9C = pHalData->RegEBC = 0x0;		//Y default value
 	}
-	
+
 	if((RegE94 != 0)/*&&(RegEA4 != 0)*/)
 	{
 		if(pHalData->CurrentBandType == BAND_ON_5G)
-			phy_PathAFillIQKMatrix_5G_Normal(pAdapter, bPathAOK, result, final_candidate, (RegEA4 == 0));			
-		else		
+			phy_PathAFillIQKMatrix_5G_Normal(pAdapter, bPathAOK, result, final_candidate, (RegEA4 == 0));
+		else
 			phy_PathAFillIQKMatrix(pAdapter, bPathAOK, result, final_candidate, (RegEA4 == 0));
 
 	}
-	
+
 	if (IS_92C_SERIAL(pHalData->VersionID) || IS_92D_SINGLEPHY(pHalData->VersionID))
 	{
 		if((RegEB4 != 0)/*&&(RegEC4 != 0)*/)
 		{
-			if(pHalData->CurrentBandType == BAND_ON_5G)		
+			if(pHalData->CurrentBandType == BAND_ON_5G)
 				phy_PathBFillIQKMatrix_5G_Normal(pAdapter, bPathBOK, result, final_candidate, (RegEC4 == 0));
 			else
 				phy_PathBFillIQKMatrix(pAdapter, bPathBOK, result, final_candidate, (RegEC4 == 0));
 		}
 	}
-	
+
 	phy_SaveADDARegisters(pAdapter, IQK_BB_REG_92C, pHalData->IQK_BB_backup_recover, 9);
 
 }
@@ -2594,10 +2590,10 @@ PHY_LCCalibrate_8192C(
 	u4Byte			timeout = 2000, timecount = 0;
 	PADAPTER	BuddyAdapter = pAdapter->BuddyAdapter;
 
-#if MP_DRIVER == 1	
+#if MP_DRIVER == 1
 	bStartContTx = pAdapter->MptCtx.bStartContTx;
 	bSingleTone = pAdapter->MptCtx.bSingleTone;
-	bCarrierSuppression = pAdapter->MptCtx.bCarrierSuppression;		
+	bCarrierSuppression = pAdapter->MptCtx.bCarrierSuppression;
 #endif
 
 #ifdef DISABLE_BB_RF
@@ -2624,12 +2620,12 @@ PHY_LCCalibrate_8192C(
 	{
 		delay_ms(50);
 		timecount += 50;
-	}	
-	
+	}
+
 	pHalData->bLCKInProgress = TRUE;
 
 	RTPRINT(FINIT, INIT_IQK, ("LCK:Start!!!interface %d currentband %x delay %d ms\n", pAdapter->interfaceIndex, pHalData->CurrentBandType, timecount));
-	
+
 	//if(IS_92C_SERIAL(pHalData->VersionID) || IS_92D_SINGLEPHY(pHalData->VersionID))
 	if(IS_2T2R(pHalData->VersionID))
 	{
@@ -2643,14 +2639,14 @@ PHY_LCCalibrate_8192C(
 	pHalData->bLCKInProgress = FALSE;
 
 	RTPRINT(FINIT, INIT_IQK, ("LCK:Finish!!!interface %d\n", pAdapter->interfaceIndex));
-	
+
 
 }
 
 VOID
 PHY_APCalibrate_8192C(
 	IN	PADAPTER	pAdapter,
-	IN	s1Byte 		delta	
+	IN	s1Byte 		delta
 	)
 {
 	HAL_DATA_TYPE	*pHalData = GET_HAL_DATA(pAdapter);
@@ -2664,7 +2660,7 @@ PHY_APCalibrate_8192C(
 
 #if FOR_BRAZIL_PRETEST != 1
 	if(pHalData->bAPKdone)
-#endif		
+#endif
 		return;
 
 	if(IS_92C_SERIAL( pHalData->VersionID)){
@@ -2686,7 +2682,7 @@ PHY_APCalibrate_8192C(
 
 VOID
 ODM_ResetIQKResult(
-	IN	PVOID		pDM_VOID 
+	IN	PVOID		pDM_VOID
 )
 {
 	return;
@@ -2694,11 +2690,11 @@ ODM_ResetIQKResult(
 #if 1//!(DM_ODM_SUPPORT_TYPE & ODM_AP)
 u1Byte ODM_GetRightChnlPlaceforIQK(u1Byte chnl)
 {
-	u1Byte	channel_all[ODM_TARGET_CHNL_NUM_2G_5G] = 
+	u1Byte	channel_all[ODM_TARGET_CHNL_NUM_2G_5G] =
 	{1,2,3,4,5,6,7,8,9,10,11,12,13,14,36,38,40,42,44,46,48,50,52,54,56,58,60,62,64,100,102,104,106,108,110,112,114,116,118,120,122,124,126,128,130,132,134,136,138,140,149,151,153,155,157,159,161,163,165};
 	u1Byte	place = chnl;
 
-	
+
 	if(chnl > 14)
 	{
 		for(place = 14; place<sizeof(channel_all); place++)
@@ -2708,7 +2704,7 @@ u1Byte ODM_GetRightChnlPlaceforIQK(u1Byte chnl)
 				return place-13;
 			}
 		}
-	}	
+	}
 	return 0;
 
 }
@@ -2716,17 +2712,17 @@ u1Byte ODM_GetRightChnlPlaceforIQK(u1Byte chnl)
 
 VOID
 odm_IQCalibrate(
-		IN	PDM_ODM_T	pDM_Odm 
+		IN	PDM_ODM_T	pDM_Odm
 		)
 {
 	PADAPTER	Adapter = pDM_Odm->Adapter;
 
-#if (DM_ODM_SUPPORT_TYPE == ODM_WIN)	
+#if (DM_ODM_SUPPORT_TYPE == ODM_WIN)
 	if (*pDM_Odm->pIsFcsModeEnable)
 		return;
 #endif
 
-	
+
 
 	if (pDM_Odm->bLinked) {
 		if ((*pDM_Odm->pChannel != pDM_Odm->preChannel) && (!*pDM_Odm->pbScanInProcess)) {
@@ -2736,31 +2732,31 @@ odm_IQCalibrate(
 
 		if (pDM_Odm->LinkedInterval < 3)
 			pDM_Odm->LinkedInterval++;
-		
+
 		if (pDM_Odm->LinkedInterval == 2) {
-			
-			#if (RTL8814A_SUPPORT == 1)	
-			if (pDM_Odm->SupportICType == ODM_RTL8814A) 
+
+			#if (RTL8814A_SUPPORT == 1)
+			if (pDM_Odm->SupportICType == ODM_RTL8814A)
 				PHY_IQCalibrate_8814A(pDM_Odm, FALSE);
 			#endif
-			
-			#if (RTL8822B_SUPPORT == 1)	
-			if (pDM_Odm->SupportICType == ODM_RTL8822B) 
+
+			#if (RTL8822B_SUPPORT == 1)
+			if (pDM_Odm->SupportICType == ODM_RTL8822B)
 				PHY_IQCalibrate_8822B(pDM_Odm, FALSE);
 			#endif
 
-			#if (RTL8821C_SUPPORT == 1) 
-			if (pDM_Odm->SupportICType == ODM_RTL8821C) 
+			#if (RTL8821C_SUPPORT == 1)
+			if (pDM_Odm->SupportICType == ODM_RTL8821C)
 				PHY_IQCalibrate_8821C(pDM_Odm, FALSE);
 			#endif
 
-			#if (RTL8821A_SUPPORT == 1)				
-			if (pDM_Odm->SupportICType == ODM_RTL8821) 
+			#if (RTL8821A_SUPPORT == 1)
+			if (pDM_Odm->SupportICType == ODM_RTL8821)
 				PHY_IQCalibrate_8821A(pDM_Odm, FALSE);
 			#endif
-			
-			#if (RTL8812A_SUPPORT == 1)	
-			if (pDM_Odm->SupportICType == ODM_RTL8812) 
+
+			#if (RTL8812A_SUPPORT == 1)
+			if (pDM_Odm->SupportICType == ODM_RTL8812)
 				phy_IQCalibrate_8812A(pDM_Odm, FALSE);
 			#endif
 		}
@@ -2775,14 +2771,14 @@ void phydm_rf_init(IN	PVOID		pDM_VOID)
 	odm_TXPowerTrackingInit(pDM_Odm);
 
 #if (DM_ODM_SUPPORT_TYPE & (ODM_WIN|ODM_CE))
-	ODM_ClearTxPowerTrackingState(pDM_Odm);	
+	ODM_ClearTxPowerTrackingState(pDM_Odm);
 #endif
 
 #if (DM_ODM_SUPPORT_TYPE & (ODM_AP))
-#if (RTL8814A_SUPPORT == 1)		
+#if (RTL8814A_SUPPORT == 1)
 	if (pDM_Odm->SupportICType & ODM_RTL8814A)
 		PHY_IQCalibrate_8814A_Init(pDM_Odm);
-#endif	
+#endif
 #endif
 
 }

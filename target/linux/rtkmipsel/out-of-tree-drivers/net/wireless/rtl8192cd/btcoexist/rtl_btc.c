@@ -238,7 +238,7 @@ void rtl_btc_special_packet_notify(struct rtl8192cd_priv *priv, u8 pkt_type)
 {
 	return exhalbtc_special_packet_notify(&gl_bt_coexist, pkt_type);
 }
-#endif 
+#endif
 
 struct rtl_btc_ops *rtl_btc_get_ops_pointer(void)
 {

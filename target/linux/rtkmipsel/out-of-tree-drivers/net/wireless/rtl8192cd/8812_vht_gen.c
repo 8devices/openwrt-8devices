@@ -24,42 +24,42 @@ void input_value_32(unsigned long *p, unsigned char start, unsigned char end, un
 		else
 		{
 			unsigned char x = 0;
-				
+
 			for(x = 0; x<=(end-start); x ++)
 				bit_mask |= BIT(x);
 
-			*p &= (~(bit_mask << start));	
-			*p |= ((value&bit_mask) << start);	
+			*p &= (~(bit_mask << start));
+			*p |= ((value&bit_mask) << start);
 		}
 	}
 }
 
-// 				20/40/80,	ShortGI,	MCS Rate 
-const u2Byte VHT_MCS_DATA_RATE[3][2][30] = 
+// 				20/40/80,	ShortGI,	MCS Rate
+const u2Byte VHT_MCS_DATA_RATE[3][2][30] =
 	{	{	{13, 26, 39, 52, 78, 104, 117, 130, 156, 156,
-			 26, 52, 78, 104, 156, 208, 234, 260, 312, 312, 
+			 26, 52, 78, 104, 156, 208, 234, 260, 312, 312,
 			 39, 78, 117, 156, 234, 312, 351, 390, 468, 520},					// Long GI, 20MHz
-			 
+
 			{14, 29, 43, 58, 87, 116, 130, 144, 173, 173,
 			 29, 58, 87, 116, 173, 231, 260, 289, 347, 347,
 			 43, 86, 130, 173, 260, 347, 390, 433, 520, 578}			},		// Short GI, 20MHz
-			 
-		{	{27, 54, 81, 108, 162, 216, 243, 270, 324, 360, 
-			 54, 108, 162, 216, 324, 432, 486, 540, 648, 720, 
+
+		{	{27, 54, 81, 108, 162, 216, 243, 270, 324, 360,
+			 54, 108, 162, 216, 324, 432, 486, 540, 648, 720,
 			 81, 162, 243, 342, 486, 648, 729, 810, 972, 1080}, 				// Long GI, 40MHz
-			 
-			{30, 60, 90, 120, 180, 240, 270, 300,360, 400, 
+
+			{30, 60, 90, 120, 180, 240, 270, 300,360, 400,
 			 60, 120, 180, 240, 360, 480, 540, 600, 720, 800,
 			 90, 180, 270, 360, 540, 720, 810, 900, 1080, 1200}			},		// Short GI, 40MHz
-			 
+
 		{	{59, 117,  176, 234, 351, 468, 527, 585, 702, 780,
-			 117, 234, 351, 468, 702, 936, 1053, 1170, 1404, 1560, 
+			 117, 234, 351, 468, 702, 936, 1053, 1170, 1404, 1560,
 			 176, 351, 527, 702, 1053, 1408, 1408, 1745, 2106, 2340}, 			// Long GI, 80MHz
-			 
-			{65, 130, 195, 260, 390, 520, 585, 650, 780, 867, 
-			 130, 260, 390, 520, 780, 1040, 1170, 1300, 1560, 1733, 
+
+			{65, 130, 195, 260, 390, 520, 585, 650, 780, 867,
+			 130, 260, 390, 520, 780, 1040, 1170, 1300, 1560, 1733,
 			 195, 390, 585, 780, 1170, 1560, 1560, 1950, 2340, 2600}	}		// Short GI, 80MHz
-			 
+
 	};
 
 enum _VHT_SUPPORT_RATE_MAP_ {
@@ -76,7 +76,7 @@ enum _VHT_SUPPORT_RATE_MAP_ {
 *	/param 	Adapter			Pionter to Adapter entity
 *			pMCSRateSet		Pointer to MCS rate bitmap
 *			pMCSFilter		Pointer to MCS rate filter
-*	
+*
 *	/return	Highest MCS rate included in pMCSRateSet and filtered by pMCSFilter.
 *
 */
@@ -89,7 +89,7 @@ VHTGetHighestMCSRate(
 	u1Byte		i, j;
 	u1Byte		bitMap;
 	u1Byte		VHTMcsRate = 0;
-	
+
 	for(i = 0; i < 2; i++)
 	{
 		if(pVHTMCSRateSet[i] != 0xff)
@@ -97,13 +97,13 @@ VHTGetHighestMCSRate(
 			for(j = 0; j < 8; j += 2)
 			{
 				bitMap = (pVHTMCSRateSet[i] >> j) & 3;
-				
+
 				if(bitMap != 3)
 					VHTMcsRate = _NSS1_MCS7_RATE_ + 5*j + i*40 + bitMap;  //VHT rate indications begin from 0x90
 			}
 		}
 	}
-	
+
 	return VHTMcsRate;
 }
 
@@ -124,9 +124,9 @@ VHTMcsToDataRate(
 	if((priv->pmib->dot11acConfigEntry.dot11SupportedVHT & 0x30) != 0x30)
 		VHTMcsRate = _NSS3_MCS7_RATE_ +((priv->pmib->dot11acConfigEntry.dot11SupportedVHT>>4) &3);
 	else if((priv->pmib->dot11acConfigEntry.dot11SupportedVHT & 0x000c) != 0x0c)
-		VHTMcsRate = _NSS2_MCS7_RATE_ +((priv->pmib->dot11acConfigEntry.dot11SupportedVHT>>2) &3);	
+		VHTMcsRate = _NSS2_MCS7_RATE_ +((priv->pmib->dot11acConfigEntry.dot11SupportedVHT>>2) &3);
 	else
-		VHTMcsRate = _NSS1_MCS7_RATE_ +((priv->pmib->dot11acConfigEntry.dot11SupportedVHT) &3);	;	
+		VHTMcsRate = _NSS1_MCS7_RATE_ +((priv->pmib->dot11acConfigEntry.dot11SupportedVHT) &3);	;
 #else
 
 
@@ -141,7 +141,7 @@ VHTMcsToDataRate(
 			isShortGI = priv->pmib->dot11nConfigEntry.dot11nShortGIfor40M?1:0;		// ??
 			break;
 	}
-#endif	
+#endif
 	VHTMcsRate -=_NSS1_MCS0_RATE_;
 
 	if( ((VHTMcsRate>20)&&get_rf_mimo_mode(priv)==MIMO_2T2R)|| (priv->pshare->is_40m_bw > 2))
@@ -155,14 +155,14 @@ unsigned int filter_mcs_9(unsigned int supported_vht, int num_ss)
 	int tmp = 0;
 
 	//panic_printk(" +++ supported_vht = 0x%x \n", supported_vht);
-	
+
 	for(tmp = 1; tmp <= num_ss; tmp++)
 	{
 		int bit_shift = ((tmp-1)*2);
 
 		if(tmp > 8)
 			break;
-			
+
 		if((tmp==3) || (tmp==6)) //3SS & 6SS support 20M + MCS9
 			continue;
 
@@ -171,7 +171,7 @@ unsigned int filter_mcs_9(unsigned int supported_vht, int num_ss)
 			supported_vht &= ~(3 << bit_shift);
 			supported_vht |= (SUPPORT_MCS_0_8_RATES << bit_shift);
 		}
-	
+
 	}
 
 	//panic_printk(" --- supported_vht = 0x%x \n", supported_vht);
@@ -185,18 +185,18 @@ void construct_vht_ie_mcr(struct rtl8192cd_priv *priv, unsigned char channel_cen
 {
 	struct vht_cap_elmt	*vht_cap;
 	struct vht_oper_elmt *vht_oper;
-	unsigned int value; 
+	unsigned int value;
 
 	unsigned char txbf_max_ant, txbf_sounding_dim;
 
 	unsigned int supported_vht = priv->pmib->dot11acConfigEntry.dot11SupportedVHT;
 
-	
+
 //// ===== VHT CAPABILITIES ELEMENT ===== /////
 //VHT CAPABILITIES INFO field
 
 	priv->vht_cap_len = sizeof(struct vht_cap_elmt);
-	vht_cap = &priv->vht_cap_buf; 
+	vht_cap = &priv->vht_cap_buf;
 	memset(vht_cap, 0, sizeof(struct vht_cap_elmt));
 
 	switch(get_rf_mimo_mode(priv)) {
@@ -210,15 +210,15 @@ void construct_vht_ie_mcr(struct rtl8192cd_priv *priv, unsigned char channel_cen
 		default:	//2T2R
 			supported_vht |= 0xfffa;
 			break;
-	}	        
+	}
 
     // TODO: MAX_MPDU_LENGTH_E in 11AC
-	if(priv->pmib->dot11nConfigEntry.dot11nAMSDURecvMax) 
+	if(priv->pmib->dot11nConfigEntry.dot11nAMSDURecvMax)
 		input_value_32(&vht_cap->vht_cap_info, MAX_MPDU_LENGTH_S, MAX_MPDU_LENGTH_E, (priv->pmib->dot11nConfigEntry.dot11nAMSDURecvMax & 0x3));
-	else	
+	else
 	input_value_32(&vht_cap->vht_cap_info, MAX_MPDU_LENGTH_S, MAX_MPDU_LENGTH_E, 0);
 
-	//0 - not support 160/80+80; 1 - support 160; 2 - support 80+80 
+	//0 - not support 160/80+80; 1 - support 160; 2 - support 80+80
 	if(priv->pshare->CurrentChannelBW == HT_CHANNEL_WIDTH_AC_160)
 		value = 1;
 	else
@@ -232,21 +232,18 @@ void construct_vht_ie_mcr(struct rtl8192cd_priv *priv, unsigned char channel_cen
 
 
 	if( (priv->pmib->dot11nConfigEntry.dot11nLDPC&1)
-#if defined(CONFIG_WLAN_HAL_8881A)
-	 && (GET_CHIP_VER(priv) != VERSION_8881A)
-#endif
-	)	
+	)
 		input_value_32(&vht_cap->vht_cap_info, RX_LDPC_S, RX_LDPC_E, 1);
 	else
 		input_value_32(&vht_cap->vht_cap_info, RX_LDPC_S, RX_LDPC_E, 0);
-	
+
 #if 1
 	if (priv->pmib->dot11nConfigEntry.dot11nSTBC)
 	{
-		if ((get_rf_mimo_mode(priv) == MIMO_2T2R) || (get_rf_mimo_mode(priv) == MIMO_3T3R)) //eric_8814 
+		if ((get_rf_mimo_mode(priv) == MIMO_2T2R) || (get_rf_mimo_mode(priv) == MIMO_3T3R)) //eric_8814
 			input_value_32(&vht_cap->vht_cap_info, TX_STBC_S, TX_STBC_E, 1);
-		
-		//8822 A/B-cut disable RX STBC		
+
+		//8822 A/B-cut disable RX STBC
 		if(GET_CHIP_VER(priv) == VERSION_8822B && GET_CHIP_VER_8822(priv) <= 0x1)
 			input_value_32(&vht_cap->vht_cap_info, RX_STBC_S, RX_STBC_E, 0);
 		else
@@ -271,36 +268,7 @@ void construct_vht_ie_mcr(struct rtl8192cd_priv *priv, unsigned char channel_cen
 	input_value_32(&vht_cap->vht_cap_info, SU_BFER_S, SU_BFER_E, 0);
 	input_value_32(&vht_cap->vht_cap_info, SU_BFEE_S, SU_BFEE_E, 0);
 	}
-#ifdef CONFIG_WLAN_HAL_8814AE
-	if(priv->pshare->rf_ft_var.bf_sup_val != 0){		
-		input_value_32(&vht_cap->vht_cap_info, MAX_ANT_SUPP_S, MAX_ANT_SUPP_E, priv->pshare->rf_ft_var.bf_sup_val);
-		input_value_32(&vht_cap->vht_cap_info, SOUNDING_DIMENSIONS_S, SOUNDING_DIMENSIONS_E, priv->pshare->rf_ft_var.bf_sup_val);
-	}else
-#endif	
 	{
-#ifdef CONFIG_WLAN_HAL_8814AE
-		if(GET_CHIP_VER(priv)==VERSION_8814A) {
-			if(get_rf_mimo_mode(priv) == MIMO_4T4R) {       
-				txbf_max_ant = 3;
-			    txbf_sounding_dim = 3;
-			} else if(get_rf_mimo_mode(priv) == MIMO_3T3R) {
-				txbf_max_ant = 2;
-			    txbf_sounding_dim = 3;
-			} else if(get_rf_mimo_mode(priv) == MIMO_2T4R) {
-				txbf_max_ant = 2;
-			    txbf_sounding_dim = 1;
-			} else  if(get_rf_mimo_mode(priv) == MIMO_2T2R) {
-				txbf_max_ant = 2;
-			    txbf_sounding_dim = 1;
-			} else {
-				txbf_max_ant = 1;
-			    txbf_sounding_dim = 1;
-			}
-			input_value_32(&vht_cap->vht_cap_info, MAX_ANT_SUPP_S, MAX_ANT_SUPP_E, txbf_max_ant);
-			input_value_32(&vht_cap->vht_cap_info, SOUNDING_DIMENSIONS_S, SOUNDING_DIMENSIONS_E, txbf_sounding_dim);	
-		}
-		else
-#endif
 		{
 			input_value_32(&vht_cap->vht_cap_info, MAX_ANT_SUPP_S, MAX_ANT_SUPP_E, BEAMFORM_MAX_ANT_SUPP);
 			input_value_32(&vht_cap->vht_cap_info, SOUNDING_DIMENSIONS_S, SOUNDING_DIMENSIONS_E, BEAMFORM_SOUNDING_DIMENSIONS);
@@ -310,7 +278,7 @@ void construct_vht_ie_mcr(struct rtl8192cd_priv *priv, unsigned char channel_cen
 
 	input_value_32(&vht_cap->vht_cap_info, MU_BFER_S, MU_BFER_E, 0);
 	input_value_32(&vht_cap->vht_cap_info, MU_BFEE_S, MU_BFEE_E, 0);
-	
+
 	input_value_32(&vht_cap->vht_cap_info, TXOP_PS_S, TXOP_PS_E, 0);
 
 	input_value_32(&vht_cap->vht_cap_info, HTC_VHT_S, HTC_VHT_E, 1);
@@ -318,9 +286,9 @@ void construct_vht_ie_mcr(struct rtl8192cd_priv *priv, unsigned char channel_cen
 	input_value_32(&vht_cap->vht_cap_info, MAX_RXAMPDU_FACTOR_S, MAX_RXAMPDU_FACTOR_E, priv->pshare->rf_ft_var.ampdu_den_vht);
 #else
 	input_value_32(&vht_cap->vht_cap_info, MAX_RXAMPDU_FACTOR_S, MAX_RXAMPDU_FACTOR_E, 7);
-#endif	
+#endif
 	input_value_32(&vht_cap->vht_cap_info, LINK_ADAPTION_S, LINK_ADAPTION_E, 0);
-	
+
 	input_value_32(&vht_cap->vht_cap_info, RX_ANT_PC_S, RX_ANT_PC_E, 0);
 	input_value_32(&vht_cap->vht_cap_info, TX_ANT_PC_S, TX_ANT_PC_E, 0);
 
@@ -331,7 +299,7 @@ void construct_vht_ie_mcr(struct rtl8192cd_priv *priv, unsigned char channel_cen
 #if defined(AC2G_256QAM) || defined(WLAN_HAL_8814AE)
 	if(is_ac2g(priv) && ((priv->pshare->CurrentChannelBW == HT_CHANNEL_WIDTH_AC_20)||(GET_CHIP_VER(priv)==VERSION_8814A))) //if bw = 20M, not support MCS9
 	{
-		if(get_rf_mimo_mode(priv) == MIMO_1T1R) 
+		if(get_rf_mimo_mode(priv) == MIMO_1T1R)
 		{
 			supported_vht = 0xfffd;
 		}
@@ -357,7 +325,7 @@ void construct_vht_ie_mcr(struct rtl8192cd_priv *priv, unsigned char channel_cen
 			supported_vht = filter_mcs_9(supported_vht, 2);
 	}
 
-	if (GET_CHIP_VER(priv)==VERSION_8814A && get_rf_mimo_mode(priv) == MIMO_2T2R) {		
+	if (GET_CHIP_VER(priv)==VERSION_8814A && get_rf_mimo_mode(priv) == MIMO_2T2R) {
 		if (pstat->IOTPeer == HT_IOT_PEER_REALTEK_8812) {
 			supported_vht = 0xfff5;
 		}
@@ -377,12 +345,12 @@ void construct_vht_ie_mcr(struct rtl8192cd_priv *priv, unsigned char channel_cen
 
 //// ===== VHT CAPABILITIES ELEMENT ===== /////
 	priv->vht_oper_len = sizeof(struct vht_oper_elmt);
-	vht_oper = &priv->vht_oper_buf; 
+	vht_oper = &priv->vht_oper_buf;
 	memset(vht_oper, 0, sizeof(struct vht_oper_elmt));
 
 	if((priv->pshare->is_40m_bw == HT_CHANNEL_WIDTH_AC_80) || (GET_CHIP_VER(priv)==VERSION_8814A))
 	{
-		vht_oper->vht_oper_info[0] = (priv->pshare->is_40m_bw ==2) ? 1 : 0;	
+		vht_oper->vht_oper_info[0] = (priv->pshare->is_40m_bw ==2) ? 1 : 0;
 
 		if(OPMODE & (WIFI_STATION_STATE))
 		vht_oper->vht_oper_info[0] = 1; //8812_client
@@ -404,21 +372,21 @@ void construct_vht_ie_mcr(struct rtl8192cd_priv *priv, unsigned char channel_cen
 			else if (channel <= 177)
 				channel_center = 171;
 		}
-			
+
 		vht_oper->vht_oper_info[1] = channel_center;
 		vht_oper->vht_oper_info[2] = 0;
 	}
 
-	if(get_rf_mimo_mode(priv) == MIMO_1T1R) 
-		value = 0xfffc; 
+	if(get_rf_mimo_mode(priv) == MIMO_1T1R)
+		value = 0xfffc;
 	else if(get_rf_mimo_mode(priv) == MIMO_2T2R)
-		value = 0xfff0; 
+		value = 0xfff0;
 	else if(get_rf_mimo_mode(priv) == MIMO_3T3R || get_rf_mimo_mode(priv) == MIMO_4T4R)
 		value = 0xffea;
 	else
 		value = 0xfff0; //2ss as default
-	
-	vht_oper->vht_basic_msc = value; 
+
+	vht_oper->vht_basic_msc = value;
 	vht_oper->vht_basic_msc = cpu_to_le16(vht_oper->vht_basic_msc);
 
 
@@ -431,18 +399,18 @@ void construct_vht_ie(struct rtl8192cd_priv *priv, unsigned char channel_center)
 {
 	struct vht_cap_elmt	*vht_cap;
 	struct vht_oper_elmt *vht_oper;
-	unsigned int value; 
+	unsigned int value;
 
 	unsigned char txbf_max_ant, txbf_sounding_dim;
 
 	unsigned int supported_vht = priv->pmib->dot11acConfigEntry.dot11SupportedVHT;
 
-	
+
 //// ===== VHT CAPABILITIES ELEMENT ===== /////
 //VHT CAPABILITIES INFO field
 
 	priv->vht_cap_len = sizeof(struct vht_cap_elmt);
-	vht_cap = &priv->vht_cap_buf; 
+	vht_cap = &priv->vht_cap_buf;
 	memset(vht_cap, 0, sizeof(struct vht_cap_elmt));
 
 	switch(get_rf_mimo_mode(priv)) {
@@ -456,15 +424,15 @@ void construct_vht_ie(struct rtl8192cd_priv *priv, unsigned char channel_center)
 		default:	//2T2R
 			supported_vht |= 0xfffa;
 			break;
-	}	        
+	}
 
     // TODO: MAX_MPDU_LENGTH_E in 11AC
-	if(priv->pmib->dot11nConfigEntry.dot11nAMSDURecvMax) 
+	if(priv->pmib->dot11nConfigEntry.dot11nAMSDURecvMax)
 		input_value_32(&vht_cap->vht_cap_info, MAX_MPDU_LENGTH_S, MAX_MPDU_LENGTH_E, (priv->pmib->dot11nConfigEntry.dot11nAMSDURecvMax & 0x3));
-	else	
+	else
 	input_value_32(&vht_cap->vht_cap_info, MAX_MPDU_LENGTH_S, MAX_MPDU_LENGTH_E, 0);
 
-	//0 - not support 160/80+80; 1 - support 160; 2 - support 80+80 
+	//0 - not support 160/80+80; 1 - support 160; 2 - support 80+80
 	if(priv->pshare->CurrentChannelBW == HT_CHANNEL_WIDTH_AC_160)
 		value = 1;
 	else
@@ -477,17 +445,17 @@ void construct_vht_ie(struct rtl8192cd_priv *priv, unsigned char channel_center)
 	input_value_32(&vht_cap->vht_cap_info, SHORT_GI160M_S, SHORT_GI160M_E, 0);
 
 
-	if( (priv->pmib->dot11nConfigEntry.dot11nLDPC&1) && (can_enable_rx_ldpc(priv)) )	
+	if( (priv->pmib->dot11nConfigEntry.dot11nLDPC&1) && (can_enable_rx_ldpc(priv)) )
 		input_value_32(&vht_cap->vht_cap_info, RX_LDPC_S, RX_LDPC_E, 1);
 	else
 		input_value_32(&vht_cap->vht_cap_info, RX_LDPC_S, RX_LDPC_E, 0);
-	
+
 #if 1
 	if (priv->pmib->dot11nConfigEntry.dot11nSTBC)
 	{
-		if ((get_rf_mimo_mode(priv) == MIMO_2T2R) || (get_rf_mimo_mode(priv) == MIMO_3T3R)) //eric_8814 
+		if ((get_rf_mimo_mode(priv) == MIMO_2T2R) || (get_rf_mimo_mode(priv) == MIMO_3T3R)) //eric_8814
 			input_value_32(&vht_cap->vht_cap_info, TX_STBC_S, TX_STBC_E, 1);
-		
+
 		//8822 A/B-cut disable RX STBC
 		if(GET_CHIP_VER(priv) == VERSION_8822B && GET_CHIP_VER_8822(priv) <= 0x1)
 			input_value_32(&vht_cap->vht_cap_info, RX_STBC_S, RX_STBC_E, 0);
@@ -513,36 +481,7 @@ void construct_vht_ie(struct rtl8192cd_priv *priv, unsigned char channel_center)
 			input_value_32(&vht_cap->vht_cap_info, SU_BFER_S, SU_BFER_E, 0);
 			input_value_32(&vht_cap->vht_cap_info, SU_BFEE_S, SU_BFEE_E, 0);
 	}
-#ifdef CONFIG_WLAN_HAL_8814AE
-	if(priv->pshare->rf_ft_var.bf_sup_val != 0){		
-		input_value_32(&vht_cap->vht_cap_info, MAX_ANT_SUPP_S, MAX_ANT_SUPP_E, priv->pshare->rf_ft_var.bf_sup_val);
-		input_value_32(&vht_cap->vht_cap_info, SOUNDING_DIMENSIONS_S, SOUNDING_DIMENSIONS_E, priv->pshare->rf_ft_var.bf_sup_val);
-	}else
-#endif	
 	{
-#ifdef CONFIG_WLAN_HAL_8814AE
-		if(GET_CHIP_VER(priv)==VERSION_8814A) {
-			if(get_rf_mimo_mode(priv) == MIMO_4T4R) {       
-				txbf_max_ant = 3;
-			    txbf_sounding_dim = 3;
-			} else if(get_rf_mimo_mode(priv) == MIMO_3T3R) {
-				txbf_max_ant = 2;
-			    txbf_sounding_dim = 2;
-			} else if(get_rf_mimo_mode(priv) == MIMO_2T4R) {
-				txbf_max_ant = 2;
-			    txbf_sounding_dim = 1;
-			} else  if(get_rf_mimo_mode(priv) == MIMO_2T2R) {
-				txbf_max_ant = 2;
-			    txbf_sounding_dim = 1;
-			} else {
-				txbf_max_ant = 1;
-			    txbf_sounding_dim = 1;
-			}
-			input_value_32(&vht_cap->vht_cap_info, MAX_ANT_SUPP_S, MAX_ANT_SUPP_E, txbf_max_ant);
-			input_value_32(&vht_cap->vht_cap_info, SOUNDING_DIMENSIONS_S, SOUNDING_DIMENSIONS_E, txbf_sounding_dim);	
-		}
-		else
-#endif
 		{
 			input_value_32(&vht_cap->vht_cap_info, MAX_ANT_SUPP_S, MAX_ANT_SUPP_E, BEAMFORM_MAX_ANT_SUPP);
 			input_value_32(&vht_cap->vht_cap_info, SOUNDING_DIMENSIONS_S, SOUNDING_DIMENSIONS_E, BEAMFORM_SOUNDING_DIMENSIONS);
@@ -560,29 +499,24 @@ void construct_vht_ie(struct rtl8192cd_priv *priv, unsigned char channel_center)
 
 		if((priv->pmib->dot11RFEntry.txbfer == 1) && (OPMODE & WIFI_AP_STATE))
 			input_value_32(&vht_cap->vht_cap_info, MU_BFER_S, MU_BFER_E, 1);
-		
+
 		if((priv->pmib->dot11RFEntry.txbfee == 1) && (OPMODE & WIFI_STATION_STATE))
 			input_value_32(&vht_cap->vht_cap_info, MU_BFEE_S, MU_BFEE_E, 1);
 
 
 		}
-	
+
 	}
 
 	input_value_32(&vht_cap->vht_cap_info, TXOP_PS_S, TXOP_PS_E, 0);
 
 	input_value_32(&vht_cap->vht_cap_info, HTC_VHT_S, HTC_VHT_E, 1);
 
-		
-#ifdef CONFIG_WLAN_HAL_8814AE
-	if((GET_CHIP_VER(priv)==VERSION_8814A) && priv->pmib->dot11nConfigEntry.dot11nUse40M == HT_CHANNEL_WIDTH_20)
-		input_value_32(&vht_cap->vht_cap_info, MAX_RXAMPDU_FACTOR_S, MAX_RXAMPDU_FACTOR_E, 2);
-	else
-#endif		
+
 		input_value_32(&vht_cap->vht_cap_info, MAX_RXAMPDU_FACTOR_S, MAX_RXAMPDU_FACTOR_E, 7);
-	
+
 	input_value_32(&vht_cap->vht_cap_info, LINK_ADAPTION_S, LINK_ADAPTION_E, 0);
-	
+
 	input_value_32(&vht_cap->vht_cap_info, RX_ANT_PC_S, RX_ANT_PC_E, 0);
 	input_value_32(&vht_cap->vht_cap_info, TX_ANT_PC_S, TX_ANT_PC_E, 0);
 
@@ -593,7 +527,7 @@ void construct_vht_ie(struct rtl8192cd_priv *priv, unsigned char channel_center)
 #if defined(AC2G_256QAM) || defined(WLAN_HAL_8814AE)
 	if(is_ac2g(priv) && ((priv->pmib->dot11nConfigEntry.dot11nUse40M == HT_CHANNEL_WIDTH_AC_20)||(GET_CHIP_VER(priv)==VERSION_8814A))) //if bw = 20M, not support MCS9
 	{
-		if(get_rf_mimo_mode(priv) == MIMO_1T1R) 
+		if(get_rf_mimo_mode(priv) == MIMO_1T1R)
 		{
 			supported_vht = 0xfffd;
 		}
@@ -618,9 +552,9 @@ void construct_vht_ie(struct rtl8192cd_priv *priv, unsigned char channel_center)
 		else if(get_rf_mimo_mode(priv) == MIMO_2T2R)
 			supported_vht = filter_mcs_9(supported_vht, 2);
 		else if (get_rf_mimo_mode(priv) == MIMO_3T3R)
-			supported_vht = filter_mcs_9(supported_vht, 3);			
+			supported_vht = filter_mcs_9(supported_vht, 3);
 		else if (get_rf_mimo_mode(priv) == MIMO_4T4R)
-			supported_vht = filter_mcs_9(supported_vht, 4);			
+			supported_vht = filter_mcs_9(supported_vht, 4);
 	}
 
 	{
@@ -637,7 +571,7 @@ void construct_vht_ie(struct rtl8192cd_priv *priv, unsigned char channel_center)
 
 //// ===== VHT CAPABILITIES ELEMENT ===== /////
 	priv->vht_oper_len = sizeof(struct vht_oper_elmt);
-	vht_oper = &priv->vht_oper_buf; 
+	vht_oper = &priv->vht_oper_buf;
 	memset(vht_oper, 0, sizeof(struct vht_oper_elmt));
 
 	if((priv->pshare->is_40m_bw == HT_CHANNEL_WIDTH_AC_80) || (GET_CHIP_VER(priv)==VERSION_8814A))
@@ -668,15 +602,15 @@ void construct_vht_ie(struct rtl8192cd_priv *priv, unsigned char channel_center)
 			else if (channel <= 177)
 				channel_center = 171;
 		}
-			
+
 		vht_oper->vht_oper_info[1] = channel_center;
 		vht_oper->vht_oper_info[2] = 0;
 	}
 
-	if(get_rf_mimo_mode(priv) == MIMO_1T1R) 
-		value = 0xfffc; 
+	if(get_rf_mimo_mode(priv) == MIMO_1T1R)
+		value = 0xfffc;
 	else if(get_rf_mimo_mode(priv) == MIMO_2T2R)
-		value = 0xfff0; 
+		value = 0xfff0;
 	else if(get_rf_mimo_mode(priv) == MIMO_3T3R || get_rf_mimo_mode(priv) == MIMO_4T4R)
 		value = 0xffea;
 	else
@@ -689,12 +623,12 @@ void construct_vht_ie(struct rtl8192cd_priv *priv, unsigned char channel_center)
 		else if(get_rf_mimo_mode(priv) == MIMO_2T2R)
 			value = filter_mcs_9(value, 2);
 		else if (get_rf_mimo_mode(priv) == MIMO_3T3R)
-			value = filter_mcs_9(value, 3);			
+			value = filter_mcs_9(value, 3);
 		else if (get_rf_mimo_mode(priv) == MIMO_4T4R)
-			value = filter_mcs_9(value, 4);			
+			value = filter_mcs_9(value, 4);
 	}
-	
-	vht_oper->vht_basic_msc = value; 
+
+	vht_oper->vht_basic_msc = value;
 	vht_oper->vht_basic_msc = cpu_to_le16(vht_oper->vht_basic_msc);
 }
 

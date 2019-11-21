@@ -191,24 +191,24 @@ ODM_TxPwrTrackSetPwr92E(
 	u1Byte					Final_CCK_Swing_Index = 0;
 	u1Byte					i = 0;
 	PODM_RF_CAL_T	pRFCalibrateInfo = &(pDM_Odm->RFCalibrateInfo);
-	
+
 	if (pDM_Odm->mp_mode == TRUE) {
 	#if (DM_ODM_SUPPORT_TYPE & (ODM_WIN | ODM_CE))
 		#if (DM_ODM_SUPPORT_TYPE & ODM_WIN)
 			#if (MP_DRIVER == 1)
 					PMPT_CONTEXT pMptCtx = &(Adapter->MptCtx);
-					
+
 					TxRate = MptToMgntRate(pMptCtx->MptRateIndex);
 			#endif
 		#elif (DM_ODM_SUPPORT_TYPE & ODM_CE)
 				PMPT_CONTEXT pMptCtx = &(Adapter->mppriv.MptCtx);
-				
+
 				TxRate = MptToMgntRate(pMptCtx->MptRateIndex);
-		#endif	
+		#endif
 	#endif
 	} else {
 		u2Byte	rate	 = *(pDM_Odm->pForcedDataRate);
-		
+
 		if (!rate) { /*auto rate*/
 			if (rate != 0xFF) {
 			#if (DM_ODM_SUPPORT_TYPE & ODM_WIN)
@@ -222,7 +222,7 @@ ODM_TxPwrTrackSetPwr92E(
 			TxRate = (u1Byte)rate;
 		}
 	}
-		
+
 	ODM_RT_TRACE(pDM_Odm, ODM_COMP_TX_PWR_TRACK, ODM_DBG_LOUD, ("Power Tracking TxRate=0x%X\n", TxRate));
 	ODM_RT_TRACE(pDM_Odm, ODM_COMP_TX_PWR_TRACK, ODM_DBG_LOUD, ("===>ODM_TxPwrTrackSetPwr8192EA\n"));
 
@@ -619,18 +619,18 @@ GetDeltaSwingTable_8192E(
 		#if (DM_ODM_SUPPORT_TYPE & ODM_WIN)
 			#if (MP_DRIVER == 1)
 					PMPT_CONTEXT pMptCtx = &(Adapter->MptCtx);
-					
+
 					TxRate = MptToMgntRate(pMptCtx->MptRateIndex);
 			#endif
 		#elif (DM_ODM_SUPPORT_TYPE & ODM_CE)
 				PMPT_CONTEXT pMptCtx = &(Adapter->mppriv.MptCtx);
-				
+
 				TxRate = MptToMgntRate(pMptCtx->MptRateIndex);
-		#endif	
+		#endif
 	#endif
 	} else {
 		u2Byte	rate	 = *(pDM_Odm->pForcedDataRate);
-		
+
 		if (!rate) { /*auto rate*/
 			if (rate != 0xFF) {
 			#if (DM_ODM_SUPPORT_TYPE & ODM_WIN)
@@ -2796,7 +2796,7 @@ PHY_IQCalibrate_8192E(
 	#if (DM_ODM_SUPPORT_TYPE & (ODM_CE|ODM_AP))
 	if (bReCovery)
 	#else /*for ODM_WIN*/
-	if (bReCovery && 
+	if (bReCovery &&
 	(!pAdapter->bInHctTest)) /*YJ,add for PowerTest,120405*/
 	#endif
 	{

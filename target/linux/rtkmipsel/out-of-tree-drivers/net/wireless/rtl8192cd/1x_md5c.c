@@ -23,7 +23,6 @@ documentation and/or software.
 //#include "8021x.h"
 #include "./8192cd_cfg.h"
 
-#if defined(INCLUDE_WPA_PSK) || defined(WIFI_HAPD) || defined(RTK_NL80211)
 
 #include "1x_md5c.h"
 
@@ -415,4 +414,3 @@ void hmac_md5(UINT8 *text, INT32 text_len, UINT8 *key, INT32 key_len,UINT8 *dige
         MD5Final(digest, &context);          /* finish up 2nd pass */
 }
 #endif
-#endif // INCLUDE_WPA_PSK

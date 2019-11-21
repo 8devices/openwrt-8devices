@@ -12,10 +12,8 @@
 
 #define _8192CD_EEPROM_C_
 #if 0
-#ifdef __KERNEL__
 #include <linux/config.h>
 #include <linux/module.h>
-#endif
 
 #include "./8192cd_cfg.h"
 #include "./8192cd.h"

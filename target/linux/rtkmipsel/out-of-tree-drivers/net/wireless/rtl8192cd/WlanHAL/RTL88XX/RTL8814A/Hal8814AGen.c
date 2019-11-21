@@ -3,14 +3,14 @@ Copyright (c) Realtek Semiconductor Corp. All rights reserved.
 
 Module Name:
 	Hal8814AGen.c
-	
+
 Abstract:
 	Defined RTL8814A HAL Function
-	    
+
 Major Change History:
 	When       Who               What
 	---------- ---------------   -------------------------------
-	2012-05-28 Filen            Create.	
+	2012-05-28 Filen            Create.
 --*/
 
 #if !defined(__ECOS) && !defined(CPTCFG_CFG80211_MODULE)

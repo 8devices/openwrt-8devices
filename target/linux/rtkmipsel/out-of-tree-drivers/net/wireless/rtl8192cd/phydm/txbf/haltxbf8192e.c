@@ -18,8 +18,8 @@ HalTxbf8192E_setNDPArate(
 )
 {
 	PDM_ODM_T	pDM_Odm = (PDM_ODM_T)pDM_VOID;
-	
-	ODM_Write1Byte(pDM_Odm, REG_NDPA_OPT_CTRL_8192E,  (Rate << 2 | BW));	
+
+	ODM_Write1Byte(pDM_Odm, REG_NDPA_OPT_CTRL_8192E,  (Rate << 2 | BW));
 
 }
 
@@ -41,7 +41,7 @@ halTxbf8192E_RfMode(
 
 	ODM_SetRFReg(pDM_Odm, ODM_RF_PATH_A, RF_WE_LUT, 0x80000, 0x1); /*RF Mode table write enable*/
 	ODM_SetRFReg(pDM_Odm, ODM_RF_PATH_B, RF_WE_LUT, 0x80000, 0x1); /*RF Mode table write enable*/
-	
+
 	if (pBeamInfo->beamformee_su_cnt > 0) {
 		/*Path_A*/
 		ODM_SetRFReg(pDM_Odm, ODM_RF_PATH_A, RF_ModeTableAddr, 0xfffff, 0x18000);	/*Select RX mode  0x30=0x18000*/
@@ -108,7 +108,7 @@ halTxbf8192E_FwTxBFCmd(
 	u1TxBFParm[2] = (Period1 << 4) | Period0;
 	ODM_FillH2CCmd(pDM_Odm, PHYDM_H2C_TXBF, 3, u1TxBFParm);
 
-	ODM_RT_TRACE(pDM_Odm, PHYDM_COMP_TXBF, ODM_DBG_LOUD, 
+	ODM_RT_TRACE(pDM_Odm, PHYDM_COMP_TXBF, ODM_DBG_LOUD,
 		("[%s] PageNum0 = %d Period0 = %d, PageNum1 = %d Period1 %d\n", __func__, PageNum0, Period0, PageNum1, Period1));
 }
 
@@ -124,11 +124,11 @@ halTxbf8192E_DownloadNDPA(
 	u1Byte			BcnValidReg = 0, count = 0, DLBcnCount = 0;
 	BOOLEAN			bSendBeacon = FALSE;
 	PADAPTER		Adapter = pDM_Odm->Adapter;
-	u1Byte			TxPageBndy = LAST_ENTRY_OF_TX_PKT_BUFFER_8812;	
+	u1Byte			TxPageBndy = LAST_ENTRY_OF_TX_PKT_BUFFER_8812;
 	/*default reseved 1 page for the IC type which is undefined.*/
 	PRT_BEAMFORMING_INFO	pBeamInfo = &pDM_Odm->BeamformingInfo;
 	PRT_BEAMFORMEE_ENTRY	pBeamEntry = pBeamInfo->BeamformeeEntry + Idx;
-	
+
 	ODM_RT_TRACE(pDM_Odm, PHYDM_COMP_TXBF, ODM_DBG_LOUD, ("[%s] Start!\n", __func__));
 #if (DM_ODM_SUPPORT_TYPE == ODM_WIN)
 	*pDM_Odm->pbFwDwRsvdPageInProgress = TRUE;
@@ -283,7 +283,7 @@ HalTxbf8192E_Enter(
 		if (BFeeIdx == 0) {
 			/*Get BIT24 & BIT25*/
 			u1Byte tmp = ODM_Read1Byte(pDM_Odm, REG_ASSOCIATED_BFMEE_SEL_8192E+3) & 0x3;
-			
+
 			ODM_Write1Byte(pDM_Odm, REG_ASSOCIATED_BFMEE_SEL_8192E+3, tmp | 0x60);
 			ODM_Write2Byte(pDM_Odm, REG_ASSOCIATED_BFMEE_SEL_8192E, STAid | BIT9);
 		} else {

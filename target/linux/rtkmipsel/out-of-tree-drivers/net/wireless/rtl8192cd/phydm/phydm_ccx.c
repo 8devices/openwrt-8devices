@@ -14,7 +14,7 @@ phydm_NHMsetting(
 	if (pDM_Odm->SupportICType & ODM_IC_11AC_SERIES) {
 
 		if (NHMsetting == SET_NHM_SETTING){
-			
+
 			/*Set inexclude_cca, inexclude_txon*/
 			ODM_SetBBReg(pDM_Odm, ODM_REG_NHM_TH9_TH10_11AC, BIT9, CCX_INFO->NHM_inexclude_cca);
 			ODM_SetBBReg(pDM_Odm, ODM_REG_NHM_TH9_TH10_11AC, BIT10, CCX_INFO->NHM_inexclude_txon);
@@ -26,7 +26,7 @@ phydm_NHMsetting(
 			ODM_SetBBReg(pDM_Odm, ODM_REG_NHM_TH3_TO_TH0_11AC, bMaskByte0, CCX_INFO->NHM_th[0]);
 			ODM_SetBBReg(pDM_Odm, ODM_REG_NHM_TH3_TO_TH0_11AC, bMaskByte1, CCX_INFO->NHM_th[1]);
 			ODM_SetBBReg(pDM_Odm, ODM_REG_NHM_TH3_TO_TH0_11AC, bMaskByte2, CCX_INFO->NHM_th[2]);
-			ODM_SetBBReg(pDM_Odm, ODM_REG_NHM_TH3_TO_TH0_11AC, bMaskByte3, CCX_INFO->NHM_th[3]);		
+			ODM_SetBBReg(pDM_Odm, ODM_REG_NHM_TH3_TO_TH0_11AC, bMaskByte3, CCX_INFO->NHM_th[3]);
 			ODM_SetBBReg(pDM_Odm, ODM_REG_NHM_TH7_TO_TH4_11AC, bMaskByte0, CCX_INFO->NHM_th[4]);
 			ODM_SetBBReg(pDM_Odm, ODM_REG_NHM_TH7_TO_TH4_11AC, bMaskByte1, CCX_INFO->NHM_th[5]);
 			ODM_SetBBReg(pDM_Odm, ODM_REG_NHM_TH7_TO_TH4_11AC, bMaskByte2, CCX_INFO->NHM_th[6]);
@@ -37,7 +37,7 @@ phydm_NHMsetting(
 
 			/*CCX EN*/
 			ODM_SetBBReg(pDM_Odm, ODM_REG_NHM_TH9_TH10_11AC, BIT8, CCX_EN);
-			
+
 		}
 		else if (NHMsetting == STORE_NHM_SETTING) {
 
@@ -52,7 +52,7 @@ phydm_NHMsetting(
 			CCX_INFO->NHM_th_restore[0] = (u1Byte)ODM_GetBBReg(pDM_Odm, ODM_REG_NHM_TH3_TO_TH0_11AC, bMaskByte0);
 			CCX_INFO->NHM_th_restore[1] = (u1Byte)ODM_GetBBReg(pDM_Odm, ODM_REG_NHM_TH3_TO_TH0_11AC, bMaskByte1);
 			CCX_INFO->NHM_th_restore[2] = (u1Byte)ODM_GetBBReg(pDM_Odm, ODM_REG_NHM_TH3_TO_TH0_11AC, bMaskByte2);
-			CCX_INFO->NHM_th_restore[3] = (u1Byte)ODM_GetBBReg(pDM_Odm, ODM_REG_NHM_TH3_TO_TH0_11AC, bMaskByte3);		
+			CCX_INFO->NHM_th_restore[3] = (u1Byte)ODM_GetBBReg(pDM_Odm, ODM_REG_NHM_TH3_TO_TH0_11AC, bMaskByte3);
 			CCX_INFO->NHM_th_restore[4] = (u1Byte)ODM_GetBBReg(pDM_Odm, ODM_REG_NHM_TH7_TO_TH4_11AC, bMaskByte0);
 			CCX_INFO->NHM_th_restore[5] = (u1Byte)ODM_GetBBReg(pDM_Odm, ODM_REG_NHM_TH7_TO_TH4_11AC, bMaskByte1);
 			CCX_INFO->NHM_th_restore[6] = (u1Byte)ODM_GetBBReg(pDM_Odm, ODM_REG_NHM_TH7_TO_TH4_11AC, bMaskByte2);
@@ -74,7 +74,7 @@ phydm_NHMsetting(
 			ODM_SetBBReg(pDM_Odm, ODM_REG_NHM_TH3_TO_TH0_11AC, bMaskByte0, CCX_INFO->NHM_th_restore[0]);
 			ODM_SetBBReg(pDM_Odm, ODM_REG_NHM_TH3_TO_TH0_11AC, bMaskByte1, CCX_INFO->NHM_th_restore[1]);
 			ODM_SetBBReg(pDM_Odm, ODM_REG_NHM_TH3_TO_TH0_11AC, bMaskByte2, CCX_INFO->NHM_th_restore[2]);
-			ODM_SetBBReg(pDM_Odm, ODM_REG_NHM_TH3_TO_TH0_11AC, bMaskByte3, CCX_INFO->NHM_th_restore[3]);		
+			ODM_SetBBReg(pDM_Odm, ODM_REG_NHM_TH3_TO_TH0_11AC, bMaskByte3, CCX_INFO->NHM_th_restore[3]);
 			ODM_SetBBReg(pDM_Odm, ODM_REG_NHM_TH7_TO_TH4_11AC, bMaskByte0, CCX_INFO->NHM_th_restore[4]);
 			ODM_SetBBReg(pDM_Odm, ODM_REG_NHM_TH7_TO_TH4_11AC, bMaskByte1, CCX_INFO->NHM_th_restore[5]);
 			ODM_SetBBReg(pDM_Odm, ODM_REG_NHM_TH7_TO_TH4_11AC, bMaskByte2, CCX_INFO->NHM_th_restore[6]);
@@ -90,19 +90,19 @@ phydm_NHMsetting(
 	else if (pDM_Odm->SupportICType & ODM_IC_11N_SERIES) {
 
 		if (NHMsetting == SET_NHM_SETTING){
-		
+
 			/*Set disable_ignore_cca, disable_ignore_txon*/
 			ODM_SetBBReg(pDM_Odm, ODM_REG_NHM_TH9_TH10_11N, BIT9, CCX_INFO->NHM_inexclude_cca);
 			ODM_SetBBReg(pDM_Odm, ODM_REG_NHM_TH9_TH10_11N, BIT10, CCX_INFO->NHM_inexclude_txon);
 
-			/*Set NHM period*/	
+			/*Set NHM period*/
 			ODM_SetBBReg(pDM_Odm, ODM_REG_CCX_PERIOD_11N, bMaskHWord, CCX_INFO->NHM_period);
 
 			/*Set NHM threshold*/
 			ODM_SetBBReg(pDM_Odm, ODM_REG_NHM_TH3_TO_TH0_11N, bMaskByte0, CCX_INFO->NHM_th[0]);
 			ODM_SetBBReg(pDM_Odm, ODM_REG_NHM_TH3_TO_TH0_11N, bMaskByte1, CCX_INFO->NHM_th[1]);
 			ODM_SetBBReg(pDM_Odm, ODM_REG_NHM_TH3_TO_TH0_11N, bMaskByte2, CCX_INFO->NHM_th[2]);
-			ODM_SetBBReg(pDM_Odm, ODM_REG_NHM_TH3_TO_TH0_11N, bMaskByte3, CCX_INFO->NHM_th[3]);		
+			ODM_SetBBReg(pDM_Odm, ODM_REG_NHM_TH3_TO_TH0_11N, bMaskByte3, CCX_INFO->NHM_th[3]);
 			ODM_SetBBReg(pDM_Odm, ODM_REG_NHM_TH7_TO_TH4_11N, bMaskByte0, CCX_INFO->NHM_th[4]);
 			ODM_SetBBReg(pDM_Odm, ODM_REG_NHM_TH7_TO_TH4_11N, bMaskByte1, CCX_INFO->NHM_th[5]);
 			ODM_SetBBReg(pDM_Odm, ODM_REG_NHM_TH7_TO_TH4_11N, bMaskByte2, CCX_INFO->NHM_th[6]);
@@ -127,14 +127,14 @@ phydm_NHMsetting(
 			CCX_INFO->NHM_th_restore[0] = (u1Byte)ODM_GetBBReg(pDM_Odm, ODM_REG_NHM_TH3_TO_TH0_11N, bMaskByte0);
 			CCX_INFO->NHM_th_restore[1] = (u1Byte)ODM_GetBBReg(pDM_Odm, ODM_REG_NHM_TH3_TO_TH0_11N, bMaskByte1);
 			CCX_INFO->NHM_th_restore[2] = (u1Byte)ODM_GetBBReg(pDM_Odm, ODM_REG_NHM_TH3_TO_TH0_11N, bMaskByte2);
-			CCX_INFO->NHM_th_restore[3] = (u1Byte)ODM_GetBBReg(pDM_Odm, ODM_REG_NHM_TH3_TO_TH0_11N, bMaskByte3);		
+			CCX_INFO->NHM_th_restore[3] = (u1Byte)ODM_GetBBReg(pDM_Odm, ODM_REG_NHM_TH3_TO_TH0_11N, bMaskByte3);
 			CCX_INFO->NHM_th_restore[4] = (u1Byte)ODM_GetBBReg(pDM_Odm, ODM_REG_NHM_TH7_TO_TH4_11N, bMaskByte0);
 			CCX_INFO->NHM_th_restore[5] = (u1Byte)ODM_GetBBReg(pDM_Odm, ODM_REG_NHM_TH7_TO_TH4_11N, bMaskByte1);
 			CCX_INFO->NHM_th_restore[6] = (u1Byte)ODM_GetBBReg(pDM_Odm, ODM_REG_NHM_TH7_TO_TH4_11N, bMaskByte2);
 			CCX_INFO->NHM_th_restore[7] = (u1Byte)ODM_GetBBReg(pDM_Odm, ODM_REG_NHM_TH7_TO_TH4_11N, bMaskByte3);
 			CCX_INFO->NHM_th_restore[8] = (u1Byte)ODM_GetBBReg(pDM_Odm, ODM_REG_NHM_TH8_11N, bMaskByte0);
 			CCX_INFO->NHM_th_restore[9] = (u1Byte)ODM_GetBBReg(pDM_Odm, ODM_REG_NHM_TH9_TH10_11N, bMaskByte2);
-			CCX_INFO->NHM_th_restore[10] = (u1Byte)ODM_GetBBReg(pDM_Odm, ODM_REG_NHM_TH9_TH10_11N, bMaskByte3);			
+			CCX_INFO->NHM_th_restore[10] = (u1Byte)ODM_GetBBReg(pDM_Odm, ODM_REG_NHM_TH9_TH10_11N, bMaskByte3);
 
 		}
 		else if (NHMsetting == RESTORE_NHM_SETTING) {
@@ -150,7 +150,7 @@ phydm_NHMsetting(
 			ODM_SetBBReg(pDM_Odm, ODM_REG_NHM_TH3_TO_TH0_11N, bMaskByte0, CCX_INFO->NHM_th_restore[0]);
 			ODM_SetBBReg(pDM_Odm, ODM_REG_NHM_TH3_TO_TH0_11N, bMaskByte1, CCX_INFO->NHM_th_restore[1]);
 			ODM_SetBBReg(pDM_Odm, ODM_REG_NHM_TH3_TO_TH0_11N, bMaskByte2, CCX_INFO->NHM_th_restore[2]);
-			ODM_SetBBReg(pDM_Odm, ODM_REG_NHM_TH3_TO_TH0_11N, bMaskByte3, CCX_INFO->NHM_th_restore[3]);		
+			ODM_SetBBReg(pDM_Odm, ODM_REG_NHM_TH3_TO_TH0_11N, bMaskByte3, CCX_INFO->NHM_th_restore[3]);
 			ODM_SetBBReg(pDM_Odm, ODM_REG_NHM_TH7_TO_TH4_11N, bMaskByte0, CCX_INFO->NHM_th_restore[4]);
 			ODM_SetBBReg(pDM_Odm, ODM_REG_NHM_TH7_TO_TH4_11N, bMaskByte1, CCX_INFO->NHM_th_restore[5]);
 			ODM_SetBBReg(pDM_Odm, ODM_REG_NHM_TH7_TO_TH4_11N, bMaskByte2, CCX_INFO->NHM_th_restore[6]);
@@ -161,7 +161,7 @@ phydm_NHMsetting(
 		}
 		else
 			return;
-		
+
 	}
 }
 
@@ -183,7 +183,7 @@ phydm_NHMtrigger(
 
 		/*Trigger NHM*/
 		ODM_SetBBReg(pDM_Odm, ODM_REG_NHM_TH9_TH10_11N, BIT1, 0);
-		ODM_SetBBReg(pDM_Odm, ODM_REG_NHM_TH9_TH10_11N, BIT1, 1);		
+		ODM_SetBBReg(pDM_Odm, ODM_REG_NHM_TH9_TH10_11N, BIT1, 1);
 	}
 }
 
@@ -196,7 +196,7 @@ phydm_getNHMresult(
 	u4Byte			value32;
 	u1Byte			i;
 	PCCX_INFO		CCX_INFO = &pDM_Odm->DM_CCX_INFO;
-	
+
 	if (pDM_Odm->SupportICType & ODM_IC_11AC_SERIES) {
 
 			value32 = ODM_Read4Byte(pDM_Odm, ODM_REG_NHM_CNT_11AC);
@@ -220,7 +220,7 @@ phydm_getNHMresult(
 			/*Get NHM duration*/
 			value32 = ODM_Read4Byte(pDM_Odm, ODM_REG_NHM_DUR_READY_11AC);
 			CCX_INFO->NHM_duration = (u2Byte)(value32 & bMaskLWord);
-			
+
 	}
 
 	else if (pDM_Odm->SupportICType & ODM_IC_11N_SERIES) {
@@ -250,9 +250,9 @@ phydm_getNHMresult(
 			CCX_INFO->NHM_duration = (u2Byte)(value32 & bMaskLWord);
 
 	}
-	
+
 	CCX_INFO->NHM_result_total = 0;
-	
+
 	for (i = 0; i <= 11; i++)
 		CCX_INFO->NHM_result_total += CCX_INFO->NHM_result[i];
 
@@ -275,11 +275,11 @@ phydm_checkNHMready(
 	u4Byte			value32 = 0;
 	u1Byte			i;
 	BOOLEAN			ret = FALSE;
-	
+
 	if (pDM_Odm->SupportICType & ODM_IC_11AC_SERIES) {
 
 		value32 = ODM_GetBBReg(pDM_Odm, ODM_REG_CLM_RESULT_11AC, bMaskDWord);
-		
+
 		for (i = 0; i < 200; i ++) {
 
 			ODM_delay_ms(1);
@@ -289,11 +289,11 @@ phydm_checkNHMready(
 			}
 		}
 	}
-	
+
 	else if (pDM_Odm->SupportICType & ODM_IC_11N_SERIES) {
 
 		value32 = ODM_GetBBReg(pDM_Odm, ODM_REG_CLM_READY_11N, bMaskDWord);
-		
+
 		for (i = 0; i < 200; i ++) {
 
 			ODM_delay_ms(1);
@@ -301,7 +301,7 @@ phydm_checkNHMready(
 				ret = 1;
 				break;
 			}
-		}		
+		}
 	}
 	return ret;
 }
@@ -319,9 +319,9 @@ phydm_storeNHMsetting(
 
 	}
 	else if (pDM_Odm->SupportICType & ODM_IC_11N_SERIES) {
-		
 
-		
+
+
 	}
 }
 
@@ -331,7 +331,7 @@ phydm_CLMInit(
 	u2Byte	clm_sample_num
 )
 {
-	PDM_ODM_T		pDM_Odm = (PDM_ODM_T)pDM_VOID;		
+	PDM_ODM_T		pDM_Odm = (PDM_ODM_T)pDM_VOID;
 //	prtl8192cd_priv		priv = pDM_Odm->priv;
 
 	if (pDM_Odm->SupportICType & ODM_IC_11AC_SERIES) {
@@ -339,7 +339,7 @@ phydm_CLMInit(
 		ODM_SetBBReg(pDM_Odm, ODM_REG_CLM_11AC, BIT8, 0x1);							/*Enable CCX for CLM*/
 	} else if (pDM_Odm->SupportICType & ODM_IC_11N_SERIES) {
 		ODM_SetBBReg(pDM_Odm, ODM_REG_CLM_TIME_PERIOD_11N, bMaskLWord, clm_sample_num);	/*4us sample 1 time*/
-		ODM_SetBBReg(pDM_Odm, ODM_REG_CLM_11N, BIT8, 0x1);								/*Enable CCX for CLM*/	
+		ODM_SetBBReg(pDM_Odm, ODM_REG_CLM_11N, BIT8, 0x1);								/*Enable CCX for CLM*/
 	}
 
 	ODM_RT_TRACE(pDM_Odm, ODM_COMP_NOISY_DETECT, ODM_DBG_LOUD, ("CLM sampleNum = %d\n", clm_sample_num));
@@ -351,7 +351,7 @@ phydm_CLMsetting(
 	IN		PVOID			pDM_VOID
 )
 {
-	PDM_ODM_T		pDM_Odm = (PDM_ODM_T)pDM_VOID;		
+	PDM_ODM_T		pDM_Odm = (PDM_ODM_T)pDM_VOID;
 	PCCX_INFO	CCX_INFO = &pDM_Odm->DM_CCX_INFO;
 
 
@@ -359,15 +359,15 @@ phydm_CLMsetting(
 
 		ODM_SetBBReg(pDM_Odm, ODM_REG_CCX_PERIOD_11AC, bMaskLWord, CCX_INFO->CLM_period);	/*4us sample 1 time*/
 		ODM_SetBBReg(pDM_Odm, ODM_REG_CLM_11AC, BIT8, 0x1);										/*Enable CCX for CLM*/
-		
+
 	} else if (pDM_Odm->SupportICType & ODM_IC_11N_SERIES) {
 
 		ODM_SetBBReg(pDM_Odm, ODM_REG_CCX_PERIOD_11N, bMaskLWord, CCX_INFO->CLM_period);	/*4us sample 1 time*/
-		ODM_SetBBReg(pDM_Odm, ODM_REG_CLM_11N, BIT8, 0x1);								/*Enable CCX for CLM*/	
+		ODM_SetBBReg(pDM_Odm, ODM_REG_CLM_11N, BIT8, 0x1);								/*Enable CCX for CLM*/
 	}
 
 	ODM_RT_TRACE(pDM_Odm, ODM_COMP_CCX, ODM_DBG_LOUD, ("[%s] : CLM period = %dus\n", __func__,  CCX_INFO->CLM_period*4));
-		
+
 }
 
 VOID
@@ -394,7 +394,7 @@ phydm_checkCLMready(
 	PDM_ODM_T		pDM_Odm = (PDM_ODM_T)pDM_VOID;
 	u4Byte			value32 = 0;
 	BOOLEAN			ret = FALSE;
-	
+
 	if (pDM_Odm->SupportICType & ODM_IC_11AC_SERIES)
 		value32 = ODM_GetBBReg(pDM_Odm, ODM_REG_CLM_RESULT_11AC, bMaskDWord);				/*make sure CLM calc is ready*/
 	else if (pDM_Odm->SupportICType & ODM_IC_11N_SERIES)
@@ -420,7 +420,7 @@ phydm_getCLMresult(
 
 	u4Byte			value32 = 0;
 //	u2Byte			results = 0;
-	
+
 	if (pDM_Odm->SupportICType & ODM_IC_11AC_SERIES)
 		value32 = ODM_GetBBReg(pDM_Odm, ODM_REG_CLM_RESULT_11AC, bMaskDWord);				/*read CLM calc result*/
 	else if (pDM_Odm->SupportICType & ODM_IC_11N_SERIES)
@@ -429,8 +429,8 @@ phydm_getCLMresult(
 	CCX_INFO->CLM_result = (u2Byte)(value32 & bMaskLWord);
 
 	ODM_RT_TRACE(pDM_Odm, ODM_COMP_CCX, ODM_DBG_LOUD, ("[%s] : CLM result = %dus\n", __func__, CCX_INFO->CLM_result*4));
-	
-	return CCX_INFO->CLM_result;	
+
+	return CCX_INFO->CLM_result;
 }
 
 
@@ -497,14 +497,14 @@ phydm_ccx_setting(
 	u8		IGI,
 	bool	NHM_inexclude_cca
 )
-{	
+{
 	PDM_ODM_T	pDM_Odm = (PDM_ODM_T)pDM_VOID;
 	PCCX_INFO	CCX_INFO = &pDM_Odm->DM_CCX_INFO;
 	u8			nhm_th[11], i, ms_to_four_us = 250;
 
 	/* check if NHM threshold is changed */
 	if (pDM_Odm->SupportICType & ODM_IC_11AC_SERIES) {
-		
+
 		nhm_th[0] = (u8)ODM_GetBBReg(pDM_Odm, ODM_REG_NHM_TH3_TO_TH0_11AC, bMaskByte0);
 		nhm_th[1] = (u8)ODM_GetBBReg(pDM_Odm, ODM_REG_NHM_TH3_TO_TH0_11AC, bMaskByte1);
 		nhm_th[2] = (u8)ODM_GetBBReg(pDM_Odm, ODM_REG_NHM_TH3_TO_TH0_11AC, bMaskByte2);
@@ -518,7 +518,7 @@ phydm_ccx_setting(
 		nhm_th[10] = (u8)ODM_GetBBReg(pDM_Odm, ODM_REG_NHM_TH9_TH10_11AC, bMaskByte3);
 
 	} else if (pDM_Odm->SupportICType & ODM_IC_11N_SERIES) {
-		
+
 		nhm_th[0] = (u8)ODM_GetBBReg(pDM_Odm, ODM_REG_NHM_TH3_TO_TH0_11N, bMaskByte0);
 		nhm_th[1] = (u8)ODM_GetBBReg(pDM_Odm, ODM_REG_NHM_TH3_TO_TH0_11N, bMaskByte1);
 		nhm_th[2] = (u8)ODM_GetBBReg(pDM_Odm, ODM_REG_NHM_TH3_TO_TH0_11N, bMaskByte2);
@@ -533,8 +533,8 @@ phydm_ccx_setting(
 	}
 
 	for (i = 0; i <= 10; i++) {
-		
-		if (nhm_th[i] != CCX_INFO->NHM_th[i]) { 
+
+		if (nhm_th[i] != CCX_INFO->NHM_th[i]) {
 			ODM_RT_TRACE(pDM_Odm, ODM_COMP_CCX, ODM_DBG_LOUD,
 				("nhm_th[%d] != CCX_INFO->nhm_th[%d]!!\n", i, i));
 		}
@@ -578,9 +578,9 @@ phydm_ccx_result(
 		else
 			clm_ratio = (CCX_INFO->CLM_result * 100) / CCX_INFO->CLM_period;
 	}
-	
+
 	nhm_ratio = ((CCX_INFO->NHM_result_total - CCX_INFO->NHM_result[0])*100) >> 8;
-	
+
 	CCX_INFO->CLM_ratio = (u8)clm_ratio;
 	CCX_INFO->NHM_ratio = (u8)nhm_ratio;
 
@@ -592,11 +592,11 @@ phydm_ccx_result(
 VOID
 phydm_ccx_lna_chk_setting(
 	IN		PVOID			pDM_VOID
-	
+
 )
 {
 	PDM_ODM_T	pDM_Odm = (PDM_ODM_T)pDM_VOID;
-	
+
 	odm_PauseDIG(pDM_Odm, PHYDM_PAUSE, PHYDM_PAUSE_LEVEL_1 ,IGI_FOR_SAT_SCAN);
 	phydm_ccx_setting(pDM_Odm, CCX_PERIOD_FOR_SCAN, IGI_FOR_SAT_SCAN, NHM_INCLUDE_CCA);
 }
@@ -618,6 +618,6 @@ phydm_ccx_lna_chk_result(
 {
 	PDM_ODM_T	pDM_Odm = (PDM_ODM_T)pDM_VOID;
 	phydm_ccx_result(pDM_Odm);
-	odm_PauseDIG(pDM_Odm, PHYDM_RESUME, PHYDM_PAUSE_LEVEL_1 ,IGI_FOR_SAT_SCAN);	
+	odm_PauseDIG(pDM_Odm, PHYDM_RESUME, PHYDM_PAUSE_LEVEL_1 ,IGI_FOR_SAT_SCAN);
 }
 #endif

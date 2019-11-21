@@ -1,7 +1,7 @@
 /******************************************************************************
  *
  * Copyright(c) 2007 - 2011 Realtek Corporation. All rights reserved.
- *                                        
+ *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of version 2 of the GNU General Public License as
  * published by the Free Software Foundation.
@@ -21,7 +21,7 @@
 #include "mp_precomp.h"
 #include "../phydm_precomp.h"
 
-#if (RTL8197F_SUPPORT == 1)  
+#if (RTL8197F_SUPPORT == 1)
 
 /* ======================================================================== */
 /* These following functions can be used for PHY DM only*/
@@ -40,18 +40,18 @@ phydm_CcaParByBw_8197f(
 	regc3c = ODM_GetBBReg(pDM_Odm, 0xc3c, bMaskDWord);
 	regc3c_8_6 = ((regc3c & 0x1c0)>>6);
 	regc3c &= (~(0x000001f8));
-	
+
 	reg_aaa = ODM_Read1Byte(pDM_Odm, 0xaaa) & 0x1f;
 	pDM_DigTable->aaa_default = reg_aaa;
-	
+
 	ODM_RT_TRACE(pDM_Odm, ODM_PHY_CONFIG, ODM_DBG_TRACE, ("%s ==> RFEType=%d, PackageType=%d, CutVersion=%d, bandwidth=%d, RXAntStatus=%d\n",
 		__func__,
 		pDM_Odm->RFEType,
 		pDM_Odm->PackageType,
 		pDM_Odm->CutVersion,
 		bandwidth,
-		pDM_Odm->RXAntStatus));	
-	
+		pDM_Odm->RXAntStatus));
+
 	if ((pDM_Odm->RFEType == 1) && (pDM_Odm->PackageType == 1)) {	// 97FS type1
 		if (pDM_Odm->CutVersion == ODM_CUT_A) {
 			if ((bandwidth == ODM_BW40M) && (pDM_Odm->RXAntStatus != (ODM_RF_A|ODM_RF_B))) {
@@ -89,7 +89,7 @@ phydm_CcaParByBw_8197f(
 			if (pDM_Odm->RXAntStatus == (ODM_RF_A|ODM_RF_B)) {
 				regc3c |= ((0x2) << 3);
 				regc3c |= (regc3c_8_6 << 6);
-			} else { 
+			} else {
 				regc3c |= ((0x2) << 3);
 				regc3c |= (regc3c_8_6 << 6);
 			}
@@ -97,8 +97,8 @@ phydm_CcaParByBw_8197f(
 		}
 		ODM_SetBBReg(pDM_Odm, 0xaa8, 0x1f0000, reg_aaa);
 		pDM_DigTable->aaa_default = reg_aaa;
-	
-	}	
+
+	}
 	else if ((pDM_Odm->RFEType == 2) && (pDM_Odm->PackageType == 2)) {
 		if ((bandwidth == ODM_BW20M)) {
 			if (pDM_Odm->RXAntStatus == (ODM_RF_A|ODM_RF_B)) {
@@ -136,7 +136,7 @@ phydm_CcaParByBw_8197f(
 			if (pDM_Odm->RXAntStatus == (ODM_RF_A|ODM_RF_B)) {
 				regc3c |= ((0x1) << 3);
 				regc3c |= (regc3c_8_6 << 6);
-			} else { 
+			} else {
 				regc3c |= ((0x1) << 3);
 				regc3c |= (regc3c_8_6 << 6);
 			}
@@ -177,7 +177,7 @@ phydm_CcaParByBw_8197f(
 			ODM_SetBBReg(pDM_Odm, 0xaa8, 0x1f0000, reg_aaa);
 			pDM_DigTable->aaa_default = reg_aaa;
 		}
-		
+
 	}
 	ODM_RT_TRACE(pDM_Odm, ODM_PHY_CONFIG, ODM_DBG_TRACE, ("%s ==> regc3c=0x%x, reg_aaa=0x%x\n", __func__, regc3c, reg_aaa));
 
@@ -223,7 +223,7 @@ phydm_init_hw_info_by_rfe_type_8197f(
 	u2Byte	mask_path_b = 0x0c0c;
 	/*u2Byte	mask_path_c = 0x3030;*/
 	/*u2Byte	mask_path_d = 0xc0c0;*/
-	
+
 	pDM_Odm->bInitHwInfoByRfe = FALSE;
 
 	if (pDM_Odm->RFEType == 0) {
@@ -232,7 +232,7 @@ phydm_init_hw_info_by_rfe_type_8197f(
 		ODM_SetBBReg(pDM_Odm, 0x4c, BIT24, 0x0);		/*GPIO setting*/
 		ODM_SetBBReg(pDM_Odm, 0x64, BIT28, 0x0);		/*GPIO setting*/
 		ODM_SetBBReg(pDM_Odm, 0x40, 0xf000000, 0x0);	/*GPIO setting*/
-		
+
 	} else if (pDM_Odm->RFEType == 1) {
 		panic_printk("[97F] RFE type 1 PHY paratemters: GPA0+GLNA0\n");
 		ODM_CmnInfoInit(pDM_Odm, ODM_CMNINFO_BOARD_TYPE, ODM_BOARD_EXT_PA|ODM_BOARD_EXT_LNA);
@@ -252,7 +252,7 @@ phydm_init_hw_info_by_rfe_type_8197f(
 		ODM_SetBBReg(pDM_Odm, 0x40, 0xf000000, 0x0);
 		ODM_CmnInfoInit(pDM_Odm, ODM_CMNINFO_EXT_LNA, FALSE);
 		ODM_CmnInfoInit(pDM_Odm, ODM_CMNINFO_EXT_PA, FALSE);
-		
+
 	} else if (pDM_Odm->RFEType == 3) {
 		panic_printk("[97F] RFE type 3 PHY paratemters: internal with TRSW\n");
 		ODM_CmnInfoInit(pDM_Odm, ODM_CMNINFO_BOARD_TYPE, ODM_BOARD_EXT_PA_5G);
@@ -263,7 +263,7 @@ phydm_init_hw_info_by_rfe_type_8197f(
 		ODM_SetBBReg(pDM_Odm, 0x40, 0xf000000, 0x5);
 		ODM_CmnInfoInit(pDM_Odm, ODM_CMNINFO_EXT_LNA, FALSE);
 		ODM_CmnInfoInit(pDM_Odm, ODM_CMNINFO_EXT_PA, FALSE);
-		
+
 	} else if (pDM_Odm->RFEType == 4) {
 		panic_printk("[97F] RFE type 4 PHY paratemters: GLNA0\n");
 		ODM_CmnInfoInit(pDM_Odm, ODM_CMNINFO_BOARD_TYPE, ODM_BOARD_EXT_LNA);
@@ -271,7 +271,7 @@ phydm_init_hw_info_by_rfe_type_8197f(
 		ODM_SetBBReg(pDM_Odm, 0x64, BIT28, 0x1);
 		ODM_SetBBReg(pDM_Odm, 0x40, 0xf000000, 0x5);
 		ODM_CmnInfoInit(pDM_Odm, ODM_CMNINFO_EXT_LNA, TRUE);
-		
+
 	} else if (pDM_Odm->RFEType == 5) {
 		panic_printk("[97F] RFE type 5 PHY paratemters: GPA1+GLNA1\n");
 		ODM_CmnInfoInit(pDM_Odm, ODM_CMNINFO_BOARD_TYPE, ODM_BOARD_EXT_PA|ODM_BOARD_EXT_LNA);
@@ -282,7 +282,7 @@ phydm_init_hw_info_by_rfe_type_8197f(
 		ODM_SetBBReg(pDM_Odm, 0x40, 0xf000000, 0x5);
 		ODM_CmnInfoInit(pDM_Odm, ODM_CMNINFO_EXT_LNA, TRUE);
 		ODM_CmnInfoInit(pDM_Odm, ODM_CMNINFO_EXT_PA, TRUE);
-		
+
 	} else if (pDM_Odm->RFEType == 6) {
 		panic_printk("[97F] RFE type 6 PHY paratemters: GLNA1\n");
 		ODM_CmnInfoInit(pDM_Odm, ODM_CMNINFO_BOARD_TYPE, ODM_BOARD_EXT_LNA);
@@ -291,7 +291,7 @@ phydm_init_hw_info_by_rfe_type_8197f(
 		ODM_SetBBReg(pDM_Odm, 0x64, BIT28, 0x1);
 		ODM_SetBBReg(pDM_Odm, 0x40, 0xf000000, 0x5);
 		ODM_CmnInfoInit(pDM_Odm, ODM_CMNINFO_EXT_LNA, TRUE);
-		
+
 	} else {
 		panic_printk("[97F] RFE type Unknown PHY paratemters:\n");
 		ODM_SetBBReg(pDM_Odm, 0x4c, BIT24, 0x1);
@@ -346,7 +346,7 @@ config_phydm_read_rf_reg_8197f(
 
 	/* Read RF register directly */
 	Readback_Value = ODM_GetBBReg(pDM_Odm, Direct_Addr, BitMask);
-	ODM_RT_TRACE(pDM_Odm, ODM_PHY_CONFIG, ODM_DBG_TRACE, ("config_phydm_read_rf_reg_8197f(): RF-%d 0x%x = 0x%x, bit mask = 0x%x\n", 
+	ODM_RT_TRACE(pDM_Odm, ODM_PHY_CONFIG, ODM_DBG_TRACE, ("config_phydm_read_rf_reg_8197f(): RF-%d 0x%x = 0x%x, bit mask = 0x%x\n",
 		RFPath, RegAddr, Readback_Value, BitMask));
 	return Readback_Value;
 }
@@ -392,18 +392,18 @@ config_phydm_write_rf_reg_8197f(
 			}
 			Data = ((Data_original) & (~BitMask)) | ((Data << BitShift) & (BitMask));
 		}
-	} 
+	}
 	else if (ODM_GetMACReg(pDM_Odm, power_RF[RFPath], bMaskByte3) != 0x7) {
 		ODM_RT_TRACE(pDM_Odm, ODM_PHY_CONFIG, ODM_DBG_TRACE, ("config_phydm_write_rf_reg_8197f(): Write fail, RF is disabled\n"));
 		return FALSE;
 	}
 
 	/* Put write addr in [27:20]  and write data in [19:00] */
-	DataAndAddr = ((RegAddr<<20) | (Data&0x000fffff)) & 0x0fffffff;	
+	DataAndAddr = ((RegAddr<<20) | (Data&0x000fffff)) & 0x0fffffff;
 
 	/* Write Operation */
 	ODM_SetBBReg(pDM_Odm, offset_writeRF[RFPath], bMaskDWord, DataAndAddr);
-	ODM_RT_TRACE(pDM_Odm, ODM_PHY_CONFIG, ODM_DBG_TRACE, ("config_phydm_write_rf_reg_8197f(): RF-%d 0x%x = 0x%x (original: 0x%x), bit mask = 0x%x\n", 
+	ODM_RT_TRACE(pDM_Odm, ODM_PHY_CONFIG, ODM_DBG_TRACE, ("config_phydm_write_rf_reg_8197f(): RF-%d 0x%x = 0x%x (original: 0x%x), bit mask = 0x%x\n",
 		RFPath, RegAddr, Data, Data_original, BitMask));
 	return TRUE;
 }
@@ -412,7 +412,7 @@ BOOLEAN
 config_phydm_write_txagc_8197f(
 	IN	PDM_ODM_T				pDM_Odm,
 	IN	u4Byte					PowerIndex,
-	IN	ODM_RF_RADIO_PATH_E	Path,	
+	IN	ODM_RF_RADIO_PATH_E	Path,
 	IN	u1Byte					HwRate
 	)
 {
@@ -621,7 +621,7 @@ config_phydm_write_txagc_8197f(
 	} else
 		ODM_RT_TRACE(pDM_Odm, ODM_PHY_CONFIG, ODM_DBG_TRACE, ("Invalid RF path!!\n"));
 
-	ODM_RT_TRACE(pDM_Odm, ODM_PHY_CONFIG, ODM_DBG_TRACE, ("config_phydm_write_txagc_8197f(): Path-%d Rate index 0x%x = 0x%x\n", 
+	ODM_RT_TRACE(pDM_Odm, ODM_PHY_CONFIG, ODM_DBG_TRACE, ("config_phydm_write_txagc_8197f(): Path-%d Rate index 0x%x = 0x%x\n",
 		Path, HwRate, PowerIndex));
 	return TRUE;
 }
@@ -839,7 +839,7 @@ config_phydm_read_txagc_8197f(
 }
 
 BOOLEAN
-config_phydm_switch_channel_8197f(	
+config_phydm_switch_channel_8197f(
 	IN	PDM_ODM_T				pDM_Odm,
 	IN	u1Byte					central_ch
 	)
@@ -886,7 +886,7 @@ config_phydm_switch_channel_8197f(
 }
 
 BOOLEAN
-config_phydm_switch_bandwidth_8197f(	
+config_phydm_switch_bandwidth_8197f(
 	IN	PDM_ODM_T				pDM_Odm,
 	IN	u1Byte					primary_ch_idx,
 	IN	ODM_BW_E				bandwidth
@@ -1027,7 +1027,7 @@ config_phydm_switch_bandwidth_8197f(
 }
 
 BOOLEAN
-config_phydm_switch_channel_bw_8197f(	
+config_phydm_switch_channel_bw_8197f(
 	IN	PDM_ODM_T				pDM_Odm,
 	IN	u1Byte					central_ch,
 	IN	u1Byte					primary_ch_idx,
@@ -1062,7 +1062,7 @@ config_phydm_trx_mode_8197f(
 	BOOLEAN		rf_reg_status = TRUE;
 	u1Byte		IGI;
 
-	ODM_RT_TRACE(pDM_Odm, ODM_PHY_CONFIG, ODM_DBG_TRACE, ("config_phydm_trx_mode_8197f()=====================>\n"));	
+	ODM_RT_TRACE(pDM_Odm, ODM_PHY_CONFIG, ODM_DBG_TRACE, ("config_phydm_trx_mode_8197f()=====================>\n"));
 
 	if (pDM_Odm->bDisablePhyApi) {
 		ODM_RT_TRACE(pDM_Odm, ODM_PHY_CONFIG, ODM_DBG_TRACE, ("config_phydm_trx_mode_8197f(): disable PHY API for debug!!\n"));

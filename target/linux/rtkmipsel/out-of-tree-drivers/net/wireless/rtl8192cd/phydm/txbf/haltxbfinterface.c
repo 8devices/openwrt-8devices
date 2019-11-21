@@ -35,7 +35,7 @@ Beamforming_GidPAid(
 		/* Fill G_ID and P_AID */
 		pTcb->G_ID = 63;
 		if (pBeamInfo->FirstMUBFeeIndex < BEAMFORMEE_ENTRY_NUM) {
-			pTcb->P_AID = pBeamInfo->BeamformeeEntry[pBeamInfo->FirstMUBFeeIndex].P_AID;			
+			pTcb->P_AID = pBeamInfo->BeamformeeEntry[pBeamInfo->FirstMUBFeeIndex].P_AID;
 			RT_DISP(FBEAM, FBEAM_FUN, ("[David]@%s End, G_ID=0x%X, P_AID=0x%X\n", __func__, pTcb->G_ID, pTcb->P_AID));
 		}
 	} else {
@@ -48,7 +48,7 @@ Beamforming_GidPAid(
 			pTcb->P_AID = 0;
 		} else if (ACTING_AS_AP(Adapter)) {
 			u2Byte	AID = (u2Byte) (MacIdGetOwnerAssociatedClientAID(Adapter, pTcb->macId) & 0x1ff);		/*AID[0:8]*/
-	
+
 			/*RT_DISP(FBEAM, FBEAM_FUN, ("@%s  pTcb->macId=0x%X, AID=0x%X\n", __func__, pTcb->macId, AID));*/
 			pTcb->G_ID = 63;
 
@@ -103,26 +103,26 @@ Beamforming_GetReportFrame(
 	}
 
 	pktType = PacketGetActionFrameType(pPduOS);
-	
+
 	//-@ Modified by David
 	if (pktType == ACT_PKT_VHT_COMPRESSED_BEAMFORMING) {
-		pMIMOCtrlField = pPduOS->Octet + 26; 
+		pMIMOCtrlField = pPduOS->Octet + 26;
 		Nc = ((*pMIMOCtrlField) & 0x7) + 1;
 		Nr = (((*pMIMOCtrlField) & 0x38) >> 3) + 1;
 		CH_W =  (((*pMIMOCtrlField) & 0xC0) >> 6);
 		pCSIMatrix = pMIMOCtrlField + 3 + Nc; //24+(1+1+3)+2  MAC header+(Category+ActionCode+MIMOControlField) +SNR(Nc=2)
 		CSIMatrixLen = pPduOS->Length  - 26 -3 -Nc;
 	} else if (pktType == ACT_PKT_HT_COMPRESSED_BEAMFORMING) {
-		pMIMOCtrlField = pPduOS->Octet + 26; 
+		pMIMOCtrlField = pPduOS->Octet + 26;
 		Nc = ((*pMIMOCtrlField) & 0x3) + 1;
 		Nr =  (((*pMIMOCtrlField) & 0xC) >> 2) + 1;
 		CH_W =  (((*pMIMOCtrlField) & 0x10) >> 4);
 		pCSIMatrix = pMIMOCtrlField + 6 + Nr;	//24+(1+1+6)+2  MAC header+(Category+ActionCode+MIMOControlField) +SNR(Nc=2)
 		CSIMatrixLen = pPduOS->Length  - 26 -6 -Nr;
 	} else
-		return RT_STATUS_SUCCESS;	
-	
-	ODM_RT_TRACE(pDM_Odm, PHYDM_COMP_TXBF, ODM_DBG_LOUD, ("[%s] idx=%d, pkt type=%d, Nc=%d, Nr=%d, CH_W=%d\n", __func__, Idx, pktType, Nc, Nr, CH_W));		
+		return RT_STATUS_SUCCESS;
+
+	ODM_RT_TRACE(pDM_Odm, PHYDM_COMP_TXBF, ODM_DBG_LOUD, ("[%s] idx=%d, pkt type=%d, Nc=%d, Nr=%d, CH_W=%d\n", __func__, Idx, pktType, Nc, Nr, CH_W));
 
 	return RT_STATUS_SUCCESS;
 }
@@ -154,10 +154,10 @@ ConstructHTNDPAPacket(
 	SET_80211_HDR_ADDRESS3(Buffer, pMgntInfo->Bssid);
 
 	Duration = 2*aSifsTime + 40;
-	
+
 	if (BW == CHANNEL_WIDTH_40)
 		Duration+= 87;
-	else	
+	else
 		Duration+= 180;
 
 	SET_80211_HDR_DURATION(Buffer, Duration);
@@ -165,11 +165,11 @@ ConstructHTNDPAPacket(
 	//HT control field
 	SET_HT_CTRL_CSI_STEERING(Buffer+sMacHdrLng, 3);
 	SET_HT_CTRL_NDP_ANNOUNCEMENT(Buffer+sMacHdrLng, 1);
-	
+
 	FillOctetString(pNDPAFrame, Buffer, sMacHdrLng+sHTCLng);
 
 	FillOctetString(ActionContent, ActionHdr, 4);
-	PacketAppendData(&pNDPAFrame, ActionContent);	
+	PacketAppendData(&pNDPAFrame, ActionContent);
 
 	*pLength = 32;
 }
@@ -213,9 +213,9 @@ SendFWHTNDPAPacket(
 		BufAddr = pBuf->Buffer.VirtualAddress + DescLen;
 
 		ConstructHTNDPAPacket(
-				Adapter, 
+				Adapter,
 				RA,
-				BufAddr, 
+				BufAddr,
 				&BufLen,
 				BW
 				);
@@ -223,7 +223,7 @@ SendFWHTNDPAPacket(
 		pTcb->PacketLength = BufLen + DescLen;
 
 		pTcb->bTxEnableSwCalcDur = TRUE;
-		
+
 		pTcb->BWOfPacket = BW;
 
 		if(ACTING_AS_IBSS(Adapter) || ACTING_AS_AP(Adapter))
@@ -237,7 +237,7 @@ SendFWHTNDPAPacket(
 		ret = FALSE;
 
 	PlatformReleaseSpinLock(Adapter, RT_TX_SPINLOCK);
-	
+
 	if (ret)
 		RT_DISP_DATA(FBEAM, FBEAM_DATA, "", pBuf->Buffer.VirtualAddress, pTcb->PacketLength);
 
@@ -265,14 +265,14 @@ SendSWHTNDPAPacket(
 
 	NDPTxRate = Beamforming_GetHTNDPTxRate(pDM_Odm, pBeamformEntry->CompSteeringNumofBFer);
 	ODM_RT_TRACE(pDM_Odm, PHYDM_COMP_TXBF, ODM_DBG_LOUD, ("[%s] NDPTxRate =%d\n", __func__, NDPTxRate));
-	
+
 	PlatformAcquireSpinLock(Adapter, RT_TX_SPINLOCK);
 
 	if (MgntGetBuffer(Adapter, &pTcb, &pBuf)) {
 		ConstructHTNDPAPacket(
-				Adapter, 
+				Adapter,
 				RA,
-				pBuf->Buffer.VirtualAddress, 
+				pBuf->Buffer.VirtualAddress,
 				&pTcb->PacketLength,
 				BW
 				);
@@ -284,7 +284,7 @@ SendSWHTNDPAPacket(
 		MgntSendPacket(Adapter, pTcb, pBuf, pTcb->PacketLength, NORMAL_QUEUE, NDPTxRate);
 	} else
 		ret = FALSE;
-	
+
 	PlatformReleaseSpinLock(Adapter, RT_TX_SPINLOCK);
 
 	if (ret)
@@ -320,12 +320,12 @@ ConstructVHTNDPAPacket(
 	SET_80211_HDR_ADDRESS2(pNDPAFrame, pBeamformEntry->MyMacAddr);
 
 	Duration = 2*aSifsTime + 44;
-	
+
 	if (BW == CHANNEL_WIDTH_80)
 		Duration += 40;
 	else if(BW == CHANNEL_WIDTH_40)
 		Duration+= 87;
-	else	
+	else
 		Duration+= 180;
 
 	SET_80211_HDR_DURATION(pNDPAFrame, Duration);
@@ -339,7 +339,7 @@ ConstructVHTNDPAPacket(
 	STAInfo.AID = AID;
 	STAInfo.FeedbackType = 0;
 	STAInfo.NcIndex = 0;
-	
+
 	ODM_MoveMemory(pDM_Odm, pNDPAFrame+17, (pu1Byte)&STAInfo, 2);
 
 	*pLength = 19;
@@ -374,7 +374,7 @@ SendFWVHTNDPAPacket(
 
 	NDPTxRate = Beamforming_GetVHTNDPTxRate(pDM_Odm, pBeamformEntry->CompSteeringNumofBFer);
 	ODM_RT_TRACE(pDM_Odm, PHYDM_COMP_TXBF, ODM_DBG_LOUD, ("[%s] NDPTxRate =%d\n", __func__, NDPTxRate));
-	
+
 	PlatformAcquireSpinLock(Adapter, RT_TX_SPINLOCK);
 
 	if (MgntGetFWBuffer(pDefAdapter, &pTcb, &pBuf)) {
@@ -384,18 +384,18 @@ SendFWVHTNDPAPacket(
 		BufAddr = pBuf->Buffer.VirtualAddress + DescLen;
 
 		ConstructVHTNDPAPacket(
-				pDM_Odm, 
+				pDM_Odm,
 				RA,
 				AID,
-				BufAddr, 
+				BufAddr,
 				&BufLen,
 				BW
 				);
-		
+
 		pTcb->PacketLength = BufLen + DescLen;
 
 		pTcb->bTxEnableSwCalcDur = TRUE;
-		
+
 		pTcb->BWOfPacket = BW;
 
 		if (phydm_actingDetermine(pDM_Odm, PhyDM_ACTING_AS_IBSS) || phydm_actingDetermine(pDM_Odm, PhyDM_ACTING_AS_AP))
@@ -407,8 +407,8 @@ SendFWVHTNDPAPacket(
 		Adapter->HalFunc.CmdSendPacketHandler(Adapter, pTcb, pBuf, pTcb->PacketLength, DESC_PACKET_TYPE_NORMAL, FALSE);
 	} else
 		ret = FALSE;
-	
-	PlatformReleaseSpinLock(Adapter, RT_TX_SPINLOCK);	
+
+	PlatformReleaseSpinLock(Adapter, RT_TX_SPINLOCK);
 
 	ODM_RT_TRACE(pDM_Odm, PHYDM_COMP_TXBF, ODM_DBG_LOUD, ("[%s] End, ret=%d\n", __func__, ret));
 
@@ -444,10 +444,10 @@ SendSWVHTNDPAPacket(
 
 	if (MgntGetBuffer(Adapter, &pTcb, &pBuf)) {
 		ConstructVHTNDPAPacket(
-				pDM_Odm, 
+				pDM_Odm,
 				RA,
 				AID,
-				pBuf->Buffer.VirtualAddress, 
+				pBuf->Buffer.VirtualAddress,
 				&pTcb->PacketLength,
 				BW
 				);
@@ -459,8 +459,8 @@ SendSWVHTNDPAPacket(
 		MgntSendPacket(Adapter, pTcb, pBuf, pTcb->PacketLength, NORMAL_QUEUE, NDPTxRate);
 	} else
 		ret = FALSE;
-	
-	PlatformReleaseSpinLock(Adapter, RT_TX_SPINLOCK);	
+
+	PlatformReleaseSpinLock(Adapter, RT_TX_SPINLOCK);
 
 	if (ret)
 		RT_DISP_DATA(FBEAM, FBEAM_DATA, "", pBuf->Buffer.VirtualAddress, pTcb->PacketLength);
@@ -492,17 +492,17 @@ Beamforming_GetVHTGIDMgntFrame(
 	PRT_BEAMFORMING_INFO	pBeamInfo = &(pDM_Odm->BeamformingInfo);
 	PRT_BEAMFORMER_ENTRY	pBeamformEntry = &pBeamInfo->BeamformerEntry[pBeamInfo->mu_ap_index];
 
-	ODM_RT_TRACE(pDM_Odm, PHYDM_COMP_TXBF, ODM_DBG_LOUD, ("[%s] On VHT GID mgnt frame!\n", __func__));		
+	ODM_RT_TRACE(pDM_Odm, PHYDM_COMP_TXBF, ODM_DBG_LOUD, ("[%s] On VHT GID mgnt frame!\n", __func__));
 
 	/* Check length*/
-	if (pPduOS->Length < (FRAME_OFFSET_VHT_GID_MGNT_USER_POSITION_ARRAY+16)) {	
+	if (pPduOS->Length < (FRAME_OFFSET_VHT_GID_MGNT_USER_POSITION_ARRAY+16)) {
 		ODM_RT_TRACE(pDM_Odm, PHYDM_COMP_TXBF, ODM_DBG_LOUD, ("Beamforming_GetVHTGIDMgntFrame(): Invalid length (%d)\n", pPduOS->Length));
 		return RT_STATUS_INVALID_LENGTH;
 	}
 
 	/* Check RA*/
 	pRaddr = (pu1Byte)(pPduOS->Octet)+4;
-	if (!eqMacAddr(pRaddr, Adapter->CurrentAddress)) {		
+	if (!eqMacAddr(pRaddr, Adapter->CurrentAddress)) {
 		ODM_RT_TRACE(pDM_Odm, PHYDM_COMP_TXBF, ODM_DBG_LOUD, ("Beamforming_GetVHTGIDMgntFrame(): Drop because of RA error.\n"));
 		return RT_STATUS_PKT_DROP;
 	}
@@ -549,7 +549,7 @@ Beamforming_GetVHTGIDMgntFrame(
 	{
 		u1Byte	Indibuffer[24] = {0};
 		u1Byte	Indioffset = 0;
-			
+
 		PlatformMoveMemory(Indibuffer + Indioffset, pBeamformEntry->gid_valid, 8);
 		Indioffset += 8;
 		PlatformMoveMemory(Indibuffer + Indioffset, pBeamformEntry->user_position, 16);
@@ -581,7 +581,7 @@ ConstructVHTGIDMgntFrame(
 	IN	PRT_BEAMFORMEE_ENTRY	pBeamformEntry,
 	OUT	pu1Byte			Buffer,
 	OUT	pu4Byte			pLength
-	
+
 )
 {
 	PRT_BEAMFORMING_INFO	pBeamInfo = &(pDM_Odm->BeamformingInfo);
@@ -592,10 +592,10 @@ ConstructVHTGIDMgntFrame(
 	*pLength = 0;
 
 	ConstructMaFrameHdr(
-					Adapter, 
-					RA, 
-					ACT_CAT_VHT, 
-					ACT_VHT_GROUPID_MANAGEMENT, 
+					Adapter,
+					RA,
+					ACT_CAT_VHT,
+					ACT_VHT_GROUPID_MANAGEMENT,
 					&osFTMFrame);
 
 	/* Membership Status Array*/
@@ -628,15 +628,15 @@ SendSWVHTGIDMgntFrame(
 	PADAPTER				Adapter = pBeamInfo->SourceAdapter;
 
 	ODM_RT_TRACE(pDM_Odm, PHYDM_COMP_TXBF, ODM_DBG_LOUD, ("[%s] Start!\n", __func__));
-	
+
 	PlatformAcquireSpinLock(Adapter, RT_TX_SPINLOCK);
 
 	if (MgntGetBuffer(Adapter, &pTcb, &pBuf)) {
 		ConstructVHTGIDMgntFrame(
-				pDM_Odm, 
+				pDM_Odm,
 				RA,
 				pBeamformEntry,
-				pBuf->Buffer.VirtualAddress, 
+				pBuf->Buffer.VirtualAddress,
 				&pTcb->PacketLength
 				);
 
@@ -645,7 +645,7 @@ SendSWVHTGIDMgntFrame(
 		MgntSendPacket(Adapter, pTcb, pBuf, pTcb->PacketLength, NORMAL_QUEUE, DataRate);
 	} else
 		ret = FALSE;
-	
+
 	PlatformReleaseSpinLock(Adapter, RT_TX_SPINLOCK);
 
 	if (ret)
@@ -671,12 +671,12 @@ ConstructVHTBFReportPoll(
 	PRT_BEAMFORMING_INFO	pBeamInfo = &(pDM_Odm->BeamformingInfo);
 	PADAPTER				Adapter = pBeamInfo->SourceAdapter;
 	pu1Byte			pBFRptPoll = Buffer;
-	
+
 	/* Frame control*/
 	SET_80211_HDR_FRAME_CONTROL(pBFRptPoll, 0);
 	SET_80211_HDR_TYPE_AND_SUBTYPE(pBFRptPoll, Type_Beamforming_Report_Poll);
 
-	/* Duration*/	
+	/* Duration*/
 	SET_80211_HDR_DURATION(pBFRptPoll, 100);
 
 	/* RA*/
@@ -716,9 +716,9 @@ SendSWVHTBFReportPoll(
 
 	if (MgntGetBuffer(Adapter, &pTcb, &pBuf)) {
 		ConstructVHTBFReportPoll(
-				pDM_Odm, 
+				pDM_Odm,
 				RA,
-				pBuf->Buffer.VirtualAddress, 
+				pBuf->Buffer.VirtualAddress,
 				&pTcb->PacketLength
 				);
 
@@ -729,12 +729,12 @@ SendSWVHTBFReportPoll(
 			pTcb->TxBFPktType = RT_BF_PKT_TYPE_FINAL_BF_REPORT_POLL;
 		else
 			pTcb->TxBFPktType = RT_BF_PKT_TYPE_BF_REPORT_POLL;
-		
+
 		DataRate = MGN_6M;	/* Legacy OFDM rate*/
 		MgntSendPacket(Adapter, pTcb, pBuf, pTcb->PacketLength, NORMAL_QUEUE, DataRate);
 	} else
 		ret = FALSE;
-	
+
 	PlatformReleaseSpinLock(Adapter, RT_TX_SPINLOCK);
 
 	if (ret)
@@ -758,7 +758,7 @@ ConstructVHTMUNDPAPacket(
 	OUT pu1Byte			Buffer,
 	OUT pu4Byte			pLength
 	)
-{	
+{
 	PRT_BEAMFORMING_INFO	pBeamInfo = &(pDM_Odm->BeamformingInfo);
 	PADAPTER				Adapter = pBeamInfo->SourceAdapter;
 	u2Byte					Duration = 0;
@@ -771,7 +771,7 @@ ConstructVHTMUNDPAPacket(
 
 	/* Fill the first MU BFee entry (STA1) MAC addr to destination address then
 	     HW will change A1 to broadcast addr. 2015.05.28. Suggested by SD1 Chunchu. */
-	for (idx = 0; idx < BEAMFORMEE_ENTRY_NUM; idx++) {		
+	for (idx = 0; idx < BEAMFORMEE_ENTRY_NUM; idx++) {
 		pEntry = &(pBeamInfo->BeamformeeEntry[idx]);
 		if (pEntry->is_mu_sta) {
 			cpMacAddr(DestAddr, pEntry->MacAddr);
@@ -780,7 +780,7 @@ ConstructVHTMUNDPAPacket(
 	}
 	if (pEntry == NULL)
 		return;
-	
+
 	/* Frame control.*/
 	SET_80211_HDR_FRAME_CONTROL(pNDPAFrame, 0);
 	SET_80211_HDR_TYPE_AND_SUBTYPE(pNDPAFrame, Type_NDPA);
@@ -791,12 +791,12 @@ ConstructVHTMUNDPAPacket(
 	/*--------------------------------------------*/
 	/* <Note> Need to modify "Duration" to MU consideration. */
 	Duration = 2*aSifsTime + 44;
-	
+
 	if (BW == CHANNEL_WIDTH_80)
 		Duration += 40;
 	else if(BW == CHANNEL_WIDTH_40)
 		Duration+= 87;
-	else	
+	else
 		Duration+= 180;
 	/*--------------------------------------------*/
 
@@ -808,7 +808,7 @@ ConstructVHTMUNDPAPacket(
 	*pLength = 17;
 
 	/* Construct STA info. for multiple STAs*/
-	for (idx = 0; idx < BEAMFORMEE_ENTRY_NUM; idx++) {		
+	for (idx = 0; idx < BEAMFORMEE_ENTRY_NUM; idx++) {
 		pEntry = &(pBeamInfo->BeamformeeEntry[idx]);
 		if (pEntry->is_mu_sta) {
 			STAInfo.AID = pEntry->AID;
@@ -816,7 +816,7 @@ ConstructVHTMUNDPAPacket(
 			STAInfo.NcIndex = 0;
 
 			ODM_RT_TRACE(pDM_Odm, PHYDM_COMP_TXBF, ODM_DBG_LOUD, ("[%s] Get BeamformeeEntry idx(%d), AID =%d\n", __func__, idx, pEntry->AID));
-			
+
 			ODM_MoveMemory(pDM_Odm, pNDPAFrame+(*pLength), (pu1Byte)&STAInfo, 2);
 			*pLength += 2;
 		}
@@ -847,7 +847,7 @@ SendSWVHTMUNDPAPacket(
 		ConstructVHTMUNDPAPacket(
 				pDM_Odm,
 				BW,
-				pBuf->Buffer.VirtualAddress, 
+				pBuf->Buffer.VirtualAddress,
 				&pTcb->PacketLength
 				);
 
@@ -859,8 +859,8 @@ SendSWVHTMUNDPAPacket(
 		MgntSendPacket(Adapter, pTcb, pBuf, pTcb->PacketLength, NORMAL_QUEUE, NDPTxRate);
 	} else
 		ret = FALSE;
-	
-	PlatformReleaseSpinLock(Adapter, RT_TX_SPINLOCK);	
+
+	PlatformReleaseSpinLock(Adapter, RT_TX_SPINLOCK);
 
 	if (ret)
 		RT_DISP_DATA(FBEAM, FBEAM_DATA, "", pBuf->Buffer.VirtualAddress, pTcb->PacketLength);
@@ -876,7 +876,7 @@ DBG_ConstructVHTMUNDPAPacket(
 	OUT pu1Byte			Buffer,
 	OUT pu4Byte			pLength
 	)
-{	
+{
 	PRT_BEAMFORMING_INFO	pBeamInfo = &(pDM_Odm->BeamformingInfo);
 	PADAPTER				Adapter = pBeamInfo->SourceAdapter;
 	u2Byte					Duration = 0;
@@ -892,7 +892,7 @@ DBG_ConstructVHTMUNDPAPacket(
 
 	/* Fill the first MU BFee entry (STA1) MAC addr to destination address then
 	     HW will change A1 to broadcast addr. 2015.05.28. Suggested by SD1 Chunchu. */
-	for (idx = 0; idx < BEAMFORMEE_ENTRY_NUM; idx++) {		
+	for (idx = 0; idx < BEAMFORMEE_ENTRY_NUM; idx++) {
 		pEntry = &(pBeamInfo->BeamformeeEntry[idx]);
 		if (pEntry->is_mu_sta) {
 			if (is_STA1 == FALSE) {
@@ -915,12 +915,12 @@ DBG_ConstructVHTMUNDPAPacket(
 	/*--------------------------------------------*/
 	/* <Note> Need to modify "Duration" to MU consideration. */
 	Duration = 2*aSifsTime + 44;
-	
+
 	if (BW == CHANNEL_WIDTH_80)
 		Duration += 40;
 	else if (BW == CHANNEL_WIDTH_40)
 		Duration += 87;
-	else	
+	else
 		Duration += 180;
 	/*--------------------------------------------*/
 
@@ -937,7 +937,7 @@ DBG_ConstructVHTMUNDPAPacket(
 	STAInfo.NcIndex = 0;
 
 	ODM_RT_TRACE(pDM_Odm, PHYDM_COMP_TXBF, ODM_DBG_LOUD, ("[%s] Get BeamformeeEntry idx(%d), AID =%d\n", __func__, idx, pEntry->AID));
-	
+
 	ODM_MoveMemory(pDM_Odm, pNDPAFrame+(*pLength), (pu1Byte)&STAInfo, 2);
 	*pLength += 2;
 
@@ -966,7 +966,7 @@ DBG_SendSWVHTMUNDPAPacket(
 		DBG_ConstructVHTMUNDPAPacket(
 				pDM_Odm,
 				BW,
-				pBuf->Buffer.VirtualAddress, 
+				pBuf->Buffer.VirtualAddress,
 				&pTcb->PacketLength
 				);
 
@@ -978,8 +978,8 @@ DBG_SendSWVHTMUNDPAPacket(
 		MgntSendPacket(Adapter, pTcb, pBuf, pTcb->PacketLength, NORMAL_QUEUE, NDPTxRate);
 	} else
 		ret = FALSE;
-	
-	PlatformReleaseSpinLock(Adapter, RT_TX_SPINLOCK);	
+
+	PlatformReleaseSpinLock(Adapter, RT_TX_SPINLOCK);
 
 	if (ret)
 		RT_DISP_DATA(FBEAM, FBEAM_DATA, "", pBuf->Buffer.VirtualAddress, pTcb->PacketLength);
@@ -1007,7 +1007,7 @@ Beamforming_GetReportFrame(
 	u4Byte					frame_len = precv_frame->u.hdr.len;
 	pu1Byte					TA;
 	u1Byte					Idx, offset;
-	
+
 
 	/*Memory comparison to see if CSI report is the same with previous one*/
 	TA = GetAddr2Ptr(pframe);
@@ -1019,7 +1019,7 @@ Beamforming_GetReportFrame(
 	else
 		return ret;
 
-	
+
 	return ret;
 }
 
@@ -1048,7 +1048,7 @@ SendFWHTNDPAPacket(
 	PRT_BEAMFORMEE_ENTRY	pBeamformEntry = phydm_Beamforming_GetBFeeEntryByAddr(pDM_Odm, RA, &Idx);
 
 	pmgntframe = alloc_mgtxmitframe(pxmitpriv);
-	
+
 	if (pmgntframe == NULL) {
 		ODM_RT_TRACE(pDM_Odm, PHYDM_COMP_TXBF, ODM_DBG_LOUD, ("%s, alloc mgnt frame fail\n", __func__));
 		return _FALSE;
@@ -1088,10 +1088,10 @@ SendFWHTNDPAPacket(
 		aSifsTime = 16;
 
 	duration = 2*aSifsTime + 40;
-	
+
 	if(BW == CHANNEL_WIDTH_40)
 		duration+= 87;
-	else	
+	else
 		duration+= 180;
 
 	SetDuration(pframe, duration);
@@ -1136,9 +1136,9 @@ SendSWHTNDPAPacket(
 	PRT_BEAMFORMEE_ENTRY	pBeamformEntry = phydm_Beamforming_GetBFeeEntryByAddr(pDM_Odm, RA, &Idx);
 
 	NDPTxRate = Beamforming_GetHTNDPTxRate(pDM_Odm, pBeamformEntry->CompSteeringNumofBFer);
-	
+
 	pmgntframe = alloc_mgtxmitframe(pxmitpriv);
-	
+
 	if (pmgntframe == NULL) {
 		ODM_RT_TRACE(pDM_Odm, PHYDM_COMP_TXBF, ODM_DBG_LOUD, ("%s, alloc mgnt frame fail\n", __func__));
 		return _FALSE;
@@ -1175,10 +1175,10 @@ SendSWHTNDPAPacket(
 		aSifsTime = 16;
 
 	duration = 2*aSifsTime + 40;
-	
+
 	if (BW == CHANNEL_WIDTH_40)
 		duration += 87;
-	else	
+	else
 		duration += 180;
 
 	SetDuration(pframe, duration);
@@ -1225,7 +1225,7 @@ SendFWVHTNDPAPacket(
 	RT_NDPA_STA_INFO	sta_info;
 
 	pmgntframe = alloc_mgtxmitframe(pxmitpriv);
-	
+
 	if (pmgntframe == NULL) {
 		ODM_RT_TRACE(pDM_Odm, PHYDM_COMP_TXBF, ODM_DBG_LOUD, ("%s, alloc mgnt frame fail\n", __func__));
 		return _FALSE;
@@ -1263,12 +1263,12 @@ SendFWVHTNDPAPacket(
 		aSifsTime = 10;
 
 	duration = 2*aSifsTime + 44;
-	
+
 	if(BW == CHANNEL_WIDTH_80)
 		duration += 40;
 	else if(BW == CHANNEL_WIDTH_40)
 		duration+= 87;
-	else	
+	else
 		duration+= 180;
 
 	SetDuration(pframe, duration);
@@ -1282,12 +1282,12 @@ SendFWVHTNDPAPacket(
 	_rtw_memcpy(pframe+16, &sequence,1);
 
 	if (((pmlmeinfo->state&0x03) == WIFI_FW_ADHOC_STATE) || ((pmlmeinfo->state&0x03) == WIFI_FW_AP_STATE))
-		AID = 0;		
+		AID = 0;
 
 	sta_info.AID = AID;
 	sta_info.FeedbackType = 0;
 	sta_info.NcIndex= 0;
-	
+
 	_rtw_memcpy(pframe+17, (u8 *)&sta_info, 2);
 
 	pattrib->pktlen = 19;
@@ -1330,12 +1330,12 @@ SendSWVHTNDPAPacket(
 	ODM_RT_TRACE(pDM_Odm, PHYDM_COMP_TXBF, ODM_DBG_LOUD, ("[%s] NDPTxRate =%d\n", __func__, NDPTxRate));
 
 	pmgntframe = alloc_mgtxmitframe(pxmitpriv);
-	
+
 	if (pmgntframe == NULL) {
 		ODM_RT_TRACE(pDM_Odm, PHYDM_COMP_TXBF, ODM_DBG_LOUD, ("%s, alloc mgnt frame fail\n", __func__));
 		return _FALSE;
 	}
-	
+
 	/*update attribute*/
 	pattrib = &pmgntframe->attrib;
 	_rtw_memcpy(pattrib->ra, RA, ETH_ALEN);
@@ -1365,16 +1365,16 @@ SendSWVHTNDPAPacket(
 		aSifsTime = 10;
 
 	duration = 2*aSifsTime + 44;
-	
+
 	if (BW == CHANNEL_WIDTH_80)
 		duration += 40;
 	else if (BW == CHANNEL_WIDTH_40)
 		duration += 87;
-	else	
+	else
 		duration += 180;
 
 	SetDuration(pframe, duration);
-	
+
 	sequence = pBeamInfo->SoundingSequence << 2;
 	if (pBeamInfo->SoundingSequence >= 0x3f)
 		pBeamInfo->SoundingSequence = 0;
@@ -1383,12 +1383,12 @@ SendSWVHTNDPAPacket(
 
 	_rtw_memcpy(pframe+16, &sequence, 1);
 	if (((pmlmeinfo->state&0x03) == WIFI_FW_ADHOC_STATE) || ((pmlmeinfo->state&0x03) == WIFI_FW_AP_STATE))
-		AID = 0;		
+		AID = 0;
 
 	ndpa_sta_info.AID = AID;
 	ndpa_sta_info.FeedbackType = 0;
 	ndpa_sta_info.NcIndex = 0;
-	
+
 	_rtw_memcpy(pframe+17, (u8 *)&ndpa_sta_info, 2);
 
 	pattrib->pktlen = 19;
@@ -1397,7 +1397,7 @@ SendSWVHTNDPAPacket(
 
 	dump_mgntframe(Adapter, pmgntframe);
 	ODM_RT_TRACE(pDM_Odm, PHYDM_COMP_TXBF, ODM_DBG_LOUD, ("[%s] [%d]\n", __func__, __LINE__));
-	
+
 	return _TRUE;
 }
 
@@ -1425,7 +1425,7 @@ Beamforming_GetNDPAFrame(
 	pu1Byte						pNDPAFrame = precv_frame->u.hdr.rx_data;
 #endif
 	PRT_BEAMFORMER_ENTRY		pBeamformerEntry = NULL;		/*Modified By Jeffery @2014-10-29*/
-	
+
 
 #if (DM_ODM_SUPPORT_TYPE == ODM_WIN)
 		RT_DISP_DATA(FBEAM, FBEAM_DATA, "Beamforming_GetNDPAFrame\n", pduOS.Octet, pduOS.Length);
@@ -1445,10 +1445,10 @@ Beamforming_GetNDPAFrame(
 #endif
 	/*Remove signaling TA. */
 	TA[0] = TA[0] & 0xFE;
-    
+
 	pBeamformerEntry = phydm_Beamforming_GetBFerEntryByAddr(pDM_Odm, TA, &Idx);		// Modified By Jeffery @2014-10-29
 
-	/*Break options for Clock Reset*/    
+	/*Break options for Clock Reset*/
 	if (pBeamformerEntry == NULL)
 		return;
 	else if (!(pBeamformerEntry->BeamformEntryCap & BEAMFORMEE_CAP_VHT_SU))
@@ -1456,7 +1456,7 @@ Beamforming_GetNDPAFrame(
 	/*LogSuccess: As long as 8812A receive NDPA and feedback CSI succeed once, clock reset is NO LONGER needed !2015-04-10, Jeffery*/
 	/*ClockResetTimes: While BFer entry always doesn't receive our CSI, clock will reset again and again.So ClockResetTimes is limited to 5 times.2015-04-13, Jeffery*/
 	else if ((pBeamformerEntry->LogSuccess == 1) || (pBeamformerEntry->ClockResetTimes == 5)) {
-		ODM_RT_TRACE(pDM_Odm, PHYDM_COMP_TXBF, ODM_DBG_LOUD, ("[%s] LogSeq=%d, PreLogSeq=%d, LogRetryCnt=%d, LogSuccess=%d, ClockResetTimes=%d, clock reset is no longer needed.\n", 
+		ODM_RT_TRACE(pDM_Odm, PHYDM_COMP_TXBF, ODM_DBG_LOUD, ("[%s] LogSeq=%d, PreLogSeq=%d, LogRetryCnt=%d, LogSuccess=%d, ClockResetTimes=%d, clock reset is no longer needed.\n",
 			__func__, pBeamformerEntry->LogSeq, pBeamformerEntry->PreLogSeq, pBeamformerEntry->LogRetryCnt, pBeamformerEntry->LogSuccess, pBeamformerEntry->ClockResetTimes));
 
         return;
@@ -1464,7 +1464,7 @@ Beamforming_GetNDPAFrame(
 
 	Sequence = (pNDPAFrame[16]) >> 2;
 
-	ODM_RT_TRACE(pDM_Odm, PHYDM_COMP_TXBF, ODM_DBG_LOUD, ("[%s] Start, Sequence=%d, LogSeq=%d, PreLogSeq=%d, LogRetryCnt=%d, ClockResetTimes=%d, LogSuccess=%d\n", 
+	ODM_RT_TRACE(pDM_Odm, PHYDM_COMP_TXBF, ODM_DBG_LOUD, ("[%s] Start, Sequence=%d, LogSeq=%d, PreLogSeq=%d, LogRetryCnt=%d, ClockResetTimes=%d, LogSuccess=%d\n",
 		__func__, Sequence, pBeamformerEntry->LogSeq, pBeamformerEntry->PreLogSeq, pBeamformerEntry->LogRetryCnt, pBeamformerEntry->ClockResetTimes, pBeamformerEntry->LogSuccess));
 
 	if ((pBeamformerEntry->LogSeq != 0) && (pBeamformerEntry->PreLogSeq != 0)) {
@@ -1482,7 +1482,7 @@ Beamforming_GetNDPAFrame(
 				pBeamformerEntry->ClockResetTimes++;
 				pBeamformerEntry->LogRetryCnt = 0;
 
-			ODM_RT_TRACE(pDM_Odm, PHYDM_COMP_TXBF, ODM_DBG_LOUD, ("[%s] Clock Reset!!! ClockResetTimes=%d\n", 
+			ODM_RT_TRACE(pDM_Odm, PHYDM_COMP_TXBF, ODM_DBG_LOUD, ("[%s] Clock Reset!!! ClockResetTimes=%d\n",
 				__func__, pBeamformerEntry->ClockResetTimes));
 			HalComTxbf_Set(pDM_Odm, TXBF_SET_SOUNDING_CLK, NULL);
 
@@ -1494,7 +1494,7 @@ Beamforming_GetNDPAFrame(
 	/*Update LogSeq & PreLogSeq*/
 	pBeamformerEntry->PreLogSeq = pBeamformerEntry->LogSeq;
 	pBeamformerEntry->LogSeq = Sequence;
-	
+
 }
 
 

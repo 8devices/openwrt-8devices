@@ -52,7 +52,7 @@
 #define LIB1X_EAPOL_KEY				3		//0000 0011B
 #define LIB1X_EAPOL_ENCASFALERT		4		//0000 0100B
 #ifdef CONFIG_IEEE80211W_CLI
-#define KeyAKMPos					16	
+#define KeyAKMPos					16
 #define KEY_AKM_LEN					4
 #endif
 
@@ -61,11 +61,7 @@
 #define A_SHA_DIGEST_LEN			20
 #define ETHER_HDRLEN				14
 #define LIB1X_EAPOL_HDRLEN			4
-#ifdef CONFIG_IEEE80211R
-#define INFO_ELEMENT_SIZE       	384
-#else
 #define INFO_ELEMENT_SIZE       	128
-#endif
 #define MAX_EAPOLMSG_LEN        	512
 #define MAX_EAPOLKEYMSG_LEN	(MAX_EAPOLMSG_LEN-(ETHER_HDRLEN+LIB1X_EAPOL_HDRLEN))
 #define EAPOLMSG_HDRLEN				95      //EAPOL-key payload length without KeyData
@@ -102,8 +98,8 @@ enum {
 
 #ifdef CONFIG_IEEE80211W
 enum mfp_options {
-	NO_MGMT_FRAME_PROTECTION = 0,	
-	MGMT_FRAME_PROTECTION_OPTIONAL = 1,	
+	NO_MGMT_FRAME_PROTECTION = 0,
+	MGMT_FRAME_PROTECTION_OPTIONAL = 1,
 	MGMT_FRAME_PROTECTION_REQUIRED = 2
 };
 #endif
@@ -175,7 +171,6 @@ typedef struct _DOT11_WPA2_IE_HEADER {
         unsigned short Version;
 } DOT11_WPA2_IE_HEADER;
 
-#if defined(WIFI_HAPD) && !defined(HAPD_DRV_PSK_WPS) || defined(RTK_NL80211)
 // group key info
 typedef struct _wpa_global_info {
 	OCTET_STRING		AuthInfoElement;
@@ -189,53 +184,7 @@ typedef struct _wpa_global_info {
 #endif
 } WPA_GLOBAL_INFO;
 
-#else
 
-// group key info
-typedef struct _wpa_global_info {
-	OCTET32_INTEGER		Counter;
-	unsigned char		PSK[A_SHA_DIGEST_LEN*2];
-	unsigned char		PSKGuest[A_SHA_DIGEST_LEN*2];
-	int					GTKAuthenticator;
-	int					GKeyDoneStations;
-	int					GInitAKeys;
-	int					GUpdateStationKeys;
-	int					GkeyReady;
-	OCTET_STRING		AuthInfoElement;
-	unsigned char		AuthInfoBuf[INFO_ELEMENT_SIZE];
-	unsigned char		MulticastCipher;
-	int					NumOfUnicastCipher;
-	unsigned char		UnicastCipher[MAX_UNICAST_CIPHER];
-#ifdef RTL_WPA2
-	int					NumOfUnicastCipherWPA2;
-	unsigned char		UnicastCipherWPA2[MAX_UNICAST_CIPHER];
-#endif
-	OCTET_STRING		GNonce;
-	unsigned char		GNonceBuf[KEY_NONCE_LEN];
-	unsigned char		GTK[NumGroupKey][GTK_LEN];
-	unsigned char		GMK[GMK_LEN];
-	int					GN;
-	int					GM;
-#ifdef CONFIG_IEEE80211W	
-#ifdef CONFIG_IEEE80211W_CLI		
-	unsigned short		rsnie_cap;	
-#endif	
-	unsigned char		IGTK[2][IGTK_LEN];	
-	int					GN_igtk;	
-	int 				GM_igtk;	
-	union PN48 IGTK_PN;
-#endif
-	int					GRekeyCounts;
-	int					GResetCounter;
-
-	int					IntegrityFailed;
-	int					GTKRekey;
-	int					GKeyFailure;
-	struct timer_list	GKRekeyTimer;
-} WPA_GLOBAL_INFO;
-#endif
-
-#if defined(WIFI_HAPD) && !defined(HAPD_DRV_PSK_WPS) || defined(RTK_NL80211)
 // wpa sta info
 typedef struct _wpa_sta_info {
 	int 				state;
@@ -244,64 +193,6 @@ typedef struct _wpa_sta_info {
 	struct rtl8192cd_priv	*priv;
 } WPA_STA_INFO;
 
-#else
-
-// wpa sta info
-typedef struct _wpa_sta_info {
-	int					state;
-	int					gstate;
-	int					RSNEnabled;		// bit0-WPA, bit1-WPA2
-	int					PMKCached;
-	int					PInitAKeys;
-	unsigned char		UnicastCipher;
- 	unsigned char		NumOfRxTSC;
- 	unsigned char		AuthKeyMethod;
-#ifdef CONFIG_IEEE80211W	
-	enum mfp_options ieee80211w;	/* dot11AssociationSAQueryMaximumTimeout (in TUs) */
-	unsigned int assoc_sa_query_max_timeout;	/* dot11AssociationSAQueryRetryTimeout (in TUs) */	
-	int assoc_sa_query_retry_timeout;
-#endif /* CONFIG_IEEE80211W */	
- 	int					isSuppSupportPreAuthentication;
-	int					isSuppSupportPairwiseAsDefaultKey;
-	LARGE_INTEGER		CurrentReplayCounter;
-	LARGE_INTEGER		LatestGKReplayCounter;
-	LARGE_INTEGER		ReplayCounterStarted; // david+1-12-2007
-	OCTET_STRING		ANonce;
-	OCTET_STRING		SNonce;
-	unsigned char		AnonceBuf[KEY_NONCE_LEN];
-	unsigned char		SnonceBuf[KEY_NONCE_LEN];
- 	unsigned char		PMK[PMK_LEN];
- 	unsigned char		PTK[PTK_LEN_TKIP];
-	OCTET_STRING		EAPOLMsgRecvd;
-	OCTET_STRING		EAPOLMsgSend;
-	OCTET_STRING		EapolKeyMsgRecvd;
-	OCTET_STRING		EapolKeyMsgSend;
-	unsigned char		eapSendBuf[MAX_EAPOLMSG_LEN];
-	unsigned char		eapRecvdBuf[MAX_EAPOLMSG_LEN];
-	struct timer_list	resendTimer;
-	struct rtl8192cd_priv	*priv;
-	int					resendCnt;
-	int					isGuest;
-	int					clientHndshkProcessing;
-	int					clientHndshkDone;
-	int 				clientGkeyUpdate;
-	LARGE_INTEGER		clientMICReportReplayCounter;
-#ifdef CONFIG_IEEE80211W	
-	BOOLEAN 			mgmt_frame_prot;
-#endif
-#ifdef CONFIG_IEEE80211R
-	unsigned char		isFT;
-	unsigned char		cache_pmk_r0_id[PMKID_LEN];
-	struct r1_key_holder *r1kh;
-	unsigned char		over_ds;
-	unsigned char		current_ap[MACADDRLEN];
-	unsigned char		cache_r0kh_id[MAX_R0KHID_LEN];
-	unsigned int		cache_r0kh_id_len;
-	unsigned char		UnicastCipher_1x;
-	unsigned char		MulticastCipher_1x;
-#endif
-} WPA_STA_INFO;
-#endif
 
 #if defined(PACK_STRUCTURE) || defined(__ECOS)
 #pragma pack(1)

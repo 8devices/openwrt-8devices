@@ -3,14 +3,14 @@ Copyright (c) Realtek Semiconductor Corp. All rights reserved.
 
 Module Name:
 	Hal8197FPhyCfg.c
-	
+
 Abstract:
 	Defined HAL 8197F PHY BB setting functions
-	    
+
 Major Change History:
 	When       Who               What
 	---------- ---------------   -------------------------------
-	2012-11-14 Eric              Create.	
+	2012-11-14 Eric              Create.
 --*/
 #if !defined(__ECOS) && !defined(CPTCFG_CFG80211_MODULE)
 #include "HalPrecomp.h"
@@ -19,7 +19,7 @@ Major Change History:
 #endif
 
 // TODO: this function should be modified
-void 
+void
 TXPowerTracking_ThermalMeter_Tmp8197F(
     IN  HAL_PADAPTER    Adapter
 )
@@ -62,7 +62,7 @@ void PHY_SetRFReg_8197F
 )
 {
     u4Byte          flags;
-    HAL_PADAPTER    priv     = Adapter;    
+    HAL_PADAPTER    priv     = Adapter;
 #if CFG_HAL_DISABLE_BB_RF
     return;
 #endif //CFG_HAL_DISABLE_BB_RF
@@ -87,8 +87,8 @@ SwBWMode88XX_97F(
             bandwidth = ODM_BW20M;
             break;
 
-        case HT_CHANNEL_WIDTH_20_40:            
-            bandwidth = ODM_BW40M;           
+        case HT_CHANNEL_WIDTH_20_40:
+            bandwidth = ODM_BW40M;
             regDataSC = HAL_RTL_R8(REG_DATA_SC);
             regDataSC &= 0xf0;
             regDataSC |= Adapter->pshare->txsc_20_92e;

@@ -1,7 +1,7 @@
 /******************************************************************************
  *
  * Copyright(c) 2007 - 2011 Realtek Corporation. All rights reserved.
- *                                        
+ *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of version 2 of the GNU General Public License as
  * published by the Free Software Foundation.
@@ -35,11 +35,11 @@ phydm_set_ext_band_switch_8821A(
 	)
 {
 	PDM_ODM_T		pDM_Odm = (PDM_ODM_T)pDM_VOID;
-	
+
 	/*Output Pin Settings*/
 	ODM_SetMACReg(pDM_Odm, 0x4C, BIT23, 0); /*select DPDT_P and DPDT_N as output pin*/
 	ODM_SetMACReg(pDM_Odm, 0x4C, BIT24, 1); /*by WLAN control*/
-	
+
 	ODM_SetBBReg(pDM_Odm, 0xCB4, 0xF, 7); /*DPDT_P = 1b'0*/
 	ODM_SetBBReg(pDM_Odm, 0xCB4, 0xF0, 7); /*DPDT_N = 1b'0*/
 

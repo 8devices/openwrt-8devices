@@ -93,10 +93,6 @@ typedef enum{
 typedef enum{
         DOT11_AuthKeyType_RSN = 1,
         DOT11_AuthKeyType_PSK = 2,
-#ifdef CONFIG_IEEE80211R
-        DOT11_AuthKeyType_FT8021x = 3,
-        DOT11_AuthKeyType_FTPSK = 4,
-#endif
          DOT11_AuthKeyType_802_1X_SHA256 = 5,		//CONFIG_IEEE80211W_CLI
          DOT11_AuthKeyType_PSK_SHA256 = 6
 } DOT11_AUTHKEY_TYPE;
@@ -186,7 +182,7 @@ typedef enum{
 		DOT11_EVENT_WSC_SET_MIB=42,
 		DOT11_EVENT_WSC_GET_MIB=43,
 		DOT11_EVENT_REQUEST_F_INCLUDE_WPS=44,
-		
+
 
 		DOT11_EVENT_WSC_INIT_IND = 70,
 		DOT11_EVENT_WSC_EXIT_IND = 71,
@@ -210,31 +206,12 @@ typedef enum{
 		DOT11_EVENT_WSC_PUTWLREQ_STATUSIND = 89,
 #endif
 
-#ifdef P2P_SUPPORT
-		DOT11_EVENT_WSC_SWITCH_MODE = 100,
-		DOT11_EVENT_WSC_STOP = 101,				
-		DOT11_EVENT_WSC_SWITCH_WLAN_MODE = 108,						
-#endif
-	/* support  Assigned MAC Addr,Assigned SSID,dymanic change STA's PIN code, 2011-0505 */	
+	/* support  Assigned MAC Addr,Assigned SSID,dymanic change STA's PIN code, 2011-0505 */
 		DOT11_EVENT_WSC_SET_MY_PIN = 102,
 		DOT11_EVENT_WSC_SPEC_SSID = 103,
 		DOT11_EVENT_WSC_SPEC_MAC_IND = 104,
-	/* support  Assigned MAC Addr,Assigned SSID,dymanic change STA's PIN code, 2011-0505 */			
-				
-#endif
-#ifdef	CONFIG_RTK_MESH
-	DOT11_EVENT_PATHSEL_GEN_RREQ = 59,
-	DOT11_EVENT_PATHSEL_GEN_RERR = 60,
-	DOT11_EVENT_PATHSEL_RECV_RREQ = 61,
-	DOT11_EVENT_PATHSEL_RECV_RREP = 62,
-	DOT11_EVENT_PATHSEL_RECV_RERR = 63,
-	DOT11_EVENT_PATHSEL_RECV_PANN = 65,
-	DOT11_EVENT_PATHSEL_RECV_RANN = 66,
-#endif // CONFIG_RTK_MESH
-#ifdef CONFIG_RTL_WAPI_SUPPORT
-	DOT11_EVENT_WAPI_INIT_QUEUE =67,
-	DOT11_EVENT_WAPI_READ_QUEUE = 68,
-	DOT11_EVENT_WAPI_WRITE_QUEUE  =69,
+	/* support  Assigned MAC Addr,Assigned SSID,dymanic change STA's PIN code, 2011-0505 */
+
 #endif
 #if defined(CONFIG_RTL_COMAPI_CFGFILE) && defined(WIFI_SIMPLE_CONFIG)
 #ifdef INCLUDE_WPS
@@ -256,7 +233,7 @@ typedef enum{
 #endif
 #endif
 	DOT11_EVENT_WSC_RM_PBC_STA=106,
-	DOT11_EVENT_WSC_CHANGE_MAC_IND = 107,		
+	DOT11_EVENT_WSC_CHANGE_MAC_IND = 107,
 #ifdef HS2_SUPPORT
 	DOT11_EVENT_WNM_NOTIFY = 109,
 	DOT11_EVENT_GAS_INIT_REQ = 110,
@@ -274,27 +251,8 @@ typedef enum{
 	DOT11_EVENT_SET_PMF = 120,
 	DOT11_EVENT_GET_IGTK_PN = 121,
 	DOT11_EVENT_INIT_PMF = 122,	// HS2 R2 logo test
-#endif	
-#ifdef RSSI_MONITOR_NCR
-	DOT11_EVENT_RSSI_MONITOR_REPORT = 122,
-	DOT11_EVENT_RSSI_MONITOR_SETTYPE = 123,	
-#endif	
-#ifdef CONFIG_IEEE80211R
-	DOT11_EVENT_FT_GET_EVENT		= 125,
-	DOT11_EVENT_FT_IMD_ASSOC_IND	= 126,
-	DOT11_EVENT_FT_GET_KEY			= 127,
-	DOT11_EVENT_FT_SET_KEY			= 128,
-	DOT11_EVENT_FT_PULL_KEY_IND		= 129,
-	DOT11_EVENT_FT_ASSOC_IND		= 130,
-	DOT11_EVENT_FT_KEY_EXPIRE_IND	= 131,
-	DOT11_EVENT_FT_ACTION_IND		= 132,
-	DOT11_EVENT_FT_QUERY_INFO		= 133,
-	DOT11_EVENT_FT_SET_INFO			= 134,
-	DOT11_EVENT_FT_AUTH_INSERT_R0	= 135,
-	DOT11_EVENT_FT_AUTH_INSERT_R1	= 136,
-	DOT11_EVENT_FT_TRIGGER_EVENT	= 137,
 #endif
-#if defined(SUPPORT_UCFGING_LED) 
+#if defined(SUPPORT_UCFGING_LED)
 	DOT11_EVENT_UCFGING_LED	= 139,
 #endif
 #ifdef INDICATE_LINK_CHANGE
@@ -304,7 +262,7 @@ typedef enum{
 	DOT11_EVENT_USER_SETIE	= 141,
 #endif
 	DOT11_EVENT_UNKNOWN = 142
-	
+
 } DOT11_EVENT;
 
 #ifdef WIFI_SIMPLE_CONFIG
@@ -579,195 +537,6 @@ typedef struct _DOT11_WSC_IND{
 } DOT11_WSC_IND;
 #endif  //CONFIG_RTL_COMAPI_CFGFILE
 #endif
-#ifdef RSSI_MONITOR_NCR
-typedef		struct _DOT11_RSSIM_SET_TYPE {
-	unsigned char 		EventId;
-	unsigned char		type;
-	unsigned char		hwaddr[MACADDRLEN];
-} DOT11_RSSIM_SET_TYPE;
-#endif
-#ifdef CONFIG_IEEE80211R
-typedef struct _DOT11_FT_IMD_ASSOC_IND{
-	unsigned char EventId;
-	unsigned char IsMoreEvent;
-	unsigned char MACAddr[MACADDRLEN];
-} __WLAN_ATTRIB_PACK__ DOT11_FT_IMD_ASSOC_IND;
-
-typedef struct _DOT11_FT_PULL_KEY_IND{
-	unsigned char EventId;
-	unsigned char IsMoreEvent;
-	unsigned char Type;
-	unsigned char r0kh_id[MAX_R0KHID_LEN];
-	unsigned int Length;
-	unsigned char nonce[FT_R0KH_R1KH_PULL_NONCE_LEN];
-	unsigned char pmk_r0_name[FT_PMKID_LEN];
-	unsigned char r1kh_id[MACADDRLEN];
-	unsigned char s1kh_id[MACADDRLEN];
-} __WLAN_ATTRIB_PACK__ DOT11_FT_PULL_KEY_IND;
-
-enum _FTKEY_TYPE{
-	FTKEY_TYPE_PUSH		= 1,
-	FTKEY_TYPE_PULL		= 2,
-};
-
-typedef struct _DOT11_FT_GET_KEY_PROTO{
-	unsigned char EventId;
-	unsigned char IsMoreEvent;
-	unsigned char Type;
-} __WLAN_ATTRIB_PACK__ DOT11_FT_GET_KEY_PROTO;
-
-typedef struct _DOT11_FT_GET_KEY{
-	unsigned char EventId;
-	unsigned char IsMoreEvent;
-	unsigned char Type;
-	unsigned int Length;
-	unsigned char r1kh_id[MACADDRLEN];
-	unsigned char s1kh_id[MACADDRLEN];
-} __WLAN_ATTRIB_PACK__ DOT11_FT_GET_KEY;
-
-typedef struct _DOT11_FT_GET_KEY_PUSH{
-	unsigned char EventId;
-	unsigned char IsMoreEvent;
-	unsigned char Type;
-	unsigned int Length;
-	unsigned int timestamp;
-	unsigned char r1kh_id[MACADDRLEN];
-	unsigned char s1kh_id[MACADDRLEN];
-	unsigned char pmk_r0_name[FT_PMKID_LEN];
-	unsigned char pmk_r1[FT_PMK_LEN];
-	unsigned char pmk_r1_name[FT_PMKID_LEN];
-	unsigned short pairwise;
-} __WLAN_ATTRIB_PACK__ DOT11_FT_GET_KEY_PUSH;
-
-typedef struct _DOT11_FT_GET_KEY_PULL{
-	unsigned char EventId;
-	unsigned char IsMoreEvent;
-	unsigned char Type;
-	unsigned int Length;
-	unsigned char nonce[FT_R0KH_R1KH_PULL_NONCE_LEN];
-	unsigned char r1kh_id[MACADDRLEN];
-	unsigned char s1kh_id[MACADDRLEN];
-	unsigned char pmk_r1[FT_PMK_LEN];
-	unsigned char pmk_r1_name[FT_PMKID_LEN];
-	unsigned short pairwise;
-} __WLAN_ATTRIB_PACK__ DOT11_FT_GET_KEY_PULL;
-
-typedef struct _DOT11_FT_SET_KEY_PROTO{
-	unsigned char EventId;
-	unsigned char IsMoreEvent;
-	unsigned char Type;
-} __WLAN_ATTRIB_PACK__ DOT11_FT_SET_KEY_PROTO;
-
-typedef struct _DOT11_FT_SET_KEY_PUSH{
-	unsigned char EventId;
-	unsigned char IsMoreEvent;
-	unsigned char Type;
-	unsigned int Length;
-	unsigned int timestamp;
-	unsigned char r1kh_id[MACADDRLEN];
-	unsigned char s1kh_id[MACADDRLEN];
-	unsigned char pmk_r0_name[FT_PMKID_LEN];
-	unsigned char pmk_r1[FT_PMK_LEN];
-	unsigned char pmk_r1_name[FT_PMKID_LEN];
-	unsigned short pairwise;
-} __WLAN_ATTRIB_PACK__ DOT11_FT_SET_KEY_PUSH;
-
-typedef struct _DOT11_FT_SET_KEY_PULL{
-	unsigned char EventId;
-	unsigned char IsMoreEvent;
-	unsigned char Type;
-	unsigned int Length;
-	unsigned char nonce[FT_R0KH_R1KH_PULL_NONCE_LEN];
-	unsigned char r1kh_id[MACADDRLEN];
-	unsigned char s1kh_id[MACADDRLEN];
-	unsigned char pmk_r1[FT_PMK_LEN];
-	unsigned char pmk_r1_name[FT_PMKID_LEN];
-	unsigned short pairwise;
-} __WLAN_ATTRIB_PACK__ DOT11_FT_SET_KEY_PULL;
-
-typedef struct _DOT11_FT_ASSOC_IND{
-	unsigned char EventId;
-	unsigned char IsMoreEvent;
-	unsigned char MACAddr[MACADDRLEN];
-} __WLAN_ATTRIB_PACK__ DOT11_FT_ASSOC_IND;
-
-typedef struct _DOT11_FT_KEY_EXPIRE_IND{
-	unsigned char EventId;
-	unsigned char IsMoreEvent;
-	unsigned char MACAddr[MACADDRLEN];
-} __WLAN_ATTRIB_PACK__ DOT11_FT_KEY_EXPIRE_IND;
-
-enum _FT_ACTION_CODE{
-	ACTION_CODE_REQUEST		= 0,
-	ACTION_CODE_RESPONSE	= 1
-};
-
-typedef struct _DOT11_FT_ACTION{
-	unsigned char EventId;
-	unsigned char IsMoreEvent;
-	unsigned char MACAddr[MACADDRLEN];
-	unsigned char ActionCode;
-	unsigned int packet_len;
-	unsigned char packet[MAX_FTACTION_LEN];
-} __WLAN_ATTRIB_PACK__ DOT11_FT_ACTION;
-
-// Following are for Auth daemon
-typedef struct _DOT11_QUERY_FT_INFORMATION
-{
-    unsigned char EventId;
-    unsigned char IsMoreEvent;
-	unsigned char sta_addr[MACADDRLEN];
-	unsigned char ssid[32];
-	unsigned int ssid_len;
-	unsigned char mdid[2];
-	unsigned char r0kh_id[MAX_R0KHID_LEN];
-	unsigned int r0kh_id_len;
-	unsigned char bssid[MACADDRLEN];
-	unsigned char over_ds;
-	unsigned char res_request;
-} DOT11_QUERY_FT_INFORMATION, *PDOT11_QUERY_FT_INFORMATION;
-
-typedef struct _DOT11_SET_FT_INFORMATION
-{
-    unsigned char EventId;
-    unsigned char IsMoreEvent;
-	unsigned char sta_addr[MACADDRLEN];
-	unsigned char UnicastCipher;
-	unsigned char MulticastCipher;
-	unsigned char bInstallKey;
-} DOT11_SET_FT_INFORMATION, *PDOT11_SET_FT_INFORMATION;
-
-typedef struct _DOT11_AUTH_FT_INSERT_R0_KEY
-{
-    unsigned char EventId;
-    unsigned char IsMoreEvent;
-	unsigned char sta_addr[MACADDRLEN];
-	unsigned char pmk_r0[FT_PMK_LEN];
-	unsigned char pmk_r0_name[FT_PMKID_LEN];
-} DOT11_AUTH_FT_INSERT_R0_KEY, *PDOT11_AUTH_FT_INSERT_R0_KEY;
-
-typedef struct _DOT11_AUTH_FT_INSERT_R1_KEY
-{
-    unsigned char EventId;
-    unsigned char IsMoreEvent;
-	unsigned char sta_addr[MACADDRLEN];
-	unsigned char bssid[MACADDRLEN];
-	unsigned char r0kh_id[MAX_R0KHID_LEN];
-	unsigned int r0kh_id_len;
-	unsigned char pmk_r1[FT_PMK_LEN];
-	unsigned char pmk_r1_name[FT_PMKID_LEN];
-	unsigned char pmk_r0_name[FT_PMKID_LEN];
-	unsigned int pairwise;
-} DOT11_AUTH_FT_INSERT_R1_KEY, *PDOT11_AUTH_FT_INSERT_R1_KEY;
-
-typedef struct _DOT11_AUTH_FT_TRIGGER_EVENT
-{
-    unsigned char EventId;
-    unsigned char IsMoreEvent;
-	unsigned char trigger_eventid;
-	unsigned char sta_addr[MACADDRLEN];
-} DOT11_AUTH_FT_TRIGGER_EVENT, *PDOT11_AUTH_FT_TRIGGER_EVENT;
-#endif
 
 #define DOT11_AI_REQFI_CAPABILITIES      1
 #define DOT11_AI_REQFI_LISTENINTERVAL    2
@@ -816,7 +585,7 @@ typedef struct _DOT11_SET_USERIE{
     char            USERIE[256];
 }DOT11_SET_USERIE;
 #endif
-#if defined(SUPPORT_UCFGING_LED) 
+#if defined(SUPPORT_UCFGING_LED)
 typedef struct _DOT11_SET_UCFGING_LED {
 	unsigned char	EventId;
 	unsigned int	State;
@@ -942,7 +711,7 @@ typedef	union _DOT11_RSN_CAPABILITY{
 		unsigned short MFPR:1; // B6
 #else
 		unsigned short Reserved1:2; // B7 B6
-#endif		
+#endif
 		unsigned short GtksaReplayCounter:2; // B5 B4
 		unsigned short PtksaReplayCounter:2; // B3 B2
 		unsigned short NoPairwise:1; // B1
@@ -994,13 +763,13 @@ typedef struct _DOT11_HS2_GAS_REQ{
 	unsigned short	Reqlen;
 	unsigned char   Req[MAX_GAS_CONTENTS_LEN];
 }DOT11_HS2_GAS_REQ;
-/*==========HS2_SUPPORT==========*/ 
+/*==========HS2_SUPPORT==========*/
 typedef struct _DOT11_WNM_NOTIFY{
         unsigned char   EventId;
         unsigned char   IsMoreEvent;
 		unsigned char   macAddr[6];
         unsigned char   remedSvrURL[2048];
-#if 1		
+#if 1
 		unsigned char   serverMethod;
 #endif
 }DOT11_WNM_NOTIFY;
@@ -1030,7 +799,7 @@ typedef struct _DOT11_BSS_SessInfo_URL{
         unsigned char   URL[2048];
 }DOT11_BSS_SessInfo_URL;
 
-/*==========HS2_SUPPORT==========*/ 
+/*==========HS2_SUPPORT==========*/
 
 typedef struct _DOT11_HS2_GAS_RSP{
 	unsigned char   EventId;
@@ -1053,7 +822,7 @@ typedef struct _DOT11_HS2_TSM_REQ{
 	unsigned char   MACAddr[MACADDRLEN];
 	unsigned char   Req_mode;
 	unsigned char	Validity_intval;
-	unsigned char   Disassoc_timer; 	/*HS2 R2 logo test*/ 
+	unsigned char   Disassoc_timer; 	/*HS2 R2 logo test*/
 	unsigned char	term_len;
 	unsigned char	url_len;
 	unsigned char	list_len;
@@ -1064,7 +833,7 @@ typedef struct _DOT11_HS2_TSM_REQ{
 #endif
 
 #ifdef CONFIG_IEEE80211W
-/*HS2 R2 logo test*/ 
+/*HS2 R2 logo test*/
 typedef struct _DOT11_INIT_11W_Flags {
 	unsigned char	EventId;
 	unsigned char	IsMoreEvent;

@@ -6,14 +6,14 @@ Copyright (c) Realtek Semiconductor Corp. All rights reserved.
 
 Module Name:
 	Hal8814ADef.h
-	
+
 Abstract:
 	Defined HAL 8814A data structure & Define
-	    
+
 Major Change History:
 	When       Who               What
 	---------- ---------------   -------------------------------
-	2013-05-28 Filen            Create.	
+	2013-05-28 Filen            Create.
 --*/
 
 // Test Chip
@@ -67,7 +67,7 @@ extern u1Byte *data_MACDM_txop_normal_8814A_start, *data_MACDM_txop_normal_8814A
 extern u1Byte *data_MACDM_state_criteria_8814A_start, *data_MACDM_state_criteria_8814A_end;
 
 
-// MP chip 
+// MP chip
 extern u1Byte *data_AGC_TAB_8814Amp_start,    *data_AGC_TAB_8814Amp_end;
 extern u1Byte *data_MAC_REG_8814Amp_start,    *data_MAC_REG_8814Amp_end;
 extern u1Byte *data_PHY_REG_8814Amp_start,    *data_PHY_REG_8814Amp_end;

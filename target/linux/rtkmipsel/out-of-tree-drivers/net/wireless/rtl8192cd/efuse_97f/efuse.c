@@ -42,7 +42,7 @@ void get_efuse_data(u1Byte offset, u1Byte len, pu1Byte value)
 
 #if 0
 void set_efuse_options(PEFUSE_DATA pefuse_data)
-{   
+{
     u4Byte strap_pin, cpu_freq;
     //globalDebugLevel = BIT_GET_EFUSE_BOOT_CTRL_DEBUG_MSG(pefuse_data->ctrl);
 
@@ -75,7 +75,7 @@ void efuse_test_data(void)
 
 #if 1
     // efuse default value is 0x00000000
-    
+
     // 0F 8E (addr: 0x200) - C3 00
 
     // verify change cpu freq
@@ -104,7 +104,7 @@ void efuse_test_data(void)
     // verify erase spi-nor-flash
     // 0F 8E (addr: 0x200) - C0 02
     // CF 8C (addr: 0x230) - 00 10 00 B0
-    // test image len and heap len 
+    // test image len and heap len
     // 6F 8C (addr: 0x218) - 06 00 03 00
     write_efuse_byte(0x02C08E0F, 0xFFFFFFFF, 0, 0);
     write_efuse_byte(0x10008CCF, 0xFFFFFFFF, 0, 1);
@@ -150,13 +150,13 @@ u1Byte write_efuse_byte(u4Byte data, u4Byte mask, u4Byte dataPort, u4Byte dataId
     REG32(REG_EFUSE_WRITE_DATA_BIT_MASK_0) = 0;
     REG32(REG_EFUSE_WRITE_DATA_BIT_MASK_1) = 0;
     REG32(REG_EFUSE_WRITE_DATA_BIT_MASK_2) = 0;
-    REG32(REG_EFUSE_WRITE_DATA_BIT_MASK_3) = 0;    
+    REG32(REG_EFUSE_WRITE_DATA_BIT_MASK_3) = 0;
 
     REG32(REG_EFUSE_WRITE_DATA_0 + dataIdx * 0x4) = data;
     REG32(REG_EFUSE_WRITE_DATA_BIT_MASK_0 + dataIdx * 0x4) = mask;
 
     REG32(REG_EFUSE_CMD) = (REG32(REG_EFUSE_CMD) & (~0x7)) | BIT_EFUSE_CMD_ADDR(dataPort) | BIT_EFUSE_RW_CTRL;
-    
+
     do {
         if ((REG32(REG_EFUSE_CMD) & BIT_EFUSE_CTRL_STATE) == BIT_EFUSE_CTRL_STATE) {
             DBG_MSG(COMP_EFUSE, DBG_TRACE, ("%s(%d): 0x%x, cnt:0x%02x \n", __FUNCTION__, __LINE__, REG32(REG_EFUSE_CMD), cnt));
@@ -172,7 +172,7 @@ u1Byte write_efuse_byte(u4Byte data, u4Byte mask, u4Byte dataPort, u4Byte dataId
     } else {
         u4Byte resultFlag = REG32(REG_EFUSE_BURN_CHECK_FAIL_0) | REG32(REG_EFUSE_BURN_CHECK_FAIL_1) |
                             REG32(REG_EFUSE_BURN_CHECK_FAIL_2) | REG32(REG_EFUSE_BURN_CHECK_FAIL_3);
-        
+
         if (resultFlag == 0) {
             DBG_MSG(COMP_EFUSE, DBG_TRACE, ("Efuse write data done. p[%d]_[%d] = 0x%x & 0x%x, 0x%02x\n", dataPort, dataIdx, data, mask, cnt));
             return STATUS_EFUSE_SUCCESS;
@@ -224,7 +224,7 @@ u1Byte load_efuse_data_to_reg(void)
 // dataPort: 0~7, dataIdx: 0~3
 u4Byte read_efuse_byte(u4Byte idx)
 {
-    // efuse controller only support read 4 bytes operation. 
+    // efuse controller only support read 4 bytes operation.
     u4Byte addr  = (REG_EFUSE_P0_0 + idx) & (~0x3);
     u4Byte value = REG32(addr);
     u1Byte retval = 0;
@@ -346,7 +346,7 @@ u1Byte load_efuse_data(PEFUSE_DATA pefuse_data, u1Byte bPrint)
     u1Byte offset_2_0;
     u4Byte loc;
     u1Byte efuse_temp_data[EFUSE_FORMAT_WORD_UNIT * 2];
-    
+
     while (i < EFUSE_DATA_SIZE_MAX) {
         efuse_val = read_efuse_byte(i);
         i++;
@@ -372,11 +372,11 @@ u1Byte load_efuse_data(PEFUSE_DATA pefuse_data, u1Byte bPrint)
                     DBG_MSG(COMP_EFUSE, DBG_TRACE, ("%s(%d): Error: extended = 0xFF \n", __FUNCTION__, __LINE__));
                     break;
                 }
-                
+
             } else {
                 offset = ((efuse_val >> 4) & 0x0F);
                 word_enb = (efuse_val & 0x0F);
-                
+
                 if (word_enb == 0xF) {
                     DBG_MSG(COMP_EFUSE, DBG_TRACE, ("%s(%d): Error: all words disabled in normal mode\n", __FUNCTION__, __LINE__));
                 }

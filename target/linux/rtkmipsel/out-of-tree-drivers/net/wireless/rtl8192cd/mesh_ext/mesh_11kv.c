@@ -25,12 +25,12 @@
 #define SUBID_LINK_TEST_REQ 1
 #define SUBID_LINK_TEST_ACK 1
 #define SUBID_LINK_TEST_REP 2
-#define SUBID_LINK_TEST_TRAFFIC 3 // In original 11v proposal (IEEE 802.11-08/0852r0), 
-                                  // it is  a QoSNull data frame. However, it is easier 
+#define SUBID_LINK_TEST_TRAFFIC 3 // In original 11v proposal (IEEE 802.11-08/0852r0),
+                                  // it is  a QoSNull data frame. However, it is easier
                                   // for us to handle an action frame, so is it an action frame.
                                   // Format: [11sHDR] [LinkMeasureReportMain] [SubElement1]*k
                                   //         Total length of above frame is 'lenTx0' or 'lenTx0+1'
-                                  //         where the format of SubElment is: 
+                                  //         where the format of SubElment is:
                                   //              [ID: SUBID_LINK_TEST_TRAFFIC, 1 byte] [len: v1, 1 byte] [content: v1 bytes]
 
 
@@ -53,7 +53,7 @@ unsigned char *fillLinkMeasureReportMain(DRV_PRIV *priv, struct stat_info *pstat
 	*pbuf = 1; // dialog (1)
 	pbuf++;
 	(*retlen)++;
-	
+
 	// TPC report element (4)
 	pbuf+=4;
 	*(retlen)+=4;
@@ -61,11 +61,11 @@ unsigned char *fillLinkMeasureReportMain(DRV_PRIV *priv, struct stat_info *pstat
 	// RX Attena, TX Attena (2)
 	pbuf+=2;
 	*(retlen)+=2;
-	
+
 	// RCPI[1], RSNI[1]
 	pbuf+=2;
 	*(retlen)+=2;
-	
+
 	return pbuf;
 }
 
@@ -82,7 +82,7 @@ unsigned char *fillActionHeader(DRV_PRIV * priv, struct stat_info * pstat, UINT8
 	SetToDs(txinsn->phdr);
 	SetFrameSubType((txinsn->phdr), WIFI_11S_MESH_ACTION);
 	memcpy((void *)GetAddr1Ptr((txinsn->phdr)), pstat->hwaddr, MACADDRLEN);
-	memcpy((void *)GetAddr2Ptr((txinsn->phdr)), GET_MY_HWADDR, MACADDRLEN); 
+	memcpy((void *)GetAddr2Ptr((txinsn->phdr)), GET_MY_HWADDR, MACADDRLEN);
 	memcpy((void *)GetAddr3Ptr((txinsn->phdr)), pstat->hwaddr, MACADDRLEN);
 
 	// Fill Address 4 (SA) in the BODY
@@ -127,7 +127,7 @@ void issue_11kv_LinkMeasureReq(DRV_PRIV * priv, struct stat_info * pstat, UINT16
 	UINT16          val;
 	unsigned char	*pbuf;
 	UINT32 r;
-	
+
 	get_random_bytes((void *)&r, sizeof(UINT32));
 	r%=HZ; // max diff is 1 sec
 	pstat->mesh_neighbor_TBL.timeMetricUpdate = jiffies + MESH_METRIC_PERIOD_UPDATE + r;
@@ -156,42 +156,42 @@ void issue_11kv_LinkMeasureReq(DRV_PRIV * priv, struct stat_info * pstat, UINT16
 
 	if (txinsn.phdr == NULL)
 		goto issue_11kv_LinkMeasureReq_fail;
-	
+
 	memset((void *)txinsn.phdr, 0, sizeof(struct  wlan_hdr));
 
 	// Category | Action | Dialog Token | Transimit Power Used | Max Transmit Power | Opeion sub-elements |
 	//     1         1           1                   1                    1                    ?
-    
+
         pbuf = fillActionHeader(priv, pstat, _CATEGORY_11K_ACTION_, ACTION_FILED_11K_LINKME_REQ, &txinsn);
         if (pbuf == NULL)
                 goto issue_11kv_LinkMeasureReq_fail;;
-	
+
 	// Set Dialog Token
 	get_random_bytes((void *)&tmp, sizeof(UINT8));;
-	*pbuf = tmp; 
+	*pbuf = tmp;
 	pbuf += 1;
-	
+
 	//Set Transimit Power Used
 	*pbuf = pstat->rssi;
 	pbuf += 1;
-	
+
 	//Set Max Transmit Power
 	*pbuf = 100;
 	pbuf += 1;
 	txinsn.fr_len += 3;
-	
+
 	//Set Opeion sub-elements
 	//Sub-element ID | Length
-	//     1              1	
+	//     1              1
 	//Set Sub-element ID
 	*pbuf = SUBID_LINK_TEST_REQ;
 	pbuf += 1;
-	
+
 	//Set Sub-element Length
 	*pbuf = 8;
 	pbuf += 1;
 	txinsn.fr_len += 2;
-    
+
 	//Packet Length | Packet Count | Packet Priority | Test Timeout | Test Direction|
 	//     2               2                1              2               1
 	//Set Packet Length
@@ -205,11 +205,11 @@ void issue_11kv_LinkMeasureReq(DRV_PRIV * priv, struct stat_info * pstat, UINT16
 	{
 		val = cpu_to_le16(priv->mesh_fake_mib.spec11kv.defPktLen);
 		memcpy(pbuf, (void *)&val, sizeof(val));
-		pstat->mesh_neighbor_TBL.spec11kv.lenTx0 = priv->mesh_fake_mib.spec11kv.defPktLen; 
-   	} 
+		pstat->mesh_neighbor_TBL.spec11kv.lenTx0 = priv->mesh_fake_mib.spec11kv.defPktLen;
+   	}
 
 	pbuf += 2;
-    
+
 	//Set Packet Count
 	if(cntTst != 0)
 	{
@@ -219,32 +219,32 @@ void issue_11kv_LinkMeasureReq(DRV_PRIV * priv, struct stat_info * pstat, UINT16
 	}
 	else
 	{
-		val = cpu_to_le16(priv->mesh_fake_mib.spec11kv.defPktCnt); 
+		val = cpu_to_le16(priv->mesh_fake_mib.spec11kv.defPktCnt);
 		memcpy(pbuf, (void *)&val, sizeof(val));
 		pstat->mesh_neighbor_TBL.spec11kv.cntTx0 = priv->mesh_fake_mib.spec11kv.defPktCnt;
 	}
 
 	pbuf += 2;
-    
+
 	//Set Packet Priority
 	if(prioTst != 0)
 		*pbuf = prioTst;
 	else
 		*pbuf = priv->mesh_fake_mib.spec11kv.defPktPri;
- 
+
 	pbuf += 1;
 
-    
+
 	//Set Test Timeout
 	pstat->mesh_neighbor_TBL.spec11kv.toTx = jiffies +  (priv->mesh_fake_mib.spec11kv.defPktTO*100/1000)*HZ + MESH_METRIC_TIMEOUT_FRAME;
 	val = cpu_to_le16(priv->mesh_fake_mib.spec11kv.defPktTO);
 	memcpy(pbuf, (void *)&val, sizeof(val));
 	pbuf += 2;
-    
+
 	//Set Test Direction
 	*pbuf = 1;
 	pbuf += 1;
-    
+
 	//Add totle length of sub-element
 	txinsn.fr_len += 8;
 
@@ -277,7 +277,7 @@ void issue_11kv_LinkMeasureRepAck(DRV_PRIV * priv, struct stat_info * pstat)
 	txinsn.fixed_rate = 1;
 
 	txinsn.pframe  = get_mgtbuf_from_poll(priv);
-	txinsn.phdr = get_wlanhdr_from_poll(priv); 
+	txinsn.phdr = get_wlanhdr_from_poll(priv);
 
 	if ((txinsn.pframe == NULL) || (txinsn.phdr == NULL))
 		goto err;
@@ -293,7 +293,7 @@ void issue_11kv_LinkMeasureRepAck(DRV_PRIV * priv, struct stat_info * pstat)
 
 	// name:      SubElementID    | Length | Response
 	// len:           1           |  1     |    1
-	// value: SUBID_LINK_TEST_ACK |  1     |  
+	// value: SUBID_LINK_TEST_ACK |  1     |
 
 	// fill ack
 	*pbuf = SUBID_LINK_TEST_ACK;
@@ -332,7 +332,7 @@ void issue_11kv_LinkMeasureRepRep(DRV_PRIV * priv, struct stat_info * pstat)
 	txinsn.fixed_rate = 1;
 
 	txinsn.pframe  = get_mgtbuf_from_poll(priv);
-	txinsn.phdr = get_wlanhdr_from_poll(priv); 
+	txinsn.phdr = get_wlanhdr_from_poll(priv);
 
 	if ((txinsn.pframe == NULL) || (txinsn.phdr == NULL))
 		goto err;
@@ -348,7 +348,7 @@ void issue_11kv_LinkMeasureRepRep(DRV_PRIV * priv, struct stat_info * pstat)
 
 	// name:      SubElementID    | Length | Pkt Length | Pkt Count | Priority
 	// len:           1           |  1     |     2           2           1
-	// value: SUBID_LINK_TEST_REP |  5     |  
+	// value: SUBID_LINK_TEST_REP |  5     |
 
 	*pbuf = SUBID_LINK_TEST_REP;
 	pbuf++;
@@ -398,7 +398,7 @@ unsigned int On11kvLinkMeasureReq(DRV_PRIV *priv, struct rx_frinfo *pfrinfo)
 	if (pframe==0)
 		return FAIL;
 
-	if(is_mesh_6addr_format_without_qos(pframe)) 
+	if(is_mesh_6addr_format_without_qos(pframe))
 		pFrameBody = pframe + WLAN_HDR_A6_MESH_DATA_LEN;
 	else
 		pFrameBody = pframe + WLAN_HDR_A4_MESH_DATA_LEN;
@@ -439,7 +439,7 @@ unsigned int On11kvLinkMeasureReq(DRV_PRIV *priv, struct rx_frinfo *pfrinfo)
 	pstat->mesh_neighbor_TBL.spec11kv.toRx = jiffies + (le16_to_cpu( *(UINT16 *)ptr)*100)/1000*HZ + MESH_METRIC_TIMEOUT_FRAME;
 
 	atomic_set(&pstat->mesh_neighbor_TBL.isMetricTesting, atomic_read(&pstat->mesh_neighbor_TBL.isMetricTesting)|FLAG_METRIC_RX);
-	
+
 	issue_11kv_LinkMeasureRepAck(priv, pstat);
 
 	return SUCCESS;
@@ -451,7 +451,7 @@ void issue_11kv_TestTraffic(DRV_PRIV *priv, struct stat_info *pstat)
 	UINT8 i;
 	UINT8 t;
 	UINT16 len_t;
-	unsigned char *pbuf; 
+	unsigned char *pbuf;
 
 	DECLARE_TXINSN(txinsn);
 
@@ -488,7 +488,7 @@ void issue_11kv_TestTraffic(DRV_PRIV *priv, struct stat_info *pstat)
 
 	// name:      (SubElementID       | Length | Content   )
 	// len:       (    1              |  1     | max=length ) x n --> total length = lenTx0 - header
-	// value: SUBID_LINK_TEST_TRAFFIC |    
+	// value: SUBID_LINK_TEST_TRAFFIC |
 
 	len_t = pstat->mesh_neighbor_TBL.spec11kv.lenTx0 - txinsn.fr_len - 24; // 24 is the length in phdr (A1~A3)
 
@@ -541,9 +541,9 @@ unsigned int On11kvLinkMeasureRepAck(DRV_PRIV *priv, struct rx_frinfo *pfrinfo, 
 	}
 
 	atomic_set(&pstat->mesh_neighbor_TBL.isMetricTesting, (atomic_read(&pstat->mesh_neighbor_TBL.isMetricTesting)&~FLAG_METRIC_TX1)|FLAG_METRIC_TX2);
-	
+
 	// Sub-element ID | Length | Response (0 / 1) |
-	//        1           1           1 
+	//        1           1           1
 
         if(*(pSubElement + 1) < 1)
         {
@@ -552,7 +552,7 @@ unsigned int On11kvLinkMeasureRepAck(DRV_PRIV *priv, struct rx_frinfo *pfrinfo, 
 
 	switch(*(pSubElement + 2))
 	{
-		case 0: 
+		case 0:
 			break;
 		case 1:
 			return FAIL;
@@ -609,7 +609,7 @@ unsigned int On11kvTestTraffic(DRV_PRIV * priv, struct rx_frinfo *pfrinfo, unsig
 	unsigned char *pframe;
 	struct stat_info *pstat;
 
-	pframe = get_pframe(pfrinfo); 
+	pframe = get_pframe(pfrinfo);
 	pstat = get_stainfo(priv, GetAddr2Ptr(pframe));
 	// pskb = get_pskb(pfrinfo);
 
@@ -621,8 +621,8 @@ unsigned int On11kvTestTraffic(DRV_PRIV * priv, struct rx_frinfo *pfrinfo, unsig
 	pstat->mesh_neighbor_TBL.spec11kv.lenRx1 += pfrinfo->pktlen;
 	pstat->mesh_neighbor_TBL.spec11kv.rateRx = pfrinfo->rx_rate;
 
-#if 0 
-	printk("@@@ receive test traffic: cnt=%d length=%d prio=%d\n", 
+#if 0
+	printk("@@@ receive test traffic: cnt=%d length=%d prio=%d\n",
 			pstat->mesh_neighbor_TBL.spec11kv.cntRx1, pstat->mesh_neighbor_TBL.spec11kv.lenRx1, pstat->mesh_neighbor_TBL.spec11kv.prioRx);
 #endif
 	if(pstat->mesh_neighbor_TBL.spec11kv.cntRx0 == pstat->mesh_neighbor_TBL.spec11kv.cntRx1)
@@ -636,7 +636,7 @@ unsigned int On11kvTestTraffic(DRV_PRIV * priv, struct rx_frinfo *pfrinfo, unsig
 					pstat->mesh_neighbor_TBL.spec11kv.cntRx1);
 		issue_11kv_LinkMeasureRepRep(priv, pstat);
 	}
-		
+
 
 	return SUCCESS;
 }
@@ -652,7 +652,7 @@ unsigned int On11kvLinkMeasureRep(DRV_PRIV *priv, struct rx_frinfo *pfrinfo)
 	if (pframe==0)
 		return FAIL;
 
-	if(is_mesh_6addr_format_without_qos(pframe)) 
+	if(is_mesh_6addr_format_without_qos(pframe))
 		pFrameBody = pframe + WLAN_HDR_A6_MESH_DATA_LEN;
 	else
 		pFrameBody = pframe + WLAN_HDR_A4_MESH_DATA_LEN;
@@ -692,7 +692,7 @@ UINT32 computeMetric(DRV_PRIV * priv, struct stat_info * pstat, UINT8 rate, UINT
 
 		return pstat->mesh_neighbor_TBL.metric;
 	}
- 
+
 	if(cntRcv == 0)
 	{
 #if 0
@@ -706,7 +706,7 @@ UINT32 computeMetric(DRV_PRIV * priv, struct stat_info * pstat, UINT8 rate, UINT
 	// O is vender define here is 0
 	// 1/(1-ef) = 1/(cntSnd/cntSnd - (cntSnd-cntRcv)/cntSnd) = cntSnd/cntRcv
 	//bt = lenTotalRcv * 8 / cntRcv;	//receive frame size
-	// metric_current = (bt * cntSnd) / (rateMbps * cntRcv); 
+	// metric_current = (bt * cntSnd) / (rateMbps * cntRcv);
 	metric_current = (lenTotalRcv * 8 * cntSnd) / (rateMbps * cntRcv * cntRcv);
 
 	pstat->mesh_neighbor_TBL.metric = (pstat->mesh_neighbor_TBL.metric + metric_current)/2;
@@ -738,7 +738,7 @@ void metric_update(DRV_PRIV *priv)
 		plist = plist->next;
 		if(time_after(jiffies, pstat->mesh_neighbor_TBL.timeMetricUpdate))
 		{
-			
+
 			if( ((pstat->mesh_neighbor_TBL.isAsym==0) && (atomic_read(&pstat->mesh_neighbor_TBL.isMetricTesting)==0)) ||
 					((pstat->mesh_neighbor_TBL.isAsym==1) && ((atomic_read(&pstat->mesh_neighbor_TBL.isMetricTesting)&FLAG_METRIC_TX)==0))
 				)
@@ -753,12 +753,12 @@ void metric_update(DRV_PRIV *priv)
 			if(time_after(jiffies, pstat->mesh_neighbor_TBL.spec11kv.toRx))
 			{
 #if 0
-				printk("@@@@ wait for test traffic expire (req cnt: %d/ cur cnt: %d), send rep rep\n", 
+				printk("@@@@ wait for test traffic expire (req cnt: %d/ cur cnt: %d), send rep rep\n",
 					pstat->mesh_neighbor_TBL.spec11kv.cntRx0, pstat->mesh_neighbor_TBL.spec11kv.cntRx1);
 #endif
 
 				pstat->mesh_neighbor_TBL.retryMetric++;
-				computeMetric(priv, pstat, pstat->mesh_neighbor_TBL.spec11kv.rateRx, 
+				computeMetric(priv, pstat, pstat->mesh_neighbor_TBL.spec11kv.rateRx,
 							pstat->mesh_neighbor_TBL.spec11kv.prioRx,
 							pstat->mesh_neighbor_TBL.spec11kv.lenRx0,
 							pstat->mesh_neighbor_TBL.spec11kv.cntRx0,
@@ -775,10 +775,10 @@ void metric_update(DRV_PRIV *priv)
 				pstat->mesh_neighbor_TBL.retryMetric++;
 				computeMetric(priv, pstat, 0, 0, 0, 0, 0, 0);
 				if((atomic_read(&pstat->mesh_neighbor_TBL.isMetricTesting)&FLAG_METRIC_TX1)!=0)
-					atomic_set(&pstat->mesh_neighbor_TBL.isMetricTesting, 
+					atomic_set(&pstat->mesh_neighbor_TBL.isMetricTesting,
 						(atomic_read(&pstat->mesh_neighbor_TBL.isMetricTesting)&~FLAG_METRIC_TX1));
 				if((atomic_read(&pstat->mesh_neighbor_TBL.isMetricTesting)&FLAG_METRIC_TX2)!=0)
-					atomic_set(&pstat->mesh_neighbor_TBL.isMetricTesting, 
+					atomic_set(&pstat->mesh_neighbor_TBL.isMetricTesting,
 						(atomic_read(&pstat->mesh_neighbor_TBL.isMetricTesting)&~FLAG_METRIC_TX2));
 			}
 		}

@@ -19,7 +19,7 @@ HalTxbf8814A_setNDPArate(
 )
 {
 	PDM_ODM_T	pDM_Odm = (PDM_ODM_T)pDM_VOID;
-	
+
 	ODM_Write1Byte(pDM_Odm, REG_NDPA_OPT_CTRL_8814A, BW);
 	ODM_Write1Byte(pDM_Odm, REG_NDPA_RATE_8814A, (u1Byte) Rate);
 
@@ -31,7 +31,7 @@ HalTxbf8814A_setNDPArate(
 VOID
 phydm_DataRate_8814A(
 	IN	PDM_ODM_T			pDM_Odm,
-	IN	u1Byte				macId,	
+	IN	u1Byte				macId,
 	OUT	pu4Byte				data,
 	IN	u1Byte				dataLen
 	)
@@ -41,16 +41,16 @@ phydm_DataRate_8814A(
 
 	ODM_Write2Byte(pDM_Odm, REG_PKTBUF_DBG_CTRL_8814A, PHYDM_CTRL_INFO_PAGE);
 	XReadDataAddr = PHYDM_MEMORY_MAP_BUF_READ + macId*32; /*Ctrl Info: 32Bytes for each macid(n)*/
-	
+
 	if ((XReadDataAddr < PHYDM_MEMORY_MAP_BUF_READ) || (XReadDataAddr > 0x8FFF)) {
 		ODM_RT_TRACE(pDM_Odm, PHYDM_COMP_TXBF, ODM_DBG_LOUD, ("XReadDataAddr(0x%x) is not correct!\n", XReadDataAddr));
-		return;	
+		return;
 	}
-	
+
 	/* Read data */
 	for (i = 0; i < dataLen; i++)
-		*(data+i) = ODM_Read2Byte(pDM_Odm, XReadDataAddr+i);	
-	
+		*(data+i) = ODM_Read2Byte(pDM_Odm, XReadDataAddr+i);
+
 }
 
 VOID
@@ -65,7 +65,7 @@ HalTxbf8814A_GetTxRate(
 	u1Byte	DataRate = 0xFF;
 
 	pEntry = &(pBeamInfo->BeamformeeEntry[pBeamInfo->BeamformeeCurIdx]);
-	
+
 	phydm_DataRate_8814A(pDM_Odm, (u1Byte)pEntry->MacId, &TxRptData, 1);
 	DataRate = (u1Byte)TxRptData;
 	DataRate &= bMask7bits;   /*Bit7 indicates SGI*/
@@ -292,7 +292,7 @@ halTxbf8814A_RfMode(
 
 		/*for 8814 19ac(idx 1), 19b4(idx 0), different Tx ant setting*/
 		ODM_SetBBReg(pDM_Odm, REG_BB_TXBF_ANT_SET_BF1_8814A, BIT28 | BIT29, 0x2);			/*enable BB TxBF ant mapping register*/
-		
+
 		if (idx == 0) {
 			switch (Nr_index) {
 			case 0:
@@ -308,7 +308,7 @@ halTxbf8814A_RfMode(
 
 			default:			/*Nr>3, same as Case 3*/
 			ODM_SetBBReg(pDM_Odm, REG_BB_TXBF_ANT_SET_BF0_8814A, bMaskByte3LowNibble | bMaskL3Bytes, 0x93f93ff);	/*tx4path, ABCD*/
-			
+
 			break;
 			}
 		} else {
@@ -454,7 +454,7 @@ halTxbf8814A_FwTxBFCmd(
 	u1TxBFParm[2] = Period;
 	ODM_FillH2CCmd(pDM_Odm, PHYDM_H2C_TXBF, 3, u1TxBFParm);
 
-	ODM_RT_TRACE(pDM_Odm, PHYDM_COMP_TXBF, ODM_DBG_LOUD, 
+	ODM_RT_TRACE(pDM_Odm, PHYDM_COMP_TXBF, ODM_DBG_LOUD,
 		("[%s] PageNum0 = %d, PageNum1 = %d Period = %d\n", __func__, PageNum0, PageNum1, Period));
 }
 #endif

@@ -17,7 +17,7 @@
  *
  *
  ******************************************************************************/
- 
+
  #ifndef __HAL_PHY_RF_H__
  #define __HAL_PHY_RF_H__
 
@@ -60,13 +60,13 @@ typedef VOID(*FuncSwingXtal)(PVOID, ps1Byte*, ps1Byte*);
 typedef VOID(*FuncSetXtal)(PVOID);
 
 typedef struct _TXPWRTRACK_CFG {
-	u1Byte 		SwingTableSize_CCK;	
+	u1Byte 		SwingTableSize_CCK;
 	u1Byte 		SwingTableSize_OFDM;
 	u1Byte		Threshold_IQK;
 	u1Byte		Threshold_DPK;
 	u1Byte 		AverageThermalNum;
 	u1Byte 		RfPathCount;
-	u4Byte 		ThermalRegAddr;	
+	u4Byte 		ThermalRegAddr;
 	FuncSetPwr 	ODM_TxPwrTrackSetPwr;
 	FuncIQK 	DoIQK;
 	FuncLCK		PHY_LCCalibrate;
@@ -106,13 +106,13 @@ VOID
 ODM_ResetIQKResult(
 	IN		PVOID					pDM_VOID
 );
-u1Byte 
+u1Byte
 ODM_GetRightChnlPlaceforIQK(
     IN u1Byte chnl
 );
 
 void phydm_rf_init(	IN		PVOID					pDM_VOID);
 void phydm_rf_watchdog(	IN		PVOID					pDM_VOID);
-								
+
 #endif	// #ifndef __HAL_PHY_RF_H__
 

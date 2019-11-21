@@ -6,14 +6,14 @@ Copyright (c) Realtek Semiconductor Corp. All rights reserved.
 
 Module Name:
 	Hal8822BDef.h
-	
+
 Abstract:
 	Defined HAL 8822B data structure & Define
-	    
+
 Major Change History:
 	When       Who               What
 	---------- ---------------   -------------------------------
-	2015/06/25 Eric            Create.	
+	2015/06/25 Eric            Create.
 --*/
 
 // Test Chip
@@ -63,7 +63,7 @@ extern u1Byte *data_MACDM_txop_normal_8822B_start, *data_MACDM_txop_normal_8822B
 extern u1Byte *data_MACDM_state_criteria_8822B_start, *data_MACDM_state_criteria_8822B_end;
 
 
-// MP chip 
+// MP chip
 extern u1Byte *data_AGC_TAB_8822Bmp_start,    *data_AGC_TAB_8822Bmp_end;
 extern u1Byte *data_MAC_REG_8822Bmp_start,    *data_MAC_REG_8822Bmp_end;
 extern u1Byte *data_PHY_REG_8822Bmp_start,    *data_PHY_REG_8822Bmp_end;

@@ -14,7 +14,7 @@ typedef struct _TX_DESC_88XX_
     volatile    u4Byte     Dword8;
     volatile    u4Byte     Dword9;
     volatile    u4Byte     Dword10;
-    volatile    u4Byte     Dword11;        
+    volatile    u4Byte     Dword11;
 } TX_DESC_88XX, *PTX_DESC_88XX;
 
 #define SIZE_TXDESC_88XX    40
@@ -43,7 +43,7 @@ typedef enum _HCI_TX_DMA_QUEUE_88XX_
     HCI_TX_DMA_QUEUE_HI5,
     HCI_TX_DMA_QUEUE_HI6,
     HCI_TX_DMA_QUEUE_HI7,
-    HCI_TX_DMA_QUEUE_CMD,            
+    HCI_TX_DMA_QUEUE_CMD,
     // Beacon
     HCI_TX_DMA_QUEUE_BCN,
     HCI_TX_DMA_QUEUE_MAX_NUM        //14
@@ -103,10 +103,10 @@ typedef struct _TX_BUFFER_DESCRIPTOR_
 
 typedef struct _HCI_TX_DMA_QUEUE_STRUCT_88XX_
 {
-    //TXBD       
+    //TXBD
     PTX_BUFFER_DESCRIPTOR   pTXBD_head;
 
-    //TXBD Queue management    
+    //TXBD Queue management
     u2Byte                  hw_idx;
     u2Byte	                host_idx;
 
@@ -169,12 +169,12 @@ typedef struct _TX_DESC_DATA_88XX_
 {
     // header
     pu1Byte         pHdr;
-    u4Byte          hdrLen;    
+    u4Byte          hdrLen;
     u4Byte          llcLen;
 
     // frame
-    pu1Byte         pBuf;    
-    u4Byte          frLen;    
+    pu1Byte         pBuf;
+    u4Byte          frLen;
 
     // encryption
     pu1Byte         pMic;
@@ -184,15 +184,15 @@ typedef struct _TX_DESC_DATA_88XX_
     u4Byte          rateId;
     u1Byte          macId;
     u1Byte          tid;
-    BOOLEAN         moreData;    
+    BOOLEAN         moreData;
 	u1Byte          enDescId;
-    
+
     // TXDESC Dword 2
     BOOLEAN         aggEn;
     u1Byte          ampduDensity;
     BOOLEAN         frag;
     BOOLEAN         bk;
-    u4Byte          p_aid;	
+    u4Byte          p_aid;
     BOOLEAN         g_id;
 #if CFG_HAL_HW_AES_IV
     BOOLEAN         hwAESIv;
@@ -217,7 +217,7 @@ typedef struct _TX_DESC_DATA_88XX_
     u1Byte          dataRate;
     BOOLEAN         rtyLmtEn;
     u1Byte          dataRtyLmt;
-    u1Byte          dataRateFBLmt;    
+    u1Byte          dataRateFBLmt;
     u1Byte          BMCRtyLmt;
 
     // TXDESC Dword 5
@@ -230,7 +230,7 @@ typedef struct _TX_DESC_DATA_88XX_
     u1Byte          RTSShort;
     u1Byte          TXPowerOffset;
     u1Byte          TXAnt;
-	
+
     // TXDESC Dword 6
 #if (defined(CONFIG_PHYDM_ANTENNA_DIVERSITY))
     u1Byte          antSel;
@@ -238,8 +238,8 @@ typedef struct _TX_DESC_DATA_88XX_
     u1Byte          antSel_B;
     u1Byte          antSel_C;
 #endif	//#if (defined(CONFIG_PHYDM_ANTENNA_DIVERSITY))
-	
-	
+
+
 #if (CFG_HAL_HW_TX_SHORTCUT_REUSE_TXDESC || CFG_HAL_HW_TX_SHORTCUT_HDR_CONV)
 	// TXDESC Dword 8
 	BOOLEAN		 	smhEn;
@@ -281,7 +281,7 @@ typedef struct _H2C_PAYLOAD_88XX_
     u4Byte          offset16;
     u4Byte          offset20;
     u4Byte          offset24;
-    u4Byte          offset28;    
+    u4Byte          offset28;
 } H2C_PAYLOAD_88XX, *PH2C_PAYLOAD_88XX;
 
 VOID
@@ -347,7 +347,7 @@ FillBeaconDesc88XX
 );
 
 VOID
-FillRsrvPageDesc88XX  
+FillRsrvPageDesc88XX
 (
     IN	HAL_PADAPTER        Adapter,
     IN  PVOID               _pdesc,
@@ -368,7 +368,7 @@ FillTxDesc88XX (
     IN  u4Byte          queueIndex,  //HCI_TX_DMA_QUEUE_88XX
     IN  PVOID           pDescData
 );
-						
+
 VOID
 FillShortCutTxDesc88XX(
     IN      HAL_PADAPTER    Adapter,
@@ -390,7 +390,7 @@ FillTxDesc88XX_V1 (
     IN  u4Byte          queueIndex,  //HCI_TX_DMA_QUEUE_88XX
     IN  PVOID           pDescData
 );
-						
+
 VOID
 FillShortCutTxDesc88XX_V1(
     IN      HAL_PADAPTER    Adapter,
@@ -417,7 +417,7 @@ FillBeaconDesc88XX_V1
 );
 
 VOID
-FillRsrvPageDesc88XX_V1 
+FillRsrvPageDesc88XX_V1
 (
     IN	HAL_PADAPTER        Adapter,
     IN  PVOID               _pdesc,
@@ -463,9 +463,9 @@ HAL_IMEM
 PVOID
 CopyShortCutTxDesc88XX(
     IN  HAL_PADAPTER    Adapter,
-    IN  u4Byte          queueIndex,  //HCI_TX_DMA_QUEUE_88XX    
+    IN  u4Byte          queueIndex,  //HCI_TX_DMA_QUEUE_88XX
     IN  PVOID           pTxDesc,
-    IN  u4Byte          direction    
+    IN  u4Byte          direction
 );
 
 HAL_IMEM
@@ -476,7 +476,7 @@ FillShortCutTxHwCtrl88XX(
     IN      PVOID           pDescData,
     IN      PVOID           pTxDesc,
     IN      u4Byte          direction,
-    IN      BOOLEAN         useHW  
+    IN      BOOLEAN         useHW
 );
 
 u2Byte
@@ -498,10 +498,8 @@ SetShortCutTxBuffSize88XX_V1(
 
 void DumpTxBDesc88XX(
     IN      HAL_PADAPTER    Adapter,
-#ifdef CONFIG_RTL_PROC_NEW
     IN      struct seq_file *s,
-#endif
-    IN      u4Byte          q_num 
+    IN      u4Byte          q_num
 );
 
 #endif  //#ifndef __HAL88XX_TXDESC_H__

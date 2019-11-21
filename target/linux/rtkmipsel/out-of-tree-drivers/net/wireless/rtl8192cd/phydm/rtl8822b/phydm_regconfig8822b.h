@@ -1,7 +1,7 @@
 /******************************************************************************
  *
  * Copyright(c) 2007 - 2011 Realtek Corporation. All rights reserved.
- *                                        
+ *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of version 2 of the GNU General Public License as
  * published by the Free Software Foundation.
@@ -31,21 +31,21 @@ odm_ConfigRFReg_8822B(
 	IN		u4Byte					RegAddr
 	);
 
-void 
+void
 odm_ConfigRF_RadioA_8822B(
 	IN		PDM_ODM_T				pDM_Odm,
 	IN		u4Byte					Addr,
 	IN		u4Byte					Data
 	);
 
-void 
+void
 odm_ConfigRF_RadioB_8822B(
 	IN		PDM_ODM_T				pDM_Odm,
 	IN		u4Byte					Addr,
 	IN		u4Byte					Data
 	);
 
-void 
+void
 odm_ConfigMAC_8822B(
 	IN		PDM_ODM_T				pDM_Odm,
 	IN		u4Byte					Addr,
@@ -59,7 +59,7 @@ odm_UpdateAgcBigJumpLmt_8822B(
 	IN	u4Byte					Data
 );
 
-void 
+void
 odm_ConfigBB_AGC_8822B(
 	IN		PDM_ODM_T				pDM_Odm,
 	IN		u4Byte					Addr,
@@ -78,7 +78,7 @@ odm_ConfigBB_PHY_REG_PG_8822B(
 	IN		u4Byte					Data
 	);
 
-void 
+void
 odm_ConfigBB_PHY_8822B(
 	IN		PDM_ODM_T				pDM_Odm,
 	IN		u4Byte					Addr,

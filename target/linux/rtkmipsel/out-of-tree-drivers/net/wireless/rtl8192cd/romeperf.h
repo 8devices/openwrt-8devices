@@ -57,15 +57,15 @@ struct rtl8651_romeperf_stat_s {
 #ifdef PERF_DUMP_CP3_DUAL_COUNTER_EN
 	uint64 accCycle[8];
 	uint64 tempCycle[8];
-    unsigned char Counter[8];    
-    unsigned char Event[8];        
+    unsigned char Counter[8];
+    unsigned char Event[8];
     unsigned char numOfCount;
-    unsigned char bUsed;    
+    unsigned char bUsed;
 #else
 	uint64 accCycle[4];
 	uint64 tempCycle[4];
 #endif // PERF_DUMP_CP3_DUAL_COUNTER_EN
-    uint32 reEnterIdx;    
+    uint32 reEnterIdx;
 	uint32 executedNum;
 	uint32 hasTempCycle:1; /* true if tempCycle is valid. */
 };
@@ -151,14 +151,14 @@ enum _ROMEPERF_INDEX_LIST_ {
     ROMEPERF_INDEX_TX_XMIT_OUT,
     ROMEPERF_INDEX_TX_XMIT_OUT_2,
 
-    //Rx     
+    //Rx
     ROMEPERF_INDEX_RX_ONE_PKT,
     ROMEPERF_INDEX_RX_ONE_PKT_2,
     ROMEPERF_INDEX_TX_START_XMIT,
     ROMEPERF_INDEX_TX_START_XMIT_2,
-    ROMEPERF_INDEX_TX_START_XMIT_3,    
-    ROMEPERF_INDEX_TX_START_XMIT_4,    
-    ROMEPERF_INDEX_TX_START_XMIT_5,        
+    ROMEPERF_INDEX_TX_START_XMIT_3,
+    ROMEPERF_INDEX_TX_START_XMIT_4,
+    ROMEPERF_INDEX_TX_START_XMIT_5,
     ROMEPERF_INDEX_MAX
 };
 
@@ -193,7 +193,7 @@ enum CP3_COUNTER
 {
     //0x0
 	CP3CNT_STOP_COUNT               = 0,
-	CP3CNT_INST_FECTH,                  
+	CP3CNT_INST_FECTH,
 	CP3CNT_ICACHE_MISS,
 	CP3CNT_ICACHE_MISS_CYCLE,
 	CP3CNT_STORE_INST,
@@ -204,7 +204,7 @@ enum CP3_COUNTER
 	CP3CNT_COMPLETE_INST,
 	CP3CNT_CYCLES,
 	CP3CNT_ICACHE_SOFT_MISS,
-	
+
 	//0xA
 	CP3CNT_DCACHE_MISS,
 	CP3CNT_DCACHE_MISS_CYCLES,
@@ -217,7 +217,7 @@ enum CP3_COUNTER
     CP3CNT_BRANCH_PREDICTION,
     CP3CNT_BRANCH_PREDICTION_MISS,
     // TODO: Filen, enumalation below should be added
-    
+
     //0x15
     //0x1A
     //0x20

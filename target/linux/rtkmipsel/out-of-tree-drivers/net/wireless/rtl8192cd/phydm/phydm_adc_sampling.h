@@ -14,25 +14,25 @@ typedef struct _RT_ADCSMP_STRING {
 
 
 typedef enum _RT_ADCSMP_TRIG_SEL {
-	PHYDM_ADC_BB_TRIG	= 0, 
-	PHYDM_ADC_MAC_TRIG	= 1, 
-	PHYDM_ADC_RF0_TRIG	= 2, 
-	PHYDM_ADC_RF1_TRIG	= 3, 
-	PHYDM_MAC_TRIG		= 4 
+	PHYDM_ADC_BB_TRIG	= 0,
+	PHYDM_ADC_MAC_TRIG	= 1,
+	PHYDM_ADC_RF0_TRIG	= 2,
+	PHYDM_ADC_RF1_TRIG	= 3,
+	PHYDM_MAC_TRIG		= 4
 } RT_ADCSMP_TRIG_SEL, *PRT_ADCSMP_TRIG_SEL;
 
 
 typedef enum _RT_ADCSMP_TRIG_SIG_SEL {
-	ADCSMP_TRIG_CRCOK	= 0, 
-	ADCSMP_TRIG_CRCFAIL	= 1, 
+	ADCSMP_TRIG_CRCOK	= 0,
+	ADCSMP_TRIG_CRCFAIL	= 1,
 	ADCSMP_TRIG_CCA		= 2,
 	ADCSMP_TRIG_REG		= 3
 } RT_ADCSMP_TRIG_SIG_SEL, *PRT_ADCSMP_TRIG_SIG_SEL;
 
 
 typedef enum _RT_ADCSMP_STATE {
-	ADCSMP_STATE_IDLE		= 0, 
-	ADCSMP_STATE_SET		= 1, 
+	ADCSMP_STATE_IDLE		= 0,
+	ADCSMP_STATE_SET		= 1,
 	ADCSMP_STATE_QUERY	=	2
 } RT_ADCSMP_STATE, *PRT_ADCSMP_STATE;
 
@@ -52,10 +52,10 @@ typedef struct _RT_ADCSMP {
 	u1Byte					is_bb_trigger;
 	u1Byte					la_work_item_index;
 
-	#if (DM_ODM_SUPPORT_TYPE == ODM_WIN)	
+	#if (DM_ODM_SUPPORT_TYPE == ODM_WIN)
 	RT_WORK_ITEM	ADCSmpWorkItem;
 	RT_WORK_ITEM	ADCSmpWorkItem_1;
-	#endif	
+	#endif
 } RT_ADCSMP, *PRT_ADCSMP;
 
 #if (DM_ODM_SUPPORT_TYPE & ODM_WIN)
@@ -79,8 +79,8 @@ ADCSmp_Set(
 RT_STATUS
 ADCSmp_Query(
 	IN	PVOID	pDM_VOID,
-	IN	ULONG	InformationBufferLength, 
-	OUT	PVOID	InformationBuffer, 
+	IN	ULONG	InformationBufferLength,
+	OUT	PVOID	InformationBuffer,
 	OUT	PULONG	BytesWritten
 );
 #elif (DM_ODM_SUPPORT_TYPE & ODM_CE)

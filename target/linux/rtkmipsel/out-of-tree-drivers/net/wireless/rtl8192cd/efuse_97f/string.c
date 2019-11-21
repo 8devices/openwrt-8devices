@@ -14,7 +14,7 @@
  * -  Added strsep() which will replace strtok() soon (because strsep() is
  *    reentrant and should be faster). Use only strsep() in new code, please.
  */
- 
+
 #include <linux/types.h>
 #include <linux/string.h>
 //#include <linux/ctype.h>
@@ -229,13 +229,13 @@ char * strtok(char * s,const char * ct)
 char * strsep(char **s, const char * ct)
 {
 	char *sbegin=*s;
-	if (!sbegin) 
+	if (!sbegin)
 		return NULL;
-	
+
 	sbegin += strspn(sbegin,ct);
-	if (*sbegin == '\0') 
+	if (*sbegin == '\0')
 		return NULL;
-	
+
 	*s = strpbrk( sbegin, ct);
 	if (*s && **s != '\0')
 		*(*s)++ = '\0';

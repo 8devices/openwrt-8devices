@@ -62,6 +62,6 @@ HalTxbfJaguar_Clk_8812A(
 #define HalTxbfJaguar_Clk_8812A(pDM_VOID)
 #endif
 
-#endif				
-#endif	// #ifndef __HAL_TXBF_JAGUAR_H__								
+#endif
+#endif	// #ifndef __HAL_TXBF_JAGUAR_H__
 

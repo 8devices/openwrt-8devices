@@ -7,28 +7,28 @@ Copyright (c) Realtek Semiconductor Corp. All rights reserved.
 
 Module Name:
 	HalDbgCmd.h
-	
+
 Abstract:
 	Defined HAL Debug Command
-	    
+
 Major Change History:
 	When       Who               What
 	---------- ---------------   -------------------------------
-	2012-03-29 Filen            Create.	
+	2012-03-29 Filen            Create.
 --*/
 
 
 #define DBG_OFF					0
 
 //
-//	Deprecated! Don't use it! 
+//	Deprecated! Don't use it!
 //	TODO: fix related debug message!
 //
 //#define DBG_SEC					1
 
 //
-//	Fatal bug. 
-//	For example, Tx/Rx/IO locked up, OS hangs, memory access violation, 
+//	Fatal bug.
+//	For example, Tx/Rx/IO locked up, OS hangs, memory access violation,
 //	resource allocation failed, unexpected HW behavior, HW BUG and so on.
 //
 #define DBG_SERIOUS				2
@@ -40,8 +40,8 @@ Major Change History:
 #define DBG_WARNING				3
 
 //
-//	Normal case with useful information about current SW or HW state. 
-//	For example, Tx/Rx descriptor to fill, Tx/Rx descriptor completed status, 
+//	Normal case with useful information about current SW or HW state.
+//	For example, Tx/Rx descriptor to fill, Tx/Rx descriptor completed status,
 //	SW protocol state change, dynamic mechanism state change and so on.
 //
 #define DBG_LOUD				4
@@ -73,19 +73,19 @@ Major Change History:
 #define COMP_QOS				BIT15	// For QoS.
 #define COMP_AUTHENTICATOR			BIT16	// For AP mode Authenticator. Added by Annie, 2006-01-30.
 #define COMP_BEACON				BIT17	// For Beacon related, by rcnjko.
-#define COMP_ANTENNA				BIT18	// For Antenna diversity related, by rcnjko. 
+#define COMP_ANTENNA				BIT18	// For Antenna diversity related, by rcnjko.
 #define COMP_RATE				BIT19	// For Rate Adaptive mechanism, 2006.07.02, by rcnjko. #define COMP_EVENTS				0x00000080	// Event handling
 #define COMP_EVENTS				BIT20	// Event handling
-#define COMP_FPGA				BIT21	// For FPGA verfication 
-#define COMP_RM					BIT22	// For Radio Measurement. 
+#define COMP_FPGA				BIT21	// For FPGA verfication
+#define COMP_RM					BIT22	// For Radio Measurement.
 #define COMP_MP					BIT23	// For mass production test, by shien chang, 2006.07.13
 #define COMP_RXDESC				BIT24	// Show Rx desc information for SD3 debug. Added by Annie, 2006-07-15.
 #define COMP_CKIP				BIT25	// For CCX 1 S13: CKIP. Added by Annie, 2006-08-14.
 #define COMP_DIG				BIT26	// For DIG, 2006.09.25, by rcnjko.
-#define COMP_TXAGC				BIT27	// For Tx power, 060928, by rcnjko. 
-#define COMP_HIPWR				BIT28	// For High Power Mechanism, 060928, by rcnjko. 
-#define COMP_HALDM				BIT29	// For HW Dynamic Mechanism, 061010, by rcnjko. 
-#define COMP_RSNA				BIT30	// For RSNA IBSS , 061201, by CCW. 
+#define COMP_TXAGC				BIT27	// For Tx power, 060928, by rcnjko.
+#define COMP_HIPWR				BIT28	// For High Power Mechanism, 060928, by rcnjko.
+#define COMP_HALDM				BIT29	// For HW Dynamic Mechanism, 061010, by rcnjko.
+#define COMP_RSNA				BIT30	// For RSNA IBSS , 061201, by CCW.
 #define COMP_INDIC				BIT31	// For link indication
 #define COMP_LED				BIT32	// For LED.
 #define COMP_RF					BIT33	// For RF.
@@ -97,8 +97,8 @@ Major Change History:
 #define COMP_POWER_TRACKING			BIT35	//FOR 8190 TX POWER TRACKING
 #define COMP_RX_REORDER				BIT36	// 8190 Rx Reorder
 #define COMP_AMSDU				BIT37	// For A-MSDU Debugging
-#define COMP_WPS				BIT38   //WPS Debug Message 
-#define COMP_RATR				BIT39	
+#define COMP_WPS				BIT38   //WPS Debug Message
+#define COMP_RATR				BIT39
 #define COMP_RESET				BIT40
 // For debug command to print on dbgview!!
 #define COMP_CMD				BIT41
@@ -159,7 +159,7 @@ Major Change History:
 				HalDbgPrint Fmt;														\
 				ASSERT(FALSE);													\
 			}
-			
+
 #define PRINT_DATA(_TitleString, _HexData, _HexDataLen)						\
 {												\
 	char			*szTitle = _TitleString;					\
@@ -263,7 +263,7 @@ Major Change History:
 		(_UUID).Data1, (_UUID).Data2, (_UUID).Data3, (_UUID).Data4[0], (_UUID).Data4[1],	\
 		(_UUID).Data4[2], (_UUID).Data4[3], (_UUID).Data4[4], (_UUID).Data4[5], (_UUID).Data4[6], (_UUID).Data4[7]));	\
 }
-			
+
 #else	// of #if DBG
 // 2009/06/22 MH Allow fre build to print info test.
 #if 1

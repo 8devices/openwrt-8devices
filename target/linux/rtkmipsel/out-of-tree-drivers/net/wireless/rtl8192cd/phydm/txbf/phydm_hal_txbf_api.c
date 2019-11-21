@@ -85,11 +85,11 @@ phydm_get_mu_bfee_snding_decision(
 		snding_score = 20;
 	else if (Throughput >= 50)
 		snding_score = 10;
-	else if (Throughput >= 1) 
+	else if (Throughput >= 1)
 		snding_score = 5;
 	else
 		snding_score = 0;
-	
+
 	ODM_RT_TRACE(pDM_Odm, PHYDM_COMP_TXBF, ODM_DBG_TRACE, ("[%s] snding_score = 0x%d\n", __func__, snding_score));
 
 	return snding_score;

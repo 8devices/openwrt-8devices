@@ -41,25 +41,25 @@
 
 
 #if !(DM_ODM_SUPPORT_TYPE & ODM_AP)
-VOID 
+VOID
 DoIQK_8822B(
 	PVOID	pDM_VOID,
 	u1Byte		DeltaThermalIndex,
-	u1Byte		ThermalValue,	
+	u1Byte		ThermalValue,
 	u1Byte		Threshold
 	);
 #else
-VOID 
+VOID
 DoIQK_8822B(
 	PVOID		pDM_VOID,
 	u1Byte 		DeltaThermalIndex,
-	u1Byte		ThermalValue,	
+	u1Byte		ThermalValue,
 	u1Byte 		Threshold
 	);
 #endif
 
-VOID	
-PHY_IQCalibrate_8822B(	
+VOID
+PHY_IQCalibrate_8822B(
 	IN	PVOID		pDM_VOID,
 	IN	BOOLEAN		clear
 	);

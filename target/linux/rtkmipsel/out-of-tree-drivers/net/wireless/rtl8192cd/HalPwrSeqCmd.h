@@ -82,11 +82,11 @@ typedef enum _PWRSEQ_CMD_DELAY_UNIT_
 typedef struct _WL_PWR_CFG_
 {
 	unsigned short 	offset;
-	unsigned char 	cut_msk; 		
-	unsigned char 	fab_msk:4; 		
-	unsigned char 	interface_msk:4; 		
-	unsigned char 	base:4; 	
-	unsigned char 	cmd:4; 	
+	unsigned char 	cut_msk;
+	unsigned char 	fab_msk:4;
+	unsigned char 	interface_msk:4;
+	unsigned char 	base:4;
+	unsigned char 	cmd:4;
 	unsigned char 	msk;
 	unsigned char 	value;
 } WLAN_PWR_CFG, *PWLAN_PWR_CFG;

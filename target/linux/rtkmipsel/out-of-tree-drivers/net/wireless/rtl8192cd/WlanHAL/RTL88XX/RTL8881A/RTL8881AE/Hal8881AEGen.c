@@ -3,14 +3,14 @@ Copyright (c) Realtek Semiconductor Corp. All rights reserved.
 
 Module Name:
 	Hal88XXGen.c
-	
+
 Abstract:
 	Defined RTL8192EE HAL Function
-	    
+
 Major Change History:
 	When       Who               What
 	---------- ---------------   -------------------------------
-	2012-03-23 Filen            Create.	
+	2012-03-23 Filen            Create.
 --*/
 
 #include "../../../HalPrecomp.h"
@@ -65,7 +65,7 @@ C2HTxTxReportHandler_8881A(
 VOID
 _C2HContentParsing8881A(
 	struct rtl8192cd_priv *priv,
-		u1Byte			c2hCmdId, 
+		u1Byte			c2hCmdId,
 		u1Byte			c2hCmdLen,
 		pu1Byte 			tmpBuf
 )
@@ -73,21 +73,21 @@ _C2HContentParsing8881A(
 	switch(c2hCmdId)
 	{
 		case C2H_8881A_TX_RATE:
-#ifdef TXREPORT	
+#ifdef TXREPORT
 			C2HTxTxReportHandler_8881A(priv, tmpBuf, c2hCmdLen);
 
 #ifdef TXRETRY_CNT
 			requestTxRetry88XX(priv);
 #else
 			requestTxReport88XX(priv);
-#endif			
-#endif		
+#endif
+#endif
 			break;
-		
+
 #ifdef TXRETRY_CNT
 		case C2H_8881A_TX_RETRY:
 			C2HTxTxRetryHandler(priv, tmpBuf);
-			requestTxReport88XX(priv);	
+			requestTxReport88XX(priv);
 			break;
 #endif
 
@@ -138,8 +138,8 @@ SetBeamformEnter8881A(
 	//I am Bfee
 	if ((pBeamformingInfo->BeamformCap & BEAMFORMEE_CAP) && (BFerIdx < BEAMFORMER_ENTRY_NUM)) {
 		BeamformerEntry = pBeamformingInfo->BeamformerEntry[BFerIdx];
-	
-		RTL_W8( REG_SND_PTCL_CTRL, 0xCB);	
+
+		RTL_W8( REG_SND_PTCL_CTRL, 0xCB);
 
 		// MAC addresss/Partial AID of Beamformer
 		if (BFerIdx == 0) {
@@ -152,9 +152,9 @@ SetBeamformEnter8881A(
 
 		// CSI report parameters of Beamformer
 		if(BeamformerEntry.BeamformEntryCap & BEAMFORMEE_CAP_VHT_SU)
-			CSI_Param = 0x01080108;	
-		else 
-			CSI_Param = 0x03080308;	
+			CSI_Param = 0x01080108;
+		else
+			CSI_Param = 0x03080308;
 
 		RTL_W32(REG_TX_CSI_RPT_PARAM_BW20, CSI_Param);
 		RTL_W32(REG_TX_CSI_RPT_PARAM_BW40, CSI_Param);
@@ -163,7 +163,7 @@ SetBeamformEnter8881A(
 		// Timeout value for MAC to leave NDP_RX_standby_state 60 us
 		RTL_W8( REG_SND_PTCL_CTRL+3, 0x50);				//ndp_rx_standby_timer, 8814 need > 0x56, suggest from Dvaid
 	}
-	
+
 }
 
 
@@ -180,7 +180,7 @@ SetBeamformLeave8881A(
 		BeamformerEntry = pBeamformingInfo->BeamformerEntry[Idx];
 	} else
 		return;
-	
+
 	/*	Clear P_AID of Beamformee
 	* 	Clear MAC addresss of Beamformer
 	*	Clear Associated Bfmee Sel
@@ -199,7 +199,7 @@ SetBeamformLeave8881A(
 			RTL_W16( REG_TX_CSI_RPT_PARAM_BW20+2, 0);
 			RTL_W16( REG_TX_CSI_RPT_PARAM_BW40+2, 0);
 			RTL_W16( REG_TX_CSI_RPT_PARAM_BW80+2, 0);
-		}	
+		}
 	}
 
 	if (((pBeamformingInfo->BeamformerEntry[0]).BeamformEntryCap == BEAMFORMING_CAP_NONE)
@@ -208,6 +208,6 @@ SetBeamformLeave8881A(
 
 }
 
-#endif 
+#endif
 
 

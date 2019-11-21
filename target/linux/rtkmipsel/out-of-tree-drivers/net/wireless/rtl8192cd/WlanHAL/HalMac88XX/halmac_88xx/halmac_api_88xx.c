@@ -869,7 +869,7 @@ halmac_pre_init_system_cfg_88xx(
 	value32 = value32 & (~(BIT(25) | BIT(26)));
 	HALMAC_REG_WRITE_32(pHalmac_adapter, REG_LED_CFG, value32);
 
-#if 0 
+#if 0
 	value32 = HALMAC_REG_READ_32(pHalmac_adapter, REG_GPIO_MUXCFG);
 	value32 = value32 & (~(BIT(2)));
 	value32 = value32 | BIT(2);

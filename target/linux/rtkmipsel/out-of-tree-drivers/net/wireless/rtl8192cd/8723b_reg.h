@@ -96,12 +96,12 @@
 #define		RF_TX_BIAS_A				0x35
 #define		RF_TX_BIAS_D				0x36
 #define		RF_LOBF_9					0x38
-#define		RF_RXRF_A3					0x3C	//	
+#define		RF_RXRF_A3					0x3C	//
 #define		RF_TRSW						0x3F
 
 #define		RF_TXRF_A2					0x41
-#define		RF_TXPA_G4					0x46	
-#define		RF_TXPA_A4					0x4B	
+#define		RF_TXPA_G4					0x46
+#define		RF_TXPA_A4					0x4B
 
 #define		RF_WE_LUT					0xEF
 
@@ -182,7 +182,7 @@
 #define REG_ATIMWND					0x055A
 #define REG_BCN_MAX_ERR				0x055D
 #define REG_RXTSF_OFFSET_CCK		0x055E
-#define REG_RXTSF_OFFSET_OFDM		0x055F	
+#define REG_RXTSF_OFFSET_OFDM		0x055F
 #define REG_TSFTR					0x0560
 #define REG_TSFTR1					0x0568				// HW Port 1 TSF Register
 #define REG_P2P_CTWIN				0x0572 // 1 Byte long (in unit of TU)
@@ -263,7 +263,7 @@
 #define REG_HPON_FSM					0x00EC
 #define REG_SYS_CFG						0x00F0
 #define REG_GPIO_OUTSTS					0x00F4	// For RTL8723 only.
-#define REG_TYPE_ID						0x00FC	
+#define REG_TYPE_ID						0x00FC
 
 #define REG_32K_CTRL					0x0194 //RTL8188E
 
@@ -306,29 +306,29 @@
 //----------------------------------------------------------------------------
 //       8188E REG_8723B_HISR bits				(Offset 0xB4-B7, 32 bits)
 //----------------------------------------------------------------------------
-#define	HIMR_8723B_TXCCK				BIT(30)		// TXRPT interrupt when CCX bit of the packet is set	
+#define	HIMR_8723B_TXCCK				BIT(30)		// TXRPT interrupt when CCX bit of the packet is set
 #define	HIMR_8723B_PSTIMEOUT			BIT(29)		// Power Save Time Out Interrupt
-#define	HIMR_8723B_GTINT4				BIT(28)		// When GTIMER4 expires, this bit is set to 1	
-#define	HIMR_8723B_GTINT3				BIT(27)		// When GTIMER3 expires, this bit is set to 1	
-#define	HIMR_8723B_TBDER				BIT(26)		// Transmit Beacon0 Error			
+#define	HIMR_8723B_GTINT4				BIT(28)		// When GTIMER4 expires, this bit is set to 1
+#define	HIMR_8723B_GTINT3				BIT(27)		// When GTIMER3 expires, this bit is set to 1
+#define	HIMR_8723B_TBDER				BIT(26)		// Transmit Beacon0 Error
 #define	HIMR_8723B_TBDOK				BIT(25)		// Transmit Beacon0 OK, ad hoc only
-#define	HIMR_8723B_TSF_BIT32_TOGGLE	BIT(24)		// TSF Timer BIT32 toggle indication interrupt			
-#define	HIMR_8723B_BcnInt				BIT(20)		// Beacon DMA Interrupt 0			
-#define	HIMR_8723B_BDOK					BIT(16)		// Beacon Queue DMA OK0			
-#define	HIMR_8723B_HSISR_IND_ON_INT	BIT(15)		// HSISR Indicator (HSIMR & HSISR is true, this bit is set to 1)			
-#define	HIMR_8723B_BCNDMAINT_E			BIT(14)		// Beacon DMA Interrupt Extension for Win7			
+#define	HIMR_8723B_TSF_BIT32_TOGGLE	BIT(24)		// TSF Timer BIT32 toggle indication interrupt
+#define	HIMR_8723B_BcnInt				BIT(20)		// Beacon DMA Interrupt 0
+#define	HIMR_8723B_BDOK					BIT(16)		// Beacon Queue DMA OK0
+#define	HIMR_8723B_HSISR_IND_ON_INT	BIT(15)		// HSISR Indicator (HSIMR & HSISR is true, this bit is set to 1)
+#define	HIMR_8723B_BCNDMAINT_E			BIT(14)		// Beacon DMA Interrupt Extension for Win7
 #define	HIMR_8723B_ATIMEND				BIT(12)		// CTWidnow End or ATIM Window End
 #define	HIMR_8723B_HISR1_IND_INT		BIT(11)		// HISR1 Indicator (HISR1 & HIMR1 is true, this bit is set to 1)
-#define	HIMR_8723B_C2HCMD				BIT(10)		// CPU to Host Command INT Status, Write 1 clear	
-#define	HIMR_8723B_CPWM2				BIT(9)		// CPU power Mode exchange INT Status, Write 1 clear	
-#define	HIMR_8723B_CPWM					BIT(8)		// CPU power Mode exchange INT Status, Write 1 clear	
-#define	HIMR_8723B_HIGHDOK				BIT(7)		// High Queue DMA OK	
-#define	HIMR_8723B_MGNTDOK				BIT(6)		// Management Queue DMA OK	
-#define	HIMR_8723B_BKDOK				BIT(5)		// AC_BK DMA OK		
-#define	HIMR_8723B_BEDOK				BIT(4)		// AC_BE DMA OK	
-#define	HIMR_8723B_VIDOK				BIT(3)		// AC_VI DMA OK		
-#define	HIMR_8723B_VODOK				BIT(2)		// AC_VO DMA OK	
-#define	HIMR_8723B_RDU					BIT(1)		// Rx Descriptor Unavailable	
+#define	HIMR_8723B_C2HCMD				BIT(10)		// CPU to Host Command INT Status, Write 1 clear
+#define	HIMR_8723B_CPWM2				BIT(9)		// CPU power Mode exchange INT Status, Write 1 clear
+#define	HIMR_8723B_CPWM					BIT(8)		// CPU power Mode exchange INT Status, Write 1 clear
+#define	HIMR_8723B_HIGHDOK				BIT(7)		// High Queue DMA OK
+#define	HIMR_8723B_MGNTDOK				BIT(6)		// Management Queue DMA OK
+#define	HIMR_8723B_BKDOK				BIT(5)		// AC_BK DMA OK
+#define	HIMR_8723B_BEDOK				BIT(4)		// AC_BE DMA OK
+#define	HIMR_8723B_VIDOK				BIT(3)		// AC_VI DMA OK
+#define	HIMR_8723B_VODOK				BIT(2)		// AC_VO DMA OK
+#define	HIMR_8723B_RDU					BIT(1)		// Rx Descriptor Unavailable
 #define	HIMR_8723B_ROK					BIT(0)		// Receive DMA OK
 
 
@@ -631,7 +631,6 @@
 
 #define LAST_ENTRY_OF_TX_PKT_BUFFER_88E		176 // 22k 22528 bytes
 
-#ifdef USE_OUT_SRC
 
 
 /*--------------------------Define Parameters-------------------------------*/
@@ -777,7 +776,7 @@
 //
 // PageB(0xB00)
 //
-#define		rPdp_AntA      					0xb00  
+#define		rPdp_AntA      					0xb00
 #define		rPdp_AntA_4    				0xb04
 #define		rPdp_AntA_8    				0xb08
 #define		rPdp_AntA_C    				0xb0c
@@ -843,7 +842,7 @@
 #define		rOFDM0_XDRxIQImbalance    		0xc2c
 
 #define		rOFDM0_RxDetector1			0xc30  //PD,BW & SBD	// DM tune init gain
-#define		rOFDM0_RxDetector2			0xc34  //SBD & Fame Sync. 
+#define		rOFDM0_RxDetector2			0xc34  //SBD & Fame Sync.
 #define		rOFDM0_RxDetector3			0xc38  //Frame Sync.
 #define		rOFDM0_RxDetector4			0xc3c  //PD, SBD, Frame Sync & Short-GI
 
@@ -1024,58 +1023,58 @@
 //
 // RL6052 Register definition
 //
-#define		RF_AC						0x00	// 
+#define		RF_AC						0x00	//
 
-#define		RF_IQADJ_G1					0x01	// 
-#define		RF_IQADJ_G2					0x02	// 
+#define		RF_IQADJ_G1					0x01	//
+#define		RF_IQADJ_G2					0x02	//
 #define		RF_BS_PA_APSET_G1_G4		0x03
 #define		RF_BS_PA_APSET_G5_G8		0x04
-#define		RF_POW_TRSW				0x05	// 
+#define		RF_POW_TRSW				0x05	//
 
-#define		RF_GAIN_RX					0x06	// 
-#define		RF_GAIN_TX					0x07	// 
+#define		RF_GAIN_RX					0x06	//
+#define		RF_GAIN_TX					0x07	//
 
-#define		RF_TXM_IDAC					0x08	// 
-#define		RF_IPA_G						0x09	// 
+#define		RF_TXM_IDAC					0x08	//
+#define		RF_IPA_G						0x09	//
 #define		RF_TXBIAS_G					0x0A
 #define		RF_TXPA_AG					0x0B
-#define		RF_IPA_A						0x0C	// 
+#define		RF_IPA_A						0x0C	//
 #define		RF_TXBIAS_A					0x0D
 #define		RF_BS_PA_APSET_G9_G11		0x0E
-#define		RF_BS_IQGEN					0x0F	// 
+#define		RF_BS_IQGEN					0x0F	//
 
-#define		RF_MODE1					0x10	// 
-#define		RF_MODE2					0x11	// 
+#define		RF_MODE1					0x10	//
+#define		RF_MODE2					0x11	//
 
-#define		RF_RX_AGC_HP				0x12	// 
-#define		RF_TX_AGC					0x13	// 
-#define		RF_BIAS						0x14	// 
-#define		RF_IPA						0x15	// 
+#define		RF_RX_AGC_HP				0x12	//
+#define		RF_TX_AGC					0x13	//
+#define		RF_BIAS						0x14	//
+#define		RF_IPA						0x15	//
 #define		RF_TXBIAS					0x16
-#define		RF_POW_ABILITY				0x17	// 
+#define		RF_POW_ABILITY				0x17	//
 #define		RF_CHNLBW					0x18	// RF channel and BW switch
-#define		RF_TOP						0x19	// 
+#define		RF_TOP						0x19	//
 
-#define		RF_RX_G1					0x1A	// 
-#define		RF_RX_G2					0x1B	// 
+#define		RF_RX_G1					0x1A	//
+#define		RF_RX_G2					0x1B	//
 
-#define		RF_RX_BB2					0x1C	// 
-#define		RF_RX_BB1					0x1D	// 
+#define		RF_RX_BB2					0x1C	//
+#define		RF_RX_BB1					0x1D	//
 
-#define		RF_RCK1						0x1E	// 
-#define		RF_RCK2						0x1F	// 
+#define		RF_RCK1						0x1E	//
+#define		RF_RCK2						0x1F	//
 
-#define		RF_TX_G1						0x20	// 
-#define		RF_TX_G2						0x21	// 
-#define		RF_TX_G3						0x22	// 
+#define		RF_TX_G1						0x20	//
+#define		RF_TX_G2						0x21	//
+#define		RF_TX_G3						0x22	//
 
-#define		RF_TX_BB1					0x23	// 
+#define		RF_TX_BB1					0x23	//
 
 //#if HARDWARE_TYPE_IS_RTL8192D	== 1
-#define		RF_T_METER_92D				0x42	// 
-#define		RF_T_METER_88E				0x42	// 
+#define		RF_T_METER_92D				0x42	//
+#define		RF_T_METER_88E				0x42	//
 //#else
-#define		RF_T_METER					0x24	// 
+#define		RF_T_METER					0x24	//
 //#endif
 
 #define		RF_SYN_G1					0x25	// RF TX Power control
@@ -1096,12 +1095,12 @@
 #define		RF_TX_BIAS_A				0x35
 #define		RF_TX_BIAS_D				0x36
 #define		RF_LOBF_9					0x38
-#define		RF_RXRF_A3					0x3C	//	
+#define		RF_RXRF_A3					0x3C	//
 #define		RF_TRSW						0x3F
 
 #define		RF_TXRF_A2					0x41
-#define		RF_TXPA_G4					0x46	
-#define		RF_TXPA_A4					0x4B	
+#define		RF_TXPA_G4					0x46
+#define		RF_TXPA_A4					0x4B
 
 //
 //Bit Mask
@@ -1170,7 +1169,7 @@
 #define		bXBTxAGC                  				0xf00	// Reg 80c rFPGA0_TxGainStage
 #define		bXCTxAGC                  				0xf000
 #define		bXDTxAGC                  				0xf0000
-       		
+
 #define		bPAStart                  				0xf0000000	// Useless now
 #define		bTRStart                  				0x00f00000
 #define		bRFStart                  				0x0000f000
@@ -1216,7 +1215,7 @@
 #define		bRFSI_ANTSW               		0x100
 #define		bRFSI_ANTSWB              		0x200
 #define		bRFSI_PAPE                			0x400
-#define		bRFSI_PAPE5G              		0x800 
+#define		bRFSI_PAPE5G              		0x800
 #define		bBandSelect               			0x1
 #define		bHTSIG2_GI                			0x80
 #define		bHTSIG2_Smoothing         		0x01
@@ -1242,7 +1241,7 @@
 #define		bLSSIReadBackData         		0xfffff		// T65 RF
 
 #define		bLSSIReadOKFlag           		0x1000	// Useless now
-#define		bCCKSampleRate            		0x8       //0: 44MHz, 1:88MHz       		
+#define		bCCKSampleRate            		0x8       //0: 44MHz, 1:88MHz
 #define		bRegulator0Standby        		0x1
 #define		bRegulatorPLLStandby      	0x2
 #define		bRegulator1Standby        		0x4
@@ -1287,8 +1286,8 @@
 #define		bAD11PowerUpAtTx          	0x1
 #define		bDA10PSAtTx               		0x10
 #define		bAD11PowerUpAtRx          	0x100
-#define		bDA10PSAtRx               		0x1000       		
-#define		bCCKRxAGCFormat           		0x200       		
+#define		bDA10PSAtRx               		0x1000
+#define		bCCKRxAGCFormat           		0x200
 #define		bPSDFFTSamplepPoint       	0xc000
 #define		bPSDAverageNum            		0x3000
 #define		bIQPathControl            		0xc00
@@ -1387,9 +1386,9 @@
 #define		bCCKRxFACounterLower      	0xff
 #define		bCCKRxFACounterUpper      	0xff000000
 #define		bCCKRxHPAGCStart          		0xe000
-#define		bCCKRxHPAGCFinal          		0x1c00       		
+#define		bCCKRxHPAGCFinal          		0x1c00
 #define		bCCKRxFalseAlarmEnable    	0x8000
-#define		bCCKFACounterFreeze       	0x4000       		
+#define		bCCKFACounterFreeze       	0x4000
 #define		bCCKTxPathSel             		0x10000000
 #define		bCCKDefaultRxPath         		0xc000000
 #define		bCCKOptionRxPath          		0x3000000
@@ -1541,16 +1540,16 @@
 #define		bRxSGI_TH                			0xc0000000
 #define		bDFSCnt0                 			0xff
 #define		bDFSCnt1                 			0xff00
-#define		bDFSFlag                 			0xf0000       		
+#define		bDFSFlag                 			0xf0000
 #define		bMFWeightSum             		0x300000
-#define		bMinIdxTH                			0x7f000000       		
-#define		bDAFormat                			0x40000       		
-#define		bTxChEmuEnable           		0x01000000       		
+#define		bMinIdxTH                			0x7f000000
+#define		bDAFormat                			0x40000
+#define		bTxChEmuEnable           		0x01000000
 #define		bTRSWIsolation_A         		0x7f
 #define		bTRSWIsolation_B         		0x7f00
 #define		bTRSWIsolation_C         		0x7f0000
-#define		bTRSWIsolation_D         		0x7f000000       		
-#define		bExtLNAGain              		0x7c00          
+#define		bTRSWIsolation_D         		0x7f000000
+#define		bExtLNAGain              		0x7c00
 
 // 6. PageE(0xE00)
 #define		bSTBCEn                  			0x4	// Useless
@@ -1587,7 +1586,7 @@
 #define		bLongCFOFLength          		11
 #define		bTailCFO                 			0x1fff
 #define		bTailCFOTLength          		13
-#define		bTailCFOFLength          		12       		
+#define		bTailCFOFLength          		12
 #define		bmax_en_pwdB             		0xffff
 #define		bCC_power_dB             		0xffff0000
 #define		bnoise_pwdB              		0xffff
@@ -1595,27 +1594,27 @@
 #define		bPowerMeasFLength        	3
 #define		bRx_HT_BW                		0x1
 #define		bRxSC                    			0x6
-#define		bRx_HT                   			0x8       		
+#define		bRx_HT                   			0x8
 #define		bNB_intf_det_on          		0x1
 #define		bIntf_win_len_cfg        		0x30
-#define		bNB_Intf_TH_cfg          		0x1c0       		
+#define		bNB_Intf_TH_cfg          		0x1c0
 #define		bRFGain                  			0x3f
 #define		bTableSel                			0x40
-#define		bTRSW                    			0x80       		
+#define		bTRSW                    			0x80
 #define		bRxSNR_A                 			0xff
 #define		bRxSNR_B                 			0xff00
 #define		bRxSNR_C                 			0xff0000
 #define		bRxSNR_D                 			0xff000000
 #define		bSNREVMTLength           		8
-#define		bSNREVMFLength           		1       		
+#define		bSNREVMFLength           		1
 #define		bCSI1st                  			0xff
 #define		bCSI2nd                  			0xff00
 #define		bRxEVM1st                			0xff0000
-#define		bRxEVM2nd                		0xff000000       		
+#define		bRxEVM2nd                		0xff000000
 #define		bSIGEVM                  			0xff
 #define		bPWDB                    			0xff00
 #define		bSGIEN                   			0x10000
-       		
+
 #define		bSFactorQAM1             		0xf	// Useless
 #define		bSFactorQAM2             		0xf0
 #define		bSFactorQAM3             		0xf00
@@ -1626,7 +1625,7 @@
 #define		bSFactorQAM8             		0xf000000
 #define		bSFactorQAM9             		0xf0000000
 #define		bCSIScheme               			0x100000
-       		
+
 #define		bNoiseLvlTopSet          		0x3	// Useless
 #define		bChSmooth                			0x4
 #define		bChSmoothCfg1            		0x38
@@ -1635,7 +1634,7 @@
 #define		bChSmoothCfg4            		0x7000
 #define		bMRCMode                 		0x800000
 #define		bTHEVMCfg                			0x7000000
-       		
+
 #define		bLoopFitType             			0x1	// Useless
 #define		bUpdCFO                  			0x40
 #define		bUpdCFOOffData           		0x80
@@ -1708,26 +1707,26 @@
 #define		bMaskHWord                		0xffff0000
 #define		bMaskLWord                		0x0000ffff
 #define		bMaskDWord                		0xffffffff
-#define		bMask12Bits				0xfff	
-#define		bMaskH4Bits				0xf0000000	
-#define		bMaskH3Bytes			0xffffff00	
+#define		bMask12Bits				0xfff
+#define		bMaskH4Bits				0xf0000000
+#define		bMaskH3Bytes			0xffffff00
 #define 		bMaskOFDM_D			0xffc00000
 #define		bMaskCCK				0x3f3f3f3f
 
 //for PutRFRegsetting & GetRFRegSetting BitMask
 //#define		bMask12Bits               0xfffff	// RF Reg mask bits
 //#define		bMask20Bits               0xfffff	// RF Reg mask bits T65 RF
-#define 		bRFRegOffsetMask			0xfffff		
-  		
+#define 		bRFRegOffsetMask			0xfffff
+
 //#define		bEnable                   0x1	// Useless
 //#define		bDisable                  0x0
-       		
+
 #define		LeftAntenna               			0x0	// Useless
 #define		RightAntenna              		0x1
-       		
+
 #define		tCheckTxStatus            		500   //500ms // Useless
 #define		tUpdateRxCounter          		100   //100ms
-       		
+
 #define		rateCCK     				0	// Useless
 #define		rateOFDM    				1
 #define		rateHT      					2
@@ -1750,14 +1749,13 @@
 #define		bPMACControl              		0x0		// Useless
 #define		bWMACControl              		0x1
 #define		bWNICControl              		0x2
-       		
+
 #define		PathA                     			0x0	// Useless
 #define		PathB                     			0x1
 #define		PathC                     			0x2
 #define		PathD                     			0x3
 
 /*--------------------------Define Parameters-------------------------------*/
-#endif
 
 #endif //#ifndef WLAN_HAL_INTERNAL_USED
 

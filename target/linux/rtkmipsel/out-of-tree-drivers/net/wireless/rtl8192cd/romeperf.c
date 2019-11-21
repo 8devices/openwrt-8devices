@@ -21,11 +21,7 @@
 #include <asm/processor.h>
 #include <asm/uaccess.h>
 #include <asm/rlxregs.h>
-#ifdef CONFIG_WIRELESS_LAN_MODULE
 #define __IRAM
-#else
-#define __IRAM		__attribute__ ((section(".iram-gen")))
-#endif
 #define __OPT_0		__attribute__((optimize("O0")))
 
 #define rtlglue_malloc(size)	kmalloc(size, 0x1f0)
@@ -54,7 +50,7 @@ enum CP3_COUNTER
 };
 
 /* Local variables */
-//static 
+//static
 uint64 tempVariable64;
 static uint32 tempVariable32;
 #ifdef PERF_DUMP_CP3_DUAL_COUNTER_EN
@@ -67,20 +63,13 @@ unsigned int countTemp = 0xff;
 
 
 /* Global variables */
-#ifdef CONFIG_WIRELESS_LAN_MODULE
 static uint64 cnt1, cnt2;
 static rtl8651_romeperf_stat_t romePerfStat[ROMEPERF_INDEX_MAX];
 static uint32 rtl8651_romeperf_inited = 0;
 static uint32 rtl8651_romeperf_enable = TRUE;
-#else
-uint64 cnt1, cnt2;
-rtl8651_romeperf_stat_t romePerfStat[ROMEPERF_INDEX_MAX];
-uint32 rtl8651_romeperf_inited = 0;
-uint32 rtl8651_romeperf_enable = TRUE;
-#endif
 
 unsigned char *mapping[]=
-{   
+{
 #if (PERF_DUMP_CP3_SELECT == PERF_DUMP_CP3_OLD)
     "CP3CNT_CYCLES",
     "CP3CNT_NEW_INST_FECTH",
@@ -119,12 +108,12 @@ unsigned char *mapping[]=
     "CP3CNT_BRANCH_PREDICTION",
     "CP3CNT_BRANCH_PREDICTION_MISS",
    };
-#endif     
+#endif
 
 
 __IRAM void CP3_COUNTER0_INIT( void )
 {
-    __asm__ __volatile__ 
+    __asm__ __volatile__
     (
     "mfc0	$8, $12			\n\t"
 	"la		$9, 0x80000000	\n\t"
@@ -138,7 +127,7 @@ __IRAM void CP3_COUNTER0_INIT( void )
 
 __IRAM uint32 CP3_COUNTER0_IS_INITED( void )
 {
-    __asm__ __volatile__ 
+    __asm__ __volatile__
     (
 	"mfc0	$8, $12			    \n\t"
 	"la		$9, tempVariable32  \n\t"
@@ -155,14 +144,14 @@ __IRAM void CP3_COUNTER0_START( void )
 {
 
 #ifdef PERF_DUMP_CP3_DUAL_COUNTER_EN
-    __asm__ __volatile__ 
+    __asm__ __volatile__
     (
 	"la		$8, tempVariable32  	\n\t"
 	"lw		$8, 0($8)			    \n\t"
 	"ctc3 	$8, $0				    \n\t"
     "la		$8, tempVariable32_2    \n\t"
     "lw		$8, 0($8)			    \n\t"
-    "ctc3 	$8, $1				    \n\t" 
+    "ctc3 	$8, $1				    \n\t"
     "li     $8, 0xf                 \n\t"
     "ctc3	$8, $2                  \n\t"
     :
@@ -170,14 +159,14 @@ __IRAM void CP3_COUNTER0_START( void )
     :"$8"
     );
 #else
-    __asm__ __volatile__ 
+    __asm__ __volatile__
     (
 	"la		$8, tempVariable32	\n\t"
 	"lw		$8, 0($8)			\n\t"
 	"ctc3 	$8, $0				\n\t"
     :
     :
-    :"$8"	
+    :"$8"
     );
 #endif // PERF_DUMP_CP3_DUAL_COUNTER_EN
 }
@@ -216,7 +205,7 @@ __IRAM void CP3_COUNTER0_ASSIGN_EVENT( void )
 	tempVariable32_2 = /* Counter0 */((CP3CNT_CYCLES)<< 0) |
 	                 /* Counter1 */((CP3CNT_INST_FECTH)<< 8) |
 	                 /* Counter2 */((CP3CNT_ICACHE_MISS)<<16) |
-	                 /* Counter3 */((CP3CNT_ICACHE_MISS_CYCLE)<<24);    
+	                 /* Counter3 */((CP3CNT_ICACHE_MISS_CYCLE)<<24);
     #elif 1 /* Data (LOAD+STORE) */
 	tempVariable32 = /* Counter0 */((CP3CNT_CYCLES)<< 0) |
 	                 /* Counter1 */((CP3CNT_LOAD_OR_STORE_INST)<< 8) |
@@ -253,60 +242,60 @@ __IRAM void CP3_COUNTER0_RESET_ONE(int cnt_num)
     switch(cnt_num)
     {
         case 0:
-            __asm__ __volatile__ 
+            __asm__ __volatile__
             (
-            	"mtc3 	$0, $8				\n\t"            
-            );            
-            
-        break;            
-        case 1:            
-            __asm__ __volatile__ 
-            (
-            	"mtc3 	$0, $10				\n\t"            
-            );            
+            	"mtc3 	$0, $8				\n\t"
+            );
 
-        break;            
-        case 2:
-            __asm__ __volatile__ 
-            (
-            	"mtc3 	$0, $12				\n\t"            
-            );            
-            
-        break;            
-        case 3:
-            __asm__ __volatile__ 
-            (
-            	"mtc3 	$0, $14				\n\t"            
-            );            
-            
-        break;            
-        case 4:        
-            __asm__ __volatile__ 
-            (
-            	"mtc3 	$0, $9  			\n\t"            
-            );            
-
-        break;            
-        case 5:
-            __asm__ __volatile__ 
-            (
-            	"mtc3 	$0, $11				\n\t"            
-            );            
-        
         break;
-        case 6:       
-            __asm__ __volatile__ 
+        case 1:
+            __asm__ __volatile__
             (
-            	"mtc3 	$0, $13				\n\t"            
-            );            
-        
+            	"mtc3 	$0, $10				\n\t"
+            );
+
+        break;
+        case 2:
+            __asm__ __volatile__
+            (
+            	"mtc3 	$0, $12				\n\t"
+            );
+
+        break;
+        case 3:
+            __asm__ __volatile__
+            (
+            	"mtc3 	$0, $14				\n\t"
+            );
+
+        break;
+        case 4:
+            __asm__ __volatile__
+            (
+            	"mtc3 	$0, $9  			\n\t"
+            );
+
+        break;
+        case 5:
+            __asm__ __volatile__
+            (
+            	"mtc3 	$0, $11				\n\t"
+            );
+
+        break;
+        case 6:
+            __asm__ __volatile__
+            (
+            	"mtc3 	$0, $13				\n\t"
+            );
+
         break;
         case 7:
-            __asm__ __volatile__ 
+            __asm__ __volatile__
             (
-            	"mtc3 	$0, $15				\n\t"            
-            );            
-        
+            	"mtc3 	$0, $15				\n\t"
+            );
+
         break;
         default:
             printk("CP3 RESET ERROR COUNTER = %x \n",cnt_num);
@@ -316,7 +305,7 @@ __IRAM void CP3_COUNTER0_RESET_ONE(int cnt_num)
 
 __IRAM void CP3_COUNTER0_RESET( void )
 {
-    __asm__ __volatile__ 
+    __asm__ __volatile__
     (
     	"mtc3 	$0, $8				\n\t"
         "mtc3 	$0, $9				\n\t"
@@ -332,13 +321,13 @@ __IRAM void CP3_COUNTER0_RESET( void )
 __IRAM void CP3_COUNTER0_STOP( void )
 {
 #ifdef PERF_DUMP_CP3_DUAL_COUNTER_EN
-    __asm__ __volatile__ 
-    (   
+    __asm__ __volatile__
+    (
 	    "ctc3 	$0, $0			\n\t"
-	    "ctc3 	$0, $1			\n\t"	    
+	    "ctc3 	$0, $1			\n\t"
     );
 #else
-    __asm__ __volatile__ 
+    __asm__ __volatile__
     (
     	"ctc3 	$0, $0			\n\t"
     );
@@ -347,7 +336,7 @@ __IRAM void CP3_COUNTER0_STOP( void )
 
 __IRAM uint64 CP3_COUNTER0_GET( void )
 {
-    __asm__ __volatile__ 
+    __asm__ __volatile__
     (
     	"la		$8, tempVariable64  \n\t"
     	"mfc3	$9, $9			    \n\t"
@@ -467,11 +456,11 @@ int32 rtl8651_romeperfInit()
     romePerfStat[ROMEPERF_INDEX_TX_XMIT_OUT_2].desc   = "XMIT_OUT_2";
     romePerfStat[ROMEPERF_INDEX_RX_ONE_PKT].desc    = "RX_ONE_PKT";
     romePerfStat[ROMEPERF_INDEX_RX_ONE_PKT_2].desc   = "RX_ONE_PKT_2";
-    romePerfStat[ROMEPERF_INDEX_TX_START_XMIT].desc    = "XMT_1";    
-    romePerfStat[ROMEPERF_INDEX_TX_START_XMIT_2].desc    = "XMIT_2";        
-    romePerfStat[ROMEPERF_INDEX_TX_START_XMIT_3].desc    = "XMIT_3";            
-    romePerfStat[ROMEPERF_INDEX_TX_START_XMIT_4].desc    = "XMIT_4";            
-    romePerfStat[ROMEPERF_INDEX_TX_START_XMIT_5].desc    = "XMIT_5";            
+    romePerfStat[ROMEPERF_INDEX_TX_START_XMIT].desc    = "XMT_1";
+    romePerfStat[ROMEPERF_INDEX_TX_START_XMIT_2].desc    = "XMIT_2";
+    romePerfStat[ROMEPERF_INDEX_TX_START_XMIT_3].desc    = "XMIT_3";
+    romePerfStat[ROMEPERF_INDEX_TX_START_XMIT_4].desc    = "XMIT_4";
+    romePerfStat[ROMEPERF_INDEX_TX_START_XMIT_5].desc    = "XMIT_5";
 #else
 #error "PERF_DUMP_INIT_SELECT flag error"
 #endif
@@ -553,33 +542,33 @@ int32 rtl8651_romeperfResume( void )
 #ifdef PERF_DUMP_CP3_DUAL_COUNTER_EN
 
 __IRAM int32 rtl_romeperfEnterPoint_dual(uint32 index, int cnt_num,char *event)
-{    
-    unsigned char i,j,counter;  
+{
+    unsigned char i,j,counter;
 
 	/* Louis patch: someone will disable CP3 in somewhere. */
     CP3_COUNTER0_INIT();
-	CP3_COUNTER0_STOP(); 
-      
+	CP3_COUNTER0_STOP();
+
 	if ( (rtl8651_romeperf_inited == FALSE) || (rtl8651_romeperf_enable == FALSE) ) {
         //CP3_COUNTER0_START();
-        return FAILED;    
+        return FAILED;
     }
-    
+
 	if ( index >= (sizeof(romePerfStat)/sizeof(rtl8651_romeperf_stat_t)) )	{
-        printk("CP3 index error! \n");        
+        printk("CP3 index error! \n");
         CP3_COUNTER0_START();
         return FAILED;
     }
 
     if(cnt_num + numOfUsedCounter > MAX_CP3_COUNTER) {
         printk("Index=[%x]CP3 counter not enough, request:%x, availableCnt:%x \n",index,cnt_num,(MAX_CP3_COUNTER-numOfUsedCounter));
-        CP3_COUNTER0_START();        
+        CP3_COUNTER0_START();
         return FAILED;
     }
 
     if(TRUE == romePerfStat[index].bUsed) {
         printk("CP3 Error : reue the index=%x \n",index);
-        CP3_COUNTER0_START();        
+        CP3_COUNTER0_START();
         return FAILED;
     }
 
@@ -587,25 +576,25 @@ __IRAM int32 rtl_romeperfEnterPoint_dual(uint32 index, int cnt_num,char *event)
     if((countTemp!=0xff)&(countTemp != index))
     {
         romePerfStat[index].reEnterIdx = countTemp;
-    }    
+    }
 
-    countTemp = index; 
-    
-    romePerfStat[index].numOfCount = cnt_num;        
-    
+    countTemp = index;
+
+    romePerfStat[index].numOfCount = cnt_num;
+
     //printk("ENTER romePerfStat[%x].startCounter =%x \n",index,romePerfStat[index].startCounter);
-    
-    for(i=0; i<cnt_num ;i++)  
+
+    for(i=0; i<cnt_num ;i++)
     {
         counter = getAvailableCnt();
         romePerfStat[index].Counter[i] = counter;
-        romePerfStat[index].Event[i] = event[i];        
+        romePerfStat[index].Event[i] = event[i];
         bCounterUsed[counter] = TRUE;
       //  printk("ENTER index= %x counter =[%x]requestCntNum :%x\n",index,counter,cnt_num);
         CP3_COUNTER0_RESET_ONE(counter);
 
         setEvent(counter,event[i]);
-        numOfUsedCounter++;    
+        numOfUsedCounter++;
      }
 
    // printk("ENTER index =%x total numOfUsedCounter =%x\n",index,numOfUsedCounter);
@@ -619,52 +608,52 @@ __IRAM int32 rtl_romeperfEnterPoint_dual(uint32 index, int cnt_num,char *event)
 
 __IRAM int32 rtl_romeperfExitPoint_dual(uint32 index)
 {
-    unsigned char i,j,counter;  
+    unsigned char i,j,counter;
 
     CP3_COUNTER0_INIT();
-    CP3_COUNTER0_STOP();  
+    CP3_COUNTER0_STOP();
 
     if ( (rtl8651_romeperf_inited == FALSE) || (rtl8651_romeperf_enable == FALSE) )
     {
-    	//CP3_COUNTER0_START();                        
+    	//CP3_COUNTER0_START();
         return FAILED;
     }
-    
+
 	if ( index >= (sizeof(romePerfStat)/sizeof(rtl8651_romeperf_stat_t)) )
 	{
-        printk("CP3 index error! \n");     
-    	CP3_COUNTER0_START();                
-		return FAILED;
-	}
-    
-	if ( romePerfStat[index].hasTempCycle == FALSE )
-	{
-        printk("CP3 EXIT error! romePerfStat[%x].hasTempCycle == FALSE \n",index);
-    	CP3_COUNTER0_START();        
+        printk("CP3 index error! \n");
+    	CP3_COUNTER0_START();
 		return FAILED;
 	}
 
-   
+	if ( romePerfStat[index].hasTempCycle == FALSE )
+	{
+        printk("CP3 EXIT error! romePerfStat[%x].hasTempCycle == FALSE \n",index);
+    	CP3_COUNTER0_START();
+		return FAILED;
+	}
+
+
     if(countTemp == index)
     {
         countTemp = 0xff;
     }
-    
-    CP3_COUNTER0_GET_ALL();        
+
+    CP3_COUNTER0_GET_ALL();
 
     for(i=0; i< romePerfStat[index].numOfCount; i++)
-    {       
+    {
         counter = romePerfStat[index].Counter[i];
         //printk("LEAVE counter=[%x] cnt_index =%x romePerfStat[index].numOfCount =%x \n",counter,index,romePerfStat[index].numOfCount);
         if (counter <4) {
             romePerfStat[index].accCycle[i] += (currCnt[counter] & 0x00ffffff);
         } else {  // conter > 4
-            romePerfStat[index].accCycle[i] += ((currCnt[counter-4]>>32) & 0x00ffffff);         
+            romePerfStat[index].accCycle[i] += ((currCnt[counter-4]>>32) & 0x00ffffff);
         }
 
         // counter available
         bCounterUsed[counter] = FALSE;
-        numOfUsedCounter--;   
+        numOfUsedCounter--;
     }
 
     // printk("LEAVE numOfUsedCounter =%x \n",numOfUsedCounter);
@@ -695,13 +684,13 @@ int getAvailableCnt(void)
 }
 
 int setEvent(int counter,char event)
-{   
+{
    if(event >= CP3_CNT_MAX)
    {
-        printk("Event over max = %x \n",event);               
+        printk("Event over max = %x \n",event);
         return FAILED;
    }
-   
+
    if(counter < 4)
    {
        tempVariable32 = (tempVariable32 & (~(0xff << (counter*8)))) | ( event << (counter*8));
@@ -709,7 +698,7 @@ int setEvent(int counter,char event)
    else
    {
        tempVariable32_2 = (tempVariable32_2 & (~(0xff << ((counter-4)*8)))) | ( event << ((counter-4)*8));
-   }    
+   }
 }
 
 #else
@@ -726,14 +715,14 @@ __IRAM int32 rtl8651_romeperfEnterPoint( uint32 index )
     {
         romePerfStat[index].reEnterIdx = countTemp;
     }
-    
+
     countTemp = index;
-    
+
 	/* Louis patch: someone will disable CP3 in somewhere. */
 	CP3_COUNTER0_INIT();
 
 	CP3_COUNTER0_STOP();
-    CP3_COUNTER0_RESET();    
+    CP3_COUNTER0_RESET();
 	CP3_COUNTER0_GET_ALL();
 
 	romePerfStat[index].tempCycle[0] = currCnt[0];
@@ -762,7 +751,7 @@ __IRAM int32 rtl8651_romeperfExitPoint( uint32 index )
     {
         countTemp = 0;
     }
-  
+
 	/* Louis patch: someone will disable CP3 in somewhere. */
 	CP3_COUNTER0_INIT();
 
@@ -855,22 +844,22 @@ int32 rtl8651_romeperfDump( int start, int end )
 		{
 			int j;
 			rtlglue_printf( "[%3d] %30s ", i, romePerfStat[i].desc );
-#ifdef PERF_DUMP_CP3_DUAL_COUNTER_EN            
+#ifdef PERF_DUMP_CP3_DUAL_COUNTER_EN
             for( j =0; j < romePerfStat[i].numOfCount; j++ )
 #else
 			for( j =0; j < sizeof(statSnapShot[i].accCycle)/sizeof(statSnapShot[i].accCycle[0]); j++ )
-#endif //#ifdef PERF_DUMP_CP3_DUAL_COUNTER_EN                            
+#endif //#ifdef PERF_DUMP_CP3_DUAL_COUNTER_EN
 			{
 				uint32 *pAccCycle = (uint32*)&statSnapShot[i].accCycle[j];
 				uint32 avrgCycle = /* Hi-word */ (pAccCycle[0]*(0xffffffff/statSnapShot[i].executedNum)) +
 				                   /* Low-word */(pAccCycle[1]/statSnapShot[i].executedNum);
 
     				rtlglue_printf( "%30s %12llu %8u %10u %8x\n",
-#ifdef PERF_DUMP_CP3_DUAL_COUNTER_EN  
+#ifdef PERF_DUMP_CP3_DUAL_COUNTER_EN
                     mapping[romePerfStat[i].Event[j]],
 #else
-                    mapping[getEventIndex(j)],                    
-#endif //#ifdef PERF_DUMP_CP3_DUAL_COUNTER_EN                            
+                    mapping[getEventIndex(j)],
+#endif //#ifdef PERF_DUMP_CP3_DUAL_COUNTER_EN
 				statSnapShot[i].accCycle[j],
 				statSnapShot[i].executedNum,
     				avrgCycle,
@@ -894,19 +883,19 @@ int getEventIndex(int i)
 {
     int index;
 #if (PERF_DUMP_CP3_SELECT == PERF_DUMP_CP3_OLD)
-    index = (tempVariable32 >> (i*8))&0xf;    
-#else 
+    index = (tempVariable32 >> (i*8))&0xf;
+#else
 #ifdef PERF_DUMP_CP3_DUAL_COUNTER_EN
     if(i < 4)
     {
-        index = (tempVariable32 >> (i*8))&0xff;    
+        index = (tempVariable32 >> (i*8))&0xff;
     }
     else
     {
-        index = (tempVariable32_2 >> ((i-4)*8))&0xff;            
+        index = (tempVariable32_2 >> ((i-4)*8))&0xff;
     }
 #else
-    index = (tempVariable32 >> (i*8))&0xff;    
+    index = (tempVariable32 >> (i*8))&0xff;
 #endif // PERF_DUMP_CP3_DUAL_COUNTER_EN
 #endif //(PERF_DUMP_CP3_SELECT == PERF_DUMP_CP3_OLD)
     return index;

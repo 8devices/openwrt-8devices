@@ -1,7 +1,7 @@
 /******************************************************************************
  *
  * Copyright(c) 2007 - 2011 Realtek Corporation. All rights reserved.
- *                                        
+ *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of version 2 of the GNU General Public License as
  * published by the Free Software Foundation.
@@ -23,7 +23,7 @@
 #define __HALHWOUTSRC_H__
 
 
-/*--------------------------Define -------------------------------------------*/ 
+/*--------------------------Define -------------------------------------------*/
 #define	CCK_RSSI_INIT_COUNT 5
 
 #define	RA_RSSI_STATE_INIT	0
@@ -52,9 +52,9 @@
 
 __PACK typedef struct _Phy_Rx_AGC_Info
 {
-	#if (ODM_ENDIAN_TYPE == ODM_ENDIAN_LITTLE)	
-		u1Byte	gain:7,trsw:1;			
-	#else			
+	#if (ODM_ENDIAN_TYPE == ODM_ENDIAN_LITTLE)
+		u1Byte	gain:7,trsw:1;
+	#else
 		u1Byte	trsw:1,gain:7;
 	#endif
 } __WLAN_ATTRIB_PACK__ PHY_RX_AGC_INFO_T, *pPHY_RX_AGC_INFO_T;
@@ -216,7 +216,7 @@ VOID
 ODM_PhyStatusQuery(
 	IN OUT	PDM_ODM_T					pDM_Odm,
 	OUT		PODM_PHY_INFO_T			pPhyInfo,
-	IN 		pu1Byte						pPhyStatus,	
+	IN 		pu1Byte						pPhyStatus,
 	IN		PODM_PACKET_INFO_T			pPktinfo
 	);
 
@@ -224,7 +224,7 @@ VOID
 ODM_MacStatusQuery(
 	IN OUT	PDM_ODM_T					pDM_Odm,
 	IN 		pu1Byte						pMacStatus,
-	IN		u1Byte						MacID,	
+	IN		u1Byte						MacID,
 	IN		BOOLEAN						bPacketMatchBSSID,
 	IN		BOOLEAN						bPacketToSelf,
 	IN		BOOLEAN						bPacketBeacon
@@ -234,7 +234,7 @@ HAL_STATUS
 ODM_ConfigRFWithTxPwrTrackHeaderFile(
 	IN 	PDM_ODM_T	        	pDM_Odm
     );
-    
+
 HAL_STATUS
 ODM_ConfigRFWithHeaderFile(
 	IN 	PDM_ODM_T	        	pDM_Odm,
@@ -261,15 +261,15 @@ ODM_ConfigFWWithHeaderFile(
 	OUT u4Byte				*pSize
 	);
 
-u4Byte 
+u4Byte
 ODM_GetHWImgVersion(
 	IN	PDM_ODM_T	pDM_Odm
 	);
 
 s4Byte
-odm_SignalScaleMapping(	
+odm_SignalScaleMapping(
 	IN OUT PDM_ODM_T pDM_Odm,
-	IN	s4Byte CurrSig 
+	IN	s4Byte CurrSig
 	);
 
 #if (ODM_PHY_STATUS_NEW_TYPE_SUPPORT == 1)
@@ -443,7 +443,7 @@ typedef struct _Phy_Status_Rpt_Jaguar2_Type2 {
 	/* DW0 ane DW1 */
 	u1Byte		page_num;
 	u1Byte		pwdb[4];
-#if (ODM_ENDIAN_TYPE == ODM_ENDIAN_LITTLE)	
+#if (ODM_ENDIAN_TYPE == ODM_ENDIAN_LITTLE)
 	u1Byte		l_rxsc: 4;
 	u1Byte		ht_rxsc: 4;
 #else

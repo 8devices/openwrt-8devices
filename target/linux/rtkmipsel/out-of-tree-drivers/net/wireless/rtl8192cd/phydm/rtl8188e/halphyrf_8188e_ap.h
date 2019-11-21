@@ -35,7 +35,7 @@ void ConfigureTxpowerTrack_8188E(
 void DoIQK_8188E(
 	PVOID		pDM_VOID,
 	u1Byte 		DeltaThermalIndex,
-	u1Byte		ThermalValue,	
+	u1Byte		ThermalValue,
 	u1Byte 		Threshold
 	);
 
@@ -49,8 +49,8 @@ ODM_TxPwrTrackSetPwr88E(
 
 //1 7.	IQK
 
-void	
-PHY_IQCalibrate_8188E(	
+void
+PHY_IQCalibrate_8188E(
 #if (DM_ODM_SUPPORT_TYPE & ODM_AP)
 	IN PDM_ODM_T		pDM_Odm,
 #else
@@ -62,7 +62,7 @@ PHY_IQCalibrate_8188E(
 //
 // LC calibrate
 //
-void	
+void
 PHY_LCCalibrate_8188E(
 #if (DM_ODM_SUPPORT_TYPE & ODM_AP)
 	IN PDM_ODM_T		pDM_Odm
@@ -74,15 +74,15 @@ PHY_LCCalibrate_8188E(
 //
 // AP calibrate
 //
-void	
-PHY_APCalibrate_8188E(		
+void
+PHY_APCalibrate_8188E(
 #if (DM_ODM_SUPPORT_TYPE & ODM_AP)
 	IN PDM_ODM_T		pDM_Odm,
 #else
 	IN	PADAPTER	pAdapter,
 #endif
 							IN 	s1Byte		delta);
-void	
+void
 PHY_DigitalPredistortion_8188E(		IN	PADAPTER	pAdapter);
 
 
@@ -118,7 +118,7 @@ _PHY_MACSettingCalibration(
 	IN	PADAPTER	pAdapter,
 #endif
 	IN	pu4Byte		MACReg,
-	IN	pu4Byte		MACBackup	
+	IN	pu4Byte		MACBackup
 	);
 
 
@@ -131,6 +131,6 @@ _PHY_PathAStandBy(
 #endif
 	);
 
-								
-#endif	// #ifndef __HAL_PHY_RF_8188E_H__								
+
+#endif	// #ifndef __HAL_PHY_RF_8188E_H__
 

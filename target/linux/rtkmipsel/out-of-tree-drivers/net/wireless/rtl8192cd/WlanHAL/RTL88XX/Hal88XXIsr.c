@@ -25,7 +25,7 @@ EnableIMR88XX(
 )
 {
     PHAL_DATA_TYPE              pHalData = _GET_HAL_DATA(Adapter);
-    
+
     RT_TRACE_F(COMP_INIT, DBG_LOUD, ("\n"));
 
     HAL_RTL_W32(REG_HIMR0, pHalData->IntMask[0]);
@@ -33,7 +33,7 @@ EnableIMR88XX(
 
 #if IS_RTL88XX_MAC_V2
     if ( _GET_HAL_DATA(Adapter)->MacVersion.is_MAC_v2) {
-        HAL_RTL_W32(REG_HIMR2, pHalData->IntMask[2]);    
+        HAL_RTL_W32(REG_HIMR2, pHalData->IntMask[2]);
         HAL_RTL_W32(REG_HIMR3, pHalData->IntMask[3]);
     }
 #endif //IS_RTL88XX_MAC_V2
@@ -41,7 +41,7 @@ EnableIMR88XX(
 #if CFG_HAL_SUPPORT_AXI_BUS_EXCEPTION
     if(IS_SUPPORT_AXI_EXCEPTION(Adapter)) {
         // write AXI exception interrupt IMR
-        HAL_RTL_W32(REG_HSIMR, pHalData->IntMask[4]);  
+        HAL_RTL_W32(REG_HSIMR, pHalData->IntMask[4]);
     }
 #endif // CFG_HAL_SUPPORT_AXI_BUS_EXCEPTION
 
@@ -106,7 +106,7 @@ InterruptRecognized88XX(
     pHalData->IntArray[3] = HAL_RTL_R32(REG_HISR3);
     pHalData->IntArray[3] &= pHalData->IntMask[3];
     HAL_RTL_W32(REG_HISR3, pHalData->IntArray[3]);
-   
+
     result = (result || (pHalData->IntArray[2]!=0 || pHalData->IntArray[3]!=0 ));
 
     }
@@ -118,9 +118,9 @@ InterruptRecognized88XX(
         pHalData->IntArray[4] &= pHalData->IntMask[4];
         HAL_RTL_W32(REG_HSISR, pHalData->IntArray[4]);
     }
-    
-    result = (result || (pHalData->IntArray[4]!=0));    
-    
+
+    result = (result || (pHalData->IntArray[4]!=0));
+
 #endif // CFG_HAL_SUPPORT_AXI_BUS_EXCEPTION
 
 #if CFG_HAL_TX_AMSDU
@@ -182,18 +182,18 @@ GetInterrupt88XX(
 	case HAL_INT_TYPE_TBDOK:
 		bResult = (pHalData->IntArray[0] & BIT_TXBCN0OK) ? TRUE : FALSE;
 		break;
-		
+
 	case HAL_INT_TYPE_TBDER:
 		bResult = (pHalData->IntArray[0] & BIT_TXBCN0ERR) ? TRUE : FALSE;
 		break;
-		
+
 	case HAL_INT_TYPE_BcnInt:
 		bResult = (pHalData->IntArray[0] & BIT_BCNDMAINT0) ? TRUE : FALSE;
 		break;
     case HAL_INT_TYPE_GTIMER4:
         bResult = (pHalData->IntArray[0] & BIT_GTINT4) ? TRUE : FALSE;
 		break;
-		
+
 	case HAL_INT_TYPE_PSTIMEOUT:
 		bResult = (pHalData->IntArray[0] & BIT_PSTIMEOUT) ? TRUE : FALSE;
 		break;
@@ -204,24 +204,24 @@ GetInterrupt88XX(
 
 	case HAL_INT_TYPE_PSTIMEOUT2:
 		bResult = (pHalData->IntArray[0] & BIT_PSTIMEOUT2) ? TRUE : FALSE;
-		break; 
-		
+		break;
+
 	case HAL_INT_TYPE_C2HCMD:
 		bResult = (pHalData->IntArray[0] & BIT_C2HCMD) ? TRUE : FALSE;
-		break;	
-		
+		break;
+
 	case HAL_INT_TYPE_VIDOK:
 		bResult = (pHalData->IntArray[0] & BIT_VIDOK) ? TRUE : FALSE;
 		break;
-		
+
 	case HAL_INT_TYPE_VODOK:
 		bResult = (pHalData->IntArray[0] & BIT_VODOK) ? TRUE : FALSE;
 		break;
-		
+
 	case HAL_INT_TYPE_BEDOK:
 		bResult = (pHalData->IntArray[0] & BIT_BEDOK) ? TRUE : FALSE;
 		break;
-		
+
 	case HAL_INT_TYPE_BKDOK:
 		bResult = (pHalData->IntArray[0] & BIT_BKDOK) ? TRUE : FALSE;
 		break;
@@ -239,7 +239,7 @@ GetInterrupt88XX(
 		bResult = (pHalData->IntArray[0] & IMR_BCNDOK0_88E) ? TRUE : FALSE;
 		break;
     #endif
-		
+
 	case HAL_INT_TYPE_CPWM:
 		bResult = (pHalData->IntArray[0] & BIT_CPWM) ? TRUE : FALSE;
 		break;
@@ -251,23 +251,23 @@ GetInterrupt88XX(
     case HAL_INT_TYPE_RX_OK:
 		bResult = (pHalData->IntArray[0] & BIT_RXOK) ? TRUE : FALSE;
         break;
-        
+
     case HAL_INT_TYPE_RDU:
 		bResult = (pHalData->IntArray[0] & BIT_RDU) ? TRUE : FALSE;
-        break;        
+        break;
     case HAL_INT_TYPE_CPWM2:
             bResult = (pHalData->IntArray[0] & BIT_CPWM2) ? TRUE : FALSE;
             break;
 
     case HAL_INT_TYPE_CTWEND:
 #if IS_RTL88XX_MAC_V1
-        if ( _GET_HAL_DATA(Adapter)->MacVersion.is_MAC_v1) { 
+        if ( _GET_HAL_DATA(Adapter)->MacVersion.is_MAC_v1) {
     		bResult = (pHalData->IntArray[0] & BIT_CTWEND) ? TRUE : FALSE;
         }
 #endif //(IS_RTL8192E_SERIES || IS_RTL8881A_SERIES)
-        
+
 #if IS_RTL88XX_MAC_V2
-        if ( _GET_HAL_DATA(Adapter)->MacVersion.is_MAC_v2)  
+        if ( _GET_HAL_DATA(Adapter)->MacVersion.is_MAC_v2)
         {
             //this interrupt is removed at 8814A
             bResult = FALSE;
@@ -286,11 +286,11 @@ GetInterrupt88XX(
 
     case HAL_INT_TYPE_RXERR:
         bResult = (pHalData->IntArray[1] & BIT_RXERR_INT) ? TRUE : FALSE;
-		break;        
-        
+		break;
+
     case HAL_INT_TYPE_TXERR:
         bResult = (pHalData->IntArray[1] & BIT_TXERR_INT) ? TRUE : FALSE;
-		break;        
+		break;
 
     case HAL_INT_TYPE_BcnInt_MBSSID:
         bResult = ((pHalData->IntArray[1] & (BIT_BCNDMAINT1|BIT_BCNDMAINT2|BIT_BCNDMAINT3|BIT_BCNDMAINT4|
@@ -350,13 +350,13 @@ GetInterrupt88XX(
         break;
     case HAL_INT_TYPE_TXBCN5OK:
         bResult = (pHalData->IntArray[2] & BIT_TXBCN5OK) ? TRUE : FALSE;
-        break;    
+        break;
     case HAL_INT_TYPE_TXBCN6OK:
         bResult = (pHalData->IntArray[2] & BIT_TXBCN6OK) ? TRUE : FALSE;
-        break;    
+        break;
     case HAL_INT_TYPE_TXBCN7OK:
         bResult = (pHalData->IntArray[2] & BIT_TXBCN7OK) ? TRUE : FALSE;
-        break;    
+        break;
 
     case HAL_INT_TYPE_TXBCNERR_MBSSID:
         bResult = ((pHalData->IntArray[2] & (BIT_TXBCN1ERR|BIT_TXBCN2ERR|BIT_TXBCN3ERR|BIT_TXBCN4ERR|
@@ -378,13 +378,13 @@ GetInterrupt88XX(
         break;
     case HAL_INT_TYPE_TXBCN5ERR:
         bResult = (pHalData->IntArray[2] & BIT_TXBCN5ERR) ? TRUE : FALSE;
-        break;    
-    case HAL_INT_TYPE_TXBCN6ERR: 
+        break;
+    case HAL_INT_TYPE_TXBCN6ERR:
         bResult = (pHalData->IntArray[2] & BIT_TXBCN6ERR) ? TRUE : FALSE;
-        break;    
+        break;
     case HAL_INT_TYPE_TXBCN7ERR:
         bResult = (pHalData->IntArray[2] & BIT_TXBCN7ERR) ? TRUE : FALSE;
-        break;            
+        break;
     }
 #endif // #if CFG_HAL_SUPPORT_EACH_VAP_INT
 
@@ -405,7 +405,7 @@ GetInterrupt88XX(
         break;
     case HAL_INT_TYPE_PwrInt4:
         bResult = (pHalData->IntArray[3] & BIT_PWR_INT_127) ? TRUE : FALSE;
-        break;    
+        break;
     }
 #endif //#if CFG_HAL_HW_DETEC_POWER_STATE
 
@@ -460,22 +460,22 @@ AddInterruptMask88XX(
     	case HAL_INT_TYPE_BCNDERR0:
             pHalData->IntMask[0] |= BIT_BCNDERR0;
     		break;
-            
+
     	case HAL_INT_TYPE_TBDOK:
     		pHalData->IntMask[0] |= BIT_TXBCN0OK;
     		break;
-    		
+
     	case HAL_INT_TYPE_TBDER:
             pHalData->IntMask[0] |= BIT_TXBCN0ERR;
     		break;
-    		
+
         case HAL_INT_TYPE_GTIMER4:
             pHalData->IntMask[0] |= BIT_GTINT4;
             break;
     	case HAL_INT_TYPE_BcnInt:
     		pHalData->IntMask[0] |= BIT_BCNDMAINT0;
     		break;
-    		
+
     	case HAL_INT_TYPE_PSTIMEOUT:
             pHalData->IntMask[0] |= BIT_PSTIMEOUT;
     		break;
@@ -486,24 +486,24 @@ AddInterruptMask88XX(
 
     	case HAL_INT_TYPE_PSTIMEOUT2:
     		pHalData->IntMask[0] |= BIT_PSTIMEOUT2;
-    		break; 
-    		
+    		break;
+
     	case HAL_INT_TYPE_C2HCMD:
     		pHalData->IntMask[0] |= BIT_C2HCMD;
-    		break;	
-    		
+    		break;
+
     	case HAL_INT_TYPE_VIDOK:
     		pHalData->IntMask[0] |= BIT_VIDOK;
     		break;
-    		
+
     	case HAL_INT_TYPE_VODOK:
     		pHalData->IntMask[0] |= BIT_VODOK;
     		break;
-    		
+
     	case HAL_INT_TYPE_BEDOK:
     		pHalData->IntMask[0] |= BIT_BEDOK;
     		break;
-    		
+
     	case HAL_INT_TYPE_BKDOK:
     		pHalData->IntMask[0] |= BIT_BKDOK;
     		break;
@@ -521,7 +521,7 @@ AddInterruptMask88XX(
             pHalData->IntMask[0] |= IMR_BCNDOK0_88E;
     		break;
         #endif
-    		
+
     	case HAL_INT_TYPE_CPWM:
     		pHalData->IntMask[0] |= BIT_CPWM;
     		break;
@@ -553,14 +553,14 @@ AddInterruptMask88XX(
         case HAL_INT_TYPE_RXERR:
             pHalData->IntMask[1] |= BIT_RXERR_INT;
             break;
-            
+
         case HAL_INT_TYPE_TXERR:
             pHalData->IntMask[1] |= BIT_TXERR_INT;
             break;
 
 #if CFG_HAL_HW_DETEC_POWER_STATE
     if ( IS_SUPPORT_HW_DETEC_POWER_STATE(Adapter)) {
-    
+
         case HAL_INT_TYPE_PwrInt0:
             pHalData->IntMask[3] |= BIT_PWR_INT_31to0;
             break;
@@ -571,11 +571,11 @@ AddInterruptMask88XX(
             pHalData->IntMask[3] |= BIT_PWR_INT_95to64;
             break;
         case HAL_INT_TYPE_PwrInt3:
-            pHalData->IntMask[3] |= BIT_PWR_INT_126to96;            
+            pHalData->IntMask[3] |= BIT_PWR_INT_126to96;
             break;
         case HAL_INT_TYPE_PwrInt4:
-            pHalData->IntMask[3] |= BIT_PWR_INT_127;            
-            break;    
+            pHalData->IntMask[3] |= BIT_PWR_INT_127;
+            break;
         }
 #endif // #if CFG_HAL_HW_DETEC_POWER_STATE
 
@@ -624,22 +624,22 @@ RemoveInterruptMask88XX(
     	case HAL_INT_TYPE_BCNDERR0:
             pHalData->IntMask[0] &= ~BIT_BCNDERR0;
     		break;
-            
+
     	case HAL_INT_TYPE_TBDOK:
     		pHalData->IntMask[0] &= ~BIT_TXBCN0OK;
     		break;
-    		
+
     	case HAL_INT_TYPE_TBDER:
             pHalData->IntMask[0] &= ~BIT_TXBCN0ERR;
     		break;
-    		
+
         case HAL_INT_TYPE_GTIMER4:
             pHalData->IntMask[0] &= ~BIT_GTINT4;
             break;
     	case HAL_INT_TYPE_BcnInt:
     		pHalData->IntMask[0] &= ~BIT_BCNDMAINT0;
     		break;
-    		
+
     	case HAL_INT_TYPE_PSTIMEOUT:
             pHalData->IntMask[0] &= ~BIT_PSTIMEOUT;
     		break;
@@ -650,24 +650,24 @@ RemoveInterruptMask88XX(
 
     	case HAL_INT_TYPE_PSTIMEOUT2:
     		pHalData->IntMask[0] &= ~BIT_PSTIMEOUT2;
-    		break; 
-    		
+    		break;
+
     	case HAL_INT_TYPE_C2HCMD:
     		pHalData->IntMask[0] &= ~BIT_C2HCMD;
-    		break;	
-    		
+    		break;
+
     	case HAL_INT_TYPE_VIDOK:
     		pHalData->IntMask[0] &= ~BIT_VIDOK;
     		break;
-    		
+
     	case HAL_INT_TYPE_VODOK:
     		pHalData->IntMask[0] &= ~BIT_VODOK;
     		break;
-    		
+
     	case HAL_INT_TYPE_BEDOK:
     		pHalData->IntMask[0] &= ~BIT_BEDOK;
     		break;
-    		
+
     	case HAL_INT_TYPE_BKDOK:
     		pHalData->IntMask[0] &= ~BIT_BKDOK;
     		break;
@@ -685,7 +685,7 @@ RemoveInterruptMask88XX(
             pHalData->IntMask[0] &= ~IMR_BCNDOK0_88E;
     		break;
         #endif
-    		
+
     	case HAL_INT_TYPE_CPWM:
     		pHalData->IntMask[0] &= ~BIT_CPWM;
     		break;
@@ -700,7 +700,7 @@ RemoveInterruptMask88XX(
 
         case HAL_INT_TYPE_RDU:
     		pHalData->IntMask[0] &= ~BIT_RDU;
-            break;            
+            break;
         case HAL_INT_TYPE_CPWM2:
             pHalData->IntMask[0] &= ~BIT_CPWM2;
             break;
@@ -717,14 +717,14 @@ RemoveInterruptMask88XX(
         case HAL_INT_TYPE_RXERR:
             pHalData->IntMask[1] &= ~BIT_RXERR_INT;
             break;
-            
+
         case HAL_INT_TYPE_TXERR:
             pHalData->IntMask[1] &= ~BIT_TXERR_INT;
             break;
 
 #if CFG_HAL_HW_DETEC_POWER_STATE
     if ( IS_SUPPORT_HW_DETEC_POWER_STATE(Adapter)) {
-    
+
         case HAL_INT_TYPE_PwrInt0:
             pHalData->IntMask[3] &= ~BIT_PWR_INT_31to0;
             break;
@@ -735,11 +735,11 @@ RemoveInterruptMask88XX(
             pHalData->IntMask[3] &= ~BIT_PWR_INT_95to64;
             break;
         case HAL_INT_TYPE_PwrInt3:
-            pHalData->IntMask[3] &= ~BIT_PWR_INT_126to96;            
+            pHalData->IntMask[3] &= ~BIT_PWR_INT_126to96;
             break;
         case HAL_INT_TYPE_PwrInt4:
-            pHalData->IntMask[3] &= ~BIT_PWR_INT_127;            
-            break;    
+            pHalData->IntMask[3] &= ~BIT_PWR_INT_127;
+            break;
         }
 #endif // #if CFG_HAL_HW_DETEC_POWER_STATE
 

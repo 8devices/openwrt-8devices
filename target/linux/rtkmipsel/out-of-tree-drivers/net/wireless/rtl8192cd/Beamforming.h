@@ -21,7 +21,7 @@ Beamforming_GetVHTNDPTxRate(
 	u1Byte	CompSteeringNumofBFer
 );
 
-void 
+void
 Beamforming_CSIRate(
 	struct rtl8192cd_priv *priv
 );
@@ -43,7 +43,7 @@ BOOLEAN
 Beamforming_InitEntry(
 	struct rtl8192cd_priv	*priv,
 	struct stat_info		*pSTA,
-	pu1Byte					Idx	
+	pu1Byte					Idx
 );
 
 BOOLEAN
@@ -71,14 +71,14 @@ Beamforming_TimerCallback(
 VOID
 Beamforming_AutoTest(
 	struct rtl8192cd_priv *priv,
-	u1Byte					Idx, 
+	u1Byte					Idx,
 	struct _RT_BEAMFORMING_ENTRY *pBeamformEntry
 );
 
 VOID
 Beamforming_End(
 	struct rtl8192cd_priv *priv,
-	BOOLEAN			Status	
+	BOOLEAN			Status
 );
 
 VOID
@@ -93,7 +93,7 @@ Beamforming_Release(
 
 BEAMFORMING_CAP
 Beamforming_GetBeamCap(
-	struct rtl8192cd_priv *priv, 
+	struct rtl8192cd_priv *priv,
 	IN PRT_BEAMFORMING_INFO 	pBeamInfo
 );
 
@@ -104,8 +104,8 @@ Beamforming_Init(
 
 VOID
 Beamforming_SetTxBFen(
-	struct rtl8192cd_priv *priv, 
-	u1Byte MacId, 
+	struct rtl8192cd_priv *priv,
+	u1Byte MacId,
 	BOOLEAN		bTxBF
 );
 
@@ -194,12 +194,12 @@ beamform_UpdateMinSoundingPeriod(
 	IN BOOLEAN		bBFeeLeave
 	);
 
-VOID 
+VOID
 beamform_SoundingTimerCallback(
 	struct rtl8192cd_priv *priv
     );
 
-VOID 
+VOID
 beamform_SoundingTimeout(
     struct rtl8192cd_priv *priv
     );
@@ -209,7 +209,7 @@ void issue_action_GROUP_ID(struct rtl8192cd_priv *priv, unsigned char idx);
 VOID
 Beamform_SoundingDown(
 	struct rtl8192cd_priv *priv,
-	IN BOOLEAN		Status	
+	IN BOOLEAN		Status
 	);
 
 //eric-6s

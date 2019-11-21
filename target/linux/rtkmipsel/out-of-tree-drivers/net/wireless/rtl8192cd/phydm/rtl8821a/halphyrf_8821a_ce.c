@@ -48,8 +48,8 @@ ODM_TxPwrTrackSetPwr8821A(
 
 	u1Byte			PwrTrackingLimit = 26; //+1.0dB
 	u1Byte			TxRate = 0xFF;
-	u1Byte			Final_OFDM_Swing_Index = 0; 
-	u1Byte			Final_CCK_Swing_Index = 0; 
+	u1Byte			Final_OFDM_Swing_Index = 0;
+	u1Byte			Final_CCK_Swing_Index = 0;
 	u1Byte			i = 0;
 	u4Byte			finalBbSwingIdx[1];
 	PODM_RF_CAL_T	pRFCalibrateInfo = &(pDM_Odm->RFCalibrateInfo);
@@ -59,18 +59,18 @@ ODM_TxPwrTrackSetPwr8821A(
 		#if (DM_ODM_SUPPORT_TYPE & ODM_WIN)
 			#if (MP_DRIVER == 1)
 					PMPT_CONTEXT pMptCtx = &(Adapter->MptCtx);
-					
+
 					TxRate = MptToMgntRate(pMptCtx->MptRateIndex);
 			#endif
 		#elif (DM_ODM_SUPPORT_TYPE & ODM_CE)
 				PMPT_CONTEXT pMptCtx = &(Adapter->mppriv.MptCtx);
-				
+
 				TxRate = MptToMgntRate(pMptCtx->MptRateIndex);
-		#endif	
+		#endif
 	#endif
 	} else {
 		u2Byte	rate	 = *(pDM_Odm->pForcedDataRate);
-		
+
 		if (!rate) { /*auto rate*/
 			if (rate != 0xFF) {
 			#if (DM_ODM_SUPPORT_TYPE & ODM_WIN)
@@ -84,7 +84,7 @@ ODM_TxPwrTrackSetPwr8821A(
 			TxRate = (u1Byte)rate;
 		}
 	}
-		
+
 	ODM_RT_TRACE(pDM_Odm, ODM_COMP_TX_PWR_TRACK, ODM_DBG_LOUD, ("Power Tracking TxRate=0x%X\n", TxRate));
 	ODM_RT_TRACE(pDM_Odm,ODM_COMP_TX_PWR_TRACK, ODM_DBG_LOUD,("===>ODM_TxPwrTrackSetPwr8821A\n"));
 
@@ -105,7 +105,7 @@ ODM_TxPwrTrackSetPwr8821A(
 			PwrTrackingLimit = 30; //+3dB
 		else if((TxRate >= MGN_MCS5)&&(TxRate <= MGN_MCS7)) //64QAM
 			PwrTrackingLimit = 28; //+2dB
-			
+
 		//2 VHT
 		else if((TxRate >= MGN_VHT1SS_MCS0)&&(TxRate <= MGN_VHT1SS_MCS2)) //QPSK/BPSK
 			PwrTrackingLimit = 34; //+5dB
@@ -120,7 +120,7 @@ ODM_TxPwrTrackSetPwr8821A(
 		else if(TxRate == MGN_VHT1SS_MCS9) //256QAM
 			PwrTrackingLimit = 22; //-1dB
 
-		else			
+		else
 			PwrTrackingLimit = 24;
 	}
 	ODM_RT_TRACE(pDM_Odm,ODM_COMP_TX_PWR_TRACK, ODM_DBG_LOUD,("TxRate=0x%x, PwrTrackingLimit=%d\n", TxRate, PwrTrackingLimit));
@@ -128,11 +128,11 @@ ODM_TxPwrTrackSetPwr8821A(
 	if (Method == BBSWING)
 	{
 		if (RFPath == ODM_RF_PATH_A)
-		{		
+		{
 			finalBbSwingIdx[ODM_RF_PATH_A] = (pDM_Odm->RFCalibrateInfo.OFDM_index[ODM_RF_PATH_A] > PwrTrackingLimit) ? PwrTrackingLimit : pDM_Odm->RFCalibrateInfo.OFDM_index[ODM_RF_PATH_A];
 			ODM_RT_TRACE(pDM_Odm,ODM_COMP_TX_PWR_TRACK, ODM_DBG_LOUD,("pDM_Odm->RFCalibrateInfo.OFDM_index[ODM_RF_PATH_A]=%d, pDM_Odm->RealBbSwingIdx[ODM_RF_PATH_A]=%d\n",
 				pDM_Odm->RFCalibrateInfo.OFDM_index[ODM_RF_PATH_A], finalBbSwingIdx[ODM_RF_PATH_A]));
-			
+
 			ODM_SetBBReg(pDM_Odm, rA_TxScale_Jaguar, 0xFFE00000, TxScalingTable_Jaguar[finalBbSwingIdx[ODM_RF_PATH_A]]);
 		}
 	}
@@ -144,12 +144,12 @@ ODM_TxPwrTrackSetPwr8821A(
 		Final_CCK_Swing_Index = pRFCalibrateInfo->DefaultCckIndex + pRFCalibrateInfo->Absolute_OFDMSwingIdx[RFPath];
 		Final_OFDM_Swing_Index = pRFCalibrateInfo->DefaultOfdmIndex + pRFCalibrateInfo->Absolute_OFDMSwingIdx[RFPath];
 
-		if (RFPath == ODM_RF_PATH_A)  
+		if (RFPath == ODM_RF_PATH_A)
 		{
 			if (Final_OFDM_Swing_Index > PwrTrackingLimit)     /*BBSwing higher then Limit*/
 			{
 				pRFCalibrateInfo->Remnant_CCKSwingIdx = Final_CCK_Swing_Index - PwrTrackingLimit;
-				pRFCalibrateInfo->Remnant_OFDMSwingIdx[RFPath] = Final_OFDM_Swing_Index - PwrTrackingLimit;            
+				pRFCalibrateInfo->Remnant_OFDMSwingIdx[RFPath] = Final_OFDM_Swing_Index - PwrTrackingLimit;
 
 				ODM_SetBBReg(pDM_Odm, rA_TxScale_Jaguar, 0xFFE00000, TxScalingTable_Jaguar[PwrTrackingLimit]);
 
@@ -162,7 +162,7 @@ ODM_TxPwrTrackSetPwr8821A(
 			else if (Final_OFDM_Swing_Index <= 0)
 			{
 				pRFCalibrateInfo->Remnant_CCKSwingIdx = Final_CCK_Swing_Index;
-				pRFCalibrateInfo->Remnant_OFDMSwingIdx[RFPath] = Final_OFDM_Swing_Index;     
+				pRFCalibrateInfo->Remnant_OFDMSwingIdx[RFPath] = Final_OFDM_Swing_Index;
 
 				ODM_SetBBReg(pDM_Odm, rA_TxScale_Jaguar, 0xFFE00000, TxScalingTable_Jaguar[0]);
 
@@ -204,7 +204,7 @@ GetDeltaSwingTable_8821A(
 	OUT pu1Byte 			*TemperatureUP_A,
 	OUT pu1Byte 			*TemperatureDOWN_A,
 	OUT pu1Byte 			*TemperatureUP_B,
-	OUT pu1Byte 			*TemperatureDOWN_B	
+	OUT pu1Byte 			*TemperatureDOWN_B
 	)
 {
 	PDM_ODM_T		pDM_Odm = (PDM_ODM_T)pDM_VOID;
@@ -219,18 +219,18 @@ GetDeltaSwingTable_8821A(
 		#if (DM_ODM_SUPPORT_TYPE & ODM_WIN)
 			#if (MP_DRIVER == 1)
 					PMPT_CONTEXT pMptCtx = &(Adapter->MptCtx);
-					
+
 					TxRate = MptToMgntRate(pMptCtx->MptRateIndex);
 			#endif
 		#elif (DM_ODM_SUPPORT_TYPE & ODM_CE)
 				PMPT_CONTEXT pMptCtx = &(Adapter->mppriv.MptCtx);
-				
+
 				TxRate = MptToMgntRate(pMptCtx->MptRateIndex);
-		#endif	
+		#endif
 	#endif
 	} else {
 		u2Byte	rate	 = *(pDM_Odm->pForcedDataRate);
-		
+
 		if (!rate) { /*auto rate*/
 			if (rate != 0xFF) {
 			#if (DM_ODM_SUPPORT_TYPE & ODM_WIN)
@@ -244,21 +244,21 @@ GetDeltaSwingTable_8821A(
 			TxRate = (u1Byte)rate;
 		}
 	}
-		
+
 	ODM_RT_TRACE(pDM_Odm, ODM_COMP_TX_PWR_TRACK, ODM_DBG_LOUD, ("Power Tracking TxRate=0x%X\n", TxRate));
 
-		
+
 	if ( 1 <= channel && channel <= 14) {
 		if (IS_CCK_RATE(TxRate)) {
 	        *TemperatureUP_A   = pRFCalibrateInfo->DeltaSwingTableIdx_2GCCKA_P;
 	        *TemperatureDOWN_A = pRFCalibrateInfo->DeltaSwingTableIdx_2GCCKA_N;
 	        *TemperatureUP_B   = pRFCalibrateInfo->DeltaSwingTableIdx_2GCCKB_P;
-	        *TemperatureDOWN_B = pRFCalibrateInfo->DeltaSwingTableIdx_2GCCKB_N;		
+	        *TemperatureDOWN_B = pRFCalibrateInfo->DeltaSwingTableIdx_2GCCKB_N;
 		} else {
 	        *TemperatureUP_A   = pRFCalibrateInfo->DeltaSwingTableIdx_2GA_P;
 	        *TemperatureDOWN_A = pRFCalibrateInfo->DeltaSwingTableIdx_2GA_N;
 	        *TemperatureUP_B   = pRFCalibrateInfo->DeltaSwingTableIdx_2GB_P;
-	        *TemperatureDOWN_B = pRFCalibrateInfo->DeltaSwingTableIdx_2GB_N;			
+	        *TemperatureDOWN_B = pRFCalibrateInfo->DeltaSwingTableIdx_2GB_N;
 		}
 	} else if (36 <= channel && channel <= 64) {
 		*TemperatureUP_A   = pRFCalibrateInfo->DeltaSwingTableIdx_5GA_P[0];
@@ -271,10 +271,10 @@ GetDeltaSwingTable_8821A(
 		*TemperatureUP_B   = pRFCalibrateInfo->DeltaSwingTableIdx_5GB_P[1];
 		*TemperatureDOWN_B = pRFCalibrateInfo->DeltaSwingTableIdx_5GB_N[1];
 	} else if (149 <= channel && channel <= 177) {
-		*TemperatureUP_A   = pRFCalibrateInfo->DeltaSwingTableIdx_5GA_P[2]; 
-		*TemperatureDOWN_A = pRFCalibrateInfo->DeltaSwingTableIdx_5GA_N[2]; 
-		*TemperatureUP_B   = pRFCalibrateInfo->DeltaSwingTableIdx_5GB_P[2]; 
-		*TemperatureDOWN_B = pRFCalibrateInfo->DeltaSwingTableIdx_5GB_N[2]; 
+		*TemperatureUP_A   = pRFCalibrateInfo->DeltaSwingTableIdx_5GA_P[2];
+		*TemperatureDOWN_A = pRFCalibrateInfo->DeltaSwingTableIdx_5GA_N[2];
+		*TemperatureUP_B   = pRFCalibrateInfo->DeltaSwingTableIdx_5GB_P[2];
+		*TemperatureDOWN_B = pRFCalibrateInfo->DeltaSwingTableIdx_5GB_N[2];
 	} else {
 		*TemperatureUP_A   = (pu1Byte)DeltaSwingTableIdx_2GA_P_8188E;
 		*TemperatureDOWN_A = (pu1Byte)DeltaSwingTableIdx_2GA_N_8188E;
@@ -295,7 +295,7 @@ void ConfigureTxpowerTrack_8821A(
 	pConfig->AverageThermalNum = AVG_THERMAL_NUM_8812A;
 	pConfig->RfPathCount = MAX_PATH_NUM_8821A;
 	pConfig->ThermalRegAddr = RF_T_METER_8812A;
-		
+
 	pConfig->ODM_TxPwrTrackSetPwr = ODM_TxPwrTrackSetPwr8821A;
 	pConfig->DoIQK = DoIQK_8821A;
 	pConfig->PHY_LCCalibrate = PHY_LCCalibrate_8821A;
@@ -315,7 +315,7 @@ PHY_LCCalibrate_8821A(
 	)
 {
 	PDM_ODM_T		pDM_Odm = (PDM_ODM_T)pDM_VOID;
-	u8Byte		StartTime; 
+	u8Byte		StartTime;
 	u8Byte		ProgressingTime;
 
 	StartTime = ODM_GetCurrentTime( pDM_Odm);

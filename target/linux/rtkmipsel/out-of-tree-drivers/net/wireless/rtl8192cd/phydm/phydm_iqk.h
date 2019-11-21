@@ -1,7 +1,7 @@
 /******************************************************************************
  *
  * Copyright(c) 2007 - 2011 Realtek Corporation. All rights reserved.
- *                                        
+ *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of version 2 of the GNU General Public License as
  * published by the Free Software Foundation.
@@ -34,7 +34,7 @@
 #define rxiqk_gs_limit 4
 
 
-#define	NUM 4	
+#define	NUM 4
 /*---------------------------End Define Parameters-------------------------------*/
 
 typedef struct _IQK_INFORMATION {
@@ -47,14 +47,14 @@ typedef struct _IQK_INFORMATION {
 	u1Byte		rxiqk_step;
 	u1Byte		tmp1bcc;
 	u1Byte		kcount;
-	
+
 	u4Byte		IQK_Channel[2];
 	BOOLEAN		IQK_fail_report[2][4][2]; /*channel/path/TRX(TX:0, RX:1) */
 	u4Byte		IQK_CFIR_real[2][4][2][8]; /*channel / path / TRX(TX:0, RX:1) / CFIR_real*/
 	u4Byte		IQK_CFIR_imag[2][4][2][8]; /*channel / path / TRX(TX:0, RX:1) / CFIR_imag*/
 	u1Byte		retry_count[2][4][3]; /* channel / path / (TXK:0, RXK1:1, RXK2:2) */
 	u1Byte		gs_retry_count[2][4][2]; /* channel / path / (GSRXK1:0, GSRXK2:1) */
-	u1Byte		RXIQK_fail_code[2][4]; /* channel / path 0:SRXK1 fail, 1:RXK1 fail 2:RXK2 fail */	
+	u1Byte		RXIQK_fail_code[2][4]; /* channel / path 0:SRXK1 fail, 1:RXK1 fail 2:RXK2 fail */
 	u4Byte		LOK_IDAC[2][4];		/*channel / path*/
 	u2Byte		RXIQK_AGC[2][4];	 /*channel / path*/
 	u4Byte		bypassIQK[2][4];	/*channel / 0xc94/0xe94*/

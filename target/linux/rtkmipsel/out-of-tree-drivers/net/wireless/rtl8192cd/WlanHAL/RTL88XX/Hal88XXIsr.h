@@ -6,14 +6,14 @@ Copyright (c) Realtek Semiconductor Corp. All rights reserved.
 
 Module Name:
 	Hal88XXIsr.h
-	
+
 Abstract:
 	Defined HAL 88XX Interrupt Service Routine Related Define & Marco
-	    
+
 Major Change History:
 	When       Who               What
 	---------- ---------------   -------------------------------
-	2012-04-30 Filen            Create.	
+	2012-04-30 Filen            Create.
 --*/
 
 
@@ -37,7 +37,7 @@ BOOLEAN
 InterruptRecognized88XX(
     IN  HAL_PADAPTER        Adapter,
 	IN	PVOID				pContent,
-	IN	u4Byte				ContentLen    
+	IN	u4Byte				ContentLen
 );
 
 HAL_IMEM

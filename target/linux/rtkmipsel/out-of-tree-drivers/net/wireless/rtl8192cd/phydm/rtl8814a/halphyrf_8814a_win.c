@@ -98,7 +98,7 @@ u1Byte CheckRFGainOffset(
 			Final_OFDM_Swing_Index = TxScalingLowerBound;
 
 		return Final_OFDM_Swing_Index;
-		
+
 	} else {	/*normal case*/
 
 		if (bPositive == TRUE)
@@ -125,7 +125,7 @@ u1Byte GetTSSIVALUE(
 	PADAPTER		Adapter = pDM_Odm->Adapter;
 	PODM_RF_CAL_T		pRFCalibrateInfo = &(pDM_Odm->RFCalibrateInfo);
 	HAL_DATA_TYPE		*pHalData = GET_HAL_DATA(Adapter);
-	
+
 	s1Byte				PowerByRateValue = 0;
 	u1Byte				Tx_num, TSSIValue = 0;
 	u1Byte				Channel  = pHalData->CurrentChannel;
@@ -133,7 +133,7 @@ u1Byte GetTSSIVALUE(
 	u1Byte				TxRate = 0xFF;
 	u1Byte				TxLimit = 0;
 	u1Byte				RegPwrTblSel = 0;
-	
+
 #if (DM_ODM_SUPPORT_TYPE & (ODM_WIN | ODM_CE))
 #if (DM_ODM_SUPPORT_TYPE & ODM_WIN)
 	PMGNT_INFO			pMgntInfo = &(Adapter->MgntInfo);
@@ -207,7 +207,7 @@ u1Byte GetTSSIVALUE(
 
 			default:
 				ODM_RT_TRACE(pDM_Odm, ODM_COMP_TX_PWR_TRACK, ODM_DBG_LOUD,
-							("Call:%s Wrong Path name!!!\n", __func__));			
+							("Call:%s Wrong Path name!!!\n", __func__));
 			break;
 			}
 		} else {
@@ -488,7 +488,7 @@ BOOLEAN GetTSSIModeTxAGCBBSWingOffset(
 
 	if ((TX_AGC_Index == pRFCalibrateInfo->Absolute_OFDMSwingIdx[RFPath]) && (TX_BBSwing_Index == pRFCalibrateInfo->BbSwingIdxOfdm[RFPath]))
 		return FALSE;
-	
+
 	else {
 		pRFCalibrateInfo->Absolute_OFDMSwingIdx[RFPath] = TX_AGC_Index;
 		pRFCalibrateInfo->BbSwingIdxOfdm[RFPath] = TX_BBSwing_Index;
@@ -629,7 +629,7 @@ VOID SetTxAGCBBSWingOffset(
 							ODM_RT_TRACE(pDM_Odm, ODM_COMP_TX_PWR_TRACK, ODM_DBG_LOUD,
 										(" PathA TXBBSwing = %d TXBBSwing=0X%X\n", TX_BBSwing_Index, TXBBSwing));
 							break;
-							
+
 						} else {
 							pRFCalibrateInfo->BbSwingIdxOfdm[RFPath] = pRFCalibrateInfo->DefaultOfdmIndex;
 						}
@@ -750,7 +750,7 @@ VOID SetTxAGCBBSWingOffset(
 							ODM_RT_TRACE(pDM_Odm, ODM_COMP_TX_PWR_TRACK, ODM_DBG_LOUD,
 										  (" PathB TXBBSwing = %d TXBBSwing=0X%X\n", TX_BBSwing_Index, TXBBSwing));
 							break;
-							
+
 						} else {
 							pRFCalibrateInfo->BbSwingIdxOfdm[RFPath] = pRFCalibrateInfo->DefaultOfdmIndex;
 						}
@@ -870,7 +870,7 @@ VOID SetTxAGCBBSWingOffset(
 							ODM_RT_TRACE(pDM_Odm, ODM_COMP_TX_PWR_TRACK, ODM_DBG_LOUD,
 										  (" PathC TXBBSwing = %d TXBBSwing=0X%X\n", TX_BBSwing_Index, TXBBSwing));
 							break;
-							
+
 						} else {
 							pRFCalibrateInfo->BbSwingIdxOfdm[RFPath] = pRFCalibrateInfo->DefaultOfdmIndex;
 						}
@@ -991,7 +991,7 @@ VOID SetTxAGCBBSWingOffset(
 							ODM_RT_TRACE(pDM_Odm, ODM_COMP_TX_PWR_TRACK, ODM_DBG_LOUD,
 										  (" PathD TXBBSwing = %d TXBBSwing=0X%X\n", TX_BBSwing_Index, TXBBSwing));
 							break;
-							
+
 						} else {
 							pRFCalibrateInfo->BbSwingIdxOfdm[RFPath] = pRFCalibrateInfo->DefaultOfdmIndex;
 						}
@@ -1389,17 +1389,17 @@ VOID GetDeltaSwingTable_8814A(
 		*TemperatureUP_B   = pRFCalibrateInfo->DeltaSwingTableIdx_5GB_P[1];
 		*TemperatureDOWN_B = pRFCalibrateInfo->DeltaSwingTableIdx_5GB_N[1];
 	} else if (149 <= channel && channel <= 177) {
-		*TemperatureUP_A   = pRFCalibrateInfo->DeltaSwingTableIdx_5GA_P[2]; 
-		*TemperatureDOWN_A = pRFCalibrateInfo->DeltaSwingTableIdx_5GA_N[2]; 
-		*TemperatureUP_B   = pRFCalibrateInfo->DeltaSwingTableIdx_5GB_P[2]; 
-		*TemperatureDOWN_B = pRFCalibrateInfo->DeltaSwingTableIdx_5GB_N[2]; 
+		*TemperatureUP_A   = pRFCalibrateInfo->DeltaSwingTableIdx_5GA_P[2];
+		*TemperatureDOWN_A = pRFCalibrateInfo->DeltaSwingTableIdx_5GA_N[2];
+		*TemperatureUP_B   = pRFCalibrateInfo->DeltaSwingTableIdx_5GB_P[2];
+		*TemperatureDOWN_B = pRFCalibrateInfo->DeltaSwingTableIdx_5GB_N[2];
 	} else {
 		*TemperatureUP_A   = (pu1Byte)DeltaSwingTableIdx_2GA_P_8188E;
 		*TemperatureDOWN_A = (pu1Byte)DeltaSwingTableIdx_2GA_N_8188E;
 		*TemperatureUP_B   = (pu1Byte)DeltaSwingTableIdx_2GA_P_8188E;
 		*TemperatureDOWN_B = (pu1Byte)DeltaSwingTableIdx_2GA_N_8188E;
 	}
-	
+
 	return;
 }
 
@@ -1474,10 +1474,10 @@ VOID GetDeltaSwingTable_8814A_PathCD(
 		*TemperatureUP_D   = pRFCalibrateInfo->DeltaSwingTableIdx_5GD_P[1];
 		*TemperatureDOWN_D = pRFCalibrateInfo->DeltaSwingTableIdx_5GD_N[1];
 	} else if (149 <= channel && channel <= 177) {
-		*TemperatureUP_C   = pRFCalibrateInfo->DeltaSwingTableIdx_5GC_P[2]; 
-		*TemperatureDOWN_C = pRFCalibrateInfo->DeltaSwingTableIdx_5GC_N[2]; 
-		*TemperatureUP_D   = pRFCalibrateInfo->DeltaSwingTableIdx_5GD_P[2]; 
-		*TemperatureDOWN_D = pRFCalibrateInfo->DeltaSwingTableIdx_5GD_N[2]; 
+		*TemperatureUP_C   = pRFCalibrateInfo->DeltaSwingTableIdx_5GC_P[2];
+		*TemperatureDOWN_C = pRFCalibrateInfo->DeltaSwingTableIdx_5GC_N[2];
+		*TemperatureUP_D   = pRFCalibrateInfo->DeltaSwingTableIdx_5GD_P[2];
+		*TemperatureDOWN_D = pRFCalibrateInfo->DeltaSwingTableIdx_5GD_N[2];
 	} else {
 		*TemperatureUP_C   = (pu1Byte)DeltaSwingTableIdx_2GA_P_8188E;
 		*TemperatureDOWN_C = (pu1Byte)DeltaSwingTableIdx_2GA_N_8188E;

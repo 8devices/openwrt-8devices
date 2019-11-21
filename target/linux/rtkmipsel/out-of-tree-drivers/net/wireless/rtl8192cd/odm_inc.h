@@ -10,18 +10,8 @@
 #define __AP_PRECOMP_H__
 
 #define		DM_ODM_SUPPORT_TYPE						ODM_AP
-#if defined(CONFIG_PCI_HCI)
 #define		DEV_BUS_TYPE 							RT_PCI_INTERFACE
-#elif defined(CONFIG_USB_HCI)
-#define DEV_BUS_TYPE		RT_USB_INTERFACE
-#elif defined(CONFIG_SDIO_HCI)
-#define DEV_BUS_TYPE		RT_SDIO_INTERFACE
-#endif
-#ifdef __ECOS
-#define 	DBG										0
-#else
 #define 	DBG										1
-#endif
 //-----------------------------------------------------------------------------------------
 // Use one of the following value to define the flag, RT_PLATFORM.
 //-----------------------------------------------------------------------------------------
@@ -45,63 +35,24 @@
 #define 	RTL8723U_HWIMG_SUPPORT					0
 #define 	RTL8723A_HWIMG_SUPPORT					0
 
-#ifdef CONFIG_RTL_88E_SUPPORT
-#define		RTL8188E_SUPPORT						1
-#define 	RTL8188ES_HWIMG_SUPPORT					1
-#define		RATE_ADAPTIVE_SUPPORT					1
-
-#if !(DM_ODM_SUPPORT_TYPE & ODM_AP) || defined(RATEADAPTIVE_BY_ODM)
-#define 	RATE_ADAPTIVE_SUPPORT					1
-#endif
-#define		RTL8188E_FOR_TEST_CHIP					0
-
-#else
 #define		RTL8188E_SUPPORT						0
 #define 	RTL8188ES_HWIMG_SUPPORT					0
 #define		RATE_ADAPTIVE_SUPPORT					0
-#endif
 
-#if defined(CONFIG_RTL_92C_SUPPORT) && !defined(_OUTSRC_COEXIST)
-#define		RTL8192C_SUPPORT						1
-#define		RTL8192C_HWIMG_SUPPORT					1
-#define		RTL8192CE_HWIMG_SUPPORT					1
-#define		RTL8192CE_TEST_HWIMG_SUPPORT			1
-#else
 #define		RTL8192C_SUPPORT						0
 #define		RTL8192C_HWIMG_SUPPORT					0
 #define		RTL8192CE_HWIMG_SUPPORT					0
 #define		RTL8192CE_TEST_HWIMG_SUPPORT			0
-#endif
 
-#if defined(CONFIG_RTL_92D_SUPPORT) && !defined(_OUTSRC_COEXIST)
-#define 	RTL8192D_SUPPORT						1
-#else
 #define 	RTL8192D_SUPPORT						0
-#endif
 
-#ifdef CONFIG_RTL_8812_SUPPORT //FOR_8812_IQK
-#define		RTL8812A_SUPPORT						1
-#else
 #define		RTL8812A_SUPPORT						0
-#endif
 
-#ifdef CONFIG_WLAN_HAL_8881A
-#define		RTL8881A_SUPPORT						1
-#else
 #define		RTL8881A_SUPPORT						0
-#endif
 
-#ifdef CONFIG_WLAN_HAL_8192EE
-#define		RTL8192E_SUPPORT						1
-#else
 #define		RTL8192E_SUPPORT						0
-#endif
 
-#ifdef CONFIG_WLAN_HAL_8814AE
-#define		RTL8814A_SUPPORT						1
-#else
 #define		RTL8814A_SUPPORT						0
-#endif
 
 #ifdef CONFIG_WLAN_HAL_8195A
 #define		RTL8195A_SUPPORT						1
@@ -109,25 +60,13 @@
 #define		RTL8195A_SUPPORT						0
 #endif
 
-#ifdef CONFIG_WLAN_HAL_8822BE
 #define		RTL8822B_SUPPORT						1
-#else
-#define		RTL8822B_SUPPORT						0
-#endif
 
-#ifdef CONFIG_WLAN_HAL_8197F
 #define		RTL8197F_SUPPORT						1
-#else
-#define		RTL8197F_SUPPORT						0
-#endif
 
 #if (DM_ODM_SUPPORT_TYPE & (ODM_AP))
 #define		RTL8723A_SUPPORT						0
-#ifdef CONFIG_RTL_8723B_SUPPORT
-#define		RTL8723B_SUPPORT						1		
-#else
 #define		RTL8723B_SUPPORT						0
-#endif
 #define		RTL8821A_SUPPORT						0
 #define		BT_30_SUPPORT							0
 #define		RTL8188F_SUPPORT						0
@@ -167,9 +106,9 @@
 #define USE_WORKITEM 								0
 
 //
-// Customer ID, note that: 
-// This variable is initiailzed through EEPROM or registry, 
-// however, its definition may be different with that in EEPROM for 
+// Customer ID, note that:
+// This variable is initiailzed through EEPROM or registry,
+// however, its definition may be different with that in EEPROM for
 // EEPROM size consideration. So, we have to perform proper translation between them.
 // Besides, CustomerID of registry has precedence of that of EEPROM.
 // defined below. 060703, by rcnjko.
@@ -182,7 +121,7 @@ typedef enum _RT_CUSTOMER_ID
 	RT_CID_8187_HW_LED = 3,
 	RT_CID_8187_NETGEAR = 4,
 	RT_CID_WHQL = 5,
-	RT_CID_819x_CAMEO  = 6, 
+	RT_CID_819x_CAMEO  = 6,
 	RT_CID_819x_RUNTOP = 7,
 	RT_CID_819x_Senao = 8,
 	RT_CID_TOSHIBA = 9,	// Merge by Jacken, 2008/01/31.
@@ -195,10 +134,10 @@ typedef enum _RT_CUSTOMER_ID
 	RT_CID_819x_ALPHA = 16,
 	RT_CID_819x_Sitecom = 17,
 	RT_CID_CCX = 18, // It's set under CCX logo test and isn't demanded for CCX functions, but for test behavior like retry limit and tx report. By Bruce, 2009-02-17.
-	RT_CID_819x_Lenovo = 19,	
+	RT_CID_819x_Lenovo = 19,
 	RT_CID_819x_QMI = 20,
-	RT_CID_819x_Edimax_Belkin = 21,		
-	RT_CID_819x_Sercomm_Belkin = 22,			
+	RT_CID_819x_Edimax_Belkin = 21,
+	RT_CID_819x_Sercomm_Belkin = 22,
 	RT_CID_819x_CAMEO1 = 23,
 	RT_CID_819x_MSI = 24,
 	RT_CID_819x_Acer = 25,
@@ -223,7 +162,7 @@ typedef enum _RF_RADIO_PATH{
 	RF_PATH_B = 1,			//Radio Path B
 	RF_PATH_C = 2,			//Radio Path C
 	RF_PATH_D = 3,			//Radio Path D
-	RF_PATH_MAX				//Max RF number 90 support 
+	RF_PATH_MAX				//Max RF number 90 support
 }RF_RADIO_PATH_E, *PRF_RADIO_PATH_E;
 
 
@@ -257,9 +196,9 @@ typedef struct _RSSI_STA{
 // Each module has independt 32 bit debug flag you cnn define the flag as yout require.
 typedef enum tag_DBGP_Flag_Type_Definition
 {
-	FQoS				= 0,	
+	FQoS				= 0,
 	FTX					= 1,
-	FRX					= 2,	
+	FRX					= 2,
 	FSEC				= 3,
 	FMGNT				= 4,
 	FMLME				= 5,

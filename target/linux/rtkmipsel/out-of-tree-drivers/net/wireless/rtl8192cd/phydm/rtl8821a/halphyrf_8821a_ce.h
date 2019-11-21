@@ -46,7 +46,7 @@ GetDeltaSwingTable_8821A(
 	OUT pu1Byte 			*TemperatureUP_A,
 	OUT pu1Byte 			*TemperatureDOWN_A,
 	OUT pu1Byte 			*TemperatureUP_B,
-	OUT pu1Byte 			*TemperatureDOWN_B	
+	OUT pu1Byte 			*TemperatureDOWN_B
 );
-#endif	// #ifndef __HAL_PHY_RF_8821A_H__								
+#endif	// #ifndef __HAL_PHY_RF_8821A_H__
 

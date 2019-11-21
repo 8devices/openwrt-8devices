@@ -1,7 +1,7 @@
 /******************************************************************************
  *
  * Copyright(c) 2007 - 2011 Realtek Corporation. All rights reserved.
- *                                        
+ *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of version 2 of the GNU General Public License as
  * published by the Free Software Foundation.
@@ -34,7 +34,7 @@ struct noise_level
 typedef struct _ODM_NOISE_MONITOR_
 {
 	s1Byte			noise[MAX_RF_PATH];
-	s2Byte			noise_all;	
+	s2Byte			noise_all;
 }ODM_NOISE_MONITOR;
 
 s2Byte ODM_InbandNoise_Monitor(PVOID pDM_VOID,u8 bPauseDIG,u8 IGIValue,u32 max_time);

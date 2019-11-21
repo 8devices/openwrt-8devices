@@ -1,7 +1,7 @@
 /******************************************************************************
  *
  * Copyright(c) 2007 - 2011 Realtek Corporation. All rights reserved.
- *                                        
+ *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of version 2 of the GNU General Public License as
  * published by the Free Software Foundation.
@@ -46,7 +46,7 @@ odm_SetCrystalCap(
 	} else if ((pDM_Odm->SupportICType & (ODM_RTL8703B|ODM_RTL8723B|ODM_RTL8192E|ODM_RTL8821))) {
 		/* 0x2C[23:18] = 0x2C[17:12] = CrystalCap */
 		CrystalCap = CrystalCap & 0x3F;
-		ODM_SetBBReg(pDM_Odm, REG_MAC_PHY_CTRL, 0x00FFF000, (CrystalCap|(CrystalCap << 6)));	
+		ODM_SetBBReg(pDM_Odm, REG_MAC_PHY_CTRL, 0x00FFF000, (CrystalCap|(CrystalCap << 6)));
 	}  else if (pDM_Odm->SupportICType & ODM_RTL8814A) {
 		/* write 0x2C[26:21] = 0x2C[20:15] = CrystalCap */
 		CrystalCap = CrystalCap & 0x3F;
@@ -101,7 +101,7 @@ odm_SetATCStatus(
 
 	if(pCfoTrack->bATCStatus == ATCStatus)
 		return;
-	
+
 	ODM_SetBBReg(pDM_Odm, ODM_REG(BB_ATC,pDM_Odm), ODM_BIT(BB_ATC,pDM_Odm), ATCStatus);
 	pCfoTrack->bATCStatus = ATCStatus;
 }
@@ -175,7 +175,7 @@ ODM_CfoTracking(
 	PDM_ODM_T					pDM_Odm = (PDM_ODM_T)pDM_VOID;
 	PCFO_TRACKING				pCfoTrack = (PCFO_TRACKING)PhyDM_Get_Structure( pDM_Odm, PHYDM_CFOTRACK);
 	s4Byte						CFO_ave = 0;
-	u4Byte						CFO_rpt_sum, CFO_kHz_avg[2] = {0};	
+	u4Byte						CFO_rpt_sum, CFO_kHz_avg[2] = {0};
 	s4Byte						CFO_ave_diff;
 	s1Byte						CrystalCap = pCfoTrack->CrystalCap;
 	u1Byte						Adjust_Xtal = 1, i, valid_path_cnt = 0;
@@ -190,10 +190,10 @@ ODM_CfoTracking(
 	ODM_RT_TRACE(pDM_Odm, ODM_COMP_CFO_TRACKING, ODM_DBG_LOUD, ("ODM_CfoTracking()=========> \n"));
 
 	if(!pDM_Odm->bLinked || !pDM_Odm->bOneEntryOnly)
-	{	
+	{
 		//4 No link or more than one entry
 		ODM_CfoTrackingReset(pDM_Odm);
-		ODM_RT_TRACE(pDM_Odm, ODM_COMP_CFO_TRACKING, ODM_DBG_LOUD, ("ODM_CfoTracking(): Reset: bLinked = %d, bOneEntryOnly = %d\n", 
+		ODM_RT_TRACE(pDM_Odm, ODM_COMP_CFO_TRACKING, ODM_DBG_LOUD, ("ODM_CfoTracking(): Reset: bLinked = %d, bOneEntryOnly = %d\n",
 			pDM_Odm->bLinked, pDM_Odm->bOneEntryOnly));
 	}
 	else
@@ -206,27 +206,27 @@ ODM_CfoTracking(
 			return;
 		}
 		pCfoTrack->packetCount_pre = pCfoTrack->packetCount;
-	
+
 		//4 1.2 Calculate CFO
 		for (i = 0; i < pDM_Odm->num_rf_path; i++) {
-		
+
 			if (pCfoTrack->CFO_cnt[i] == 0)
 				continue;
 
 			valid_path_cnt++;
 			CFO_rpt_sum = (u4Byte)((pCfoTrack->CFO_tail[i] < 0) ? (0 - pCfoTrack->CFO_tail[i]) :  pCfoTrack->CFO_tail[i]);
 			CFO_kHz_avg[i] = CFO_HW_RPT_2_MHZ(CFO_rpt_sum) / pCfoTrack->CFO_cnt[i];
-	
+
 			ODM_RT_TRACE(pDM_Odm, ODM_COMP_CFO_TRACKING, ODM_DBG_LOUD, ("[Path %d] CFO_rpt_sum = (( %d )), CFO_cnt = (( %d )) , CFO_avg= (( %s%d )) kHz\n",
 				i, CFO_rpt_sum, pCfoTrack->CFO_cnt[i],((pCfoTrack->CFO_tail[i] < 0) ? "-" : " ") ,CFO_kHz_avg[i]));
 		}
-		
+
 		for (i = 0; i < valid_path_cnt; i++) {
-			
-			//ODM_RT_TRACE(pDM_Odm, ODM_COMP_CFO_TRACKING, ODM_DBG_LOUD, ("path [%d], pCfoTrack->CFO_tail = %d\n", i, pCfoTrack->CFO_tail[i]));	
+
+			//ODM_RT_TRACE(pDM_Odm, ODM_COMP_CFO_TRACKING, ODM_DBG_LOUD, ("path [%d], pCfoTrack->CFO_tail = %d\n", i, pCfoTrack->CFO_tail[i]));
 			if (pCfoTrack->CFO_tail[i] < 0) {
 				CFO_ave += (0-(s4Byte)CFO_kHz_avg[i]);
-				//ODM_RT_TRACE(pDM_Odm, ODM_COMP_CFO_TRACKING, ODM_DBG_LOUD, ("CFO_ave = %d\n", CFO_ave));	
+				//ODM_RT_TRACE(pDM_Odm, ODM_COMP_CFO_TRACKING, ODM_DBG_LOUD, ("CFO_ave = %d\n", CFO_ave));
 			}
 			else
 				CFO_ave += (s4Byte)CFO_kHz_avg[i];
@@ -234,7 +234,7 @@ ODM_CfoTracking(
 
 		if (valid_path_cnt == 2)
 			CFO_ave = (CFO_ave>>1);
-			
+
 		ODM_RT_TRACE(pDM_Odm, ODM_COMP_CFO_TRACKING, ODM_DBG_LOUD, ("valid_path_cnt = ((%d)), CFO_ave = ((%d kHz))\n", valid_path_cnt, CFO_ave));
 
 		/*reset counter*/
@@ -284,7 +284,7 @@ ODM_CfoTracking(
 			ODM_RT_TRACE(pDM_Odm, ODM_COMP_CFO_TRACKING, ODM_DBG_LOUD, ("ODM_CfoTracking(): Disable CFO tracking for BT!!\n"));
 		}
 /*
-		//4 1.6 Big jump 
+		//4 1.6 Big jump
 		if(pCfoTrack->bAdjust)
 		{
 			if(CFO_ave > CFO_TH_XTAL_LOW)
@@ -296,7 +296,7 @@ ODM_CfoTracking(
 		}
 */
 #endif
-		
+
 		//4 1.7 Adjust Crystal Cap.
 		if(pCfoTrack->bAdjust)
 		{
@@ -312,13 +312,13 @@ ODM_CfoTracking(
 
 			odm_SetCrystalCap(pDM_Odm, (u1Byte)CrystalCap);
 		}
-		ODM_RT_TRACE(pDM_Odm, ODM_COMP_CFO_TRACKING, ODM_DBG_LOUD, ("ODM_CfoTracking(): Crystal cap = 0x%x, Default Crystal cap = 0x%x\n", 
+		ODM_RT_TRACE(pDM_Odm, ODM_COMP_CFO_TRACKING, ODM_DBG_LOUD, ("ODM_CfoTracking(): Crystal cap = 0x%x, Default Crystal cap = 0x%x\n",
 			pCfoTrack->CrystalCap, pCfoTrack->DefXCap));
 
 #if (DM_ODM_SUPPORT_TYPE & (ODM_WIN|ODM_CE|ODM_AP))
 		if(pDM_Odm->SupportICType & ODM_IC_11AC_SERIES)
 			return;
-		
+
 		//3 2. Dynamic ATC switch
 		if(CFO_ave < CFO_TH_ATC && CFO_ave > -CFO_TH_ATC)
 		{
@@ -358,14 +358,14 @@ ODM_ParsingCFO(
 	{
 		if (num_ss > pDM_Odm->num_rf_path) /*For fool proof*/
 			num_ss = pDM_Odm->num_rf_path;
-		
+
 		//3 Update CFO report for path-A & path-B
 		// Only paht-A and path-B have CFO tail and short CFO
 		for(i = 0; i < num_ss; i++)
 		{
 			pCfoTrack->CFO_tail[i] += pcfotail[i];
 			pCfoTrack->CFO_cnt[i] ++;
-			//ODM_RT_TRACE(pDM_Odm, ODM_COMP_CFO_TRACKING, ODM_DBG_LOUD, ("[ID %d][path %d][Rate 0x%x] CFO_tail = ((%d)), CFO_tail_sum = ((%d)), CFO_cnt = ((%d))\n", 
+			//ODM_RT_TRACE(pDM_Odm, ODM_COMP_CFO_TRACKING, ODM_DBG_LOUD, ("[ID %d][path %d][Rate 0x%x] CFO_tail = ((%d)), CFO_tail_sum = ((%d)), CFO_cnt = ((%d))\n",
 			//	pPktinfo->StationID, i, pPktinfo->DataRate, pcfotail[i], pCfoTrack->CFO_tail[i], pCfoTrack->CFO_cnt[i]));
 		}
 

@@ -1,7 +1,7 @@
 /******************************************************************************
  *
  * Copyright(c) 2007 - 2011 Realtek Corporation. All rights reserved.
- *                                        
+ *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of version 2 of the GNU General Public License as
  * published by the Free Software Foundation.
@@ -37,7 +37,7 @@ odm_UpdateTxPath_8812A(IN PDM_ODM_T pDM_Odm, IN u1Byte Path)
 	if(pDM_PathDiv->RespTxPath != Path)
 	{
 		ODM_RT_TRACE(pDM_Odm,ODM_COMP_PATH_DIV, ODM_DBG_LOUD, ("Need to Update Tx Path\n"));
-		
+
 		if(Path == ODM_RF_PATH_A)
 		{
 			ODM_SetBBReg(pDM_Odm, 0x80c , 0xFFF0, 0x111); //Tx by Reg
@@ -61,7 +61,7 @@ ODM_PathDiversityInit_8812A(
 {
 	u4Byte	i;
 	pPATHDIV_T	pDM_PathDiv = &pDM_Odm->DM_PathDiv;
-	
+
 	ODM_SetBBReg(pDM_Odm, 0x80c , BIT29, 1); //Tx path from Reg
 	ODM_SetBBReg(pDM_Odm, 0x80c , 0xFFF0, 0x111); //Tx by Reg
 	ODM_SetBBReg(pDM_Odm, 0x6d8 , BIT7|BIT6, 1); //Resp Tx by Txinfo
@@ -87,7 +87,7 @@ ODM_PathDiversity_8812A(
 
 
 	ODM_RT_TRACE(pDM_Odm,ODM_COMP_PATH_DIV, ODM_DBG_LOUD, ("Odm_PathDiversity_8812A() =>\n"));
-	   
+
 	for (i=0; i<ODM_ASSOCIATE_ENTRY_NUM; i++)
 	{
 		pEntry = pDM_Odm->pODM_StaInfo[i];
@@ -107,7 +107,7 @@ ODM_PathDiversity_8812A(
 			{
 				MinRSSI = LocalMinRSSI;
 				TxRespPath = TargetPath;
-			}	
+			}
 
 			//2 Select Tx DESC
 			if(TargetPath == ODM_RF_PATH_A)
@@ -115,17 +115,17 @@ ODM_PathDiversity_8812A(
 			else
 				pDM_PathDiv->PathSel[i] = 2;
 
-			ODM_RT_TRACE(pDM_Odm,ODM_COMP_ANT_DIV, ODM_DBG_LOUD, ("Tx from TxInfo, TargetPath=%s\n", 
+			ODM_RT_TRACE(pDM_Odm,ODM_COMP_ANT_DIV, ODM_DBG_LOUD, ("Tx from TxInfo, TargetPath=%s\n",
 								(TargetPath==ODM_RF_PATH_A)?"ODM_RF_PATH_A":"ODM_RF_PATH_B"));
 			ODM_RT_TRACE(pDM_Odm,ODM_COMP_ANT_DIV, ODM_DBG_LOUD,("pDM_PathDiv->PathSel[%d] = %d\n", i, pDM_PathDiv->PathSel[i]));
-				
+
 		}
 		pDM_PathDiv->PathA_Cnt[i] = 0;
 		pDM_PathDiv->PathA_Sum[i] = 0;
 		pDM_PathDiv->PathB_Cnt[i] = 0;
 		pDM_PathDiv->PathB_Sum[i] = 0;
 	}
-       
+
 	//2 Update Tx Path
 	odm_UpdateTxPath_8812A(pDM_Odm, TxRespPath);
 
@@ -137,7 +137,7 @@ VOID
 ODM_SetTxPathByTxInfo_8812A(
 	IN		PDM_ODM_T		pDM_Odm,
 	IN		pu1Byte			pDesc,
-	IN		u1Byte			macId	
+	IN		u1Byte			macId
 )
 {
 	pPATHDIV_T	pDM_PathDiv = &pDM_Odm->DM_PathDiv;
@@ -150,7 +150,7 @@ ODM_SetTxPathByTxInfo_8812A(
 #else// (DM_ODM_SUPPORT_TYPE == ODM_AP)
 VOID
 ODM_SetTxPathByTxInfo_8812A(
-	IN		PDM_ODM_T		pDM_Odm	
+	IN		PDM_ODM_T		pDM_Odm
 )
 {
 

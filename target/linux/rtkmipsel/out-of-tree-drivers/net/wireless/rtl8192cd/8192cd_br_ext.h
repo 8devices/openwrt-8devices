@@ -30,9 +30,6 @@ struct nat25_network_db_entry
 	atomic_t						use_count;
 	unsigned char					macAddr[6];
 	unsigned long					ageing_timer;
-#ifdef __ECOS
-	unsigned	int					used;
-#endif
 	unsigned char    				networkAddr[MAX_NETWORK_ADDR_LEN];
 };
 

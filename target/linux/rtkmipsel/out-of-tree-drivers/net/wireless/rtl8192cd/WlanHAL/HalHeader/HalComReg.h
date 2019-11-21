@@ -4,7 +4,7 @@
     For Page0, it is based on Combo_And_WL_Only_Page0_Reg.xls SVN524
     The supported IC are 8723A, 8881A, 8723B, 8192E, 8881A
     8812A and 8188E is not included in page0 register
-    
+
     For other pages, it is based on MAC_Register.doc SVN502
     Most IC is the same with 8812A
 -------------------------Modification Log-----------------------------------*/
@@ -37,7 +37,7 @@
     #define REG_LDO_EFUSE_CTRL          0x0034
     #define REG_PWR_OPTION_CTRL         0x0038
     #define REG_CAL_TIMER               0x003C
-    #define REG_ACLK_MON                0x003E    
+    #define REG_ACLK_MON                0x003E
     #define REG_GPIO_MUXCFG             0x0040
     #define REG_GPIO_PIN_CTRL           0x0044
     #define REG_GPIO_INTM               0x0048
@@ -104,11 +104,11 @@
 
 #if (RTL8192E_SUPPORT || RTL8814A_SUPPORT || RTL8881A_SUPPORT)
 
-    #define REG_LDO_SWR_CTRL            0x007C  
+    #define REG_LDO_SWR_CTRL            0x007C
     #define REG_8051FW_CTRL             0x0080
-    #define REG_MCU_TST_CFG             0x0084    
-    #define REG_HMEBOX_E0_E1            0x0088			
-    #define REG_HMEBOX_E2_E3            0x008C    
+    #define REG_MCU_TST_CFG             0x0084
+    #define REG_HMEBOX_E0_E1            0x0088
+    #define REG_HMEBOX_E2_E3            0x008C
     #define REG_WLLPS_CTRL              0x0090
     #define REG_GPIO_DEBOUNCE_CTRL      0x0098
     #define REG_RPWM2                   0x009C
@@ -164,7 +164,7 @@
 #endif
 
 
-#if (RTL8192E_SUPPORT || RTL8814A_SUPPORT || RTL8881A_SUPPORT) 
+#if (RTL8192E_SUPPORT || RTL8814A_SUPPORT || RTL8881A_SUPPORT)
 
 #define REG_SYS_CFG1                            0x00F0
 #define REG_SYS_STATUS1                         0x00F4
@@ -266,7 +266,7 @@
 
 #define REG_MBIST_FAIL_NRML                   	0x017C
 
-#endif 
+#endif
 
 
 #if (RTL8192E_SUPPORT || RTL8814A_SUPPORT || RTL8881A_SUPPORT)
@@ -944,7 +944,7 @@
 #define REG_PKT_LIFETIME_CTRL       0x0528
 #define REG_P2PPS_SPEC_STATE        0x052B
 #define REG_TBTT_PROHIBIT           0x0540
-#define REG_P2PPS_STATE             0x0543  
+#define REG_P2PPS_STATE             0x0543
 #define REG_RD_NAV_NXT              0x0544
 #define REG_NAV_PROT_LEN            0x0546
 #define REG_BCN_CTRL                0x0550
@@ -1016,7 +1016,7 @@
 
 #define REG_CTWND                   0x0572
 #define REG_BCNIVLCUNT              0x0573
-#define REG_BCNDROPCTRL	            0x0574    
+#define REG_BCNDROPCTRL	            0x0574
 #define REG_HGQ_TIMEOUT_PERIOD      0x0575
 
 #endif
@@ -1049,19 +1049,19 @@
 #define REG_CROSS_TXOP_CTRL         0x0593
 #define REG_ATIMWND2                0x05A0
 #define REG_ATIMWND3                0x05A1
-#define REG_ATIMWND4                0x05A2    
-#define REG_ATIMWND5                0x05A3    
-#define REG_ATIMWND6                0x05A4    
+#define REG_ATIMWND4                0x05A2
+#define REG_ATIMWND5                0x05A3
+#define REG_ATIMWND6                0x05A4
 #define REG_ATIMWND7                0x05A5
 #define REG_ATIMUGT                 0x05A6
 #define REG_HIQ_NO_LMT_EN           0x05A7
 #define REG_DTIM_COUNTER_ROOT       0x05A8
-#define REG_DTIM_COUNTER_VAP1       0x05A9    
-#define REG_DTIM_COUNTER_VAP2       0x05AA    
-#define REG_DTIM_COUNTER_VAP3       0x05AB    
-#define REG_DTIM_COUNTER_VAP4       0x05AC    
-#define REG_DTIM_COUNTER_VAP5       0x05AD    
-#define REG_DTIM_COUNTER_VAP6       0x05AE    
+#define REG_DTIM_COUNTER_VAP1       0x05A9
+#define REG_DTIM_COUNTER_VAP2       0x05AA
+#define REG_DTIM_COUNTER_VAP3       0x05AB
+#define REG_DTIM_COUNTER_VAP4       0x05AC
+#define REG_DTIM_COUNTER_VAP5       0x05AD
+#define REG_DTIM_COUNTER_VAP6       0x05AE
 #define REG_DTIM_COUNTER_VAP7       0x05AF
 #define REG_DIS_ATIM                0x05B0
 
@@ -1249,7 +1249,7 @@
     #define REG_FLC_PTS             0x06AE
     #define REG_FLC_TRPC            0x06AF
 
-#endif 
+#endif
 
 
 #if (RTL8814A_SUPPORT)
@@ -1744,7 +1744,7 @@
 
 //-----------------------------------------------------
 //
-//	0x1200h ~ 0x12FFh	DDMA CTRL  
+//	0x1200h ~ 0x12FFh	DDMA CTRL
 //
 //  // temp add by Eric, wait for docutment define
 //-----------------------------------------------------
@@ -1792,7 +1792,7 @@
 #define REG_PONSTS_RPT3         0xFD03
 #define REG_PONSTS_RPT4         0xFD04  //0x84
 #define REG_PONSTS_RPT5         0xFD05  //0x85
-#define REG_8051ERRFLAG         0xFD08  
+#define REG_8051ERRFLAG         0xFD08
 #define REG_8051ERRFLAG_MASK    0xFD09
 #define REG_TXADDRH             0xFD10  //Tx Packet High Address
 #define REG_RXADDRH             0xFD11  //Rx Packet High Address
@@ -1820,7 +1820,7 @@
 #define REG_MCUERR_IE           0xFD97  //IE[7:0]
 #define REG_MCUERR_EIE          0xFD98  //EIE[7:0]
 #define REG_VERA_SIM            0xFD9F
-//0xFD99~0xFD9F are reserved.. 
+//0xFD99~0xFD9F are reserved..
 
 //-----------------------------------------------------
 //
@@ -1885,13 +1885,13 @@
 #define REG_USB_PHY_PARA2               0xFE69  //Bit[7:5]: XCVR_BG   (USB PHY 0xE3[5:3]), Bit[4:2]: XCVR_DR    (USB PHY 0xE3[2:0]), Bit[1]: SE0_LVL       (USB PHY 0xE5[7]), Bit[0]:  FORCE_XTL_ON  (USB PHY 0xE5[1])
 #define REG_USB_PHY_PARA3               0xFE6A  //Bit[7:5]: XCVR_SRC  (USB PHY 0xE5[4:2]), Bit[4]: LATE_DLLEN   (USB PHY 0xF0[4]), Bit[3]: HS_LP_MODE   (USB PHY 0xF0[3]), Bit[2]: UTMI_POS_OUT (USB PHY 0xF1 [7]), Bit[1:0]: TX_DELAY   (USB PHY 0xF1 [2:1])
 #define REG_USB_PHY_PARA4               0xFE6B  //(USB PHY 0xE7[7:0])
-#define REG_USB_OPT2                    0xFE6C  
+#define REG_USB_OPT2                    0xFE6C
 #define REG_USB_MAC_ADDR                0xFE70  //0xFE70~0xFE75
 #define REG_USB_MANUFACTURE_SETTING     0xFE80  //0xFE80~0xFE90  Max : 32 bytes
 #define REG_USB_PRODUCT_STRING          0xFEA0  //0xFEA0~0xFECF  Max : 48 bytes
 #define REG_USB_SERIAL_NUMBER_STRING    0xFED0  //0xFED0~0xFEDF  Max : 12 bytes
 
-#define REG_USB_ALTERNATE_SETTING       0xFE4F 
+#define REG_USB_ALTERNATE_SETTING       0xFE4F
 #define REG_USB_INT_BINTERVAL           0xFE6E
 #define REG_USB_GPS_EP_CONFIG           0xFE6D
 
@@ -1913,14 +1913,14 @@
 #define		RF_TX_BIAS_A				0x35
 #define		RF_TX_BIAS_D				0x36
 #define		RF_LOBF_9					0x38
-#define		RF_RXRF_A3					0x3C	//	
+#define		RF_RXRF_A3					0x3C	//
 #define		RF_TRSW						0x3F
 
 #define		RF_TXRF_A2					0x41
-#define		RF_TXPA_G4					0x46	
-#define		RF_TXPA_A4					0x4B	
+#define		RF_TXPA_G4					0x46
+#define		RF_TXPA_A4					0x4B
 #define 	RF_0x52						0x52
-#define		RF_WE_LUT					0xEF	
+#define		RF_WE_LUT					0xEF
 
 
 #endif  //__HAL_COM_REG_H__

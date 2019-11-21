@@ -6,14 +6,14 @@ Copyright (c) Realtek Semiconductor Corp. All rights reserved.
 
 Module Name:
 	Hal88XXDef.h
-	
+
 Abstract:
 	Defined HAL 88XX common data structure & Define
-	    
+
 Major Change History:
 	When       Who               What
 	---------- ---------------   -------------------------------
-	2012-03-23 Filen            Create.	
+	2012-03-23 Filen            Create.
 --*/
 
 #ifdef  WLAN_HAL_INTERNAL_USED
@@ -42,7 +42,7 @@ VOID
 CAMReadMACConfig88XX
 (
     IN  HAL_PADAPTER    Adapter,
-    IN  u1Byte          index, 
+    IN  u1Byte          index,
     OUT pu1Byte         pMacad,
     OUT PCAM_ENTRY_CFG  pCfg
 );
@@ -83,7 +83,7 @@ GetMACIDQueueInTXPKTBUF88XX(
 RT_STATUS
 SetMACIDSleep88XX(
     IN  HAL_PADAPTER Adapter,
-    IN  BOOLEAN      bSleep,   
+    IN  BOOLEAN      bSleep,
     IN  u4Byte       aid
 );
 
@@ -124,15 +124,15 @@ InitVAPIMR88XX(
 );
 
 
-RT_STATUS      
+RT_STATUS
 InitHCIDMAMem88XX(
     IN      HAL_PADAPTER    Adapter
-);  
+);
 
 RT_STATUS
 InitHCIDMAReg88XX(
     IN      HAL_PADAPTER    Adapter
-);  
+);
 
 VOID
 StopHCIDMASW88XX(
@@ -164,7 +164,7 @@ StopMBSSID88XX(
 RT_STATUS
 SetMBIDCAM88XX(
     IN  HAL_PADAPTER Adapter,
-    IN  u1Byte       MBID_Addr,    
+    IN  u1Byte       MBID_Addr,
     IN  u1Byte       IsRoot
 );
 
@@ -214,21 +214,21 @@ Timer1Sec88XX(
     IN  HAL_PADAPTER Adapter
 );
 
-RT_STATUS 
+RT_STATUS
 GetTxRPTBuf88XX(
     IN	HAL_PADAPTER        Adapter,
     IN	u4Byte              macID,
-    IN  u1Byte              variable,   
+    IN  u1Byte              variable,
     IN 	u1Byte				byteoffset,
     OUT pu1Byte             val
 );
 
-RT_STATUS 
+RT_STATUS
 SetTxRPTBuf88XX(
     IN	HAL_PADAPTER        Adapter,
     IN	u4Byte              macID,
     IN  u1Byte              variable,
-    IN  pu1Byte             val    
+    IN  pu1Byte             val
 );
 
 u4Byte
@@ -249,31 +249,31 @@ SetCRC5ValidBit88XX(
     IN	HAL_PADAPTER        Adapter,
     IN	u1Byte              group,
     IN  u1Byte              bValid
-    
+
 );
 
 VOID
 SetCRC5EndBit88XX(
     IN	HAL_PADAPTER        Adapter,
     IN	u1Byte              group,
-    IN  u1Byte              bEnd    
+    IN  u1Byte              bEnd
 );
 
 VOID
 InitMACIDSearch88XX(
-    IN	HAL_PADAPTER        Adapter    
+    IN	HAL_PADAPTER        Adapter
 );
 
 
 RT_STATUS
 CheckHWMACIDResult88XX(
-    IN	HAL_PADAPTER        Adapter,    
+    IN	HAL_PADAPTER        Adapter,
     IN  u4Byte              MacID,
     OUT pu1Byte             result
 );
 
 
-RT_STATUS 
+RT_STATUS
 InitDDMA88XX(
     IN  HAL_PADAPTER    Adapter,
     IN  u4Byte	source,

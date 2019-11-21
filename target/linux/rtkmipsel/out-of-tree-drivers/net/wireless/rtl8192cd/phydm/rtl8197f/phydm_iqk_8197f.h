@@ -38,24 +38,24 @@
 
 
 #if !(DM_ODM_SUPPORT_TYPE & ODM_AP)
-VOID 
+VOID
 DoIQK_8197F(
 	PVOID	pDM_VOID,
 	u1Byte		DeltaThermalIndex,
-	u1Byte		ThermalValue,	
+	u1Byte		ThermalValue,
 	u1Byte		Threshold
 	);
 #else
-VOID 
+VOID
 DoIQK_8197F(
 	PVOID		pDM_VOID,
 	u1Byte		DeltaThermalIndex,
-	u1Byte		ThermalValue,	
+	u1Byte		ThermalValue,
 	u1Byte		Threshold
 	);
 #endif
 
-VOID	
+VOID
 do_dpk_8197f(
 	PVOID	pDM_VOID,
 	BOOLEAN	is2T,
@@ -63,14 +63,14 @@ do_dpk_8197f(
 	);
 
 
-VOID	
+VOID
 phy_dpk_track_8197f(
 	PVOID		pDM_VOID
 );
 
 
-VOID	
-PHY_IQCalibrate_8197F(	
+VOID
+PHY_IQCalibrate_8197F(
 	PVOID		pDM_VOID,
 	BOOLEAN		bReCovery
 	);

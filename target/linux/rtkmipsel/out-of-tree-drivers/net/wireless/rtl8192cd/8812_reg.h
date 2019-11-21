@@ -5,15 +5,15 @@
  *
  *
  * Note:	1. Define Mac register address and corresponding bit mask map
- *			
+ *
  *
  * Export:	Constants, macro, functions(API), global variables(None).
  *
- * Abbrev:	
+ * Abbrev:
  *
  * History:
- *		Data		Who		Remark 
- * 
+ *		Data		Who		Remark
+ *
  *****************************************************************************/
 #ifndef __INC_HAL8812REG_H
 #define __INC_HAL8812REG_H
@@ -22,15 +22,15 @@
 
 #if 1 //FOR_8812_IQK
 
-#define		RF_AC						0x00	
+#define		RF_AC						0x00
 
-#define		rPdp_AntA      				0xb00  
+#define		rPdp_AntA      				0xb00
 #define		rBndA						0xb30
 #define		rPdp_AntB 					0xb70
 #define		rBndB						0xba0
 
-#define		RF_MODE1					0x10	 
-#define		RF_MODE2					0x11	
+#define		RF_MODE1					0x10
+#define		RF_MODE2					0x11
 
 #define		rTxAGC_B_CCK11_A_CCK2_11	0x86c
 
@@ -40,19 +40,19 @@
 #define		RF_TXPA_G2					0x32	// RF TX PA control
 #define		RF_TXPA_G3					0x33	// RF TX PA control
 #define		RF_LOBF_9					0x38
-#define		RF_RXRF_A3					0x3C	
+#define		RF_RXRF_A3					0x3C
 #define		RF_TRSW						0x3F
 
 #define		RF_TXPA_G1					0x31	// RF TX PA control
 #define		RF_TXPA_G2					0x32	// RF TX PA control
 #define		RF_TXPA_G3					0x33	// RF TX PA control
 #define		RF_LOBF_9					0x38
-#define		RF_RXRF_A3					0x3C	
+#define		RF_RXRF_A3					0x3C
 #define		RF_TRSW						0x3F
 
 #define		RF_TXRF_A2					0x41
-#define		RF_TXPA_G4					0x46	
-#define		RF_TXPA_A4					0x4B	
+#define		RF_TXPA_G4					0x46
+#define		RF_TXPA_A4					0x4B
 
 #define		RF_IQADJ_G1					0x01
 #define		RF_IQADJ_G2					0x02
@@ -73,56 +73,56 @@
 // RL6052 Register definition
 //
 
-#define		RF_IQADJ_G1					0x01	// 
-#define		RF_IQADJ_G2					0x02	// 
+#define		RF_IQADJ_G1					0x01	//
+#define		RF_IQADJ_G2					0x02	//
 #define		RF_BS_PA_APSET_G1_G4		0x03
 #define		RF_BS_PA_APSET_G5_G8		0x04
-#define		RF_POW_TRSW				0x05	// 
+#define		RF_POW_TRSW				0x05	//
 
-#define		RF_GAIN_RX					0x06	// 
-#define		RF_GAIN_TX					0x07	// 
+#define		RF_GAIN_RX					0x06	//
+#define		RF_GAIN_TX					0x07	//
 
-#define		RF_TXM_IDAC					0x08	// 
-#define		RF_IPA_G						0x09	// 
+#define		RF_TXM_IDAC					0x08	//
+#define		RF_IPA_G						0x09	//
 #define		RF_TXBIAS_G					0x0A
 #define		RF_TXPA_AG					0x0B
-#define		RF_IPA_A						0x0C	// 
+#define		RF_IPA_A						0x0C	//
 #define		RF_TXBIAS_A					0x0D
 #define		RF_BS_PA_APSET_G9_G11		0x0E
-#define		RF_BS_IQGEN					0x0F	// 
+#define		RF_BS_IQGEN					0x0F	//
 
-#define		RF_MODE1					0x10	// 
-#define		RF_MODE2					0x11	// 
+#define		RF_MODE1					0x10	//
+#define		RF_MODE2					0x11	//
 
-#define		RF_RX_AGC_HP				0x12	// 
-#define		RF_TX_AGC					0x13	// 
-#define		RF_BIAS						0x14	// 
-#define		RF_IPA						0x15	// 
+#define		RF_RX_AGC_HP				0x12	//
+#define		RF_TX_AGC					0x13	//
+#define		RF_BIAS						0x14	//
+#define		RF_IPA						0x15	//
 #define		RF_TXBIAS					0x16
-#define		RF_POW_ABILITY				0x17	// 
+#define		RF_POW_ABILITY				0x17	//
 #define		RF_CHNLBW					0x18	// RF channel and BW switch
-#define		RF_TOP						0x19	// 
+#define		RF_TOP						0x19	//
 
-#define		RF_RX_G1					0x1A	// 
-#define		RF_RX_G2					0x1B	// 
+#define		RF_RX_G1					0x1A	//
+#define		RF_RX_G2					0x1B	//
 
-#define		RF_RX_BB2					0x1C	// 
-#define		RF_RX_BB1					0x1D	// 
+#define		RF_RX_BB2					0x1C	//
+#define		RF_RX_BB1					0x1D	//
 
-#define		RF_RCK1						0x1E	// 
-#define		RF_RCK2						0x1F	// 
+#define		RF_RCK1						0x1E	//
+#define		RF_RCK2						0x1F	//
 
-#define		RF_TX_G1						0x20	// 
-#define		RF_TX_G2						0x21	// 
-#define		RF_TX_G3						0x22	// 
+#define		RF_TX_G1						0x20	//
+#define		RF_TX_G2						0x21	//
+#define		RF_TX_G3						0x22	//
 
-#define		RF_TX_BB1					0x23	// 
+#define		RF_TX_BB1					0x23	//
 
 
 //
 // PageB(0xB00)
 //
-#define		rPdp_AntA      					0xb00  
+#define		rPdp_AntA      					0xb00
 #define		rPdp_AntA_4    				0xb04
 #define		rPdp_AntA_8    				0xb08
 #define		rPdp_AntA_C    				0xb0c
@@ -167,7 +167,7 @@
 #define		rPm_Rx2_AntB				0xbf4
 #define		rPm_Rx3_AntB				0xbf8
 
-//for power tracking 
+//for power tracking
 #define	 	rA_TxScale_Jaguar 		0xc1c  // Pah_A TX scaling factor
 #define		rB_TxScale_Jaguar 		0xe1c  // Path_B TX scaling factor
 #define	 	rC_TxScale_Jaguar2 		0x181c  // Pah_C TX scaling factor
@@ -221,12 +221,12 @@
 #define		RF_TX_BIAS_A				0x35
 #define		RF_TX_BIAS_D				0x36
 #define		RF_LOBF_9					0x38
-#define		RF_RXRF_A3					0x3C	//	
+#define		RF_RXRF_A3					0x3C	//
 #define		RF_TRSW						0x3F
 
 #define		RF_TXRF_A2					0x41
-#define		RF_TXPA_G4					0x46	
-#define		RF_TXPA_A4					0x4B	
+#define		RF_TXPA_G4					0x46
+#define		RF_TXPA_A4					0x4B
 
 #define		RF_WE_LUT					0xEF
 
@@ -281,7 +281,7 @@
 #define REG_MACID_PKT_SLEEP_1		0x0488
 #define REG_MACID_PKT_SLEEP_2		0x04D0
 #define REG_MACID_PKT_SLEEP_0		0x04D4
-#endif 
+#endif
 #ifndef MACID_REGION1_LIMIT
 #define MACID_REGION1_LIMIT			31
 #define MACID_REGION2_LIMIT			63
@@ -318,7 +318,7 @@
 #define REG_ATIMWND					0x055A
 #define REG_BCN_MAX_ERR				0x055D
 #define REG_RXTSF_OFFSET_CCK		0x055E
-#define REG_RXTSF_OFFSET_OFDM		0x055F	
+#define REG_RXTSF_OFFSET_OFDM		0x055F
 #define REG_TSFTR					0x0560
 #define REG_TSFTR1					0x0568				// HW Port 1 TSF Register
 #define REG_P2P_CTWIN				0x0572 // 1 Byte long (in unit of TU)
@@ -399,7 +399,7 @@
 #define REG_HPON_FSM					0x00EC
 #define REG_SYS_CFG						0x00F0
 #define REG_GPIO_OUTSTS					0x00F4	// For RTL8723 only.
-#define REG_TYPE_ID						0x00FC	
+#define REG_TYPE_ID						0x00FC
 
 #define		rConfig_AntA 				0xb68
 #define		rConfig_AntB 				0xb6c
@@ -526,7 +526,7 @@
 #define REG_RXDMA_AGG_PG_TH_8812		0x0280
 #define REG_FW_UPD_RDPTR_8812		0x0284 // FW shall update this register before FW write RXPKT_RELEASE_POLL to 1
 #define REG_RXDMA_CONTROL_8812		0x0286 // Control the RX DMA.
-#define REG_RXPKT_NUM_8812			0x0287 // The number of packets in RXPKTBUF.	
+#define REG_RXPKT_NUM_8812			0x0287 // The number of packets in RXPKTBUF.
 #define REG_RXDMA_STATUS_8812			0x0288
 #define REG_RXDMA_PRO_8812			0x0290
 #define REG_EARLY_MODE_CONTROL_8812	0x02BC
@@ -540,7 +540,7 @@
 //
 //-----------------------------------------------------
 #define	REG_PCIE_CTRL_REG_8812		0x0300
-#define	REG_INT_MIG_8812				0x0304	// Interrupt Migration 
+#define	REG_INT_MIG_8812				0x0304	// Interrupt Migration
 #define	REG_BCNQ_DESA_8812			0x0308	// TX Beacon Descriptor Address
 #define	REG_HQ_DESA_8812				0x0310	// TX High Queue Descriptor Address
 #define	REG_MGQ_DESA_8812			0x0318	// TX Manage Queue Descriptor Address
@@ -654,7 +654,7 @@
 #define REG_ATIMWND_8812				0x055A
 #define REG_BCN_MAX_ERR_8812			0x055D
 #define REG_RXTSF_OFFSET_CCK_8812		0x055E
-#define REG_RXTSF_OFFSET_OFDM_8812	0x055F	
+#define REG_RXTSF_OFFSET_OFDM_8812	0x055F
 #define REG_TSFTR_8812					0x0560
 #define REG_CTWND_8812					0x0572
 #define REG_PSTIMER_8812				0x0580
@@ -734,7 +734,7 @@
 #define		rB_RFE_Jaguar			0xeb8 // Path_B RFE control
 #define		b_sel5g_Jaguar    			0x1000 // sel5g
 #define		b_LNA_sw_Jaguar			0x8000 // HW/WS control for LNA
-#define		rFc_area_Jaguar			0x860   // fc_area 
+#define		rFc_area_Jaguar			0x860   // fc_area
 #define		bFc_area_Jaguar			0x1ffe000
 #define		rSingleTone_ContTx_Jaguar 0x914
 #define     rfc_cck_enable_JAguar         0x808
@@ -743,10 +743,6 @@
 // DIG-related
 #define		rA_IGI_Jaguar				0xc50	// Initial Gain for path-A
 #define		rB_IGI_Jaguar				0xe50	// Initial Gain for path-B
-#if defined(CONFIG_WLAN_HAL_8814AE)
-#define		rC_IGI_Jaguar				0x1850	// Initial Gain for path-C
-#define		rD_IGI_Jaguar				0x1a50	// Initial Gain for path-D
-#endif
 #define		rOFDM_FalseAlarm1_Jaguar		0xf48  // counter for break
 #define		rOFDM_FalseAlarm2_Jaguar		0xf4c  // counter for spoofing
 #define		rCCK_FalseAlarm_Jaguar        	0xa5c // counter for cck false alarm
@@ -756,7 +752,7 @@
 #define		bCCK_CCA_Jaguar				0x00ff0000
 
 #if 0
-// TX AGC 
+// TX AGC
 #define		rTxAGC_A_CCK11_CCK1_JAguar	0xc20
 #define		rTxAGC_A_Ofdm18_Ofdm6_JAguar	0xc24
 #define		rTxAGC_A_Ofdm54_Ofdm24_JAguar	0xc28
@@ -795,14 +791,14 @@
 #define		rTxPath_Jaguar			0x80c	// Tx antenna
 #define		bTxPath_Jaguar			0x0fffffff
 #define		rCCK_RX_Jaguar			0xa04	// for cck rx path selection
-#define		bCCK_RX_Jaguar			0x0c000000 
+#define		bCCK_RX_Jaguar			0x0c000000
 #define		rVhtlen_Use_Lsig_Jaguar	0x8c3	// Use LSIG for VHT length
-#define		RF_AC_Jaguar				0x00	// 
-#define		RF_RF_Top_Jaguar			0x07	// 
-#define		RF_TXLOK_Jaguar				0x08	// 
+#define		RF_AC_Jaguar				0x00	//
+#define		RF_RF_Top_Jaguar			0x07	//
+#define		RF_TXLOK_Jaguar				0x08	//
 #define		RF_TXAPK_Jaguar				0x0B
 #define		RF_CHNLBW_Jaguar			0x18	// RF channel and BW switch
-#define		RF_RCK1_Jaguar				0x1c	// 
+#define		RF_RCK1_Jaguar				0x1c	//
 #define		RF_RCK2_Jaguar				0x1d
 #define		RF_RCK3_Jaguar				0x1e
 #define		RF_ModeTableAddr			0x30
@@ -853,7 +849,7 @@
 #define	MSR_8812							(REG_CR_8812 + 2)		// Media Status register
 #define	ISR_8812							REG_HISR0_8812
 #define	TSFR_8812							REG_TSFTR_8812			// Timing Sync Function Timer Register.
-					
+
 #define 	PBP_8812							REG_PBP_8812
 
 // Redifine MACID register, to compatible prior ICs.
@@ -923,7 +919,7 @@
 #define	HSISR_GPIO9_INT				BIT25
 
 //----------------------------------------------------------------------------
-//       8195 (MSR) Media Status Register	(Offset 0x4C, 8 bits)  
+//       8195 (MSR) Media Status Register	(Offset 0x4C, 8 bits)
 //----------------------------------------------------------------------------
 #define	MSR_NOLINK					0x00
 #define	MSR_ADHOC					0x01
@@ -931,7 +927,7 @@
 #define	MSR_AP						0x03
 
 //----------------------------------------------------------------------------
-//       88EU (MSR) Media Status Register	(Offset 0x4C, 8 bits)  
+//       88EU (MSR) Media Status Register	(Offset 0x4C, 8 bits)
 //----------------------------------------------------------------------------
 #define	USB_INTR_CONTENT_HISR_OFFSET		48
 #define	USB_INTR_CONTENT_HISRE_OFFSET		52
@@ -944,16 +940,16 @@
 //       8192C Response Rate Set Register	(offset 0x181, 24bits)
 //----------------------------------------------------------------------------
 #define	RRSR_1M						BIT0
-#define	RRSR_2M						BIT1 
-#define	RRSR_5_5M					BIT2 
-#define	RRSR_11M					BIT3 
-#define	RRSR_6M						BIT4 
-#define	RRSR_9M						BIT5 
-#define	RRSR_12M					BIT6 
-#define	RRSR_18M					BIT7 
-#define	RRSR_24M					BIT8 
-#define	RRSR_36M					BIT9 
-#define	RRSR_48M					BIT10 
+#define	RRSR_2M						BIT1
+#define	RRSR_5_5M					BIT2
+#define	RRSR_11M					BIT3
+#define	RRSR_6M						BIT4
+#define	RRSR_9M						BIT5
+#define	RRSR_12M					BIT6
+#define	RRSR_18M					BIT7
+#define	RRSR_24M					BIT8
+#define	RRSR_36M					BIT9
+#define	RRSR_48M					BIT10
 #define	RRSR_54M					BIT11
 #define	RRSR_MCS0					BIT12
 #define	RRSR_MCS1					BIT13
@@ -981,7 +977,7 @@
 #define	RATR_2M						0x00000002
 #define	RATR_55M					0x00000004
 #define	RATR_11M					0x00000008
-//OFDM 		
+//OFDM
 #define	RATR_6M						0x00000010
 #define	RATR_9M						0x00000020
 #define	RATR_12M					0x00000040
@@ -990,7 +986,7 @@
 #define	RATR_36M					0x00000200
 #define	RATR_48M					0x00000400
 #define	RATR_54M					0x00000800
-//MCS 1 Spatial Stream	
+//MCS 1 Spatial Stream
 #define	RATR_MCS0					0x00001000
 #define	RATR_MCS1					0x00002000
 #define	RATR_MCS2					0x00004000
@@ -1016,7 +1012,7 @@
 #define RATE_2M						BIT(1)
 #define RATE_5_5M						BIT(2)
 #define RATE_11M						BIT(3)
-//OFDM 
+//OFDM
 #define RATE_6M						BIT(4)
 #define RATE_9M						BIT(5)
 #define RATE_12M						BIT(6)
@@ -1048,11 +1044,11 @@
 
 
 // ALL CCK Rate
-#define	RATE_ALL_CCK					RATR_1M|RATR_2M|RATR_55M|RATR_11M 
+#define	RATE_ALL_CCK					RATR_1M|RATR_2M|RATR_55M|RATR_11M
 #define	RATE_ALL_OFDM_AG			RATR_6M|RATR_9M|RATR_12M|RATR_18M|RATR_24M|\
-									RATR_36M|RATR_48M|RATR_54M	
+									RATR_36M|RATR_48M|RATR_54M
 #define	RATE_ALL_OFDM_1SS			RATR_MCS0|RATR_MCS1|RATR_MCS2|RATR_MCS3 |\
-									RATR_MCS4|RATR_MCS5|RATR_MCS6	|RATR_MCS7	
+									RATR_MCS4|RATR_MCS5|RATR_MCS6	|RATR_MCS7
 #define	RATE_ALL_OFDM_2SS			RATR_MCS8|RATR_MCS9	|RATR_MCS10|RATR_MCS11|\
 									RATR_MCS12|RATR_MCS13|RATR_MCS14|RATR_MCS15
 
@@ -1070,7 +1066,7 @@
 // 10. Power Save Control Registers	 (Offset: 0x0260 - 0x02DF)
 //
 #define	WOW_PMEN				BIT0 // Power management Enable.
-#define	WOW_WOMEN			BIT1 // WoW function on or off. 
+#define	WOW_WOMEN			BIT1 // WoW function on or off.
 #define	WOW_MAGIC				BIT2 // Magic packet
 #define	WOW_UWF				BIT3 // Unicast Wakeup frame.
 
@@ -1084,27 +1080,27 @@
 #define	IMR_DISABLED_8812					0
 // IMR DW0(0x00B0-00B3) Bit 0-31
 #define	IMR_TIMER2_8812					BIT31		// Timeout interrupt 2
-#define	IMR_TIMER1_8812					BIT30		// Timeout interrupt 1	
+#define	IMR_TIMER1_8812					BIT30		// Timeout interrupt 1
 #define	IMR_PSTIMEOUT_8812				BIT29		// Power Save Time Out Interrupt
-#define	IMR_GTINT4_8812					BIT28		// When GTIMER4 expires, this bit is set to 1	
-#define	IMR_GTINT3_8812					BIT27		// When GTIMER3 expires, this bit is set to 1	
-#define	IMR_TXBCN0ERR_8812				BIT26		// Transmit Beacon0 Error			
-#define	IMR_TXBCN0OK_8812					BIT25		// Transmit Beacon0 OK			
-#define	IMR_TSF_BIT32_TOGGLE_8812		BIT24		// TSF Timer BIT32 toggle indication interrupt			
-#define	IMR_BCNDMAINT0_8812				BIT20		// Beacon DMA Interrupt 0			
-#define	IMR_BCNDERR0_8812					BIT16		// Beacon Queue DMA OK0			
-#define	IMR_BCNDMAINT_E_8812				BIT14		// Beacon DMA Interrupt Extension for Win7			
+#define	IMR_GTINT4_8812					BIT28		// When GTIMER4 expires, this bit is set to 1
+#define	IMR_GTINT3_8812					BIT27		// When GTIMER3 expires, this bit is set to 1
+#define	IMR_TXBCN0ERR_8812				BIT26		// Transmit Beacon0 Error
+#define	IMR_TXBCN0OK_8812					BIT25		// Transmit Beacon0 OK
+#define	IMR_TSF_BIT32_TOGGLE_8812		BIT24		// TSF Timer BIT32 toggle indication interrupt
+#define	IMR_BCNDMAINT0_8812				BIT20		// Beacon DMA Interrupt 0
+#define	IMR_BCNDERR0_8812					BIT16		// Beacon Queue DMA OK0
+#define	IMR_BCNDMAINT_E_8812				BIT14		// Beacon DMA Interrupt Extension for Win7
 #define	IMR_ATIMEND_8812					BIT12		// CTWidnow End or ATIM Window End
-#define	IMR_C2HCMD_8812					BIT10		// CPU to Host Command INT Status, Write 1 clear	
-#define	IMR_CPWM2_8812					BIT9			// CPU power Mode exchange INT Status, Write 1 clear	
-#define	IMR_CPWM_8812						BIT8			// CPU power Mode exchange INT Status, Write 1 clear	
-#define	IMR_HIGHDOK_8812					BIT7			// High Queue DMA OK	
-#define	IMR_MGNTDOK_8812					BIT6			// Management Queue DMA OK	
-#define	IMR_BKDOK_8812					BIT5			// AC_BK DMA OK		
-#define	IMR_BEDOK_8812					BIT4			// AC_BE DMA OK	
-#define	IMR_VIDOK_8812					BIT3			// AC_VI DMA OK		
-#define	IMR_VODOK_8812					BIT2			// AC_VO DMA OK	
-#define	IMR_RDU_8812						BIT1			// Rx Descriptor Unavailable	
+#define	IMR_C2HCMD_8812					BIT10		// CPU to Host Command INT Status, Write 1 clear
+#define	IMR_CPWM2_8812					BIT9			// CPU power Mode exchange INT Status, Write 1 clear
+#define	IMR_CPWM_8812						BIT8			// CPU power Mode exchange INT Status, Write 1 clear
+#define	IMR_HIGHDOK_8812					BIT7			// High Queue DMA OK
+#define	IMR_MGNTDOK_8812					BIT6			// Management Queue DMA OK
+#define	IMR_BKDOK_8812					BIT5			// AC_BK DMA OK
+#define	IMR_BEDOK_8812					BIT4			// AC_BE DMA OK
+#define	IMR_VIDOK_8812					BIT3			// AC_VI DMA OK
+#define	IMR_VODOK_8812					BIT2			// AC_VO DMA OK
+#define	IMR_RDU_8812						BIT1			// Rx Descriptor Unavailable
 #define	IMR_ROK_8812						BIT0			// Receive DMA OK
 
 // IMR DW1(0x00B4-00B7) Bit 0-31
@@ -1134,7 +1130,7 @@
 
 /*===================================================================
 =====================================================================
-Here the register defines are for 92C. When the define is as same with 92C, 
+Here the register defines are for 92C. When the define is as same with 92C,
 we will use the 92C's define for the consistency
 So the following defines for 92C is not entire!!!!!!
 =====================================================================
@@ -1194,7 +1190,7 @@ Current IOREG MAP
 
 */
 //============================================================================
-//       8192C Regsiter Bit and Content definition 
+//       8192C Regsiter Bit and Content definition
 //============================================================================
 //-----------------------------------------------------
 //
@@ -1409,7 +1405,7 @@ Current IOREG MAP
 // For normal driver, 0x10C
 #define _TXDMA_HIQ_MAP(x) 	 		(((x)&0x3) << 14)
 #define _TXDMA_MGQ_MAP(x) 	 		(((x)&0x3) << 12)
-#define _TXDMA_BKQ_MAP(x) 	 		(((x)&0x3) << 10)		
+#define _TXDMA_BKQ_MAP(x) 	 		(((x)&0x3) << 10)
 #define _TXDMA_BEQ_MAP(x) 	 		(((x)&0x3) << 8 )
 #define _TXDMA_VIQ_MAP(x) 	 		(((x)&0x3) << 6 )
 #define _TXDMA_VOQ_MAP(x) 	 		(((x)&0x3) << 4 )
@@ -1419,7 +1415,7 @@ Current IOREG MAP
 #define QUEUE_HIGH					3
 
 
-//2 REG_C2HEVT_CLEAR 0x01AF 
+//2 REG_C2HEVT_CLEAR 0x01AF
 #define	C2H_EVT_HOST_CLOSE			0x00	// Set by driver and notify FW that the driver has read the C2H command message
 #define	C2H_EVT_FW_CLOSE			0xFF		// Set by FW indicating that FW had set the C2H command message and it's not yet read by driver.
 
@@ -1461,10 +1457,10 @@ Current IOREG MAP
 // Write only. When this bit is set, RXDMA will decrease RX PKT counter by one. Before
 // this bit is polled, FW shall update RXFF_RD_PTR first. This register is write pulse and auto clear.
 #define	RXPKT_RELEASE_POLL			BIT(0)
-// Read only. When RXMA finishes on-going DMA operation, RXMDA will report idle state in 
+// Read only. When RXMA finishes on-going DMA operation, RXMDA will report idle state in
 // this bit. FW can start releasing packets after RXDMA entering idle mode.
-#define	RXDMA_IDLE					BIT(1)	
-// When this bit is set, RXDMA will enter this mode after on-going RXDMA packet to host 
+#define	RXDMA_IDLE					BIT(1)
+// When this bit is set, RXDMA will enter this mode after on-going RXDMA packet to host
 // completed, and stop DMA packet to host. RXDMA will then report Default: 0;
 #define	RW_RELEASE_EN				BIT(2)
 */
@@ -1487,7 +1483,7 @@ Current IOREG MAP
 #define	HAL92C_MSDU_LIFE_TIME_UNIT		128		// in us, said by Tim.
 
 
-//2 SPEC SIFS 0x0428 
+//2 SPEC SIFS 0x0428
 #define _SPEC_SIFS_CCK(x)				((x) & 0xFF)
 #define _SPEC_SIFS_OFDM(x)				(((x) & 0xFF) << 8)
 
@@ -1554,7 +1550,7 @@ Current IOREG MAP
 //----------------------------------------------------------------------------
 /*
 #define	RCR_APPFCS					BIT31		// WMAC append FCS after pauload
-#define	RCR_APP_MIC					BIT30		// MACRX will retain the MIC at the bottom of the packet. 
+#define	RCR_APP_MIC					BIT30		// MACRX will retain the MIC at the bottom of the packet.
 #define	RCR_APP_ICV					BIT29       // MACRX will retain the ICV at the bottom of the packet.
 #define	RCR_APP_PHYST_RXFF			BIT28       // HY Status is appended before RX packet in RXFF
 #define	RCR_APP_BA_SSN				BIT27		// SSN of previous TXBA is appended as after original RXDESC as the 4-th DW of RXDESC.
@@ -1576,16 +1572,16 @@ Current IOREG MAP
 #define	RCR_ADF						BIT11		// Accept data type frame. This bit also regulates BA, BAR, and PS-Poll (AP mode only).
 */
 /*#define	RCR_AICV						BIT9		// Accept ICV error packet
-#define	RCR_ACRC32					BIT8		// Accept CRC32 error packet 
+#define	RCR_ACRC32					BIT8		// Accept CRC32 error packet
 #define	RCR_CBSSID_BCN				BIT7		// Accept BSSID match packet (Rx beacon, probe rsp)
 #define	RCR_CBSSID_DATA				BIT6		// Accept BSSID match packet (Data)
 #define	RCR_CBSSID					RCR_CBSSID_DATA		// Accept BSSID match packet
 #define	RCR_APWRMGT				BIT5		// Accept power management packet
 #define	RCR_ADD3					BIT4		// Accept address 3 match packet
-#define	RCR_AB						BIT3		// Accept broadcast packet 
-#define	RCR_AM						BIT2		// Accept multicast packet 
+#define	RCR_AB						BIT3		// Accept broadcast packet
+#define	RCR_AM						BIT2		// Accept multicast packet
 #define	RCR_APM					BIT1		// Accept physical match packet
-#define	RCR_AAP						BIT0		// Accept all unicast packet 
+#define	RCR_AAP						BIT0		// Accept all unicast packet
 
 #define AAP								BIT(0)
 #define APM								BIT(1)
@@ -1615,7 +1611,7 @@ Current IOREG MAP
 
 //----------------------------------------------------------------------------
 //       8195 CAM Config Setting (offset 0x680, 1 byte)
-//----------------------------------------------------------------------------      	       		
+//----------------------------------------------------------------------------
 /*
 #define	SCR_TxUseDK					BIT(0)			//Force Tx Use Default Key
 #define	SCR_RxUseDK					BIT(1)			//Force Rx Use Default Key
@@ -1632,13 +1628,13 @@ Current IOREG MAP
 #define	CAM_AES						0x04
 #define	CAM_WEP104					0x05
 #define	CAM_SMS4						0x6
-        		
+
 #define	TOTAL_CAM_ENTRY				32
-#define	HALF_CAM_ENTRY				16	
-       		
+#define	HALF_CAM_ENTRY				16
+
 #define	CAM_CONFIG_USEDK				TRUE
 #define	CAM_CONFIG_NO_USEDK			FALSE
-       		
+
 
 #define	SCR_UseDK						0x01
 #define	SCR_TxSecEnable				0x02
@@ -1754,68 +1750,6 @@ Current IOREG MAP
 #endif
 
 */
-#if defined(EN_EFUSE)
-#define PATHA_OFFSET 0x10
-#define PATHB_OFFSET 0x3A
-#define PATHC_OFFSET 0x64
-#define PATHD_OFFSET 0x8E
-/*2.4 GHz, PATH A, 1T*/
-#define EEPROM_2G_CCK1T_TxPower			0x0 // CCK Tx Power base
-#define EEPROM_2G_HT401S_TxPower		0x6 // HT40 Tx Power base
-#define EEPROM_2G_HT201S_TxPowerDiff	0xB // HT20 Tx Power Diff [7:4]
-#define EEPROM_2G_OFDM1T_TxPowerDiff    0xB // OFDM Tx Power Diff [3:0]
-/*2.4 GHz, PATH A, 2T*/
-#define EEPROM_2G_HT402S_TxPowerDiff	0xC // HT40 Tx Power Diff [7:4]
-#define EEPROM_2G_HT202S_TxPowerDiff	0xC // HT20 Tx Power Diff [3:0]
-#define EEPROM_2G_OFDM2T_TxPowerDiff	0xD // OFDM Tx Power Diff [7:4]
-#define EEPROM_2G_CCK2T_TxPowerDiff		0xD // CCK Tx Power Diff [3:0]
-/*2.4 GHz, PATH A, 3T*/
-#define EEPROM_2G_HT403S_TxPowerDiff	0xE // HT40 Tx Power Diff [7:4]
-#define EEPROM_2G_HT203S_TxPowerDiff	0xE // HT40 Tx Power Diff [3:0]
-#define EEPROM_2G_OFDM3T_TxPowerDiff	0xF // OFDM Tx Power Diff [7:4]
-#define EEPROM_2G_CCK3T_TxPowerDiff		0xF // CCK Tx Power Diff [3:0]
-/*2.4 GHz, PATH A, 4T*/
-#define EEPROM_2G_HT404S_TxPowerDiff    0x10 // HT40 Tx Power Diff [7:4]
-#define EEPROM_2G_HT204S_TxPowerDiff    0x10 // HT20 Tx Power Diff [0:3]
-#define EEPROM_2G_OFDM4T_TxPowerDiff    0x11 // OFDM Tx Power Diff [7:4]
-#define EEPROM_2G_CCK4T_TxPowerDiff		0x11 // CCK Tx Power Diff [3:0]
-/*5 GHz, PATH A, 1T*/
-#define EEPROM_5G_HT401S_TxPower		0x12 // HT40 Tx Power Base
-#define EEPROM_5G_HT201S_TxPowerDiff    0x20 // HT20 Tx Power Diff [7:4]
-#define EEPROM_5G_OFDM1T_TxPowerDiff    0x20 // OFDM Tx Power Diff [3:0]
-#define EEPROM_5G_HT801S_TxPowerDiff    0x26 // HT80 Tx Power Diff [7:4]
-#define EEPROM_5G_HT1601S_TxPowerDiff   0x26 // HT160 Tx Power Diff [3:0]
-/*5 GHz, PATH A, 2T*/
-#define EEPROM_5G_HT402S_TxPowerDiff    0x21 // HT40 Tx Power Diff [7:4]
-#define EEPROM_5G_HT202S_TxPowerDiff    0x21 // HT20 Tx Power Diff [3:0]
-#define EEPROM_5G_OFDM2T_TxPowerDiff    0x24 // OFDM Tx Power Diff [7:4]
-#define EEPROM_5G_HT802S_TxPowerDiff    0x27 // HT80 Tx Power Diff [7:4]
-/*5 GHz, PATH A, 3T*/
-#define EEPROM_5G_OFDM3T_TxPowerDiff    0x24 // OFDM Tx Power Diff [3:0]
-#define EEPROM_5G_HT403S_TxPowerDiff    0x22 // HT40 Tx Power Diff [7:4]
-#define EEPROM_5G_HT203S_TxPowerDiff    0x22 // HT20 Tx Power Diff [3:0]
-#define EEPROM_5G_HT803S_TxPowerDiff    0x28 // HT80 Tx Power Diff [7:4]
-#define EEPROM_5G_HT1603S_TxPowerDiff   0x28 // HT160 Tx Power Diff [3:0]
-/*5 GHz, PATH A, 4T*/
-#define EEPROM_5G_HT404S_TxPowerDiff    0x23 // HT40 Tx Power Diff [7:4]
-#define EEPROM_5G_HT204S_TxPowerDiff    0x23 // HT20 Tx Power Diff [3:0]
-#define EEPROM_5G_OFDM4T_TxPowerDiff    0x25 // OFDM Tx Power Diff [3:0]
-#define EEPROM_5G_HT804S_TxPowerDiff    0x29 // HT80 Tx Power Diff [7:4]
-#define EEPROM_5G_HT1604S_TxPowerDiff   0x29 // HT160 Tx Power Diff [3:0]
-
-#define EEPROM_8812_CHANNEL_PLAN		0xB8
-#define EEPROM_8812_XTAL_K				0xB9 //[5:0]
-#define EEPROM_8812_THERMAL_METER		0xBA
-#define EEPROM_8812_LCK_DELTA			0xBB //[3:2]
-#define EEPROM_8812_IQK_DELTA			0xBB //[1:0]
-
-#define EEPROM_8812_VERSION				0xC4
-#define EEPROM_8812_CUSTOMER_ID         0xC5
-#define EEPROM_2G_TxBBSwing				0xC6
-#define EEPROM_5G_TxBBSwing				0xC7
-
-#define EEPROM_8812_MACADDRESS                  0xD0 // MAC Address
-#endif
 
 #endif //#ifndef WLAN_HAL_INTERNAL_USED
 

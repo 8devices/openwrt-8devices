@@ -42,7 +42,7 @@ phydm_h2C_debug(
 
 	PHYDM_SNPRINTF((output+used, out_len-used, "Phydm Send H2C_ID (( 0x%x))\n", phydm_h2c_id));
 	for (i = 0; i < H2C_MAX_LENGTH; i++) {
-		
+
 		H2C_Parameter[i] = (u1Byte)dm_value[i+1];
 		PHYDM_SNPRINTF((output+used, out_len-used, "H2C: Byte[%d] = ((0x%x))\n", i, H2C_Parameter[i]));
 	}
@@ -290,7 +290,7 @@ phydm_RA_debug_PCR(
 		PHYDM_SNPRINTF((output+used, out_len-used, "[Set] Error\n"));
 		/**/
 	}
-	
+
 }
 
 #endif /*#if (defined(CONFIG_RA_DBG_CMD))*/
@@ -312,7 +312,7 @@ ODM_C2HRaParaReportHandler(
 
 
 	ODM_RT_TRACE(pDM_Odm, PHYDM_COMP_RA_DBG, ODM_DBG_LOUD, ("[ From FW C2H RA Para ]  CmdBuf[0]= (( %d ))\n", CmdBuf[0]));
-	
+
 #if (defined(CONFIG_RA_DBG_CMD))
 	if (para_idx == RADBG_RTY_PENALTY) {
 		ODM_RT_TRACE(pDM_Odm, PHYDM_COMP_RA_DBG, ODM_DBG_LOUD, (" |Rate Index|   |RTY Penality Index|\n"));
@@ -354,7 +354,7 @@ ODM_C2HRaParaReportHandler(
 			pRA_Table->RATE_DOWN_RTY_RATIO[RateTypeStart + i] = CmdBuf[2 + i];
 			ODM_RT_TRACE(pDM_Odm, PHYDM_COMP_RA_DBG, ODM_DBG_LOUD, ("%8d  %15d\n", (RateTypeStart + i), pRA_Table->RATE_DOWN_RTY_RATIO[RateTypeStart + i]));
 		}
-	} else	 
+	} else
 #endif
 	if (para_idx == RADBG_DEBUG_MONITOR1) {
 		ODM_RT_TRACE(pDM_Odm, ODM_FW_DEBUG_TRACE, ODM_DBG_LOUD, ("-------------------------------\n"));
@@ -434,11 +434,11 @@ phydm_ra_dynamic_retry_count(
 		if (pDM_Odm->NoisyDecision) {
 			ODM_RT_TRACE(pDM_Odm, ODM_COMP_RATE_ADAPTIVE, ODM_DBG_LOUD, ("->Noisy Env. RA fallback value\n"));
 			ODM_SetMACReg(pDM_Odm, 0x430, bMaskDWord, 0x0);
-			ODM_SetMACReg(pDM_Odm, 0x434, bMaskDWord, 0x04030201);		
+			ODM_SetMACReg(pDM_Odm, 0x434, bMaskDWord, 0x04030201);
 		} else {
 			ODM_RT_TRACE(pDM_Odm, ODM_COMP_RATE_ADAPTIVE, ODM_DBG_LOUD, ("->Clean Env. RA fallback value\n"));
 			ODM_SetMACReg(pDM_Odm, 0x430, bMaskDWord, 0x01000000);
-			ODM_SetMACReg(pDM_Odm, 0x434, bMaskDWord, 0x06050402);		
+			ODM_SetMACReg(pDM_Odm, 0x434, bMaskDWord, 0x06050402);
 		}
 		pDM_Odm->pre_b_noisy = pDM_Odm->NoisyDecision;
 	}
@@ -457,9 +457,9 @@ phydm_retry_limit_table_bound(
 	pRA_T		        pRA_Table = &pDM_Odm->DM_RA_Table;
 
 	if (*retry_limit >  offset) {
-		
+
 		*retry_limit -= offset;
-		
+
 		if (*retry_limit < pRA_Table->retrylimit_low)
 			*retry_limit = pRA_Table->retrylimit_low;
 		else if (*retry_limit > pRA_Table->retrylimit_high)
@@ -480,7 +480,7 @@ phydm_reset_retry_limit_table(
 	#if (DM_ODM_SUPPORT_TYPE == ODM_WIN) /*support all IC platform*/
 
 	#else
-		#if ((RTL8192E_SUPPORT == 1) || (RTL8723B_SUPPORT == 1) || (RTL8188E_SUPPORT == 1)) 
+		#if ((RTL8192E_SUPPORT == 1) || (RTL8723B_SUPPORT == 1) || (RTL8188E_SUPPORT == 1))
 			u1Byte per_rate_retrylimit_table_20M[ODM_RATEMCS15+1] = {
 				1, 1, 2, 4,					/*CCK*/
 				2, 2, 4, 6, 8, 12, 16, 18,		/*OFDM*/
@@ -494,7 +494,7 @@ phydm_reset_retry_limit_table(
 				4, 8, 12, 16, 24, 32, 32, 32		/*40M HT-2SS*/
 			};
 
-		#elif (RTL8821A_SUPPORT == 1) || (RTL8881A_SUPPORT == 1) 
+		#elif (RTL8821A_SUPPORT == 1) || (RTL8881A_SUPPORT == 1)
 
 		#elif (RTL8812A_SUPPORT == 1)
 
@@ -511,7 +511,7 @@ phydm_reset_retry_limit_table(
 	for (i = 0; i < ODM_NUM_RATE_IDX; i++) {
 		phydm_retry_limit_table_bound(pDM_Odm, &(pRA_Table->per_rate_retrylimit_20M[i]), 0);
 		phydm_retry_limit_table_bound(pDM_Odm, &(pRA_Table->per_rate_retrylimit_40M[i]), 0);
-	}	
+	}
 }
 
 VOID
@@ -525,9 +525,9 @@ phydm_ra_dynamic_retry_limit_init(
 	pRA_Table->retry_descend_num = RA_RETRY_DESCEND_NUM;
 	pRA_Table->retrylimit_low = RA_RETRY_LIMIT_LOW;
 	pRA_Table->retrylimit_high = RA_RETRY_LIMIT_HIGH;
-	
+
 	phydm_reset_retry_limit_table(pDM_Odm);
-	
+
 }
 
 #endif
@@ -546,10 +546,10 @@ phydm_ra_dynamic_retry_limit(
 
 
 	if (pDM_Odm->pre_number_active_client == pDM_Odm->number_active_client) {
-		
+
 		ODM_RT_TRACE(pDM_Odm, PHYDM_COMP_RA_DBG, ODM_DBG_LOUD, (" pre_number_active_client ==  number_active_client\n"));
 		return;
-		
+
 	} else {
 		if (pDM_Odm->number_active_client == 1) {
 			phydm_reset_retry_limit_table(pDM_Odm);
@@ -557,12 +557,12 @@ phydm_ra_dynamic_retry_limit(
 		} else {
 
 			retry_offset = pDM_Odm->number_active_client * pRA_Table->retry_descend_num;
-			
+
 			for (i = 0; i < ODM_NUM_RATE_IDX; i++) {
 
 				phydm_retry_limit_table_bound(pDM_Odm, &(pRA_Table->per_rate_retrylimit_20M[i]), retry_offset);
-				phydm_retry_limit_table_bound(pDM_Odm, &(pRA_Table->per_rate_retrylimit_40M[i]), retry_offset);	
-			}				
+				phydm_retry_limit_table_bound(pDM_Odm, &(pRA_Table->per_rate_retrylimit_40M[i]), retry_offset);
+			}
 		}
 	}
 #endif
@@ -577,11 +577,11 @@ phydm_ra_dynamic_rate_id_on_assoc(
 )
 {
 	PDM_ODM_T	pDM_Odm = (PDM_ODM_T)pDM_VOID;
-	
+
 	ODM_RT_TRACE(pDM_Odm, ODM_COMP_RATE_ADAPTIVE, ODM_DBG_LOUD, ("[ON ASSOC] rf_mode = ((0x%x)), wireless_mode = ((0x%x)), init_rate_id = ((0x%x))\n", pDM_Odm->RFType, wireless_mode, init_rate_id));
-	
+
 	if ((pDM_Odm->RFType == ODM_2T2R) | (pDM_Odm->RFType == ODM_2T2R_GREEN) | (pDM_Odm->RFType == ODM_2T3R) | (pDM_Odm->RFType == ODM_2T4R)) {
-		
+
 		if ((pDM_Odm->SupportICType & (ODM_RTL8812|ODM_RTL8192E)) &&
 			(wireless_mode & (ODM_WM_N24G | ODM_WM_N5G))
 			){
@@ -605,12 +605,12 @@ phydm_ra_dynamic_rate_id_init(
 )
 {
 	PDM_ODM_T	pDM_Odm = (PDM_ODM_T)pDM_VOID;
-	
+
 	if (pDM_Odm->SupportICType & (ODM_RTL8812|ODM_RTL8192E)) {
-		
+
 		ODM_SetMACReg(pDM_Odm, 0x4a4, bMaskDWord, 0xfc1ffff);	/*N-2SS, ARFR5, rate_id = 0xe*/
 		ODM_SetMACReg(pDM_Odm, 0x4a8, bMaskDWord, 0x0);		/*N-2SS, ARFR5, rate_id = 0xe*/
-		
+
 		ODM_SetMACReg(pDM_Odm, 0x444, bMaskDWord, 0x0fff);		/*AC-2SS, ARFR0, rate_id = 0x9*/
 		ODM_SetMACReg(pDM_Odm, 0x448, bMaskDWord, 0xff01f000);	/*AC-2SS, ARFR0, rate_id = 0x9*/
 	}
@@ -630,8 +630,8 @@ phydm_update_rate_id(
 	u1Byte		wireless_mode;
 	u1Byte		phydm_macid;
 	PSTA_INFO_T	pEntry;
-	
-	
+
+
 #if	0
 	if (rate_idx >= ODM_RATEVHTSS2MCS0) {
 		ODM_RT_TRACE(pDM_Odm, ODM_COMP_RATE_ADAPTIVE, ODM_DBG_LOUD, ("Rate[%d]: (( VHT2SS-MCS%d ))\n", platform_macid, (rate_idx-ODM_RATEVHTSS2MCS0)));
@@ -647,25 +647,25 @@ phydm_update_rate_id(
 		/*dummy for SD4 check patch*/
 	}
 #endif
-		
+
 	phydm_macid = pDM_Odm->platform2phydm_macid_table[platform_macid];
 	pEntry = pDM_Odm->pODM_StaInfo[phydm_macid];
-	
+
 	if (IS_STA_VALID(pEntry)) {
 		wireless_mode = pEntry->WirelessMode;
 
 		if ((pDM_Odm->RFType  == ODM_2T2R) | (pDM_Odm->RFType  == ODM_2T2R_GREEN) | (pDM_Odm->RFType  == ODM_2T3R) | (pDM_Odm->RFType  == ODM_2T4R)) {
-			
+
 			pEntry->ratr_idx = pEntry->ratr_idx_init;
 			if (wireless_mode & (ODM_WM_N24G | ODM_WM_N5G)) { /*N mode*/
 				if (rate_idx >= ODM_RATEMCS8 && rate_idx <= ODM_RATEMCS15) { /*2SS mode*/
-					
+
 					pEntry->ratr_idx = ARFR_5_RATE_ID;
 					ODM_RT_TRACE(pDM_Odm, ODM_COMP_RATE_ADAPTIVE, ODM_DBG_LOUD, ("ARFR_5\n"));
 				}
 			} else if (wireless_mode & (ODM_WM_AC_5G | ODM_WM_AC_24G | ODM_WM_AC_ONLY)) {/*AC mode*/
 				if (rate_idx >= ODM_RATEVHTSS2MCS0 && rate_idx <= ODM_RATEVHTSS2MCS9) {/*2SS mode*/
-					
+
 					pEntry->ratr_idx = ARFR_0_RATE_ID;
 					ODM_RT_TRACE(pDM_Odm, ODM_COMP_RATE_ADAPTIVE, ODM_DBG_LOUD, ("ARFR_0\n"));
 				}
@@ -687,9 +687,9 @@ phydm_print_rate(
 	PDM_ODM_T	pDM_Odm = (PDM_ODM_T)pDM_VOID;
 	u1Byte		legacy_table[12] = {1, 2, 5, 11, 6, 9, 12, 18, 24, 36, 48, 54};
 	u1Byte		rate_idx = rate & 0x7f; /*remove bit7 SGI*/
-	u1Byte		vht_en = (rate_idx >= ODM_RATEVHTSS1MCS0) ? 1 : 0;	
+	u1Byte		vht_en = (rate_idx >= ODM_RATEVHTSS1MCS0) ? 1 : 0;
 	u1Byte		b_sgi = (rate & 0x80)>>7;
-	
+
 	ODM_RT_TRACE_F(pDM_Odm, dbg_component, ODM_DBG_LOUD, ("( %s%s%s%s%d%s%s)\n",
 		((rate_idx >= ODM_RATEVHTSS1MCS0) && (rate_idx <= ODM_RATEVHTSS1MCS9)) ? "VHT 1ss  " : "",
 		((rate_idx >= ODM_RATEVHTSS2MCS0) && (rate_idx <= ODM_RATEVHTSS2MCS9)) ? "VHT 2ss " : "",
@@ -710,7 +710,7 @@ phydm_c2h_ra_report_handler(
 	PDM_ODM_T	pDM_Odm = (PDM_ODM_T)pDM_VOID;
 	pRA_T		pRA_Table = &pDM_Odm->DM_RA_Table;
 	u1Byte	legacy_table[12] = {1,2,5,11,6,9,12,18,24,36,48,54};
-	u1Byte	isMU_RPT=0;    
+	u1Byte	isMU_RPT=0;
 	u1Byte	macid = CmdBuf[1];
 	u1Byte	rate = CmdBuf[0];
 	u1Byte	rate_idx = rate & 0x7f; /*remove bit7 SGI*/
@@ -721,8 +721,8 @@ phydm_c2h_ra_report_handler(
 
 	GET_HAL_DATA(Adapter)->CurrentRARate = HwRateToMRate(rate_idx);
 	#endif
-	
-	
+
+
 	if (CmdLen >= 4) {
 		if (CmdBuf[3] == 0) {
 			ODM_RT_TRACE(pDM_Odm, ODM_COMP_RATE_ADAPTIVE, ODM_DBG_LOUD, ("TX Init-Rate Update[%d]:", macid));
@@ -750,13 +750,13 @@ phydm_c2h_ra_report_handler(
 		ODM_RT_TRACE(pDM_Odm, ODM_COMP_RATE_ADAPTIVE, ODM_DBG_LOUD, ("Tx Rate Update[%d]:", macid));
 		/**/
 	}
-	
+
 	/*phydm_print_rate(pDM_Odm, pre_rate_idx, ODM_COMP_RATE_ADAPTIVE);*/
 	/*ODM_RT_TRACE(pDM_Odm, ODM_COMP_RATE_ADAPTIVE, ODM_DBG_LOUD, (">\n",macid );*/
 	phydm_print_rate(pDM_Odm, rate, ODM_COMP_RATE_ADAPTIVE);
 	if (macid >= 128) {
 		u1Byte gid_index = macid - 128;
-		pRA_Table->mu1_rate[gid_index] = rate;     
+		pRA_Table->mu1_rate[gid_index] = rate;
 	}
 	pre_rate = pRA_Table->link_tx_rate[macid];
 	pRA_Table->link_tx_rate[macid] = rate;
@@ -765,16 +765,16 @@ phydm_c2h_ra_report_handler(
 	#if (DM_ODM_SUPPORT_TYPE & (ODM_WIN | ODM_CE))
 
 	rate_order = phydm_rate_order_compute(pDM_Odm, rate_idx);
-	
+
 	if ((pDM_Odm->bOneEntryOnly) ||
 		((rate_order > pRA_Table->highest_client_tx_order) && (pRA_Table->power_tracking_flag == 1))
 		) {
 		phydm_update_pwr_track(pDM_Odm, rate_idx);
 		pRA_Table->power_tracking_flag = 0;
 	}
-	
+
 	#endif
-	
+
 	/*trigger dynamic rate ID*/
 	#if (defined(CONFIG_RA_DYNAMIC_RATE_ID))
 	if (pDM_Odm->SupportICType & (ODM_RTL8812|ODM_RTL8192E))
@@ -796,14 +796,14 @@ odm_RSSIMonitorInit(
 	HAL_DATA_TYPE	*pHalData = GET_HAL_DATA(Adapter);
 
 	pRA_Table->PT_collision_pre = TRUE;	/*used in ODM_DynamicARFBSelect(WIN only)*/
-	
+
 	pHalData->UndecoratedSmoothedPWDB = -1;
 	pHalData->ra_rpt_linked = FALSE;
 	#endif
 
 	pRA_Table->firstconnect = FALSE;
 
-	
+
 #endif
 }
 
@@ -938,7 +938,7 @@ odm_RSSIMonitorCheckMP(
 					if (pEntry->rssi_stat.UndecoratedSmoothedPWDB > tmpEntryMaxPWDB)
 						tmpEntryMaxPWDB = pEntry->rssi_stat.UndecoratedSmoothedPWDB;
 
-					H2C_Parameter[4] = (pRA_Table->RA_threshold_offset & 0x7f) | (pRA_Table->RA_offset_direction<<8); 
+					H2C_Parameter[4] = (pRA_Table->RA_threshold_offset & 0x7f) | (pRA_Table->RA_offset_direction<<8);
 					ODM_RT_TRACE(pDM_Odm, ODM_COMP_RA_MASK, ODM_DBG_LOUD, ("RA_threshold_offset = (( %s%d ))\n", ((pRA_Table->RA_threshold_offset == 0) ? " " : ((pRA_Table->RA_offset_direction) ? "+" : "-")),pRA_Table->RA_threshold_offset));
 
 					if (bExtRAInfo) {
@@ -953,7 +953,7 @@ odm_RSSIMonitorCheckMP(
 						}
 
 						if (pDM_Odm->NoisyDecision)
-							H2C_Parameter[3] |= RAINFO_NOISY_STATE; 
+							H2C_Parameter[3] |= RAINFO_NOISY_STATE;
 						else
 							H2C_Parameter[3] &= (~RAINFO_NOISY_STATE);
 						#if 1
@@ -962,12 +962,12 @@ odm_RSSIMonitorCheckMP(
 							ODM_RT_TRACE(pDM_Odm, ODM_COMP_RA_MASK, ODM_DBG_LOUD, ("H2C_RARpt_connect = (( %d ))\n", pDM_Odm->H2C_RARpt_connect));
 						}
 						#else
-						
+
 						if (pEntry->rssi_stat.ra_rpt_linked == FALSE) {
 							H2C_Parameter[3] |= RAINFO_INIT_RSSI_RATE_STATE;
 							pEntry->rssi_stat.ra_rpt_linked = TRUE;
 
-							ODM_RT_TRACE(pDM_Odm, ODM_COMP_RSSI_MONITOR, ODM_DBG_LOUD, ("RA First Link, RSSI[%d] = ((%d))\n", 
+							ODM_RT_TRACE(pDM_Odm, ODM_COMP_RSSI_MONITOR, ODM_DBG_LOUD, ("RA First Link, RSSI[%d] = ((%d))\n",
 								pEntry->AssociatedMacId, pEntry->rssi_stat.UndecoratedSmoothedPWDB));
 						}
 						#endif
@@ -1003,10 +1003,10 @@ odm_RSSIMonitorCheckMP(
 
 	/* Default porti sent RSSI to FW */
 	if (pHalData->bUseRAMask) {
-		ODM_RT_TRACE(pDM_Odm, ODM_COMP_RSSI_MONITOR, ODM_DBG_LOUD, ("1 RA First Link, RSSI[%d] = ((%d)) , ra_rpt_linked = ((%d))\n", 
-			WIN_DEFAULT_PORT_MACID, pHalData->UndecoratedSmoothedPWDB, pHalData->ra_rpt_linked));		
+		ODM_RT_TRACE(pDM_Odm, ODM_COMP_RSSI_MONITOR, ODM_DBG_LOUD, ("1 RA First Link, RSSI[%d] = ((%d)) , ra_rpt_linked = ((%d))\n",
+			WIN_DEFAULT_PORT_MACID, pHalData->UndecoratedSmoothedPWDB, pHalData->ra_rpt_linked));
 		if (pHalData->UndecoratedSmoothedPWDB > 0) {
-			
+
 			PRT_HIGH_THROUGHPUT			pHTInfo = GET_HT_INFO(pDefaultMgntInfo);
 			PRT_VERY_HIGH_THROUGHPUT	pVHTInfo = GET_VHT_INFO(pDefaultMgntInfo);
 
@@ -1028,7 +1028,7 @@ odm_RSSIMonitorCheckMP(
 				TEST_FLAG(pHTInfo->HtCurStbc, STBC_HT_ENABLE_TX))
 				stbc_en = 1;
 
-			H2C_Parameter[4] = (pRA_Table->RA_threshold_offset & 0x7f) | (pRA_Table->RA_offset_direction<<8); 
+			H2C_Parameter[4] = (pRA_Table->RA_threshold_offset & 0x7f) | (pRA_Table->RA_offset_direction<<8);
 			ODM_RT_TRACE(pDM_Odm, ODM_COMP_RA_MASK, ODM_DBG_LOUD, ("RA_threshold_offset = (( %s%d ))\n", ((pRA_Table->RA_threshold_offset == 0) ? " " : ((pRA_Table->RA_offset_direction) ? "+" : "-")), pRA_Table->RA_threshold_offset));
 
 			if (bExtRAInfo) {
@@ -1045,21 +1045,21 @@ odm_RSSIMonitorCheckMP(
 					ODM_RT_TRACE(pDM_Odm, ODM_COMP_RA_MASK, ODM_DBG_LOUD, ("H2C_RARpt_connect = (( %d ))\n", pDM_Odm->H2C_RARpt_connect));
 				}
 				#else
-					ODM_RT_TRACE(pDM_Odm, ODM_COMP_RSSI_MONITOR, ODM_DBG_LOUD, ("2 RA First Link, RSSI[%d] = ((%d)) , ra_rpt_linked = ((%d))\n", 
+					ODM_RT_TRACE(pDM_Odm, ODM_COMP_RSSI_MONITOR, ODM_DBG_LOUD, ("2 RA First Link, RSSI[%d] = ((%d)) , ra_rpt_linked = ((%d))\n",
 						WIN_DEFAULT_PORT_MACID, pHalData->UndecoratedSmoothedPWDB, pHalData->ra_rpt_linked));
-				
+
 				if (pHalData->ra_rpt_linked == FALSE) {
-				
-					ODM_RT_TRACE(pDM_Odm, ODM_COMP_RSSI_MONITOR, ODM_DBG_LOUD, ("3 RA First Link, RSSI[%d] = ((%d)) , ra_rpt_linked = ((%d))\n", 
+
+					ODM_RT_TRACE(pDM_Odm, ODM_COMP_RSSI_MONITOR, ODM_DBG_LOUD, ("3 RA First Link, RSSI[%d] = ((%d)) , ra_rpt_linked = ((%d))\n",
 						WIN_DEFAULT_PORT_MACID, pHalData->UndecoratedSmoothedPWDB, pHalData->ra_rpt_linked));
-					
+
 					H2C_Parameter[3] |= RAINFO_INIT_RSSI_RATE_STATE;
 					pHalData->ra_rpt_linked = TRUE;
 
 
 				}
 				#endif
-				
+
 				if (pDM_Odm->NoisyDecision == 1) {
 					H2C_Parameter[3] |= RAINFO_NOISY_STATE;
 					ODM_RT_TRACE(pDM_Odm, ODM_COMP_NOISY_DETECT, ODM_DBG_LOUD, ("[RSSIMonitorCheckMP] Send H2C to FW\n"));
@@ -1075,7 +1075,7 @@ odm_RSSIMonitorCheckMP(
 
 			ODM_FillH2CCmd(pDM_Odm, ODM_H2C_RSSI_REPORT, cmdlen, H2C_Parameter);
 		}
-		
+
 		// BT 3.0 HS mode Rssi
 		if (pDM_Odm->bBtHsOperation) {
 			H2C_Parameter[2] = pDM_Odm->btHsRssi;
@@ -1103,7 +1103,7 @@ odm_RSSIMonitorCheckMP(
 
 			if (*pbLink_temp)
 				bLink = TRUE;
-			
+
 			if ((LocalRSSI_Min < GlobalRSSI_min) && (*pbLink_temp))
 				GlobalRSSI_min = LocalRSSI_Min;
 
@@ -1135,7 +1135,7 @@ s8 phydm_rssi_report(PDM_ODM_T pDM_Odm, u8 mac_id)
 	u8 cmdlen = 4, first_connect = _FALSE;
 	u64	curTxOkCnt = 0, curRxOkCnt = 0;
 	PSTA_INFO_T pEntry = pDM_Odm->pODM_StaInfo[mac_id];
-	
+
 	if (!IS_STA_VALID(pEntry))
 		return _FAIL;
 
@@ -1143,8 +1143,8 @@ s8 phydm_rssi_report(PDM_ODM_T pDM_Odm, u8 mac_id)
 		ODM_RT_TRACE(pDM_Odm, ODM_COMP_RATE_ADAPTIVE, ODM_DBG_LOUD, ("%s mac_id:%u:%u invalid\n", __func__, mac_id, pEntry->mac_id));
 		rtw_warn_on(1);
 		return _FAIL;
-	}	
-	
+	}
+
 	if (IS_MCAST(pEntry->hwaddr))  /*if(psta->mac_id ==1)*/
 		return _FAIL;
 
@@ -1159,7 +1159,7 @@ s8 phydm_rssi_report(PDM_ODM_T pDM_Odm, u8 mac_id)
 		UL_DL_STATE = 1;
 	else
 		UL_DL_STATE = 0;
-	
+
 	#ifdef CONFIG_BEAMFORMING
 	{
 		#if (BEAMFORMING_SUPPORT == 1)
@@ -1174,7 +1174,7 @@ s8 phydm_rssi_report(PDM_ODM_T pDM_Odm, u8 mac_id)
 			TxBF_EN = 0;
 	}
 	#endif /*#ifdef CONFIG_BEAMFORMING*/
-		
+
 	if (TxBF_EN)
 		STBC_TX = 0;
 	else {
@@ -1185,38 +1185,38 @@ s8 phydm_rssi_report(PDM_ODM_T pDM_Odm, u8 mac_id)
 		#endif
 			STBC_TX = TEST_FLAG(pEntry->htpriv.stbc_cap, STBC_HT_ENABLE_TX);
 	}
-		
+
 	H2C_Parameter[0] = (u8)(pEntry->mac_id & 0xFF);
 	H2C_Parameter[2] = pEntry->rssi_stat.UndecoratedSmoothedPWDB & 0x7F;
-		
+
 	if (UL_DL_STATE)
 		H2C_Parameter[3] |= RAINFO_BE_RX_STATE;
-		
+
 	if (TxBF_EN)
 		H2C_Parameter[3] |= RAINFO_BF_STATE;
 	if (STBC_TX)
 		H2C_Parameter[3] |= RAINFO_STBC_STATE;
 	if (pDM_Odm->NoisyDecision)
 		H2C_Parameter[3] |= RAINFO_NOISY_STATE;
-		
+
 	if ((pEntry->ra_rpt_linked == _FALSE) && (pEntry->rssi_stat.bsend_rssi == RA_RSSI_STATE_SEND)) {
 		H2C_Parameter[3] |= RAINFO_INIT_RSSI_RATE_STATE;
 		pEntry->ra_rpt_linked = _TRUE;
 		pEntry->rssi_stat.bsend_rssi = RA_RSSI_STATE_HOLD;
 		first_connect = _TRUE;
 	}
-		
+
 	#if 1
 	if (first_connect) {
 		ODM_RT_TRACE(pDM_Odm, ODM_COMP_RATE_ADAPTIVE, ODM_DBG_LOUD, ("%s mac_id:%u, mac:"MAC_FMT", rssi:%d\n", __func__,
 			pEntry->mac_id, MAC_ARG(pEntry->hwaddr), pEntry->rssi_stat.UndecoratedSmoothedPWDB));
-			
+
 		ODM_RT_TRACE(pDM_Odm, ODM_COMP_RATE_ADAPTIVE, ODM_DBG_LOUD, ("%s RAINFO - TP:%s, TxBF:%s, STBC:%s, Noisy:%s, Firstcont:%s\n", __func__,
 			(UL_DL_STATE) ? "DL" : "UL", (TxBF_EN) ? "EN" : "DIS", (STBC_TX) ? "EN" : "DIS",
 			(pDM_Odm->NoisyDecision) ? "True" : "False", (first_connect) ? "True" : "False"));
 	}
 	#endif
-		
+
 	if (pHalData->fw_ractrl == _TRUE) {
 		#if (RTL8188E_SUPPORT == 1)
 		if (pDM_Odm->SupportICType == ODM_RTL8188E)
@@ -1237,8 +1237,8 @@ void phydm_ra_rssi_rpt_wk_hdl(PVOID pContext)
 	PDM_ODM_T	pDM_Odm = (PDM_ODM_T)pContext;
 	int i;
 	u8 mac_id = 0xFF;
-	PSTA_INFO_T	pEntry = NULL;	
-	
+	PSTA_INFO_T	pEntry = NULL;
+
 	for (i = 0; i < ODM_ASSOCIATE_ENTRY_NUM; i++) {
 		pEntry = pDM_Odm->pODM_StaInfo[i];
 		if (IS_STA_VALID(pEntry)) {
@@ -1256,7 +1256,7 @@ void phydm_ra_rssi_rpt_wk_hdl(PVOID pContext)
 void phydm_ra_rssi_rpt_wk(PVOID pContext)
 {
 	PDM_ODM_T	pDM_Odm = (PDM_ODM_T)pContext;
-	
+
 	rtw_run_in_thread_cmd(pDM_Odm->Adapter, phydm_ra_rssi_rpt_wk_hdl, pDM_Odm);
 }
 #endif
@@ -1269,14 +1269,14 @@ odm_RSSIMonitorCheckCE(
 #if (DM_ODM_SUPPORT_TYPE == ODM_CE)
 	PDM_ODM_T		pDM_Odm = (PDM_ODM_T)pDM_VOID;
 	PADAPTER		Adapter = pDM_Odm->Adapter;
-	HAL_DATA_TYPE	*pHalData = GET_HAL_DATA(Adapter);	
+	HAL_DATA_TYPE	*pHalData = GET_HAL_DATA(Adapter);
 	PSTA_INFO_T           pEntry;
 	int	i;
 	int	tmpEntryMaxPWDB = 0, tmpEntryMinPWDB = 0xff;
 	u8	sta_cnt = 0;
-	
+
 	if (pDM_Odm->bLinked != _TRUE)
-		return;	
+		return;
 
 	for (i = 0; i < ODM_ASSOCIATE_ENTRY_NUM; i++) {
 		pEntry = pDM_Odm->pODM_StaInfo[i];
@@ -1364,12 +1364,12 @@ odm_RSSIMonitorCheckAP(
 			PRT_BEAMFORMING_ENTRY	pEntry = Beamforming_GetEntryByMacId(priv, pstat->aid, &Idx);
 
 			if (Beamform_cap & (BEAMFORMER_CAP_HT_EXPLICIT | BEAMFORMER_CAP_VHT_SU))	{
-				
+
 				if (pEntry->Sounding_En)
 					TxBF_EN = 1;
 				else
 					TxBF_EN = 0;
-				
+
 				act_bfer = TRUE;
 			}
 
@@ -1416,7 +1416,7 @@ odm_RSSIMonitorCheckAP(
 					H2C_Parameter[3] |= RAINFO_NOISY_STATE;
 				else
 					H2C_Parameter[3] &= (~RAINFO_NOISY_STATE);
-				
+
 				if (pstat->H2C_rssi_rpt) {
 					H2C_Parameter[3] |= RAINFO_INIT_RSSI_RATE_STATE;
 					ODM_RT_TRACE(pDM_Odm, ODM_COMP_RATE_ADAPTIVE, ODM_DBG_LOUD, ("[RA Init] set Init rate by RSSI, STA %d\n", pstat->aid));
@@ -1449,7 +1449,7 @@ odm_RSSIMonitorCheck(
 )
 {
 	PDM_ODM_T		pDM_Odm = (PDM_ODM_T)pDM_VOID;
-	
+
 	if (!(pDM_Odm->SupportAbility & ODM_BB_RSSI_MONITOR))
 		return;
 
@@ -1551,7 +1551,7 @@ odm_RefreshRateAdaptiveMask(
 
 	if (!pDM_Odm->bLinked)
 		return;
-		
+
 	if (!(pDM_Odm->SupportAbility & ODM_BB_RA_MASK)) {
 		ODM_RT_TRACE(pDM_Odm, ODM_COMP_RA_MASK, ODM_DBG_TRACE, ("odm_RefreshRateAdaptiveMask(): Return cos not supported\n"));
 		return;
@@ -1586,36 +1586,36 @@ phydm_trans_platform_bw(
 	#if (DM_ODM_SUPPORT_TYPE == ODM_WIN)
 		if (BW == CHANNEL_WIDTH_20)
 			BW = PHYDM_BW_20;
-			
+
 		else if (BW == CHANNEL_WIDTH_40)
 			BW = PHYDM_BW_40;
-			
+
 		else if (BW == CHANNEL_WIDTH_80)
 			BW = PHYDM_BW_80;
-			
+
 		else if (BW == CHANNEL_WIDTH_160)
 			BW = PHYDM_BW_160;
-			
+
 		else if (BW == CHANNEL_WIDTH_80_80)
 			BW = PHYDM_BW_80_80;
 
 	#elif (DM_ODM_SUPPORT_TYPE == ODM_AP)
-	
+
 		if (BW == HT_CHANNEL_WIDTH_20)
 			BW = PHYDM_BW_20;
-			
+
 		else if (BW == HT_CHANNEL_WIDTH_20_40)
 			BW = PHYDM_BW_40;
-			
+
 		else if (BW == HT_CHANNEL_WIDTH_80)
 			BW = PHYDM_BW_80;
-			
+
 		else if (BW == HT_CHANNEL_WIDTH_160)
 			BW = PHYDM_BW_160;
-			
+
 		else if (BW == HT_CHANNEL_WIDTH_10)
 			BW = PHYDM_BW_10;
-		
+
 		else if (BW == HT_CHANNEL_WIDTH_5)
 			BW = PHYDM_BW_5;
 
@@ -1623,16 +1623,16 @@ phydm_trans_platform_bw(
 
 		if (BW == CHANNEL_WIDTH_20)
 			BW = PHYDM_BW_20;
-			
+
 		else if (BW == CHANNEL_WIDTH_40)
 			BW = PHYDM_BW_40;
-			
+
 		else if (BW == CHANNEL_WIDTH_80)
 			BW = PHYDM_BW_80;
-			
+
 		else if (BW == CHANNEL_WIDTH_160)
 			BW = PHYDM_BW_160;
-			
+
 		else if (BW == CHANNEL_WIDTH_80_80)
 			BW = PHYDM_BW_80_80;
 	#endif
@@ -1650,25 +1650,25 @@ phydm_trans_platform_rf_type(
 	#if (DM_ODM_SUPPORT_TYPE == ODM_WIN)
 		if (RfType == RF_1T2R)
 			RfType = PHYDM_RF_1T2R;
-			
+
 		else if (RfType == RF_2T4R)
 			RfType = PHYDM_RF_2T4R;
-			
+
 		else if (RfType == RF_2T2R)
 			RfType = PHYDM_RF_2T2R;
-			
+
 		else if (RfType == RF_1T1R)
 			RfType = PHYDM_RF_1T1R;
-			
+
 		else if (RfType == RF_2T2R_GREEN)
 			RfType = PHYDM_RF_2T2R_GREEN;
-			
+
 		else if (RfType == RF_3T3R)
 			RfType = PHYDM_RF_3T3R;
-			
+
 		else if (RfType == RF_4T4R)
 			RfType = PHYDM_RF_4T4R;
-			
+
 		else if (RfType == RF_2T3R)
 			RfType = PHYDM_RF_1T2R;
 
@@ -1679,22 +1679,22 @@ phydm_trans_platform_rf_type(
 
 		if (RfType == MIMO_1T2R)
 			RfType = PHYDM_RF_1T2R;
-			
+
 		else if (RfType == MIMO_2T4R)
 			RfType = PHYDM_RF_2T4R;
-			
+
 		else if (RfType == MIMO_2T2R)
 			RfType = PHYDM_RF_2T2R;
-			
+
 		else if (RfType == MIMO_1T1R)
 			RfType = PHYDM_RF_1T1R;
-			
+
 		else if (RfType == MIMO_3T3R)
 			RfType = PHYDM_RF_3T3R;
-			
+
 		else if (RfType == MIMO_4T4R)
 			RfType = PHYDM_RF_4T4R;
-			
+
 		else if (RfType == MIMO_2T3R)
 			RfType = PHYDM_RF_1T2R;
 
@@ -1702,28 +1702,28 @@ phydm_trans_platform_rf_type(
 			RfType = PHYDM_RF_3T4R;
 
 	#elif (DM_ODM_SUPPORT_TYPE == ODM_CE)
-	
+
 		if (RfType == RF_1T2R)
 			RfType = PHYDM_RF_1T2R;
-			
+
 		else if (RfType == RF_2T4R)
 			RfType = PHYDM_RF_2T4R;
-			
+
 		else if (RfType == RF_2T2R)
 			RfType = PHYDM_RF_2T2R;
-			
+
 		else if (RfType == RF_1T1R)
 			RfType = PHYDM_RF_1T1R;
-		
+
 		else if (RfType == RF_2T2R_GREEN)
 			RfType = PHYDM_RF_2T2R_GREEN;
-		
+
 		else if (RfType == RF_3T3R)
 			RfType = PHYDM_RF_3T3R;
-			
+
 		else if (RfType == RF_4T4R)
 			RfType = PHYDM_RF_4T4R;
-			
+
 		else if (RfType == RF_2T3R)
 			RfType = PHYDM_RF_1T2R;
 
@@ -1743,43 +1743,43 @@ phydm_trans_platform_wireless_mode(
 )
 {
 	#if (DM_ODM_SUPPORT_TYPE == ODM_WIN)
-	
+
 	#elif (DM_ODM_SUPPORT_TYPE == ODM_AP)
 
 	#elif (DM_ODM_SUPPORT_TYPE == ODM_CE)
-	
+
 	if (wireless_mode == WIRELESS_11A)
 			wireless_mode = PHYDM_WIRELESS_MODE_A;
-			
+
 		else if (wireless_mode == WIRELESS_11B)
 			wireless_mode = PHYDM_WIRELESS_MODE_B;
-			
+
 		else if ((wireless_mode == WIRELESS_11G) || (wireless_mode == WIRELESS_11BG))
 			wireless_mode = PHYDM_WIRELESS_MODE_G;
-			
+
 		else if (wireless_mode == WIRELESS_AUTO)
 			wireless_mode = PHYDM_WIRELESS_MODE_AUTO;
-			
+
 		else if ((wireless_mode == WIRELESS_11_24N) || (wireless_mode == WIRELESS_11G_24N) || (wireless_mode == WIRELESS_11B_24N) ||
 			(wireless_mode == WIRELESS_11BG_24N) || (wireless_mode == WIRELESS_MODE_24G) || (wireless_mode == WIRELESS_11ABGN) || (wireless_mode == WIRELESS_11AGN))
 			wireless_mode = PHYDM_WIRELESS_MODE_N_24G;
-			
+
 		else if ((wireless_mode == WIRELESS_11_5N) || (wireless_mode == WIRELESS_11A_5N))
 			wireless_mode = PHYDM_WIRELESS_MODE_N_5G;
-			
+
 		else if ((wireless_mode == WIRELESS_11AC) || (wireless_mode == WIRELESS_11_5AC) || (wireless_mode == WIRELESS_MODE_5G))
 			wireless_mode = PHYDM_WIRELESS_MODE_AC_5G;
-			
+
 		else if (wireless_mode == WIRELESS_11_24AC)
 			wireless_mode = PHYDM_WIRELESS_MODE_AC_24G;
 
 		else if (wireless_mode == WIRELESS_11AC)
 			wireless_mode = PHYDM_WIRELESS_MODE_AC_ONLY;
-		
+
 		else if (wireless_mode == WIRELESS_MODE_MAX)
 			wireless_mode = PHYDM_WIRELESS_MODE_MAX;
 		else
-			wireless_mode = PHYDM_WIRELESS_MODE_UNKNOWN;	
+			wireless_mode = PHYDM_WIRELESS_MODE_UNKNOWN;
 	#endif
 
 	return wireless_mode;
@@ -1802,7 +1802,7 @@ phydm_vht_en_mapping(
 		vht_en_out = 1;
 		/**/
 	}
-	
+
 	ODM_RT_TRACE(pDM_Odm, ODM_COMP_RA_MASK, ODM_DBG_LOUD, ("WirelessMode= (( 0x%x )), VHT_EN= (( %d ))\n", WirelessMode, vht_en_out));
 	return vht_en_out;
 }
@@ -1819,33 +1819,33 @@ phydm_rate_id_mapping(
 	u1Byte			rate_id_idx = 0;
 	u1Byte			phydm_BW;
 	u1Byte			phydm_RfType;
-	
+
 	phydm_BW = phydm_trans_platform_bw(pDM_Odm, bw);
 	phydm_RfType = phydm_trans_platform_rf_type(pDM_Odm, RfType);
 	#if (DM_ODM_SUPPORT_TYPE == ODM_CE)
 	WirelessMode = phydm_trans_platform_wireless_mode(pDM_Odm, WirelessMode);
 	#endif
 
-	ODM_RT_TRACE(pDM_Odm, ODM_COMP_RA_MASK, ODM_DBG_LOUD, ("wirelessMode= (( 0x%x )), RfType = (( 0x%x )), BW = (( 0x%x ))\n", 
+	ODM_RT_TRACE(pDM_Odm, ODM_COMP_RA_MASK, ODM_DBG_LOUD, ("wirelessMode= (( 0x%x )), RfType = (( 0x%x )), BW = (( 0x%x ))\n",
 		WirelessMode, phydm_RfType, phydm_BW));
 
-	
+
 	switch (WirelessMode) {
-	
+
 	case PHYDM_WIRELESS_MODE_N_24G:
 		{
-	
+
 			if (phydm_BW == PHYDM_BW_40) {
-			
+
 				if (phydm_RfType == PHYDM_RF_1T1R)
 					rate_id_idx = PHYDM_BGN_40M_1SS;
 				else if (phydm_RfType == PHYDM_RF_2T2R)
 					rate_id_idx = PHYDM_BGN_40M_2SS;
 				else
 					rate_id_idx = PHYDM_ARFR5_N_3SS;
-				
+
 			} else {
-			
+
 				if (phydm_RfType == PHYDM_RF_1T1R)
 					rate_id_idx = PHYDM_BGN_20M_1SS;
 				else if (phydm_RfType == PHYDM_RF_2T2R)
@@ -1855,7 +1855,7 @@ phydm_rate_id_mapping(
 			}
 		}
 		break;
-		
+
 	case PHYDM_WIRELESS_MODE_N_5G:
 		{
 			if (phydm_RfType == PHYDM_RF_1T1R)
@@ -1865,22 +1865,22 @@ phydm_rate_id_mapping(
 			else
 				rate_id_idx = PHYDM_ARFR5_N_3SS;
 		}
-		
+
 		break;
-	
+
 	case PHYDM_WIRELESS_MODE_G:
 		rate_id_idx = PHYDM_BG;
 		break;
-				
+
 	case PHYDM_WIRELESS_MODE_A:
 		rate_id_idx = PHYDM_G;
-		break;	
-	
+		break;
+
 	case PHYDM_WIRELESS_MODE_B:
 		rate_id_idx = PHYDM_B_20M;
 		break;
-	
-	
+
+
 	case PHYDM_WIRELESS_MODE_AC_5G:
 	case PHYDM_WIRELESS_MODE_AC_ONLY:
 		{
@@ -1892,7 +1892,7 @@ phydm_rate_id_mapping(
 				rate_id_idx = PHYDM_ARFR4_AC_3SS;
 		}
 		break;
-	
+
 	case PHYDM_WIRELESS_MODE_AC_24G:
 		{
 			if (phydm_BW >= PHYDM_BW_80) {
@@ -1903,7 +1903,7 @@ phydm_rate_id_mapping(
 				else
 					rate_id_idx = PHYDM_ARFR5_N_3SS;
 			} else {
-				
+
 				if (phydm_RfType == PHYDM_RF_1T1R)
 					rate_id_idx = PHYDM_ARFR2_AC_2G_1SS;
 				else
@@ -1911,14 +1911,14 @@ phydm_rate_id_mapping(
 			}
 		}
 		break;
-	
+
 	default:
 		rate_id_idx = 0;
 		break;
 	}
-	
+
 	ODM_RT_TRACE(pDM_Odm, ODM_COMP_RA_MASK, ODM_DBG_LOUD, ("RA Rate ID = (( 0x%d ))\n", rate_id_idx));
-	
+
 	return rate_id_idx;
 }
 
@@ -1945,15 +1945,15 @@ phydm_UpdateHalRAMask(
 	#if (DM_ODM_SUPPORT_TYPE == ODM_CE)
 	wirelessMode = phydm_trans_platform_wireless_mode(pDM_Odm, wirelessMode);
 	#endif
-	
+
 	phydm_RfType = phydm_trans_platform_rf_type(pDM_Odm, RfType);
 	phydm_BW = phydm_trans_platform_bw(pDM_Odm, BW);
-	
+
 	/*ODM_RT_TRACE(pDM_Odm, ODM_COMP_RA_MASK, ODM_DBG_LOUD, ("phydm_RfType = (( %x )), RfType = (( %x ))\n", phydm_RfType, RfType));*/
 	ODM_RT_TRACE(pDM_Odm, ODM_COMP_RA_MASK, ODM_DBG_LOUD, ("Platfoem original RA Mask = (( 0x %x | %x ))\n", ratr_bitmap_msb, ratr_bitmap));
-	
+
 	switch (wirelessMode) {
-		
+
 	case PHYDM_WIRELESS_MODE_B:
 		{
 			ratr_bitmap &= 0x0000000f;
@@ -1961,37 +1961,37 @@ phydm_UpdateHalRAMask(
 		break;
 
 	case PHYDM_WIRELESS_MODE_G:
-		{			
+		{
 			ratr_bitmap &= 0x00000ff5;
 		}
 		break;
-		
+
 	case PHYDM_WIRELESS_MODE_A:
 		{
 			ratr_bitmap &= 0x00000ff0;
 		}
 		break;
-		
+
 	case PHYDM_WIRELESS_MODE_N_24G:
 	case PHYDM_WIRELESS_MODE_N_5G:
 		{
 			if (MimoPs_enable)
 				phydm_RfType = PHYDM_RF_1T1R;
-			
+
 			if (phydm_RfType == PHYDM_RF_1T1R) {
-				
+
 				if (phydm_BW == PHYDM_BW_40)
 					ratr_bitmap &= 0x000ff015;
 				else
 					ratr_bitmap &= 0x000ff005;
 			} else if (phydm_RfType == PHYDM_RF_2T2R || phydm_RfType == PHYDM_RF_2T4R || phydm_RfType == PHYDM_RF_2T3R) {
-			
+
 				if (phydm_BW == PHYDM_BW_40)
 					ratr_bitmap &= 0x0ffff015;
 				else
 					ratr_bitmap &= 0x0ffff005;
 			} else { /*3T*/
-			
+
 				ratr_bitmap &= 0xfffff015;
 				ratr_bitmap_msb &= 0xf;
 			}
@@ -2001,11 +2001,11 @@ phydm_UpdateHalRAMask(
 	case PHYDM_WIRELESS_MODE_AC_24G:
 		{
 			if (phydm_RfType == PHYDM_RF_1T1R)
-				ratr_bitmap &= 0x003ff015;	
-			else if (phydm_RfType == PHYDM_RF_2T2R || phydm_RfType == PHYDM_RF_2T4R || phydm_RfType == PHYDM_RF_2T3R) 
+				ratr_bitmap &= 0x003ff015;
+			else if (phydm_RfType == PHYDM_RF_2T2R || phydm_RfType == PHYDM_RF_2T4R || phydm_RfType == PHYDM_RF_2T3R)
 				ratr_bitmap &= 0xfffff015;
 			else {/*3T*/
-				
+
 				ratr_bitmap &= 0xfffff010;
 				ratr_bitmap_msb &= 0x3ff;
 			}
@@ -2021,10 +2021,10 @@ phydm_UpdateHalRAMask(
 		{
 			if (phydm_RfType == PHYDM_RF_1T1R)
 				ratr_bitmap &= 0x003ff010;
-			else if (phydm_RfType == PHYDM_RF_2T2R || phydm_RfType == PHYDM_RF_2T4R || phydm_RfType == PHYDM_RF_2T3R) 
+			else if (phydm_RfType == PHYDM_RF_2T2R || phydm_RfType == PHYDM_RF_2T4R || phydm_RfType == PHYDM_RF_2T3R)
 				ratr_bitmap &= 0xfffff010;
 			else {/*3T*/
-				
+
 				ratr_bitmap &= 0xfffff010;
 				ratr_bitmap_msb &= 0x3ff;
 			}
@@ -2041,26 +2041,26 @@ phydm_UpdateHalRAMask(
 	}
 
 	if (wirelessMode != PHYDM_WIRELESS_MODE_B) {
-		
-		if (tx_rate_level == 0) 
+
+		if (tx_rate_level == 0)
 			ratr_bitmap &=  0xffffffff;
-		else if (tx_rate_level == 1) 
+		else if (tx_rate_level == 1)
 			ratr_bitmap &=  0xfffffff0;
-		 else if (tx_rate_level == 2) 
+		 else if (tx_rate_level == 2)
 			ratr_bitmap &=  0xffffefe0;
-		else if (tx_rate_level == 3) 
+		else if (tx_rate_level == 3)
 			ratr_bitmap &=  0xffffcfc0;
-		else if (tx_rate_level == 4) 
+		else if (tx_rate_level == 4)
 			ratr_bitmap &=  0xffff8f80;
-		else if (tx_rate_level >= 5) 
+		else if (tx_rate_level >= 5)
 			ratr_bitmap &=  0xffff0f00;
-		
+
 	}
-	
+
 	if (disable_cck_rate)
 		ratr_bitmap &= 0xfffffff0;
 
-	ODM_RT_TRACE(pDM_Odm, ODM_COMP_RA_MASK, ODM_DBG_LOUD, ("wirelessMode= (( 0x%x )), RfType = (( 0x%x )), BW = (( 0x%x )), MimoPs_en = (( %d )), tx_rate_level= (( 0x%d ))\n", 
+	ODM_RT_TRACE(pDM_Odm, ODM_COMP_RA_MASK, ODM_DBG_LOUD, ("wirelessMode= (( 0x%x )), RfType = (( 0x%x )), BW = (( 0x%x )), MimoPs_en = (( %d )), tx_rate_level= (( 0x%d ))\n",
 		wirelessMode, phydm_RfType, phydm_BW, MimoPs_enable, tx_rate_level));
 
 	/*ODM_RT_TRACE(pDM_Odm, ODM_COMP_RA_MASK, ODM_DBG_LOUD, ("111 Phydm modified RA Mask = (( 0x %x | %x ))\n", ratr_bitmap_msb, ratr_bitmap));*/
@@ -2071,7 +2071,7 @@ phydm_UpdateHalRAMask(
 
 }
 
-u1Byte 
+u1Byte
 phydm_RA_level_decision(
 	IN		PVOID			pDM_VOID,
 	IN		u4Byte			rssi,
@@ -2084,7 +2084,7 @@ phydm_RA_level_decision(
 	u1Byte	new_Ratr_State = 0;
 	u1Byte	i;
 
-	ODM_RT_TRACE(pDM_Odm, ODM_COMP_RA_MASK, ODM_DBG_LOUD, ("curr RA level = ((%d)), Rate_floor_table ori [ %d , %d, %d , %d, %d, %d]\n", Ratr_State, 
+	ODM_RT_TRACE(pDM_Odm, ODM_COMP_RA_MASK, ODM_DBG_LOUD, ("curr RA level = ((%d)), Rate_floor_table ori [ %d , %d, %d , %d, %d, %d]\n", Ratr_State,
 		ra_rate_floor_table[0], ra_rate_floor_table[1], ra_rate_floor_table[2], ra_rate_floor_table[3], ra_rate_floor_table[4], ra_rate_floor_table[5]));
 
 	for (i = 0; i < RA_FLOOR_TABLE_SIZE; i++) {
@@ -2092,10 +2092,10 @@ phydm_RA_level_decision(
 		if (i >= (Ratr_State))
 			ra_rate_floor_table[i] += RA_FLOOR_UP_GAP;
 	}
-	
-	ODM_RT_TRACE(pDM_Odm, ODM_COMP_RA_MASK, ODM_DBG_LOUD, ("RSSI = ((%d)), Rate_floor_table_mod [ %d , %d, %d , %d, %d, %d]\n", 
+
+	ODM_RT_TRACE(pDM_Odm, ODM_COMP_RA_MASK, ODM_DBG_LOUD, ("RSSI = ((%d)), Rate_floor_table_mod [ %d , %d, %d , %d, %d, %d]\n",
 		rssi, ra_rate_floor_table[0], ra_rate_floor_table[1], ra_rate_floor_table[2], ra_rate_floor_table[3], ra_rate_floor_table[4], ra_rate_floor_table[5]));
-	
+
 	for (i = 0; i < RA_FLOOR_TABLE_SIZE; i++) {
 
 		if (rssi < ra_rate_floor_table[i]) {
@@ -2106,7 +2106,7 @@ phydm_RA_level_decision(
 
 
 
-	return	new_Ratr_State;		
+	return	new_Ratr_State;
 
 }
 
@@ -2144,18 +2144,18 @@ odm_RefreshRateAdaptiveMaskMP(
 			Ratr_State_new = phydm_RA_level_decision(pDM_Odm, pHalData->UndecoratedSmoothedPWDB, pMgntInfo->Ratr_State);
 
 			if (pMgntInfo->Ratr_State != Ratr_State_new) {
-				
+
 				ODM_PRINT_ADDR(pDM_Odm, ODM_COMP_RA_MASK, ODM_DBG_LOUD, ("Target AP addr :"), pMgntInfo->Bssid);
-				ODM_RT_TRACE(pDM_Odm, ODM_COMP_RA_MASK, ODM_DBG_LOUD, ("Update RA Level: ((%x)) -> ((%x)),  RSSI = ((%d))\n\n", 
+				ODM_RT_TRACE(pDM_Odm, ODM_COMP_RA_MASK, ODM_DBG_LOUD, ("Update RA Level: ((%x)) -> ((%x)),  RSSI = ((%d))\n\n",
 					pMgntInfo->Ratr_State, Ratr_State_new, pHalData->UndecoratedSmoothedPWDB));
-				
+
 				pMgntInfo->Ratr_State = Ratr_State_new;
 				pAdapter->HalFunc.UpdateHalRAMaskHandler(pAdapter, pMgntInfo->mMacId, NULL, Ratr_State_new);
 			} else {
 				ODM_RT_TRACE(pDM_Odm, ODM_COMP_RA_MASK, ODM_DBG_LOUD, ("Stay in RA level  = (( %d ))\n\n", Ratr_State_new));
 				/**/
 			}
-			
+
 		#else
 			if (ODM_RAStateCheck(pDM_Odm, pHalData->UndecoratedSmoothedPWDB, pMgntInfo->bSetTXPowerTrainingByOid, &pMgntInfo->Ratr_State)) {
 				ODM_PRINT_ADDR(pDM_Odm, ODM_COMP_RA_MASK, ODM_DBG_LOUD, ("Target AP addr : "), pMgntInfo->Bssid);
@@ -2181,9 +2181,9 @@ odm_RefreshRateAdaptiveMaskMP(
 	// if extension port (softap) is started, updaet RA table for more than one clients associate
 	if (pTargetAdapter != NULL) {
 		for (i = 0; i < ODM_ASSOCIATE_ENTRY_NUM; i++) {
-			
+
 			pEntry = AsocEntry_EnumStation(pTargetAdapter, i);
-			
+
 			if (IS_STA_VALID(pEntry)) {
 
 				odm_RefreshLdpcRtsMP(pAdapter, pDM_Odm, pEntry->AssociatedMacId, pEntry->IOTPeer, pEntry->rssi_stat.UndecoratedSmoothedPWDB);
@@ -2192,21 +2192,21 @@ odm_RefreshRateAdaptiveMaskMP(
 				Ratr_State_new = phydm_RA_level_decision(pDM_Odm, pEntry->rssi_stat.UndecoratedSmoothedPWDB, pEntry->Ratr_State);
 
 				if (pEntry->Ratr_State != Ratr_State_new) {
-					
+
 					ODM_PRINT_ADDR(pDM_Odm, ODM_COMP_RA_MASK, ODM_DBG_LOUD, ("Target AP addr :"), pEntry->MacAddr);
-					ODM_RT_TRACE(pDM_Odm, ODM_COMP_RA_MASK, ODM_DBG_LOUD, ("Update Tx RA Level: ((%x)) -> ((%x)),  RSSI = ((%d))\n", 
+					ODM_RT_TRACE(pDM_Odm, ODM_COMP_RA_MASK, ODM_DBG_LOUD, ("Update Tx RA Level: ((%x)) -> ((%x)),  RSSI = ((%d))\n",
 						pEntry->Ratr_State, Ratr_State_new,  pEntry->rssi_stat.UndecoratedSmoothedPWDB));
-					
+
 					pEntry->Ratr_State = Ratr_State_new;
 					pAdapter->HalFunc.UpdateHalRAMaskHandler(pAdapter, pEntry->AssociatedMacId, NULL, Ratr_State_new);
 				} else {
 					ODM_RT_TRACE(pDM_Odm, ODM_COMP_RA_MASK, ODM_DBG_LOUD, ("Stay in RA level  = (( %d ))\n\n", Ratr_State_new));
 					/**/
 				}
-			
-				
+
+
 				#else
-				
+
 				if (ODM_RAStateCheck(pDM_Odm, pEntry->rssi_stat.UndecoratedSmoothedPWDB, pMgntInfo->bSetTXPowerTrainingByOid, &pEntry->Ratr_State)) {
 					ODM_PRINT_ADDR(pDM_Odm, ODM_COMP_RA_MASK, ODM_DBG_LOUD, ("Target STA addr : "), pEntry->MacAddr);
 					ODM_RT_TRACE(pDM_Odm, ODM_COMP_RA_MASK, ODM_DBG_LOUD, ("RSSI:%d, RSSI_LEVEL:%d\n", pEntry->rssi_stat.UndecoratedSmoothedPWDB, pEntry->Ratr_State));
@@ -2216,11 +2216,11 @@ odm_RefreshRateAdaptiveMaskMP(
 					pAdapter->HalFunc.UpdateHalRAMaskHandler(pAdapter, pMgntInfo->mMacId, NULL, pMgntInfo->Ratr_State);
 				}
 				#endif
-				
+
 			}
 		}
 	}
-	
+
 	#if RA_MASK_PHYDMLIZE_WIN
 
 	#else
@@ -2255,9 +2255,9 @@ odm_RefreshRateAdaptiveMaskCE(
 	}
 
 	for (i = 0; i < ODM_ASSOCIATE_ENTRY_NUM; i++) {
-		
+
 		pEntry = pDM_Odm->pODM_StaInfo[i];
-		
+
 		if (IS_STA_VALID(pEntry)) {
 
 			if (IS_MCAST(pEntry->hwaddr))
@@ -2280,16 +2280,16 @@ odm_RefreshRateAdaptiveMaskCE(
 				}
 			}
 			#endif
-			
+
 		#if RA_MASK_PHYDMLIZE_CE
 			Ratr_State_new = phydm_RA_level_decision(pDM_Odm, pEntry->rssi_stat.UndecoratedSmoothedPWDB, pEntry->rssi_level);
 
 			if (pEntry->rssi_level != Ratr_State_new) {
-				
+
 				/*ODM_PRINT_ADDR(pDM_Odm, ODM_COMP_RA_MASK, ODM_DBG_LOUD, ("Target AP addr :"), pstat->hwaddr);*/
-				ODM_RT_TRACE(pDM_Odm, ODM_COMP_RA_MASK, ODM_DBG_LOUD, ("Update Tx RA Level: ((%x)) -> ((%x)),  RSSI = ((%d))\n", 
+				ODM_RT_TRACE(pDM_Odm, ODM_COMP_RA_MASK, ODM_DBG_LOUD, ("Update Tx RA Level: ((%x)) -> ((%x)),  RSSI = ((%d))\n",
 					 pEntry->rssi_level, Ratr_State_new, pEntry->rssi_stat.UndecoratedSmoothedPWDB));
-				
+
 				pEntry->rssi_level = Ratr_State_new;
 				rtw_hal_update_ra_mask(pEntry, pEntry->rssi_level);
 			} else {
@@ -2325,7 +2325,7 @@ odm_RefreshRateAdaptiveMaskAPADSL(
 	u4Byte		i;
 	PSTA_INFO_T pEntry;
 	u1Byte		Ratr_State_new;
-	
+
 	if (priv->up_time % 2)
 		return;
 
@@ -2333,11 +2333,9 @@ odm_RefreshRateAdaptiveMaskAPADSL(
 		pEntry = pDM_Odm->pODM_StaInfo[i];
 
 		if (IS_STA_VALID(pEntry)) {
-			
-			#if defined(UNIVERSAL_REPEATER) || defined(MBSSID)
+
 			aidarray = container_of(pEntry, struct aid_obj, station);
 			priv = aidarray->priv;
-			#endif
 
 			if (!priv->pmib->dot11StationConfigEntry.autoRate)
 				continue;
@@ -2346,10 +2344,10 @@ odm_RefreshRateAdaptiveMaskAPADSL(
 			Ratr_State_new = phydm_RA_level_decision(pDM_Odm, (u4Byte)pEntry->rssi, pEntry->rssi_level);
 
 			if (pEntry->rssi_level != Ratr_State_new) {
-				
+
 				ODM_PRINT_ADDR(pDM_Odm, ODM_COMP_RA_MASK, ODM_DBG_LOUD, ("Target AP addr :"), pEntry->hwaddr);
 				ODM_RT_TRACE(pDM_Odm, ODM_COMP_RA_MASK, ODM_DBG_LOUD, ("Update Tx RA Level: ((%x)) -> ((%x)),  RSSI = ((%d))\n", pEntry->rssi_level, Ratr_State_new, pEntry->rssi));
-				
+
 				pEntry->rssi_level = Ratr_State_new;
 				phydm_gen_ramask_h2c_AP(pDM_Odm, priv, pEntry, pEntry->rssi_level);
 			} else {
@@ -2362,34 +2360,17 @@ odm_RefreshRateAdaptiveMaskAPADSL(
 				ODM_PRINT_ADDR(pDM_Odm, ODM_COMP_RA_MASK, ODM_DBG_LOUD, ("Target STA addr : "), pEntry->hwaddr);
 				ODM_RT_TRACE(pDM_Odm, ODM_COMP_RA_MASK, ODM_DBG_LOUD, ("RSSI:%d, RSSI_LEVEL:%d\n", pEntry->rssi, pEntry->rssi_level));
 
-	#ifdef CONFIG_WLAN_HAL
 				if (IS_HAL_CHIP(priv)) {
-	#ifdef WDS
-			/*if(!(pstat->state & WIFI_WDS))*/	/*if WDS donot setting*/
-	#endif
 					GET_HAL_INTERFACE(priv)->UpdateHalRAMaskHandler(priv, pEntry, pEntry->rssi_level);
 				} else
-	#endif
 
-	#ifdef CONFIG_RTL_8812_SUPPORT
-					if (GET_CHIP_VER(priv) == VERSION_8812E)
-						UpdateHalRAMask8812(priv, pEntry, 3);
-					else
-	#endif
 					{
-	#ifdef CONFIG_RTL_88E_SUPPORT
-						if (GET_CHIP_VER(priv) == VERSION_8188E) {
-	#ifdef TXREPORT
-							add_RATid(priv, pEntry);
-	#endif
-						}
-	#endif
 
 
 					}
 				}
 #endif /*#ifdef RA_MASK_PHYDMLIZE*/
-			
+
 		}
 	}
 #endif /*#if (DM_ODM_SUPPORT_TYPE & ODM_AP)*/
@@ -2444,32 +2425,32 @@ phydm_rate_order_compute(
 	u1Byte		rate_order = 0;
 
 	if (rate_idx >= ODM_RATEVHTSS4MCS0) {
-		
+
 		rate_idx -= ODM_RATEVHTSS4MCS0;
 		/**/
 	} else if (rate_idx >= ODM_RATEVHTSS3MCS0) {
-	
+
 		rate_idx -= ODM_RATEVHTSS3MCS0;
-		/**/	
+		/**/
 	} else if (rate_idx >= ODM_RATEVHTSS2MCS0) {
-	
+
 		rate_idx -= ODM_RATEVHTSS2MCS0;
-		/**/	
+		/**/
 	} else if (rate_idx >= ODM_RATEVHTSS1MCS0) {
-	
+
 		rate_idx -= ODM_RATEVHTSS1MCS0;
 		/**/
 	} else if (rate_idx >= ODM_RATEMCS24) {
-	
+
 		rate_idx -= ODM_RATEMCS24;
 		/**/
 	} else if (rate_idx >= ODM_RATEMCS16) {
-	
+
 		rate_idx -= ODM_RATEMCS16;
 		/**/
 	} else if (rate_idx >= ODM_RATEMCS8) {
-	
-		rate_idx -= ODM_RATEMCS8;	
+
+		rate_idx -= ODM_RATEMCS8;
 		/**/
 	}
 	rate_order = rate_idx;
@@ -2494,16 +2475,16 @@ phydm_ra_common_info_update(
 
 	if (pDM_Odm->number_linked_client != 0) {
 		for (macid = 0; macid < ODM_ASSOCIATE_ENTRY_NUM; macid++) {
-			
+
 			rate_order_tmp = phydm_rate_order_compute(pDM_Odm, ((pRA_Table->link_tx_rate[macid]) & 0x7f));
 
 			if (rate_order_tmp >= (pRA_Table->highest_client_tx_order)) {
 				pRA_Table->highest_client_tx_order = rate_order_tmp;
 				pRA_Table->highest_client_tx_rate_order = macid;
 			}
-			
+
 			cnt++;
-		
+
 			if (cnt == pDM_Odm->number_linked_client)
 				break;
 		}
@@ -2541,7 +2522,7 @@ phydm_ra_info_init(
 	#if (defined(CONFIG_RA_DYNAMIC_RTY_LIMIT))
 	phydm_ra_dynamic_retry_limit_init(pDM_Odm);
 	#endif
-	
+
 	#if (defined(CONFIG_RA_DYNAMIC_RATE_ID))
 	phydm_ra_dynamic_rate_id_init(pDM_Odm);
 	#endif
@@ -2562,7 +2543,7 @@ odm_Find_RTS_Rate(
 {
 	PDM_ODM_T		pDM_Odm = (PDM_ODM_T)pDM_VOID;
 	u1Byte	RTS_Ini_Rate = ODM_RATE6M;
-	
+
 	if (bErpProtect) /* use CCK rate as RTS*/
 		RTS_Ini_Rate = ODM_RATE1M;
 	else {
@@ -2601,7 +2582,7 @@ odm_Find_RTS_Rate(
 		case ODM_RATE54M:
 		case ODM_RATE48M:
 		case ODM_RATE36M:
-		case ODM_RATE24M:		
+		case ODM_RATE24M:
 			RTS_Ini_Rate = ODM_RATE24M;
 			break;
 		case ODM_RATEVHTSS3MCS2:
@@ -2694,7 +2675,7 @@ phydm_update_pwr_track(
 	ODM_RT_TRACE(pDM_Odm, ODM_COMP_TX_PWR_TRACK, ODM_DBG_LOUD, ("Pwr Track Get Rate=0x%x\n", Rate));
 
 	pDM_Odm->TxRate = Rate;
-		
+
 	#if (DM_ODM_SUPPORT_TYPE == ODM_WIN)
 		#if DEV_BUS_TYPE == RT_PCI_INTERFACE
 			#if USE_WORKITEM
@@ -2742,24 +2723,24 @@ IN		PADAPTER		pAdapter,
 IN	OUT	BOOLEAN			*pbLink_temp
 
 	)
-{	
+{
 	HAL_DATA_TYPE	*pHalData = GET_HAL_DATA(pAdapter);
 	PMGNT_INFO		pMgntInfo = &(pAdapter->MgntInfo);
 	BOOLEAN			act_as_ap = ACTING_AS_AP(pAdapter);
-	
+
 	/* 1.Determine the minimum RSSI */
-	if ((!pMgntInfo->bMediaConnect) ||	
+	if ((!pMgntInfo->bMediaConnect) ||
 		(act_as_ap && (pHalData->EntryMinUndecoratedSmoothedPWDB == 0))) {/* We should check AP mode and Entry info.into consideration, revised by Roger, 2013.10.18*/
-	
+
 		pHalData->MinUndecoratedPWDBForDM = 0;
 		*pbLink_temp = FALSE;
 
 	} else
-		*pbLink_temp = TRUE; 
-	
+		*pbLink_temp = TRUE;
+
 
 	if (pMgntInfo->bMediaConnect) {	/* Default port*/
-	
+
 		if (act_as_ap || pMgntInfo->mIbss) {
 			pHalData->MinUndecoratedPWDBForDM = pHalData->EntryMinUndecoratedSmoothedPWDB;
 			/**/
@@ -2783,14 +2764,14 @@ ODM_UpdateInitRateWorkItemCallback(
 	PADAPTER	Adapter = (PADAPTER)pContext;
 	HAL_DATA_TYPE	*pHalData = GET_HAL_DATA(Adapter);
 	PDM_ODM_T		pDM_Odm = &pHalData->DM_OutSrc;
-	u1Byte		p = 0;	
+	u1Byte		p = 0;
 
 	if (pDM_Odm->SupportICType == ODM_RTL8821) {
 		ODM_TxPwrTrackSetPwr8821A(pDM_Odm, MIX_MODE, ODM_RF_PATH_A, 0);
 		/**/
 	} else if (pDM_Odm->SupportICType == ODM_RTL8812) {
 		for (p = ODM_RF_PATH_A; p < MAX_PATH_NUM_8812A; p++) {    /*DOn't know how to include &c*/
-		
+
 			ODM_TxPwrTrackSetPwr8812A(pDM_Odm, MIX_MODE, p, 0);
 			/**/
 		}
@@ -3296,13 +3277,13 @@ phydm_gen_ramask_h2c_AP(
 	PDM_ODM_T	pDM_Odm = (PDM_ODM_T)pDM_VOID;
 
 	if (pDM_Odm->SupportICType == ODM_RTL8812) {
-	
+
 		#if (RTL8812A_SUPPORT == 1)
 		UpdateHalRAMask8812(priv, pEntry, rssi_level);
 		/**/
 		#endif
 	} else if (pDM_Odm->SupportICType == ODM_RTL8188E) {
-	
+
 		#if (RTL8188E_SUPPORT == 1)
 		#ifdef TXREPORT
 		add_RATid(priv, pEntry);
@@ -3310,10 +3291,8 @@ phydm_gen_ramask_h2c_AP(
 		#endif
 		#endif
 	} else {
-		
-		#ifdef CONFIG_WLAN_HAL
+
 		GET_HAL_INTERFACE(priv)->UpdateHalRAMaskHandler(priv, pEntry, rssi_level);
-		#endif
 	}
 }
 
@@ -3339,7 +3318,7 @@ ODM_RAStateCheck(
 	u1Byte HighRSSIThreshForRA = pRA->HighRSSIThresh;
 	u1Byte LowRSSIThreshForRA = pRA->LowRSSIThresh;
 	u1Byte RATRState;
-	
+
 	ODM_RT_TRACE(pDM_Odm, ODM_COMP_RA_MASK, ODM_DBG_LOUD, ("RSSI= (( %d )), Current_RSSI_level = (( %d ))\n", RSSI, *pRATRState));
 	ODM_RT_TRACE(pDM_Odm, ODM_COMP_RA_MASK, ODM_DBG_LOUD, ("[Ori RA RSSI Thresh]  High= (( %d )), Low = (( %d ))\n", HighRSSIThreshForRA, LowRSSIThreshForRA));
 	/* Threshold Adjustment:*/

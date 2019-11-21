@@ -136,7 +136,7 @@ ODM_TxPwrTrackSetPwr8822B(
 	TxPowerIndex = PHY_GetTxPowerIndex(Adapter, (ODM_RF_RADIO_PATH_E) RFPath, TxRate, BandWidth, Channel);
 
 	ODM_RT_TRACE(pDM_Odm, ODM_COMP_TX_PWR_TRACK, ODM_DBG_LOUD,
-	   ("type=%d   TxPowerIndex=%d	 pRFCalibrateInfo->Absolute_OFDMSwingIdx=%d   pRFCalibrateInfo->DefaultOfdmIndex=%d   RFPath=%d\n", Method, TxPowerIndex, pRFCalibrateInfo->Absolute_OFDMSwingIdx[RFPath], pRFCalibrateInfo->DefaultOfdmIndex, RFPath)); 
+	   ("type=%d   TxPowerIndex=%d	 pRFCalibrateInfo->Absolute_OFDMSwingIdx=%d   pRFCalibrateInfo->DefaultOfdmIndex=%d   RFPath=%d\n", Method, TxPowerIndex, pRFCalibrateInfo->Absolute_OFDMSwingIdx[RFPath], pRFCalibrateInfo->DefaultOfdmIndex, RFPath));
 
 	pPwr_tracking_opt->type = Method;
 	pPwr_tracking_opt->bbswing_index = pRFCalibrateInfo->DefaultOfdmIndex;
@@ -173,21 +173,21 @@ ODM_TxPwrTrackSetPwr8822B(
 	u1Byte			TxPowerIndexOffest = 0;
 	u1Byte			TxPowerIndex = 0;
 
-	ODM_RT_TRACE(pDM_Odm, ODM_COMP_TX_PWR_TRACK, ODM_DBG_LOUD, 
+	ODM_RT_TRACE(pDM_Odm, ODM_COMP_TX_PWR_TRACK, ODM_DBG_LOUD,
 		("pRF->DefaultOfdmIndex=%d   pRF->DefaultCckIndex=%d\n", pRFCalibrateInfo->DefaultOfdmIndex, pRFCalibrateInfo->DefaultCckIndex));
-	
-	ODM_RT_TRACE(pDM_Odm, ODM_COMP_TX_PWR_TRACK, ODM_DBG_LOUD, 
+
+	ODM_RT_TRACE(pDM_Odm, ODM_COMP_TX_PWR_TRACK, ODM_DBG_LOUD,
 		("pRF->Absolute_OFDMSwingIdx=%d   pRF->Remnant_OFDMSwingIdx=%d   pRF->Absolute_CCKSwingIdx=%d   pRF->Remnant_CCKSwingIdx=%d   RFPath=%d\n",
 		pRFCalibrateInfo->Absolute_OFDMSwingIdx[RFPath], pRFCalibrateInfo->Remnant_OFDMSwingIdx[RFPath], pRFCalibrateInfo->Absolute_CCKSwingIdx[RFPath], pRFCalibrateInfo->Remnant_CCKSwingIdx, RFPath));
-					
+
 	TxPowerIndex = config_phydm_read_txagc_8822b(pDM_Odm, RFPath, 0x04); /*0x04(TX_AGC_OFDM_6M)*/
 
 	if (TxPowerIndex >= 63)
 		TxPowerIndex = 63;
-	
+
 	TxPowerIndexOffest = 63 - TxPowerIndex;
 
-	ODM_RT_TRACE(pDM_Odm, ODM_COMP_TX_PWR_TRACK, ODM_DBG_LOUD, 
+	ODM_RT_TRACE(pDM_Odm, ODM_COMP_TX_PWR_TRACK, ODM_DBG_LOUD,
 		("TxPowerIndex=%d TxPowerIndexOffest=%d RFPath=%d\n", TxPowerIndex, TxPowerIndexOffest, RFPath));
 
 
@@ -204,26 +204,26 @@ ODM_TxPwrTrackSetPwr8822B(
 						ODM_GetBBReg(pDM_Odm, 0xc1c, 0xFFE00000),
 						pRFCalibrateInfo->BbSwingIdxOfdm[RFPath], RFPath));
 		break;
-					
+
 		case ODM_RF_PATH_B:
 			GetMixModeTXAGCBBSWingOffset_8822b(pDM_Odm, Method, RFPath, TxPowerIndexOffest);
 			ODM_SetBBReg(pDM_Odm, 0xE94, (BIT29 | BIT28 | BIT27 | BIT26 | BIT25), pRFCalibrateInfo->Absolute_OFDMSwingIdx[RFPath]);
 			ODM_SetBBReg(pDM_Odm, rB_TxScale_Jaguar, 0xFFE00000, TxScalingTable_Jaguar[pRFCalibrateInfo->BbSwingIdxOfdm[RFPath]]);
-				
+
 			ODM_RT_TRACE(pDM_Odm, ODM_COMP_TX_PWR_TRACK, ODM_DBG_LOUD,
 						("TXAGC(0xE94)=0x%x BBSwing(0xe1c)=0x%x BBSwingIndex=%d RFPath=%d\n",
 						ODM_GetBBReg(pDM_Odm, 0xE94, (BIT29 | BIT28 | BIT27 | BIT26 | BIT25)),
 						ODM_GetBBReg(pDM_Odm, 0xe1c, 0xFFE00000),
 						pRFCalibrateInfo->BbSwingIdxOfdm[RFPath], RFPath));
 		break;
-		
+
 		default:
 			break;
 		}
 	}
 
 #endif
-	
+
 }
 
 
@@ -244,7 +244,7 @@ GetDeltaSwingTable_8822B(
 	pu1Byte		*TemperatureDOWN_A,
 	pu1Byte		*TemperatureUP_B,
 	pu1Byte		*TemperatureDOWN_B
-#endif	
+#endif
 	)
 {
 	PDM_ODM_T		pDM_Odm		= (PDM_ODM_T)pDM_VOID;
@@ -264,12 +264,12 @@ GetDeltaSwingTable_8822B(
 	*TemperatureUP_CCK_B   = pRFCalibrateInfo->DeltaSwingTableIdx_2GCCKB_P;
 	*TemperatureDOWN_CCK_B = pRFCalibrateInfo->DeltaSwingTableIdx_2GCCKB_N;
 #endif
-	
+
 	*TemperatureUP_A   = pRFCalibrateInfo->DeltaSwingTableIdx_2GA_P;
 	*TemperatureDOWN_A = pRFCalibrateInfo->DeltaSwingTableIdx_2GA_N;
 	*TemperatureUP_B   = pRFCalibrateInfo->DeltaSwingTableIdx_2GB_P;
 	*TemperatureDOWN_B = pRFCalibrateInfo->DeltaSwingTableIdx_2GB_N;
-		
+
 	if (36 <= channel && channel <= 64) {
 		*TemperatureUP_A   = pRFCalibrateInfo->DeltaSwingTableIdx_5GA_P[0];
 		*TemperatureDOWN_A = pRFCalibrateInfo->DeltaSwingTableIdx_5GA_N[0];
@@ -289,7 +289,7 @@ GetDeltaSwingTable_8822B(
 }
 
 
-VOID	
+VOID
 phy_LCCalibrate_8822B(
 	PDM_ODM_T	pDM_Odm
 	)
@@ -313,7 +313,7 @@ phy_LCCalibrate_8822B(
 	ODM_delay_ms(100);
 	for (cnt = 0; cnt < 100; cnt++) {
 		if (ODM_GetRFReg(pDM_Odm, ODM_RF_PATH_A, RF_CHNLBW, 0x8000) != 0x1)
-			break;	
+			break;
 		ODM_delay_ms(10);
 	}
 	/*Recover channel number*/
@@ -340,16 +340,16 @@ PHY_LCCalibrate_8822B(
 	u8Byte		ProgressingTime;
 
 
-	
+
 #if !(DM_ODM_SUPPORT_TYPE & ODM_AP)
 	PADAPTER		pAdapter = pDM_Odm->Adapter;
-	
+
 #if (MP_DRIVER == 1)
-#if (DM_ODM_SUPPORT_TYPE == ODM_WIN)	
+#if (DM_ODM_SUPPORT_TYPE == ODM_WIN)
 	PMPT_CONTEXT	pMptCtx = &(pAdapter->MptCtx);
 #else
-	PMPT_CONTEXT	pMptCtx = &(pAdapter->mppriv.MptCtx);		
-#endif	
+	PMPT_CONTEXT	pMptCtx = &(pAdapter->mppriv.MptCtx);
+#endif
 	bStartContTx = pMptCtx->bStartContTx;
 	bSingleTone = pMptCtx->bSingleTone;
 	bCarrierSuppression = pMptCtx->bCarrierSuppression;
@@ -376,15 +376,15 @@ void ConfigureTxpowerTrack_8822B(
 	pConfig->SwingTableSize_CCK = TXSCALE_TABLE_SIZE;
 	pConfig->SwingTableSize_OFDM = TXSCALE_TABLE_SIZE;
 	pConfig->Threshold_IQK = IQK_THRESHOLD;
-	pConfig->Threshold_DPK = DPK_THRESHOLD;	
+	pConfig->Threshold_DPK = DPK_THRESHOLD;
 	pConfig->AverageThermalNum = AVG_THERMAL_NUM_8822B;
 	pConfig->RfPathCount = MAX_PATH_NUM_8822B;
 	pConfig->ThermalRegAddr = RF_T_METER_8822B;
-		
+
 	pConfig->ODM_TxPwrTrackSetPwr = ODM_TxPwrTrackSetPwr8822B;
 	pConfig->DoIQK = DoIQK_8822B;
 	pConfig->PHY_LCCalibrate = PHY_LCCalibrate_8822B;
-	
+
 #if (DM_ODM_SUPPORT_TYPE & ODM_AP)
 	pConfig->GetDeltaAllSwingTable = GetDeltaSwingTable_8822B;
 #else
@@ -415,19 +415,19 @@ VOID PHY_SetRFPathSwitch_8822B(
 	/*BY SY Request */
 	ODM_SetBBReg(pDM_Odm, 0x4C, (BIT24 | BIT23), 0x2);
 	ODM_SetBBReg(pDM_Odm, 0x974, 0xff, 0xff);
-	
+
 	/*ODM_SetBBReg(pDM_Odm, 0x1991, 0x3, 0x0);*/
 	ODM_SetBBReg(pDM_Odm, 0x1990, (BIT9 | BIT8), 0x0);
-	
+
 	/*ODM_SetBBReg(pDM_Odm, 0xCBE, 0x8, 0x0);*/
 	ODM_SetBBReg(pDM_Odm, 0xCBC, BIT19, 0x0);
-	
+
 	ODM_SetBBReg(pDM_Odm, 0xCB4, 0xff, 0x77);
 
 	ODM_SetBBReg(pDM_Odm, 0x70, bMaskByte3, 0x0e);
 	ODM_SetBBReg(pDM_Odm, 0x1704, bMaskDWord, 0x0000ff00);
 	ODM_SetBBReg(pDM_Odm, 0x1700, bMaskDWord, 0xc00f0038);
-	
+
 	if (bMain) {
 		/*ODM_SetBBReg(pDM_Odm, 0xCBD, 0x3, 0x2);		WiFi */
 		ODM_SetBBReg(pDM_Odm, 0xCBC, (BIT9 | BIT8), 0x2);		/*WiFi */
@@ -437,7 +437,7 @@ VOID PHY_SetRFPathSwitch_8822B(
 	}
 }
 
-BOOLEAN 
+BOOLEAN
 phy_QueryRFPathSwitch_8822B(
 #if (DM_ODM_SUPPORT_TYPE & ODM_AP)
 	PDM_ODM_T	pDM_Odm
@@ -463,7 +463,7 @@ phy_QueryRFPathSwitch_8822B(
 }
 
 
-BOOLEAN PHY_QueryRFPathSwitch_8822B(	
+BOOLEAN PHY_QueryRFPathSwitch_8822B(
 #if (DM_ODM_SUPPORT_TYPE & ODM_AP)
 	PDM_ODM_T		pDM_Odm
 #else

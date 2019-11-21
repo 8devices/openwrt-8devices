@@ -9,17 +9,17 @@
 
 //3 ============Programming guide Start=====================
 /*
-    BB BIT define rules 
+    BB BIT define rules
     1. For all bit define, it should be prefixed by "BIT_BB"
     2. For all bit mask, it should be prefixed by "BIT_MASK_BB"
     3. For all bit shift, it should be prefixed by "BIT_SHIFT_BB"
     4. For other case, prefix is not needed
 
-    RF BIT define rules 
+    RF BIT define rules
     1. For all bit define, it should be prefixed by "BIT_RF"
     2. For all bit mask, it should be prefixed by "BIT_MASK_RF"
     3. For all bit shift, it should be prefixed by "BIT_SHIFT_RF"
-    4. For other case, prefix is not needed    
+    4. For other case, prefix is not needed
 
     SET BIT define rules
     1. Setting byte mask for BB or RF, it should be prefixed by "BIT_SET"
@@ -27,8 +27,8 @@
     Suffixed BIT define rules
     1. For AC chip, it should be suffixed by "_AC"
     2. For N chip, it should be suffixed by "_N"
-    3. For Common bit define, it should be suffixed by "_COMMON"    
-    
+    3. For Common bit define, it should be suffixed by "_COMMON"
+
 */
 #if IS_RTL88XX_AC
 /**** page 8 ****/
@@ -60,9 +60,9 @@
 
 /**** page a ****/
 //REG_BB_RCCK_SYSTEM_AC offset: 0xa00   // for cck sideband
-#define    BIT_MASK_BB_BCCK_SYSTEM_AC                          0x10 
+#define    BIT_MASK_BB_BCCK_SYSTEM_AC                          0x10
 //REG_BB_RCCK_RX_AC     offset:  0xa04    // for cck rx path selection
-#define    BIT_MASK_BB_BCCK_RX_AC                              0x0c000000 
+#define    BIT_MASK_BB_BCCK_RX_AC                              0x0c000000
 //REG_BB_RCCK_CCA_AC    offset:  0xa08    // cca threshold
 #define    BIT_MASK_BB_BCCK_CCA_AC                             0x00ff0000
 
@@ -494,7 +494,7 @@
 #define    BIT_MASK_BB_TxChEmuEnable_N                0x01000000
 #define    BIT_MASK_BB_TRSWIsolation_A_N              0x7f
 #define    BIT_MASK_BB_TRSWIsolation_B_N              0x7f00
-/*  
+/*
 #define    BIT_MASK_BB_TRSWIsolation_C_N              0x7f0000
 #define    BIT_MASK_BB_TRSWIsolation_D_N              0x7f000000
 */
@@ -652,8 +652,8 @@
 #define    BIT_MASK_RF_RTL8256REGMODECTRL0_N       0x40
 #define    BIT_MASK_RF_RTL8256_TXLPFBW_N           0x18
 #define    BIT_MASK_RF_RTL8256_RXLPFBW_N           0x600
-                    
-//RTL8258           
+
+//RTL8258
 #define    BIT_MASK_RF_RTL8258_TXLPFBW_N           0xc    // Useless
 #define    BIT_MASK_RF_RTL8258_RXLPFBW_N           0xc00
 #define    BIT_MASK_RF_RTL8258_RSSILPFBW_N         0xc0
@@ -662,7 +662,7 @@
 
 #endif //#if IS_RTL88XX_N
 
-// Other Common setting bit define 
+// Other Common setting bit define
 
 //byte endable for sb_write
 #define    BIT_MASK_SET_BYTE0_COMMON                     0x1    // Useless
@@ -682,7 +682,7 @@
 #define    BIT_MASK_SET_MASKLWORD_COMMON                 0x0000ffff
 #define    BIT_MASK_SET_MASKDWORD_COMMON                 0xffffffff
 #define    BIT_MASK_SET_MASKH4BITS_COMMON                0xf0000000
-#define    BIT_MASK_SET_MASKH3BYTES_COMMON               0xffffff00    
+#define    BIT_MASK_SET_MASKH3BYTES_COMMON               0xffffff00
 #define    BIT_MASK_SET_MASKOFDM_D_COMMON                0xffc00000
 #define    BIT_MASK_SET_MASKCCK_COMMON                   0x3f3f3f3f
 

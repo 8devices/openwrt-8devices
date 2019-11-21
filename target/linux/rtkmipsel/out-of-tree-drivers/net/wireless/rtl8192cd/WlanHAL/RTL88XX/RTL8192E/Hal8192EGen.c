@@ -3,14 +3,14 @@ Copyright (c) Realtek Semiconductor Corp. All rights reserved.
 
 Module Name:
 	Hal8192EGen.c
-	
+
 Abstract:
 	Defined RTL8192E HAL Function
-	    
+
 Major Change History:
 	When       Who               What
 	---------- ---------------   -------------------------------
-	2012-04-16 Filen            Create.	
+	2012-04-16 Filen            Create.
 --*/
 
 #if !defined(__ECOS) && !defined(CPTCFG_CFG80211_MODULE)
@@ -37,7 +37,7 @@ Major Change History:
 
 // High Power
 #if CFG_HAL_HIGH_POWER_EXT_PA
-#ifdef PWR_BY_RATE_92E_HP			
+#ifdef PWR_BY_RATE_92E_HP
 #include "../../../data_PHY_REG_PG_8192Emp_hp.c"
 #endif
 #if CFG_HAL_HIGH_POWER_EXT_LNA
@@ -145,7 +145,7 @@ VAR_MAPPING(PHY_REG_PG_8192E_new, PHY_REG_PG_8192E_new);
 #endif
 // High Power
 #if CFG_HAL_HIGH_POWER_EXT_PA
-#ifdef PWR_BY_RATE_92E_HP			
+#ifdef PWR_BY_RATE_92E_HP
 VAR_MAPPING(PHY_REG_PG_8192Emp_hp, PHY_REG_PG_8192Emp_hp);
 #endif
 #if CFG_HAL_HIGH_POWER_EXT_LNA

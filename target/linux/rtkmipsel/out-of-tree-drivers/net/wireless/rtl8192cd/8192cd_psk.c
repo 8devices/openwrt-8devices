@@ -12,17 +12,10 @@
 
 #define _8192CD_PSK_C_
 
-#ifdef __KERNEL__
 #include <linux/module.h>
 #include <linux/netdevice.h>
 #include <linux/timer.h>
 #include <linux/random.h>
-#elif defined(__ECOS)
-#include <cyg/io/eth/rltk/819x/wrapper/sys_support.h>
-#include <cyg/io/eth/rltk/819x/wrapper/skbuff.h>
-#include <cyg/io/eth/rltk/819x/wrapper/timer.h>
-#include <cyg/io/eth/rltk/819x/wrapper/wrapper.h>
-#endif
 
 #include "./8192cd_cfg.h"
 
@@ -33,27 +26,14 @@
 #include "./8192cd_util.h"
 #include "./8192cd_headers.h"
 #include "./8192cd_security.h"
-#if defined(__KERNEL__) || defined(__OSK__)
 #include "./ieee802_mib.h"
-#elif defined(__ECOS)
-#include <cyg/io/eth/rltk/819x/wlan/ieee802_mib.h>
-#endif
 #include "./8192cd_debug.h"
 #include "./8192cd_psk.h"
 #include "./1x_rc4.h"
 
-#if !defined(__KERNEL__) && !defined(__ECOS)
-#include "./sys-support.h"
-#endif
 
 
-#if defined(__OSK__) && (defined(INCLUDE_WPA_PSK) && defined(CONFIG_AUTH))
-extern int DecGTK(OCTET_STRING EAPOLMsgRecvd, unsigned char *kek, int keklen, int keylen, unsigned char *kout);
-#endif
 
-#ifdef CONFIG_IEEE80211R
-#include "./sha256.h"
-#endif
 
 //#define DEBUG_PSK
 
@@ -73,18 +53,6 @@ extern int DecGTK(OCTET_STRING EAPOLMsgRecvd, unsigned char *kek, int keklen, in
 #define IGMK_EXPANSION_CONST 	        "IGTK key expansion"
 #define IGMK_EXPANSION_CONST_SIZE		18
 
-#ifdef CONFIG_IEEE80211R
-#define FT_PMKR0_CONST					"FT-R0"
-#define FT_PMKR0_CONST_SIZE				5
-#define FT_PMKR0_NAME_CONST				"FT-R0N"
-#define FT_PMKR0_NAME_CONST_SIZE		6
-#define FT_PMKR1_CONST					"FT-R1"
-#define FT_PMKR1_CONST_SIZE				5
-#define FT_PMKR1_NAME_CONST				"FT-R1N"
-#define FT_PMKR1_NAME_CONST_SIZE		6
-#define FT_PMK_EXPANSION_CONST			"FT-PTK"
-#define FT_PMK_EXPANSION_CONST_SIZE		6
-#endif
 /*
 	2008-12-16, For Corega CG-WLCB54GL 54Mbps NIC interoperability issue.
 	The behavior of this NIC when it connect to the other AP with WPA/TKIP is:
@@ -105,14 +73,9 @@ extern int DecGTK(OCTET_STRING EAPOLMsgRecvd, unsigned char *kek, int keklen, in
 	And this NIC will always can not connect to our AP.
 	set MAX_RESEND_NUM=5 can fix this issue.
  */
-#if defined(__ECOS) && defined(CONFIG_SDIO_HCI)
-#define MAX_RESEND_NUM					3
-#define RESEND_TIME						RTL_MILISECONDS_TO_JIFFIES(500)
-#else
 //#define MAX_RESEND_NUM					3
 #define MAX_RESEND_NUM					5
 #define RESEND_TIME						RTL_SECONDS_TO_JIFFIES(1)	// in 10ms
-#endif
 
 #ifdef CLIENT_MODE
 #define WAIT_EAP_TIME				RTL_SECONDS_TO_JIFFIES(5)
@@ -159,9 +122,6 @@ static void SendEAPOL(struct rtl8192cd_priv *priv, struct stat_info *pstat, int 
 static void ResendTimeout(unsigned long task_psta);
 static void reset_sta_info(struct rtl8192cd_priv *priv, struct stat_info *pstat);
 
-#ifdef CONFIG_IEEE80211R
-static void CalcFTPTK(struct rtl8192cd_priv *priv, struct stat_info *pstat, unsigned char *keyout, int keyoutlen);
-#endif
 
 #ifdef DEBUG_PSK
 static char *ID2STR(int id)
@@ -435,7 +395,7 @@ void ConstructIE(struct rtl8192cd_priv *priv, unsigned char *pucOut, int *usOutL
 #endif
 #if 0
 	unsigned char prefer_auth = 0;
-	
+
 	if (OPMODE & WIFI_STATION_STATE)
 	{
 		if ( priv->pmib->dot1180211AuthEntry.dot11EnablePSK == (PSK_WPA | PSK_WPA2) &&
@@ -443,7 +403,7 @@ void ConstructIE(struct rtl8192cd_priv *priv, unsigned char *pucOut, int *usOutL
 		{
 			for (ulIndex=0; ulIndex<priv->wpa_global_info->NumOfUnicastCipherWPA2; ulIndex++)
 			{
-				if (priv->pmib->dot11Bss.t_stamp[0] & (BIT(priv->wpa_global_info->UnicastCipherWPA2[ulIndex]) << 22)) 
+				if (priv->pmib->dot11Bss.t_stamp[0] & (BIT(priv->wpa_global_info->UnicastCipherWPA2[ulIndex]) << 22))
 				{
 					prefer_auth = PSK_WPA2;
 					break;
@@ -453,7 +413,7 @@ void ConstructIE(struct rtl8192cd_priv *priv, unsigned char *pucOut, int *usOutL
 			{
 				for (ulIndex=0; ulIndex<priv->wpa_global_info->NumOfUnicastCipher; ulIndex++)
 				{
-					if (priv->pmib->dot11Bss.t_stamp[0] & (BIT(priv->wpa_global_info->UnicastCipher[ulIndex]) << 6)) 
+					if (priv->pmib->dot11Bss.t_stamp[0] & (BIT(priv->wpa_global_info->UnicastCipher[ulIndex]) << 6))
 					{
 						prefer_auth = PSK_WPA;
 						break;
@@ -472,7 +432,7 @@ void ConstructIE(struct rtl8192cd_priv *priv, unsigned char *pucOut, int *usOutL
 	*usOutLen = 0;
 	if ( priv->pmib->dot1180211AuthEntry.dot11EnablePSK & PSK_WPA
 //#ifdef SUPPORT_CLIENT_MIXED_SECURITY
-//		&& ((OPMODE & WIFI_STATION_STATE)==0 || 
+//		&& ((OPMODE & WIFI_STATION_STATE)==0 ||
 //			((OPMODE & WIFI_STATION_STATE) && (prefer_auth & PSK_WPA)))
 //#endif
 	) {
@@ -502,7 +462,7 @@ void ConstructIE(struct rtl8192cd_priv *priv, unsigned char *pucOut, int *usOutL
 		memset(pDot11RSNPairwiseSuite, 0, sizeof(DOT11_RSN_IE_COUNT_SUITE));
 		usSuitCount = 0;
 		{
-		for (ulIndex = 0; ulIndex < priv->wpa_global_info->NumOfUnicastCipher; ulIndex++) 
+		for (ulIndex = 0; ulIndex < priv->wpa_global_info->NumOfUnicastCipher; ulIndex++)
                 {
 			pDot11RSNPairwiseSuite->dot11RSNIESuite[usSuitCount].OUI[0] = 0x00;
 			pDot11RSNPairwiseSuite->dot11RSNIESuite[usSuitCount].OUI[1] = 0x50;
@@ -575,9 +535,9 @@ void ConstructIE(struct rtl8192cd_priv *priv, unsigned char *pucOut, int *usOutL
 	}
 
 #ifdef RTL_WPA2
-	if ( priv->pmib->dot1180211AuthEntry.dot11EnablePSK & PSK_WPA2 
+	if ( priv->pmib->dot1180211AuthEntry.dot11EnablePSK & PSK_WPA2
 //#ifdef SUPPORT_CLIENT_MIXED_SECURITY
-//		&& ((OPMODE & WIFI_STATION_STATE)==0 || 
+//		&& ((OPMODE & WIFI_STATION_STATE)==0 ||
 //			((OPMODE & WIFI_STATION_STATE) && (prefer_auth & PSK_WPA2)))
 //#endif
 	) {
@@ -638,14 +598,14 @@ void ConstructIE(struct rtl8192cd_priv *priv, unsigned char *pucOut, int *usOutL
 		pDot11RSNAuthSuite->dot11RSNIESuite[usSuitCount].OUI[2] = 0xAC;
 
 
-#ifdef CONFIG_IEEE80211W_CLI 
+#ifdef CONFIG_IEEE80211W_CLI
 	if(OPMODE & WIFI_STATION_STATE) {
-		
-		if ((priv->pmib->dot1180211AuthEntry.dot11IEEE80211W == MGMT_FRAME_PROTECTION_REQUIRED) 
+
+		if ((priv->pmib->dot1180211AuthEntry.dot11IEEE80211W == MGMT_FRAME_PROTECTION_REQUIRED)
 			|| (priv->bss_support_pmf == MGMT_FRAME_PROTECTION_REQUIRED)) {
 			pDot11RSNAuthSuite->dot11RSNIESuite[usSuitCount].Type = DOT11_AuthKeyType_PSK_SHA256;
 			usSuitCount++;
-		} 
+		}
 		else {
 
 			if(priv->bss_support_akmp & BIT(DOT11_AuthKeyType_PSK_SHA256)){
@@ -661,10 +621,10 @@ void ConstructIE(struct rtl8192cd_priv *priv, unsigned char *pucOut, int *usOutL
 				usSuitCount++;
 			}
 		}
-	
+
 
 	}
-	else 
+	else
 #endif
 	{
 #ifdef CONFIG_IEEE80211W
@@ -688,16 +648,7 @@ void ConstructIE(struct rtl8192cd_priv *priv, unsigned char *pucOut, int *usOutL
 #endif
 	}
 
-	
-#ifdef CONFIG_IEEE80211R
-		if (FT_ENABLE && (OPMODE & WIFI_AP_STATE)) {
-			pDot11RSNAuthSuite->dot11RSNIESuite[usSuitCount].OUI[0] = 0x00;
-			pDot11RSNAuthSuite->dot11RSNIESuite[usSuitCount].OUI[1] = 0x0F;
-			pDot11RSNAuthSuite->dot11RSNIESuite[usSuitCount].OUI[2] = 0xAC;
-			pDot11RSNAuthSuite->dot11RSNIESuite[usSuitCount].Type = DOT11_AuthKeyType_FTPSK;
-			usSuitCount++;
-		}
-#endif
+
 
 		pDot11RSNAuthSuite->SuiteCount = cpu_to_le16(usSuitCount);
 		ulAuthLength = sizeof(pDot11RSNAuthSuite->SuiteCount) + usSuitCount * sizeof(DOT11_RSN_IE_SUITE);
@@ -752,7 +703,7 @@ void ConstructIE(struct rtl8192cd_priv *priv, unsigned char *pucOut, int *usOutL
 		//		- IGTK Suite:
 		//
 
-		if (OPMODE & WIFI_AP_STATE) 
+		if (OPMODE & WIFI_AP_STATE)
 		if ((priv->pmib->dot1180211AuthEntry.dot11IEEE80211W == 1 && priv->pmib->dot1180211AuthEntry.dot11EnableSHA256 == TRUE)  ||
 		(priv->pmib->dot1180211AuthEntry.dot11IEEE80211W == 2 && priv->pmib->dot1180211AuthEntry.dot11EnableSHA256 == TRUE)) {
 			memset(&dot11RSNIGTKSuite, 0, sizeof(dot11RSNIGTKSuite));
@@ -776,7 +727,7 @@ void ConstructIE(struct rtl8192cd_priv *priv, unsigned char *pucOut, int *usOutL
 		memcpy(pucBlob, &dot11RSNCapability, ulRSNCapabilityLength);
 
 #ifdef CONFIG_IEEE80211W
-		if (OPMODE & WIFI_AP_STATE) 
+		if (OPMODE & WIFI_AP_STATE)
 		if (priv->pmib->dot1180211AuthEntry.dot11IEEE80211W != NO_MGMT_FRAME_PROTECTION) {
 			pucBlob += ulRSNCapabilityLength + 2; // add PMDID Count (2bytes)
 			memcpy(pucBlob, &dot11RSNIGTKSuite, sizeof(DOT11_RSN_IE_SUITE));
@@ -897,11 +848,6 @@ static void EncGTK(struct rtl8192cd_priv *priv, struct stat_info *pstat,
 	EAPOLMsgSend.Octet = pstat->wpa_sta_info->EAPOLMsgSend.Octet;
 	eapolkey = (lib1x_eapol_key *)(EAPOLMsgSend.Octet + ETHER_HDRLEN + LIB1X_EAPOL_HDRLEN);
 
-#ifdef CONFIG_IEEE80211R
-	if (FT_ENABLE && pstat->wpa_sta_info->isFT && !priv->pmib->dot1180211AuthEntry.dot11EnablePSK) {
-		AES_WRAP(key, keylen, default_key_iv, 8, kek, keklen, out, outlen);
-	} else
-#endif
 // should refer tx packet, david+2006-04-06
 //	if (Message_KeyDescVer(pstat->wpa_sta_info->EapolKeyMsgRecvd) == key_desc_ver1) {
 	if (Message_KeyDescVer(pstat->wpa_sta_info->EapolKeyMsgSend) == key_desc_ver1) {
@@ -961,17 +907,17 @@ static int CheckMIC(OCTET_STRING EAPOLMsgRecvd, unsigned char *key, int keylen)
 		if (!memcmp(tmpeapolkey->key_mic, EapolKeyMsgRecvd.Octet + KeyMICPos, KEY_MIC_LEN))
 			retVal = 1;
 	} else if (ucAlgo == key_desc_ver2) {
-		hmac_sha1((unsigned char*)tmpeapol, LIB1X_EAPOL_HDRLEN + ntohs(tmpeapol->packet_body_length) ,	
+		hmac_sha1((unsigned char*)tmpeapol, LIB1X_EAPOL_HDRLEN + ntohs(tmpeapol->packet_body_length) ,
 					key, keylen, sha1digest);
 		if (!memcmp(sha1digest, EapolKeyMsgRecvd.Octet + KeyMICPos, KEY_MIC_LEN))
 			retVal = 1;
 	}
 #if defined(CONFIG_IEEE80211W) || defined(CONFIG_IEEE80211R)
-	else if (ucAlgo == key_desc_ver3 
-        #ifdef HS2_SUPPORT     // OSEN     
+	else if (ucAlgo == key_desc_ver3
+        #ifdef HS2_SUPPORT     // OSEN
         || ucAlgo == 0
         #endif
-        ) 
+        )
     {
 
 		omac1_aes_128(key, (unsigned char*)tmpeapol, LIB1X_EAPOL_HDRLEN + ntohs(tmpeapol->packet_body_length) , tmpeapolkey->key_mic);
@@ -1099,11 +1045,7 @@ static void CalcPTK(unsigned char *addr1, unsigned char *addr2,
 */
 // Use RC4 or AES to decode the keydata by checking desc-ver, david-2006-01-06
 //int DecWPA2KeyData(u_char *key, int keylen, u_char *kek, int keklen, u_char *kout)
-#if defined(__OSK__) && defined(CONFIG_WIFI_INCLUDE_WPA_PSK)
-int DecWPA2KeyData_driver(WPA_STA_INFO* pStaInfo, unsigned char *key, int keylen, unsigned char *kek, int keklen, unsigned char *kout)
-#else
 int DecWPA2KeyData(WPA_STA_INFO* pStaInfo, unsigned char *key, int keylen, unsigned char *kek, int keklen, unsigned char *kout)
-#endif
 {
 	int	retVal = 0;
 	unsigned char		default_key_iv[] = { 0xA6, 0xA6, 0xA6, 0xA6, 0xA6, 0xA6, 0xA6, 0xA6 };
@@ -1147,7 +1089,6 @@ int DecWPA2KeyData(WPA_STA_INFO* pStaInfo, unsigned char *key, int keylen, unsig
 	return retVal;
 }
 
-#if !defined(__OSK__) || !defined(CONFIG_AUTH)
 int DecGTK(OCTET_STRING EAPOLMsgRecvd, unsigned char *kek, int keklen, int keylen, unsigned char *kout)
 {
 	int		retVal = 0;
@@ -1197,7 +1138,6 @@ int DecGTK(OCTET_STRING EAPOLMsgRecvd, unsigned char *kek, int keklen, int keyle
 	kfree(rc4key);
 	return retVal;
 }
-#endif //#ifndef __OSK__
 #endif /* CLIENT_MODE */
 
 static int parseIE(struct rtl8192cd_priv *priv, WPA_STA_INFO *pInfo,
@@ -1335,14 +1275,6 @@ static int parseIE(struct rtl8192cd_priv *priv, WPA_STA_INFO *pInfo,
 		return ERROR_INVALID_RSNIE;
 	}
 
-#ifdef CONFIG_IEEE80211R
-	if (FT_ENABLE && pInfo->isFT) {
-		if (pDot11RSNIESuite->Type != DOT11_AuthKeyType_FTPSK) {
-			DEBUG_WARN("ERROR_INVALID_AKMP !\n");
-			return ERROR_INVALID_AKMP;
-		}
-	} else
-#endif
 	if ( pDot11RSNIESuite->Type < DOT11_AuthKeyType_RSN ||
 			pDot11RSNIESuite->Type > DOT11_AuthKeyType_PSK) {
 		DEBUG_WARN("parseIE err 11!\n");
@@ -1470,9 +1402,6 @@ static int parseIEWPA2(struct rtl8192cd_priv *priv, WPA_STA_INFO *pInfo,
 		return ERROR_INVALID_MULTICASTCIPHER;
 	}
 
-#ifdef CONFIG_IEEE80211R
-	if (priv->pmib->dot1180211AuthEntry.dot11EnablePSK)
-#endif
 	if (pDot11RSNIESuite->Type != priv->wpa_global_info->MulticastCipher) {
 		DEBUG_WARN("ERROR_INVALID_MULTICASTCIPHER, err 6!\n");
 		return ERROR_INVALID_MULTICASTCIPHER;
@@ -1486,10 +1415,6 @@ static int parseIEWPA2(struct rtl8192cd_priv *priv, WPA_STA_INFO *pInfo,
 	}
 #endif
 
-#ifdef CONFIG_IEEE80211R
-	if (FT_ENABLE && !priv->pmib->dot1180211AuthEntry.dot11EnablePSK)
-		pInfo->MulticastCipher_1x = pDot11RSNIESuite->Type;
-#endif
 
 	ulIELength -= sizeof(DOT11_RSN_IE_SUITE);
 	pucIE += sizeof(DOT11_RSN_IE_SUITE);
@@ -1504,13 +1429,6 @@ static int parseIEWPA2(struct rtl8192cd_priv *priv, WPA_STA_INFO *pInfo,
 	pDot11RSNIESuite = pDot11RSNIECountSuite->dot11RSNIESuite;
 	usSuitCount = le16_to_cpu(pDot11RSNIECountSuite->SuiteCount);
 
-#ifdef CONFIG_IEEE80211R
-	if((usSuitCount != 1 && FT_ENABLE == 0) ||
-		pDot11RSNIESuite->OUI[0] != 0x00 ||
-		pDot11RSNIESuite->OUI[1] != 0x0F ||
-		pDot11RSNIESuite->OUI[2] != 0xAC)
-		DEBUG_WARN("ERROR_INVALID_RSNIE, err 7!\n");
-#else
 	if(usSuitCount != 1 ||
 		pDot11RSNIESuite->OUI[0] != 0x00 ||
 		pDot11RSNIESuite->OUI[1] != 0x0F ||
@@ -1518,16 +1436,12 @@ static int parseIEWPA2(struct rtl8192cd_priv *priv, WPA_STA_INFO *pInfo,
 		DEBUG_WARN("ERROR_INVALID_RSNIE, err 7!\n");
 		return ERROR_INVALID_RSNIE;
 	}
-#endif
 
 	if (pDot11RSNIESuite->Type > DOT11_ENC_WEP104) {
 		DEBUG_WARN("ERROR_INVALID_UNICASTCIPHER, err 8!\n");
 		return ERROR_INVALID_UNICASTCIPHER;
 	}
 
-#ifdef CONFIG_IEEE80211R
-	if (priv->pmib->dot1180211AuthEntry.dot11EnablePSK)
-#endif
 	if ((pDot11RSNIESuite->Type < DOT11_ENC_WEP40)
 			|| (!(BIT(pDot11RSNIESuite->Type - 1) & priv->pmib->dot1180211AuthEntry.dot11WPA2Cipher))) {
 		DEBUG_WARN("ERROR_INVALID_UNICASTCIPHER, err 9!\n");
@@ -1569,15 +1483,6 @@ static int parseIEWPA2(struct rtl8192cd_priv *priv, WPA_STA_INFO *pInfo,
 		return ERROR_INVALID_RSNIE;
 	}
 
-#ifdef CONFIG_IEEE80211R
-	if (FT_ENABLE && pInfo->isFT) {
-		if (pDot11RSNIESuite->Type != DOT11_AuthKeyType_FTPSK &&
-			pDot11RSNIESuite->Type != DOT11_AuthKeyType_FT8021x) {
-			DEBUG_WARN("ERROR_INVALID_AKMP !\n");
-			return ERROR_INVALID_AKMP;
-		}
-	} else
-#endif
 	if (pDot11RSNIESuite->Type < DOT11_AuthKeyType_RSN ||
 #ifdef CONFIG_IEEE80211W
 			pDot11RSNIESuite->Type > DOT11_AuthKeyType_PSK_SHA256
@@ -1589,13 +1494,7 @@ static int parseIEWPA2(struct rtl8192cd_priv *priv, WPA_STA_INFO *pInfo,
 		return ERROR_INVALID_AUTHKEYMANAGE;
 	}
 
-#ifdef CONFIG_IEEE80211R
-	if (priv->pmib->dot1180211AuthEntry.dot11EnablePSK)
-#endif
 	if (pDot11RSNIESuite->Type != DOT11_AuthKeyType_PSK
-#ifdef CONFIG_IEEE80211R
-			&& pDot11RSNIESuite->Type != DOT11_AuthKeyType_FTPSK
-#endif
 #ifdef CONFIG_IEEE80211W
 			&& pDot11RSNIESuite->Type != DOT11_AuthKeyType_PSK_SHA256
 #endif
@@ -1865,103 +1764,6 @@ static void ToDrv_SetIGTK(struct rtl8192cd_priv *priv)
 }
 #endif // CONFIG_IEEE80211W
 
-#ifdef CONFIG_IEEE80211R
-void FT_IndicateEvent(struct rtl8192cd_priv *priv, struct stat_info *pstat, unsigned char event, void *data)
-{
-	switch (event)
-	{
-		case DOT11_EVENT_FT_IMD_ASSOC_IND:
-		{
-			DOT11_FT_IMD_ASSOC_IND imd_assoc_ind;
-
-			memset(&imd_assoc_ind, 0, sizeof(DOT11_FT_IMD_ASSOC_IND));
-			
-			imd_assoc_ind.EventId = event;
-			imd_assoc_ind.IsMoreEvent = 0;
-			memcpy(imd_assoc_ind.MACAddr, pstat->hwaddr, MACADDRLEN);
-
-			DOT11_EnQueue((unsigned long)priv, priv->pftevent_queue, (unsigned char *)&imd_assoc_ind, sizeof(DOT11_FT_IMD_ASSOC_IND));
-		}
-		break;
-
-		case DOT11_EVENT_FT_PULL_KEY_IND:
-		{
-			DOT11_FT_PULL_KEY_IND pull_key_ind;
-
-			struct r1_key_holder *r1kh = (struct r1_key_holder *)data;
-			if (!r1kh)
-				return;
-			
-			memset(&pull_key_ind, 0, sizeof(DOT11_FT_PULL_KEY_IND));
-			
-			pull_key_ind.EventId = event;
-			pull_key_ind.IsMoreEvent = 0;
-			pull_key_ind.Type = FTKEY_TYPE_PULL;
-			memcpy(pull_key_ind.r0kh_id, r1kh->r0kh_id, r1kh->r0kh_id_len);
-			pull_key_ind.Length = sizeof(DOT11_FT_PULL_KEY_IND) - offsetof(DOT11_FT_PULL_KEY_IND, nonce);
-			memset(pull_key_ind.nonce, 0, FT_R0KH_R1KH_PULL_NONCE_LEN);
-			memcpy(pull_key_ind.pmk_r0_name, r1kh->pmk_r0_name, PMKID_LEN);
-			memcpy(pull_key_ind.r1kh_id, r1kh->r1kh_id, MACADDRLEN);
-			memcpy(pull_key_ind.s1kh_id, r1kh->sta_addr, MACADDRLEN);
-
-			DOT11_EnQueue((unsigned long)priv, priv->pftevent_queue, (unsigned char *)&pull_key_ind, sizeof(DOT11_FT_PULL_KEY_IND));
-		}
-		break;
-
-		case DOT11_EVENT_FT_ASSOC_IND:
-		{
-			DOT11_FT_ASSOC_IND ft_assoc_ind;
-
-			memset(&ft_assoc_ind, 0, sizeof(DOT11_FT_ASSOC_IND));
-			
-			ft_assoc_ind.EventId = event;
-			ft_assoc_ind.IsMoreEvent = 0;
-			memcpy(ft_assoc_ind.MACAddr, pstat->hwaddr, MACADDRLEN);
-			
-			DOT11_EnQueue((unsigned long)priv, priv->pftevent_queue, (unsigned char *)&ft_assoc_ind, sizeof(DOT11_FT_ASSOC_IND));
-		}
-		break;
-
-		case DOT11_EVENT_FT_KEY_EXPIRE_IND:
-		{
-			DOT11_FT_KEY_EXPIRE_IND key_expire_ind;
-			unsigned char *sta_addr = (unsigned char *)data;
-
-			memset(&key_expire_ind, 0, sizeof(DOT11_FT_KEY_EXPIRE_IND));
-			key_expire_ind.EventId = event;
-			key_expire_ind.IsMoreEvent = 0;
-			memcpy(key_expire_ind.MACAddr, sta_addr, MACADDRLEN);
-			
-			DOT11_EnQueue((unsigned long)priv, priv->pftevent_queue, (unsigned char *)&key_expire_ind, sizeof(DOT11_FT_KEY_EXPIRE_IND));
-		}
-		break;
-
-		case DOT11_EVENT_FT_ACTION_IND:
-		{
-			struct ft_action_param *param = (struct ft_action_param *)data;
-			DOT11_FT_ACTION ft_action;
-			
-			memset(&ft_action, 0, sizeof(DOT11_FT_ACTION));
-			
-			ft_action.EventId = DOT11_EVENT_FT_ACTION_IND;
-			ft_action.IsMoreEvent = 0;
-			memcpy(ft_action.MACAddr, param->target_addr, MACADDRLEN);
-			ft_action.ActionCode = param->action_code;
-			ft_action.packet_len = param->length;
-			memcpy(ft_action.packet, param->pdata, ft_action.packet_len); 					
-			DOT11_EnQueue((unsigned long)priv, priv->pftevent_queue, (unsigned char*)&ft_action, sizeof(DOT11_FT_ACTION));
-		}
-		break;
-
-		default:
-			DEBUG_ERR("Not supported FT event : %d\n", event);
-			break;
-	}
-
-	ft_event_indicate(priv);
-}
-
-#endif
 
 static void ToDrv_SetPTK(struct rtl8192cd_priv *priv, struct stat_info *pstat)
 {
@@ -1982,11 +1784,6 @@ static void ToDrv_SetPTK(struct rtl8192cd_priv *priv, struct stat_info *pstat)
 	Set_Key.KeyIndex = 0;
 	Set_Key.KeyType = DOT11_KeyType_Pairwise;
 
-#ifdef MULTI_MAC_CLONE
-	if ((OPMODE & WIFI_STATION_STATE) && priv->pmib->ethBrExtInfo.macclone_enable)
-		memcpy(&Set_Key.MACAddr, pstat->sa_addr, 6);
-	else
-#endif
 		memcpy(&Set_Key.MACAddr, pstat->hwaddr, 6);
 
 	switch (pstat->wpa_sta_info->UnicastCipher) {
@@ -2098,7 +1895,7 @@ static void ToDrv_SetPort(struct rtl8192cd_priv *priv, struct stat_info *pstat, 
 	rtl8192cd_ioctl_priv_daemonreq(priv->dev, &wrq);
 }
 
-void ToDrv_SetIE(struct rtl8192cd_priv *priv) 
+void ToDrv_SetIE(struct rtl8192cd_priv *priv)
 {
 	struct iw_point wrq;
 	DOT11_SET_RSNIE Set_Rsnie;
@@ -2184,9 +1981,6 @@ static void reset_sta_info(struct rtl8192cd_priv *priv, struct stat_info *pstat)
 	pInfo->SNonce.Octet = pInfo->SnonceBuf;
 	pInfo->SNonce.Length = KEY_NONCE_LEN;
 
-#ifdef CONFIG_IEEE80211R
-	pInfo->isFT = !!pstat->ft_state;
-#endif
 
 	pInfo->EAPOLMsgSend.Octet = pInfo->eapSendBuf;
 	pInfo->EapolKeyMsgSend.Octet = pInfo->EAPOLMsgSend.Octet + ETHER_HDRLEN + LIB1X_EAPOL_HDRLEN;
@@ -2223,9 +2017,6 @@ static void ResendTimeout(unsigned long task_psta)
 {
 	struct stat_info *pstat = (struct stat_info *)task_psta;
 	struct rtl8192cd_priv *priv = pstat->wpa_sta_info->priv;
-#ifdef SMP_SYNC
-	unsigned long flags;
-#endif
 
 	DEBUG_TRACE;
 
@@ -2237,9 +2028,6 @@ static void ResendTimeout(unsigned long task_psta)
 
 	SMP_LOCK_PSK_RESEND(flags);
 #ifdef CLIENT_MODE
-#ifdef MULTI_MAC_CLONE
-	ACTIVE_ID = pstat->mclone_id;
-#endif
 	if ((OPMODE & WIFI_STATION_STATE) && !pstat->wpa_sta_info->clientHndshkProcessing) {
 		DEBUG_ERR("Wait EAP timeout, disconnect  AP!\n");
 		priv->dot114WayStatus = _RSON_4WAY_HNDSHK_TIMEOUT_;
@@ -2305,12 +2093,6 @@ static void ResendTimeout(unsigned long task_psta)
 #ifdef DEBUG_PSK
 		printk("PSK: Exceed max retry, disconnect sta\n");
 #endif
-#if defined(__ECOS) && defined(CONFIG_SDIO_HCI) && defined(CLIENT_MODE)
-		if (OPMODE & WIFI_STATION_STATE) {
-			if (priv->link_status_cb_func)
-				priv->link_status_cb_func("wlan0", WIFI_LINK_STATUS_HANDSHAKE_TIMEOUT);
-		}
-#endif
 	} else {
 		if (OPMODE & WIFI_AP_STATE)
 			SendEAPOL(priv, pstat, 1);
@@ -2328,9 +2110,6 @@ static void GKRekeyTimeout(unsigned long task_priv)
 {
 	struct rtl8192cd_priv *priv = (struct rtl8192cd_priv *)task_priv;
 	unsigned long flags = 0;
-#ifdef SMP_SYNC
-	unsigned long flags2;
-#endif
 
 	DEBUG_TRACE;
 
@@ -2386,11 +2165,6 @@ static void SendEAPOL(struct rtl8192cd_priv *priv, struct stat_info *pstat, int 
 		KeyDescriptorVer = key_desc_ver3;
 	else
 #endif
-#ifdef CONFIG_IEEE80211R
-	if (pStaInfo->AuthKeyMethod == DOT11_AuthKeyType_FT8021x || pStaInfo->AuthKeyMethod == DOT11_AuthKeyType_FTPSK)
-		KeyDescriptorVer = key_desc_ver3;
-	else
-#endif
 		if ((pGblInfo->MulticastCipher == _CCMP_PRIVACY_) || (pStaInfo->UnicastCipher == _CCMP_PRIVACY_))
 			KeyDescriptorVer = key_desc_ver2;
 
@@ -2399,12 +2173,7 @@ static void SendEAPOL(struct rtl8192cd_priv *priv, struct stat_info *pstat, int 
 		EapolKeyMsgSend.Length = pStaInfo->EapolKeyMsgSend.Length;
 		Message_setReplayCounter(EapolKeyMsgSend, pStaInfo->CurrentReplayCounter.field.HighPart, pStaInfo->CurrentReplayCounter.field.LowPart);
 		INCLargeInteger(&pStaInfo->CurrentReplayCounter);
-#if defined(__ECOS) && defined(CONFIG_SDIO_HCI)
-		if (pStaInfo->state != PSK_STATE_PTKSTART)
-			IfCalcMIC = TRUE;
-#else
 		IfCalcMIC = TRUE;
-#endif
 		goto send_packet;
 	}
 
@@ -2533,25 +2302,18 @@ static void SendEAPOL(struct rtl8192cd_priv *priv, struct stat_info *pstat, int 
 
 #ifdef RTL_WPA2
 		if (pStaInfo->RSNEnabled & PSK_WPA2) {
-#ifdef CONFIG_IEEE80211R
-			unsigned char key_data[384];
-#else
 			unsigned char key_data[128];
-#endif
 			unsigned char *key_data_pos = key_data;
 			int i;
 			unsigned char GTK_KDE_TYPE[] = {0xDD, 0x16, 0x00, 0x0F, 0xAC, 0x01, 0x01, 0x00};
 #ifdef CONFIG_IEEE80211W
 			unsigned char IGTK_KDE_TYPE[] = {0xDD, 0x1C, 0x00, 0x0F, 0xAC, 0x09};
 #endif
-#ifdef CONFIG_IEEE80211R
-			unsigned int frlen = 0;
-#endif
 
 
 			EapolKeyMsgSend.Octet[1] = 0x13;
 //???
-			if (KeyDescriptorVer == key_desc_ver2 
+			if (KeyDescriptorVer == key_desc_ver2
 			#ifdef CONFIG_IEEE80211W
 				|| KeyDescriptorVer == key_desc_ver3
 			#endif
@@ -2588,25 +2350,7 @@ static void SendEAPOL(struct rtl8192cd_priv *priv, struct stat_info *pstat, int 
 #endif
 				}
 			}
-#ifdef CONFIG_IEEE80211R
-			if (FT_ENABLE && pStaInfo->isFT) {
-				// Append PMK-R1Name to RSNIE
-				struct r1_key_holder *r1kh = pStaInfo->r1kh;
-				if (r1kh) {
-					*((unsigned short *)key_data_pos) = cpu_to_le16(1);
-					key_data_pos += 2;
-					memcpy(key_data_pos, r1kh->pmk_r1_name, PMKID_LEN);
-					key_data_pos += PMKID_LEN;
-					key_data[1] += (2 + PMKID_LEN);
-				}
-			}
-#endif
 
-#ifdef CONFIG_IEEE80211R
-			if (FT_ENABLE && pStaInfo->isFT) {
-				key_data_pos = construct_mobility_domain_ie(priv, key_data_pos , &frlen);
-			}
-#endif
 
 			memcpy(key_data_pos, GTK_KDE_TYPE, sizeof(GTK_KDE_TYPE));
 			key_data_pos[1] = (unsigned char) 6 + ((pGblInfo->MulticastCipher == DOT11_ENC_TKIP) ? 32 : 16);
@@ -2649,15 +2393,6 @@ static void SendEAPOL(struct rtl8192cd_priv *priv, struct stat_info *pstat, int 
 				panic_printk("\n");
                 #endif
 				key_data_pos += 16;
-			}
-#endif
-#ifdef CONFIG_IEEE80211R
-			if (FT_ENABLE && pStaInfo->isFT) {
-				key_data_pos = construct_fast_bss_transition_ie(priv, key_data_pos, &frlen, pstat);
-				key_data_pos = construct_timeout_interval_ie(priv, key_data_pos, &frlen,
-						TIE_TYPE_REASSOC_DEADLINE, (priv->pmib->dot11FTEntry.dot11FTReassociationDeadline * 1000) / 1024);
-				key_data_pos = construct_timeout_interval_ie(priv, key_data_pos, &frlen,
-						TIE_TYPE_KEY_LIFETIME, priv->pmib->dot11FTEntry.dot11FTR0KeyLifetime * 60);
 			}
 #endif
 
@@ -2927,56 +2662,6 @@ send_packet:
 }
 
 
-#ifdef __ECOS
-int ecos_send_wlan(struct net_device *dev, unsigned char *data, int size)
-{
-	struct rtl8192cd_priv *priv;
-	struct sk_buff *pskb;
-
-	priv = dev->priv;
-	pskb = rtl_dev_alloc_skb(priv, size, _SKB_TX_, 1);
-	if (pskb == NULL) {
-		DEBUG_ERR("wps: allocate EAP skb failed!\n");
-		return -1;
-	}
-	memcpy(pskb->data, data, size);
-	skb_put(pskb, size);
-
-#ifdef ENABLE_RTL_SKB_STATS
-	rtl_atomic_dec(&priv->rtl_tx_skb_cnt);
-#endif
-
-	//pskb->cb[0] = 7;	// use highest priority to xmit
-	if (rtl8192cd_start_xmit(pskb, priv->dev)) {
-		DEBUG_ERR("tx from wps\n");
-		rtl_kfree_skb(priv, pskb, _SKB_TX_);
-	}
-	return 0;
-}
-#ifdef __ECOS
-int ecos_send_wlan_mesh(struct net_device *dev, unsigned char *data, int size)
-{
-	struct rtl8192cd_priv *priv;
-	struct sk_buff *pskb;
-	priv = dev->priv;
-	pskb = rtl_dev_alloc_skb(priv, size, _SKB_TX_, 1);
-	if (pskb == NULL) {
-		DEBUG_ERR("wps: allocate EAP skb failed!\n");
-		return -1;
-	}
-	memcpy(pskb->data, data, size);
-	skb_put(pskb, size);
-#ifdef ENABLE_RTL_SKB_STATS
-	rtl_atomic_dec(&priv->rtl_tx_skb_cnt);
-#endif
-	if (mesh_start_xmit(pskb, dev)) {
-		DEBUG_ERR("tx from wps\n");
-		rtl_kfree_skb(priv, pskb, _SKB_TX_);
-	}
-	return 0;
-}
-#endif
-#endif
 
 
 #ifdef CLIENT_MODE
@@ -3036,7 +2721,7 @@ void ClientSendEAPOL(struct rtl8192cd_priv *priv, struct stat_info *pstat, int r
 				DEBUG_INFO("client mode 4-2\n");
 				PSKDEBUG("client mode 4-2\n");
 
-				priv->is_4Way_finished= 0; 
+				priv->is_4Way_finished= 0;
 				pStaInfo->clientHndshkProcessing = fourWaystep2;
 
 				memset(EapolKeyMsgSend.Octet, 0, MAX_EAPOLKEYMSG_LEN);
@@ -3109,10 +2794,6 @@ void ClientSendEAPOL(struct rtl8192cd_priv *priv, struct stat_info *pstat, int r
 				EAPOLMsgSend.Length = ETHER_HDRLEN + LIB1X_EAPOL_HDRLEN + EapolKeyMsgSend.Length;
 
 				LOG_MSG( "Open and authenticated\n");
-#if defined(__ECOS)
-				extern void kick_event(unsigned int);
-				kick_event(1 << (26)); //set BRIDGE_WLAN_CONNECT
-#endif
 
 				pStaInfo->clientMICReportReplayCounter.field.HighPart = 0;
 				pStaInfo->clientMICReportReplayCounter.field.LowPart = 0;
@@ -3165,12 +2846,12 @@ void ClientSendEAPOL(struct rtl8192cd_priv *priv, struct stat_info *pstat, int r
 #endif
 					Message_setDescType(EapolKeyMsgSend, desc_type_RSN);
 
-				
+
 		#ifdef CONFIG_IEEE80211W_CLI
 				if (pStaInfo->AuthKeyMethod == DOT11_AuthKeyType_PSK_SHA256)
 					KeyDescriptorVer = key_desc_ver3;
 				else
-		#endif		
+		#endif
 				if ((pGblInfo->MulticastCipher == _CCMP_PRIVACY_) || (pStaInfo->UnicastCipher == _CCMP_PRIVACY_))
 					KeyDescriptorVer = key_desc_ver2;
 				Message_setKeyDescVer(EapolKeyMsgSend, KeyDescriptorVer);
@@ -3279,10 +2960,6 @@ static void AuthenticationRequest(struct rtl8192cd_priv *priv, struct stat_info 
 	pstat->wpa_sta_info->state = PSK_STATE_PTKSTART;
 	pstat->wpa_sta_info->resendCnt = 0;
 
-#ifdef CONFIG_IEEE80211R
-	if (pstat->ft_state == state_imd_assoc)
-		pstat->ft_state = state_imd_4way;
-#endif
 
 	//send 1st message
 	SendEAPOL(priv, pstat, 0);
@@ -3296,9 +2973,6 @@ static void UpdateGK(struct rtl8192cd_priv *priv)
 	WPA_GLOBAL_INFO *pGblInfo = priv->wpa_global_info;
 	struct stat_info *pstat;
 	int i;
-#ifdef SMP_SYNC
-	unsigned long flags = 0;
-#endif
 
 	SMP_LOCK_PSK_GKREKEY(flags);
 	//------------------------------------------------------------
@@ -3332,10 +3006,8 @@ static void UpdateGK(struct rtl8192cd_priv *priv)
 
 		for (i = 0; i < NUM_STAT; i++) {
 			if (priv->pshare->aidarray[i] && (priv->pshare->aidarray[i]->used == TRUE)) {
-#if defined(UNIVERSAL_REPEATER) || defined(MBSSID)
 				if (priv != priv->pshare->aidarray[i]->priv)
 					continue;
-#endif
 
 				if ((priv->pshare->aidarray[i]->station.state & WIFI_ASOC_STATE) &&
 						(priv->pshare->aidarray[i]->station.wpa_sta_info->state == PSK_STATE_PTKINITDONE))
@@ -3345,9 +3017,6 @@ static void UpdateGK(struct rtl8192cd_priv *priv)
 	}
 
 #ifdef CONFIG_IEEE80211W
-#ifdef CONFIG_IEEE80211R
-	if (!FT_ENABLE)
-#endif
 	if (priv->pmib->dot1180211AuthEntry.dot11IEEE80211W != NO_MGMT_FRAME_PROTECTION) {
 		//int ii;
 		PMFDEBUG("Calculate IGTK\n");
@@ -3374,10 +3043,8 @@ static void UpdateGK(struct rtl8192cd_priv *priv)
 		if ((priv->pshare->aidarray[i]->used != TRUE) || !(pstat->state & WIFI_ASOC_STATE))
 			continue;
 
-#if defined(UNIVERSAL_REPEATER) || defined(MBSSID)
 		if (priv != priv->pshare->aidarray[i]->priv)
 			continue;
-#endif
 
 		//---- Group key handshake to only one supplicant ----
 		if (pstat->wpa_sta_info->state == PSK_STATE_PTKINITDONE &&
@@ -3409,13 +3076,6 @@ static void EAPOLKeyRecvd(struct rtl8192cd_priv *priv, struct stat_info *pstat)
 	LARGE_INTEGER recievedRC;
 	struct lib1x_eapol *eapol;
 	OCTET_STRING tmpSNonce;
-#ifdef CONFIG_IEEE80211R
-	OCTET_STRING tmpKeyData;
-	unsigned int status, reason = unspec_reason;
-#endif
-#ifdef SMP_SYNC
-	unsigned long flags = 0;
-#endif
 
 	DEBUG_TRACE;
 
@@ -3476,12 +3136,6 @@ check_msg2:
 			tmpSNonce = Message_KeyNonce(pStaInfo->EapolKeyMsgRecvd);
 			memcpy(pStaInfo->SNonce.Octet, tmpSNonce.Octet, KEY_NONCE_LEN);
 			pStaInfo->SNonce.Length = tmpSNonce.Length;
-#ifdef CONFIG_IEEE80211R
-			if (FT_ENABLE && pStaInfo->isFT) {
-				CalcFTPTK(priv, pstat, pStaInfo->PTK, 
-					(pStaInfo->AuthKeyMethod >= DOT11_AuthKeyType_FT8021x) ? 48 : PTK_LEN_TKIP);
-			} else
-#endif
 			CalcPTK(pStaInfo->EAPOLMsgRecvd.Octet, pStaInfo->EAPOLMsgRecvd.Octet + 6,
 					pStaInfo->ANonce.Octet, pStaInfo->SNonce.Octet,
 					pStaInfo->PMK, PMK_LEN,
@@ -3495,40 +3149,6 @@ check_msg2:
 			debug_out("PSK: Generated PTK=", pStaInfo->PTK, PTK_LEN_TKIP);
 #endif
 
-#ifdef CONFIG_IEEE80211R
-			if (FT_ENABLE && pStaInfo->isFT) {
-				tmpKeyData = Message_KeyData(pStaInfo->EapolKeyMsgRecvd, Message_KeyDataLength(pStaInfo->EapolKeyMsgRecvd));
-				if (ft_check_imd_4way(priv, pstat, tmpKeyData.Octet, tmpKeyData.Length, &status)) {
-				switch (status)
-				{
-				case __STATS_INVALID_IE_:
-					DEBUG_ERR("4-2: RSNIE not present in FT Message 2\n");
-					reason = RSN_invalid_info_element;
-					break;
-				case _STATS_INVALID_MDIE_:
-					DEBUG_ERR("4-2: Invalid MDIE in FT Message 2\n");
-					reason = RSN_invalid_info_element;
-					break;
-				case __STATS_INVALID_AKMP_:
-					DEBUG_ERR("4-2: Invalid AKM Suite\n");
-					reason = RSN_AKMP_not_valid;
-					break;
-				case _STATS_INVALID_PMKID_:
-					DEBUG_ERR("4-2: PMKR1-Name not match\n");
-					reason = RSN_invalid_info_element;
-					break;
-				default:
-					break;
-				}
-					ToDrv_DisconnectSTA(priv, pstat, reason);
-					pStaInfo->state = PSK_STATE_IDLE;
-#if defined(CONFIG_WLAN_STATS_EXTENTION)
-					priv->ext_stats.total_psk_fail++;
-#endif
-					break;
-				}
-			}
-#endif
 
 			if (!CheckMIC(pStaInfo->EAPOLMsgRecvd, pStaInfo->PTK, PTK_LEN_EAPOLMIC)) {
 				if (priv->pmib->dot1180211AuthEntry.dot11PassPhraseGuest[0]) {
@@ -3569,17 +3189,6 @@ check_msg2:
 							   pstat->hwaddr[3],
 							   pstat->hwaddr[4],
 							   pstat->hwaddr[5]);
-#elif defined(CONFIG_RTL8196B_TLD)
-				LOG_MSG_DEL("[WLAN access rejected: incorrect security] from MAC address: %02x:%02x:%02x:%02x:%02x:%02x,\n",
-							pstat->hwaddr[0],
-							pstat->hwaddr[1],
-							pstat->hwaddr[2],
-							pstat->hwaddr[3],
-							pstat->hwaddr[4],
-							pstat->hwaddr[5]);
-#elif defined(__ECOS) && defined(CONFIG_SDIO_HCI)
-				if (priv->sta_status_cb_func)
-					priv->sta_status_cb_func("wlan0", pstat->hwaddr, WIFI_STA_STATUS_AUTH_FAIL);
 #endif
 #ifdef RTK_WLAN_EVENT_INDICATE
 				rtk_wlan_event_indicate(priv->dev->name, WIFI_CONNECT_FAIL, pstat->hwaddr, RSN_MIC_failure);
@@ -3605,7 +3214,7 @@ check_msg2:
 #endif
 #ifdef STA_ASSOC_STATISTIC
 				add_sta_assoc_status(priv, pstat->hwaddr, pstat->rssi, RSN_MIC_failure);
-#endif				
+#endif
 #ifdef ERR_ACCESS_CNTR
 				{
 					int i = 0, found = 0;
@@ -3712,17 +3321,6 @@ cont_msg:
 							   pstat->hwaddr[3],
 							   pstat->hwaddr[4],
 							   pstat->hwaddr[5]);
-#elif defined(CONFIG_RTL8196B_TLD)
-				LOG_MSG_DEL("[WLAN access rejected: incorrect security] from MAC address: %02x:%02x:%02x:%02x:%02x:%02x,\n",
-							pstat->hwaddr[0],
-							pstat->hwaddr[1],
-							pstat->hwaddr[2],
-							pstat->hwaddr[3],
-							pstat->hwaddr[4],
-							pstat->hwaddr[5]);
-#elif defined(__ECOS) && defined(CONFIG_SDIO_HCI)
-				if (priv->sta_status_cb_func)
-					priv->sta_status_cb_func("wlan0", pstat->hwaddr, WIFI_STA_STATUS_AUTH_FAIL);
 #endif
 #ifdef RTK_WLAN_EVENT_INDICATE
 				rtk_wlan_event_indicate(priv->dev->name, WIFI_CONNECT_FAIL, pstat->hwaddr, RSN_MIC_failure);
@@ -3748,7 +3346,7 @@ cont_msg:
 #endif
 #ifdef STA_ASSOC_STATISTIC
 				add_sta_assoc_status(priv, pstat->hwaddr, pstat->rssi, RSN_MIC_failure);
-#endif				
+#endif
 #ifdef ERR_ACCESS_CNTR
 				{
 					int i = 0, found = 0;
@@ -3794,20 +3392,10 @@ cont_msg:
 						   pstat->hwaddr[3],
 						   pstat->hwaddr[4],
 						   pstat->hwaddr[5]);
-#elif defined(CONFIG_RTL8196B_TLD)
-			if (!list_empty(&priv->wlan_acl_list)) {
-				LOG_MSG_DEL("[WLAN access allowed] from MAC: %02x:%02x:%02x:%02x:%02x:%02x,\n",
-							pstat->hwaddr[0],
-							pstat->hwaddr[1],
-							pstat->hwaddr[2],
-							pstat->hwaddr[3],
-							pstat->hwaddr[4],
-							pstat->hwaddr[5]);
-			}
 #endif
 #ifdef STA_ASSOC_STATISTIC
 			add_sta_assoc_status(priv, pstat->hwaddr, pstat->rssi, 0);
-#endif			
+#endif
 #ifdef RTK_WLAN_EVENT_INDICATE
 			rtk_wlan_event_indicate(priv->dev->name, WIFI_CONNECT_SUCCESS, pstat->hwaddr, 0);
 #endif
@@ -3828,10 +3416,6 @@ cont_msg:
 			else
 				ToDrv_SetPort(priv, pstat, DOT11_PortStatus_Authorized);
 
-#if defined(__ECOS) && defined(CONFIG_SDIO_HCI)
-			if (priv->sta_status_cb_func)
-				priv->sta_status_cb_func("wlan0", pstat->hwaddr, WIFI_STA_STATUS_PORT_AUTHORIZED);
-#endif
 
 // david+2006-04-04, fix the issue of re-generating group key, and need not
 // update group key in WPA2
@@ -3885,22 +3469,9 @@ cont_msg:
 #ifdef CONFIG_IEEE80211W
 				ToDrv_SetPMF(priv, pstat);
 #endif
-#ifdef CONFIG_IEEE80211R
-				if (FT_ENABLE && pStaInfo->isFT) {
-					FT_IndicateEvent(priv, pstat, DOT11_EVENT_FT_IMD_ASSOC_IND, NULL);
-
-					// Set key expire timer
-					if (priv->pmib->dot11FTEntry.dot11FTR0KeyLifetime) {
-						set_r0key_expire_time(priv, pstat->hwaddr, priv->pmib->dot11FTEntry.dot11FTR0KeyLifetime * 60);
-					}
-				}
-#endif
 
 				DEBUG_INFO("\nWPA2: 4-way handshake done\n");
 				PSKDEBUG("WPA2: 4-way handshake done\n");
-#ifdef RTK_SMART_ROAMING
-				notify_new_sta(priv, pstat->hwaddr,ASSOC_NEW_STA, pstat->rssi);
-#endif
 
 			}
 #endif	// RTL_WPA2
@@ -4004,17 +3575,6 @@ cont_msg:
 							   pstat->hwaddr[3],
 							   pstat->hwaddr[4],
 							   pstat->hwaddr[5]);
-#elif defined(CONFIG_RTL8196B_TLD)
-				LOG_MSG_DEL("[WLAN access rejected: incorrect security] from MAC address: %02x:%02x:%02x:%02x:%02x:%02x,\n",
-							pstat->hwaddr[0],
-							pstat->hwaddr[1],
-							pstat->hwaddr[2],
-							pstat->hwaddr[3],
-							pstat->hwaddr[4],
-							pstat->hwaddr[5]);
-#elif defined(__ECOS) && defined(CONFIG_SDIO_HCI)
-				if (priv->sta_status_cb_func)
-					priv->sta_status_cb_func("wlan0", pstat->hwaddr, WIFI_STA_STATUS_AUTH_FAIL);
 #endif
 #ifdef RTK_WLAN_EVENT_INDICATE
 				rtk_wlan_event_indicate(priv->dev->name, WIFI_CONNECT_FAIL, pstat->hwaddr, RSN_MIC_failure);
@@ -4040,7 +3600,7 @@ cont_msg:
 #endif
 #ifdef STA_ASSOC_STATISTIC
 				add_sta_assoc_status(priv, pstat->hwaddr, pstat->rssi, RSN_MIC_failure);
-#endif				
+#endif
 #ifdef ERR_ACCESS_CNTR
 				{
 					int i = 0, found = 0;
@@ -4112,9 +3672,6 @@ static void ClientEAPOLKeyRecvd(struct rtl8192cd_priv *priv, struct stat_info *p
 	struct lib1x_eapol *eapol;
 	int toSetKey = 0, error_code = 0;
 	OCTET_STRING tmpANonce;
-#ifdef SMP_SYNC
-	unsigned long flags = 0;
-#endif
 
 	eapol = ( struct lib1x_eapol * ) ( pstat->wpa_sta_info->EAPOLMsgRecvd.Octet + ETHER_HDRLEN );
 	if (eapol->packet_type != LIB1X_EAPOL_KEY) {
@@ -4185,10 +3742,10 @@ static void ClientEAPOLKeyRecvd(struct rtl8192cd_priv *priv, struct stat_info *p
                 else
                     printk("unicastcipher in wpa = nothing\n");
 			}
-			
+
 	#ifdef CONFIG_IEEE80211W_CLI
 			if(Message_KeyDescVer(pStaInfo->EapolKeyMsgRecvd) == key_desc_ver3)
-				pStaInfo->AuthKeyMethod = DOT11_AuthKeyType_PSK_SHA256; 
+				pStaInfo->AuthKeyMethod = DOT11_AuthKeyType_PSK_SHA256;
 	#endif
 
 
@@ -4222,14 +3779,14 @@ static void ClientEAPOLKeyRecvd(struct rtl8192cd_priv *priv, struct stat_info *p
 			//---- Receive 3rd message ----
 			DEBUG_INFO("client mode 4-3\n");
 			PSKDEBUG("client mode 4-3\n");
-			
+
 			if (!pStaInfo->clientHndshkProcessing) {
 				DEBUG_ERR("client mode 4-3: ERROR_MSG_1_ABSENT\n");
 				error_code = _STATS_OUT_OF_AUTH_SEQ_;
 				goto error_reconn;
 			}
 
-			pStaInfo->resendCnt = 0;			
+			pStaInfo->resendCnt = 0;
 			pStaInfo->clientHndshkProcessing=fourWaystep3;
 
 			// delete resend timer
@@ -4252,10 +3809,6 @@ static void ClientEAPOLKeyRecvd(struct rtl8192cd_priv *priv, struct stat_info *p
 			} else if (!CheckMIC(pStaInfo->EAPOLMsgRecvd, pStaInfo->PTK, PTK_LEN_EAPOLMIC)) {
 				DEBUG_ERR("client mode 4-3: PTK MIC ERROR\n");
 				LOG_MSG("Authentication failled! (4-3: MIC error)\n");
-#if defined(__ECOS) && defined(CONFIG_SDIO_HCI)
-				if (priv->link_status_cb_func)
-					priv->link_status_cb_func("wlan0", WIFI_LINK_STATUS_AUTH_FAIL);
-#endif
 				error_code = _RSON_MIC_FAILURE_;
 				goto error_reconn;
 			}
@@ -4274,18 +3827,10 @@ static void ClientEAPOLKeyRecvd(struct rtl8192cd_priv *priv, struct stat_info *p
 				keyDataLength = Message_KeyDataLength(pStaInfo->EapolKeyMsgRecvd);
 				pKeyData = pStaInfo->EapolKeyMsgRecvd.Octet + KeyDataPos;
 
-#if defined(__OSK__) && defined(CONFIG_WIFI_INCLUDE_WPA_PSK)
-				if(!DecWPA2KeyData_driver(pStaInfo, pKeyData, keyDataLength, pStaInfo->PTK + PTK_LEN_EAPOLMIC, PTK_LEN_EAPOLENC, decrypted_data))
-#else
 				if(!DecWPA2KeyData(pStaInfo, pKeyData, keyDataLength, pStaInfo->PTK + PTK_LEN_EAPOLMIC, PTK_LEN_EAPOLENC, decrypted_data))
-#endif
 				{
 					DEBUG_ERR("client mode 4-3: ERROR_AESKEYWRAP_MIC_FAIL\n");
 					LOG_MSG("Authentication failled! (4-3: ERROR_AESKEYWRAP_MIC_FAIL)\n");
-#if defined(__ECOS) && defined(CONFIG_SDIO_HCI)
-					if (priv->link_status_cb_func)
-						priv->link_status_cb_func("wlan0", WIFI_LINK_STATUS_AUTH_FAIL);
-#endif
 					error_code = _RSON_MIC_FAILURE_;
 					goto error_reconn;
 				}
@@ -4311,7 +3856,7 @@ static void ClientEAPOLKeyRecvd(struct rtl8192cd_priv *priv, struct stat_info *p
 							memcpy(pGblInfo->GTK[keyID], (pGTK_KDE + 8), gtk_len);
 							toSetKey = 1;
 							pGblInfo->GkeyReady = TRUE;
-						#ifdef CONFIG_IEEE80211W_CLI 
+						#ifdef CONFIG_IEEE80211W_CLI
 						if(priv->bss_support_pmf){
 							unsigned char IGTK_KDE_TYPE[] = {0xDD, 0x1C, 0x00, 0x0F, 0xAC, 0x09};
 
@@ -4320,7 +3865,7 @@ static void ClientEAPOLKeyRecvd(struct rtl8192cd_priv *priv, struct stat_info *p
 								PMFDEBUG("IGTK KDE Exists \n");
 								memcpy(priv->pmib->dot11IGTKTable.dot11EncryptKey.dot11TTKey.skey,
 										(pGTK_KDE+8+gtk_len+sizeof(IGTK_KDE_TYPE)+IGTK_HEADER_LEN), IGTK_LEN);
-							#ifdef CONFIG_IEEE80211W_CLI_DEBUG									
+							#ifdef CONFIG_IEEE80211W_CLI_DEBUG
 								panic_printk("IGTK=");
 								int idx;
 								for(idx=0;idx<IGTK_LEN;idx++)
@@ -4358,7 +3903,7 @@ static void ClientEAPOLKeyRecvd(struct rtl8192cd_priv *priv, struct stat_info *p
 			if (pStaInfo->clientHndshkProcessing && !pStaInfo->clientHndshkDone){
 				rtk_wlan_event_indicate(priv->dev->name, WIFI_CONNECT_SUCCESS, pstat->hwaddr, 0);
 			}
-#endif		
+#endif
 
 			/* Refine, make 4-4 only be sent 5 times
 			   to prevent MAYBE some AP keep sending out 4-3 because of incorrect PSK */
@@ -4378,7 +3923,7 @@ static void ClientEAPOLKeyRecvd(struct rtl8192cd_priv *priv, struct stat_info *p
 				pstat->wpa_sta_info->mgmt_frame_prot = 0;
 
 			ToDrv_SetPMF(priv,pstat);
-#endif			
+#endif
 		}
 	} else if (Message_KeyType(pStaInfo->EapolKeyMsgRecvd) == type_Group) {
 
@@ -4402,10 +3947,6 @@ static void ClientEAPOLKeyRecvd(struct rtl8192cd_priv *priv, struct stat_info *p
 		} else if (!CheckMIC(pStaInfo->EAPOLMsgRecvd, pStaInfo->PTK, PTK_LEN_EAPOLMIC)) {
 			DEBUG_ERR("client mode 2-1: ERROR_MIC_FAIL\n");
 			LOG_MSG("Authentication failled! (4-2: MIC error)\n");
-#if defined(__ECOS) && defined(CONFIG_SDIO_HCI)
-			if (priv->link_status_cb_func)
-				priv->link_status_cb_func("wlan0", WIFI_LINK_STATUS_AUTH_FAIL);
-#endif
 #if defined(CONFIG_RTL8186_KB_N)|| defined(CONFIG_AUTH_RESULT)
 			priv->authRes = 1;//Auth failed
 #endif
@@ -4434,8 +3975,8 @@ static void ClientEAPOLKeyRecvd(struct rtl8192cd_priv *priv, struct stat_info *p
 					ClientSendEAPOL(priv, pstat, 0); // send msg 2-1
 					return;
 				}
-				
-				pGblInfo->GN = keyID;				
+
+				pGblInfo->GN = keyID;
 				memcpy(pGblInfo->GTK[keyID], (pGTK_KDE + 8), gtk_len);
 			}
 		} else {
@@ -4466,9 +4007,6 @@ error_reconn:
 		opmode &= ~(WIFI_AUTH_SUCCESS | WIFI_ASOC_STATE);
 		OPMODE_VAL(opmode);
 		JOIN_RES_VAL(STATE_Sta_No_Bss);
-#if defined(CONFIG_RTL8672) && !defined(__OSK__)
-		wlan_sta_state_notify(priv, STATE_Sta_No_Bss);
-#endif
 		start_clnt_lookup(priv, RESCAN);
 	}
 }
@@ -4488,7 +4026,7 @@ void derivePSK(struct rtl8192cd_priv *priv)
 		memset(priv->Backup_SSID, 0x0, sizeof(priv->Backup_SSID));
 		priv->Backup_SSIDLen = 0;
 	}else{
-		if(!memcmp(SSID, priv->Backup_SSID, sizeof(priv->Backup_SSID)) && 
+		if(!memcmp(SSID, priv->Backup_SSID, sizeof(priv->Backup_SSID)) &&
 			SSID_LEN==priv->Backup_SSIDLen &&
 			!memcmp(priv->Backup_PassPhrase, priv->pmib->dot1180211AuthEntry.dot11PassPhrase, sizeof(priv->Backup_PassPhrase))){
 			//panic_printk(" ### hit PSK backup data!!!\n");
@@ -4500,7 +4038,7 @@ void derivePSK(struct rtl8192cd_priv *priv)
 			memset(priv->Backup_PSK, 0x0, sizeof(priv->Backup_PSK));
 			memset(priv->Backup_PassPhrase, 0x0, sizeof(priv->Backup_PassPhrase));
 			memset(priv->Backup_SSID, 0x0, sizeof(priv->Backup_SSID));
-			priv->Backup_SSIDLen = 0;			
+			priv->Backup_SSIDLen = 0;
 		}
 	}
 #endif
@@ -4519,7 +4057,7 @@ void derivePSK(struct rtl8192cd_priv *priv)
 						 pGblInfo->PSKGuest);
 	}
 
-#if 1//backup derivePSK	
+#if 1//backup derivePSK
 	//panic_printk(" ### backup PSK data\n");
 	memcpy(priv->Backup_SSID, SSID, sizeof(priv->Backup_SSID));
 	priv->Backup_SSIDLen = SSID_LEN;
@@ -4696,7 +4234,7 @@ void psk_init(struct rtl8192cd_priv *priv)
 void client_psk_reConstructIE(struct rtl8192cd_priv *priv)
 {
 	WPA_GLOBAL_INFO *pGblInfo=priv->wpa_global_info;
-	
+
 	ConstructIE(priv, pGblInfo->AuthInfoElement.Octet,
 					 &pGblInfo->AuthInfoElement.Length);
 
@@ -4704,45 +4242,6 @@ void client_psk_reConstructIE(struct rtl8192cd_priv *priv)
 }
 #endif
 
-#if defined(WDS) && defined(INCLUDE_WPA_PSK)
-void wds_psk_set(struct rtl8192cd_priv *priv, int idx, unsigned char *key)
-{
-	unsigned char pchar[40];
-
-	if (key == NULL) {
-		if (strlen((char *)priv->pmib->dot11WdsInfo.wdsPskPassPhrase) == 64) // hex
-			get_array_val(priv->pmib->dot11WdsInfo.wdsMapingKey[idx], (char *)priv->pmib->dot11WdsInfo.wdsPskPassPhrase, 64);
-		else {
-			memset(pchar, 0, sizeof(unsigned char) * 40);
-			PasswordHash((char *)priv->pmib->dot11WdsInfo.wdsPskPassPhrase, (unsigned char *)"REALTEK", strlen("REALTEK"), pchar);
-			memcpy(priv->pmib->dot11WdsInfo.wdsMapingKey[idx], pchar, sizeof(unsigned char) * 32);
-		}
-	} else
-		memcpy(priv->pmib->dot11WdsInfo.wdsMapingKey[idx], key, sizeof(unsigned char) * 32);
-
-	priv->pmib->dot11WdsInfo.wdsMappingKeyLen[idx] = 32;
-	priv->pmib->dot11WdsInfo.wdsMappingKeyLen[idx] |= 0x80000000;  //set bit to protect the key
-}
-
-
-void wds_psk_init(struct rtl8192cd_priv *priv)
-{
-	unsigned char *key;
-	int i;
-
-	if ( !(OPMODE & WIFI_AP_STATE))
-		return;
-
-	for (i = 0; i < priv->pmib->dot11WdsInfo.wdsNum; i++) {
-		if (i == 0)
-			key = NULL;
-		else
-			key = priv->pmib->dot11WdsInfo.wdsMapingKey[0];
-
-		wds_psk_set(priv, i, key);
-	}
-}
-#endif
 
 #ifdef CONFIG_IEEE80211W
 
@@ -4809,11 +4308,6 @@ int psk_indicate_evt(struct rtl8192cd_priv *priv, int id, unsigned char *mac, un
 	int isWPA2 = 0;
 #endif
 
-#ifdef CONFIG_IEEE80211R
-	if (id == DOT11_EVENT_FT_ASSOC_IND && !priv->pmib->dot1180211AuthEntry.dot11EnablePSK) {
-		// pass the check
-	} else
-#endif
 	if (!priv->pmib->dot1180211AuthEntry.dot11EnablePSK ||
 			!((priv->pmib->dot1180211AuthEntry.dot11PrivacyAlgrthm == _TKIP_PRIVACY_) ||
 			  (priv->pmib->dot1180211AuthEntry.dot11PrivacyAlgrthm == _CCMP_PRIVACY_)))
@@ -4939,42 +4433,6 @@ int psk_indicate_evt(struct rtl8192cd_priv *priv, int id, unsigned char *mac, un
 		break;
 #endif
 
-#ifdef CONFIG_IEEE80211R
-	case DOT11_EVENT_FT_ASSOC_IND:
-		if (OPMODE & WIFI_AP_STATE) {
-			if (len > 2 && msg != NULL) {
-				memcpy(tmpbuf, msg, len);
-				len -= 2;
-				isWPA2 = (tmpbuf[0] == WPA2_ELEMENT_ID) ? 1 : 0;
-				if (isWPA2)
-					ret = parseIEWPA2(priv, pstat->wpa_sta_info, tmpbuf, len + 2);
-				if (ret != 0) {
-#if defined(CONFIG_WLAN_STATS_EXTENTION)
-					priv->ext_stats.total_psk_fail++;
-#endif
-					DEBUG_ERR("parse IE error [%x]!\n", ret);
-				}
-				else {
-					#ifdef RTK_SMART_ROAMING
-					if(pstat && pstat->IOTPeer == HT_IOT_PEER_RTK_APCLIENT)		
-						panic_printk("repeater sta connect\n");			
-					else
-						notify_new_sta(priv, pstat->hwaddr, ASSOC_NEW_STA, pstat->rssi);
-					#endif
-				}
-				
-				if (!priv->pmib->dot1180211AuthEntry.dot11EnablePSK)
-					priv->wpa_global_info->MulticastCipher = pstat->wpa_sta_info->MulticastCipher_1x;
-				install_ft_keys(priv, pstat);
-				
-				ToDrv_RspAssoc(priv, id, mac, -ret);
-			} else { // RNSIE is null
-				if (priv->pmib->dot1180211AuthEntry.dot11EnablePSK)
-					ToDrv_RspAssoc(priv, id, mac, -ERROR_INVALID_RSNIE);
-			}
-		}
-		break;
-#endif
 
 	case DOT11_EVENT_EAP_PACKET:
 		if (OPMODE & WIFI_AP_STATE) {
@@ -5071,36 +4529,6 @@ void UKRekeyTimeout(struct rtl8192cd_priv *priv, struct stat_info *pstat)
 
 
 
-#ifdef CONFIG_RTK_MESH
-void dot11s_mp_set_key(DRV_PRIV *priv, unsigned char *mac)
-{
-	DOT11_SET_KEY Set_Key;
-	struct Dot11EncryptKey	*pEncryptKey = &(priv->pmib->dot11sKeysTable.dot11EncryptKey);
-	unsigned char key[40];
-
-	if (pEncryptKey->dot11TTKeyLen == 0) {
-		if (strlen((char *)priv->pmib->dot1180211sInfo.dot11PassPhrase) == 64) {// hex
-			get_array_val(key, (char *)priv->pmib->dot1180211sInfo.dot11PassPhrase, 64);
-		} else {
-			PasswordHash(priv->pmib->dot1180211sInfo.dot11PassPhrase,
-						 priv->pmib->dot1180211sInfo.mesh_id,
-						 strlen(priv->pmib->dot1180211sInfo.mesh_id),
-						 key);
-		}
-		pEncryptKey->dot11TTKeyLen = 16;
-		memcpy(pEncryptKey->dot11TTKey.skey, key, pEncryptKey->dot11TTKeyLen);
-	}
-
-	memset(key, 0, sizeof(key));
-	memcpy(key, pEncryptKey->dot11TTKey.skey, pEncryptKey->dot11TTKeyLen);
-	memcpy(Set_Key.MACAddr, mac, MACADDRLEN);
-	Set_Key.KeyType = DOT11_KeyType_Pairwise;
-	Set_Key.EncType = DOT11_ENC_CCMP;
-	Set_Key.KeyIndex = priv->pmib->dot11sKeysTable.keyid;
-	DOT11_Process_Set_Key(priv->dev, NULL, &Set_Key, key);
-}
-
-#endif
 
 
 
@@ -5182,50 +4610,50 @@ void choose_cipher(struct rtl8192cd_priv *priv, struct bss_desc *bss_target)
 		}
 	}
 	else {
-		if ((priv->pmib->dot1180211AuthEntry.dot11EnablePSK & dot11EnablePSK) 
-		&& ((priv->pmib->dot1180211AuthEntry.dot11WPACipher & dot11WPACipher) 
+		if ((priv->pmib->dot1180211AuthEntry.dot11EnablePSK & dot11EnablePSK)
+		&& ((priv->pmib->dot1180211AuthEntry.dot11WPACipher & dot11WPACipher)
 		|| (priv->pmib->dot1180211AuthEntry.dot11WPA2Cipher & dot11WPA2Cipher))
 		) {
-		
-			if ((priv->pmib->dot1180211AuthEntry.dot11WPA2Cipher & dot11WPA2Cipher) & BIT3) {			
+
+			if ((priv->pmib->dot1180211AuthEntry.dot11WPA2Cipher & dot11WPA2Cipher) & BIT3) {
 				DEBUG_INFO("\nWPA2-AES\n");
-				dot11EnablePSK = PSK_WPA2;                           
-		       		dot11WPACipher = 0;   
+				dot11EnablePSK = PSK_WPA2;
+		       		dot11WPACipher = 0;
 	        		dot11WPA2Cipher = BIT3;
 				dot11PrivacyAlgrthm = _CCMP_PRIVACY_;
-			} else if ((priv->pmib->dot1180211AuthEntry.dot11WPACipher & dot11WPACipher) & BIT3) {	
+			} else if ((priv->pmib->dot1180211AuthEntry.dot11WPACipher & dot11WPACipher) & BIT3) {
 				DEBUG_INFO("\nWPA-AES\n");
-				dot11EnablePSK = PSK_WPA;                           
-		       		dot11WPACipher = BIT3;   
+				dot11EnablePSK = PSK_WPA;
+		       		dot11WPACipher = BIT3;
 	        		dot11WPA2Cipher = 0;
 				dot11PrivacyAlgrthm = _CCMP_PRIVACY_;
-			} else if ((priv->pmib->dot1180211AuthEntry.dot11WPA2Cipher & dot11WPA2Cipher) & BIT1) {	
+			} else if ((priv->pmib->dot1180211AuthEntry.dot11WPA2Cipher & dot11WPA2Cipher) & BIT1) {
 				DEBUG_INFO("\nWPA2-TKIP\n");
-				dot11EnablePSK = PSK_WPA2;                           
-		       		dot11WPACipher = 0;   
+				dot11EnablePSK = PSK_WPA2;
+		       		dot11WPACipher = 0;
 	        		dot11WPA2Cipher = BIT1;
 				dot11PrivacyAlgrthm = _TKIP_PRIVACY_;
-			} else if ((priv->pmib->dot1180211AuthEntry.dot11WPACipher & dot11WPACipher) & BIT1) {	
+			} else if ((priv->pmib->dot1180211AuthEntry.dot11WPACipher & dot11WPACipher) & BIT1) {
 				DEBUG_INFO("\nWPA-TKIP\n");
-				dot11EnablePSK = PSK_WPA;                           
-		       		dot11WPACipher = BIT1;   
+				dot11EnablePSK = PSK_WPA;
+		       		dot11WPACipher = BIT1;
 	        		dot11WPA2Cipher = 0;
 				dot11PrivacyAlgrthm = _TKIP_PRIVACY_;
 			} else {
 				DEBUG_INFO("No match wpa cipher!!!\n");
 				return;
-			}		
+			}
 		} else {
 			DEBUG_INFO("Not wpa enable!!!\n");
 			return;
 		}
 	}
-	
+
 	priv->pmib->dot1180211AuthEntry.dot11EnablePSK = dot11EnablePSK;
 	priv->pmib->dot1180211AuthEntry.dot11WPACipher = dot11WPACipher;
 	priv->pmib->dot1180211AuthEntry.dot11WPA2Cipher = dot11WPA2Cipher;
 	priv->pmib->dot1180211AuthEntry.dot11PrivacyAlgrthm = dot11PrivacyAlgrthm;
-	
+
 	DEBUG_INFO("choose_cipher: psk_enable %d wpa_cipher %d wpa2_cipher %d\n\n",
 			   priv->pmib->dot1180211AuthEntry.dot11EnablePSK,
 			   priv->pmib->dot1180211AuthEntry.dot11WPACipher,
@@ -5242,759 +4670,23 @@ void choose_cipher(struct rtl8192cd_priv *priv, struct bss_desc *bss_target)
 	if (should_forbid_Nmode(priv)) {
 		if (priv->pmib->dot11BssType.net_work_type & WIRELESS_11N) {
 #ifdef SUPPORT_MULTI_PROFILE
-			if (!priv->mask_n_band) 
+			if (!priv->mask_n_band)
 				priv->mask_n_band = (priv->pmib->dot11BssType.net_work_type & (WIRELESS_11N | WIRELESS_11AC));
-#endif			
+#endif
 			priv->pmib->dot11BssType.net_work_type &= ~(WIRELESS_11N | WIRELESS_11AC);
 		}
 	}
-#ifdef SUPPORT_MULTI_PROFILE	
+#ifdef SUPPORT_MULTI_PROFILE
 	else {
 		if (priv->mask_n_band) {
 			priv->pmib->dot11BssType.net_work_type |= priv->mask_n_band;
-			priv->mask_n_band = 0;				
-		}		
+			priv->mask_n_band = 0;
+		}
 	}
-#endif		
+#endif
 }
 #endif
 
-#ifdef CONFIG_IEEE80211R
-int derive_ft_pmk_r1(struct r0_key_holder *r0kh, unsigned char *s1kh_id, unsigned char *r1kh_id, unsigned char *pmk, unsigned char *pmkid)
-{
-	unsigned char data[512];
-	unsigned char *pos;
-	unsigned char *data_vec[4];
-	size_t len_vec[4];
-	unsigned char tmpBuf[128];
-
-	pos = data;
-	memcpy(pos, r1kh_id, MACADDRLEN);
-	pos += MACADDRLEN;
-	memcpy(pos, s1kh_id, MACADDRLEN);
-	pos += MACADDRLEN;
-	sha256_prf(r0kh->pmk_r0, PMK_LEN, (unsigned char *)FT_PMKR1_CONST,
-		data, pos - data, pmk, PMK_LEN);
-
-	data_vec[0] = FT_PMKR1_NAME_CONST;
-	len_vec[0] = FT_PMKR1_NAME_CONST_SIZE;
-	data_vec[1] = r0kh->pmk_r0_name;
-	len_vec[1] = PMKID_LEN;
-	data_vec[2] = r1kh_id;
-	len_vec[2] = MACADDRLEN;
-	data_vec[3] = s1kh_id;
-	len_vec[3] = MACADDRLEN;
-	if (sha256_vector(4, data_vec, len_vec, tmpBuf)) {
-		printk("Error: sha256 fail\n");
-		return -1;
-	}
-	
-	memcpy(pmkid, tmpBuf, PMKID_LEN);
-	return 0;
-}
-
-void derive_ft_ptk(struct r1_key_holder *r1kh, unsigned char *snonce, unsigned char *anonce, unsigned char *keyout, unsigned int keyoutlen)
-{
-	unsigned char data[512];
-	unsigned char *pos;
-
-	pos = data;
-	memcpy(pos, snonce, KEY_NONCE_LEN);
-	pos += KEY_NONCE_LEN;
-	memcpy(pos, anonce, KEY_NONCE_LEN);
-	pos += KEY_NONCE_LEN;
-	memcpy(pos, r1kh->r1kh_id, MACADDRLEN);
-	pos += MACADDRLEN;
-	memcpy(pos, r1kh->sta_addr, MACADDRLEN);
-	pos += MACADDRLEN;
-	sha256_prf(r1kh->pmk_r1, PMK_LEN, (unsigned char *)FT_PMK_EXPANSION_CONST, 
-		data, pos - data, keyout, keyoutlen);
-}
-
-void derive_ft_pmk_r1_id(struct rtl8192cd_priv *priv, struct stat_info *pstat, unsigned char *pmk_r0_id, unsigned char *pmk_r1_id)
-{
-	unsigned char *data_vec[4];
-	size_t len_vec[4];
-	unsigned char tmpBuf[128];
-
-	data_vec[0] = FT_PMKR1_NAME_CONST;
-	len_vec[0] = FT_PMKR1_NAME_CONST_SIZE;
-	data_vec[1] = pmk_r0_id;
-	len_vec[1] = PMKID_LEN;
-	data_vec[2] = BSSID;
-	len_vec[2] = MACADDRLEN;
-	data_vec[3] = pstat->hwaddr;
-	len_vec[3] = MACADDRLEN;
-	if (sha256_vector(4, data_vec, len_vec, tmpBuf)) {
-		DEBUG_ERR("Error: sha256 fail\n");
-		return;
-	}
-	memcpy(pmk_r1_id, tmpBuf, PMKID_LEN);
-}
-
-static void CalcFTPTK(struct rtl8192cd_priv *priv, struct stat_info *pstat, unsigned char *keyout, int keyoutlen)
-{
-	WPA_STA_INFO *pStaInfo = pstat->wpa_sta_info;
-	unsigned char data[512];
-	unsigned char *pos;
-	unsigned char tmpBuf[128];
-	unsigned char *data_vec[4];
-	size_t len_vec[4];
-	unsigned char pmk_r0[PMK_LEN], pmk_r1[PMK_LEN];
-	unsigned char pmk_r0_name[PMKID_LEN], pmk_r1_name[PMKID_LEN];
-	unsigned char salt_buff[PMKID_LEN];
-
-	// Calc PMK-R0
-	pos = data;
-	*pos++ = (unsigned char)SSID_LEN;
-	memcpy(pos, SSID, SSID_LEN);
-	pos += SSID_LEN;
-	memcpy(pos, MDID, 2);
-	pos += 2;
-	*pos++ = R0KH_ID_LEN;
-	memcpy(pos, R0KH_ID, R0KH_ID_LEN);
-	pos += R0KH_ID_LEN;
-	memcpy(pos, pstat->hwaddr, MACADDRLEN);
-	pos += MACADDRLEN;
-	sha256_prf(pStaInfo->PMK, PMK_LEN, (unsigned char*)FT_PMKR0_CONST, data, pos - data, tmpBuf, 48);	
-	memcpy(pmk_r0, tmpBuf, PMK_LEN);
-	memcpy(salt_buff, tmpBuf + PMK_LEN, PMKID_LEN);
-
-	// Calc PMK-R0Name
-	data_vec[0] = FT_PMKR0_NAME_CONST;
-	len_vec[0] = FT_PMKR0_NAME_CONST_SIZE;
-	data_vec[1] = salt_buff;
-	len_vec[1] = PMKID_LEN;
-	if (sha256_vector(2, data_vec, len_vec, tmpBuf)) {
-		DEBUG_ERR("Error: sha256 fail\n");
-		return;
-	}
-	memcpy(pmk_r0_name, tmpBuf, PMKID_LEN);
-
-#ifdef DEBUG_PSK
-	debug_out("PSK: Generate PMK_R0_Name=", pmk_r0_name, PMKID_LEN);
-#endif
-
-	if (store_r0kh(priv, pstat->hwaddr, pmk_r0, pmk_r0_name)) {
-		DEBUG_ERR("Error: can't store r0kh\n");
-		return;
-	}
-
-	// Calc PMK-R1
-	pos = data;
-	memcpy(pos, BSSID, MACADDRLEN);
-	pos += MACADDRLEN;
-	memcpy(pos, pstat->hwaddr, MACADDRLEN);
-	pos += MACADDRLEN;
-	sha256_prf(pmk_r0, PMK_LEN, (unsigned char *)FT_PMKR1_CONST,
-		data, pos - data, tmpBuf, 32);
-	memcpy(pmk_r1, tmpBuf, PMK_LEN);
-
-#ifdef DEBUG_PSK
-	debug_out("PSK: Generate PMK_R1=", pmk_r1, PMK_LEN);
-#endif
-
-	// Calc PMK-R1Name
-	data_vec[0] = FT_PMKR1_NAME_CONST;
-	len_vec[0] = FT_PMKR1_NAME_CONST_SIZE;
-	data_vec[1] = pmk_r0_name;
-	len_vec[1] = PMKID_LEN;
-	data_vec[2] = BSSID;
-	len_vec[2] = MACADDRLEN;
-	data_vec[3] = pstat->hwaddr;
-	len_vec[3] = MACADDRLEN;
-	if (sha256_vector(4, data_vec, len_vec, tmpBuf)) {
-		DEBUG_ERR("Error: sha256 fail\n");
-		return;
-	}
-	memcpy(pmk_r1_name, tmpBuf, PMKID_LEN);
-
-#ifdef DEBUG_PSK
-	debug_out("PSK: Generate PMK_R1_Name=", pmk_r1_name, PMKID_LEN);
-#endif
-
-	// Calc PTK
-	pos = data;
-	memcpy(pos, pStaInfo->SNonce.Octet, KEY_NONCE_LEN);
-	pos += KEY_NONCE_LEN;
-	memcpy(pos, pStaInfo->ANonce.Octet, KEY_NONCE_LEN);
-	pos += KEY_NONCE_LEN;
-	memcpy(pos, BSSID, MACADDRLEN);
-	pos += MACADDRLEN;
-	memcpy(pos, pstat->hwaddr, MACADDRLEN);
-	pos += MACADDRLEN;
-	sha256_prf(pmk_r1, PMK_LEN, (unsigned char *)FT_PMK_EXPANSION_CONST,
-		data, pos - data, tmpBuf, keyoutlen);
-	memcpy(keyout, tmpBuf, keyoutlen);
-
-	if (store_r1kh(priv, pstat->hwaddr, BSSID, R0KH_ID, R0KH_ID_LEN, 
-			pmk_r1, pmk_r1_name, pmk_r0_name, mapPairwise(pstat->wpa_sta_info->UnicastCipher) )) {
-		DEBUG_ERR("Error: fail to store r1kh\n");
-		return;
-	}
-	
-	pStaInfo->r1kh = search_r1kh(priv, pstat->hwaddr, BSSID);
-}
-
-static unsigned char *getPMKID(unsigned int index, unsigned char *rsnie, unsigned int rsnie_len)
-{
-	unsigned char *pos;
-	unsigned int pmk_cnt;
-
-	pos = rsnie + 8; 
-	pos += 2 + 4 * le16_to_cpu(*(unsigned short *)pos);
-	pos += 2 + 4 * le16_to_cpu(*(unsigned short *)pos);
-	pos += 2;
-	pmk_cnt = le16_to_cpu(*(unsigned short *)pos);
-	pos += 2;
-	if (index < pmk_cnt && (pos + index * 16) < (rsnie + rsnie_len))
-		return (pos + index * 16);
-	return NULL;
-}
-
-static int isFTAuth(struct rtl8192cd_priv *priv, unsigned char *rsnie, unsigned int rsnie_len, int psk)
-{
-	unsigned int akm_cnt, i;
-	unsigned char akm_ft[4] = {0x00, 0x0f, 0xac, 0x03};
-	unsigned char akm_ft_psk[4] = {0x00, 0x0f, 0xac, 0x04};
-	unsigned char *pos = rsnie;
-
-	pos += 8;
-	pos += 2 + 4 * le16_to_cpu(*(unsigned short *)pos);
-	akm_cnt = le16_to_cpu(*(unsigned short *)pos);
-	pos += 2;
-
-	for (i = 0; i< akm_cnt; i++) {
-		if ( (!psk && !memcmp(pos + (i * 4), akm_ft, 4)) ||
-			 ((psk & PSK_WPA2) && !memcmp(pos + (i * 4), akm_ft_psk, 4)) )
-			return 1;
-	}
-
-	return 0;
-}
-
-static int validateMDIE(struct rtl8192cd_priv *priv, unsigned char *pbuf)
-{
-	if ( (memcmp(GetFTMDID(pbuf), MDID, 2) == 0) &&
-			(GetFTOverDS(pbuf) == priv->pmib->dot11FTEntry.dot11FTOverDSEnabled) &&
-			(GetFTResReq(pbuf) == priv->pmib->dot11FTEntry.dot11FTResourceRequestSupported) )
-		return 1;
-	else
-		return 0;
-}
-
-static unsigned char *getFTIESubElmt(unsigned char *ftie, unsigned int ftie_len, unsigned char elmt_id, unsigned int *outlen)
-{
-	unsigned char *pos;
-
-	if (ftie_len <= sizeof(struct ft_ie_elmt_hdr) + 2)
-		return NULL;
-	
-	pos = ftie + 2 + sizeof(struct ft_ie_elmt_hdr);
-	while (pos - ftie < ftie_len) {
-		if (*pos == elmt_id) {
-			*outlen = *(pos + 1);
-			return pos + 2;
-		}
-		else
-			pos += *(pos + 1) + 2;
-	}
-
-	return NULL;
-}
-
-#define PairwiseEnc(_x_) ( *((_x_) + 13) )
-
-int ft_check_imd_assoc(struct rtl8192cd_priv *priv, struct stat_info *pstat, unsigned char *pbuf, unsigned int limit, unsigned int *status)
-{
-	unsigned char *p;
-	unsigned int len;
-
-//	panic_printk("==> %s\n", __FUNCTION__);
-
-	// Check MDIE
-	p = get_ie(pbuf, _MOBILITY_DOMAIN_IE_, &len, limit);
-	if (!p || !validateMDIE(priv, p)) {
-		*status = _STATS_INVALID_MDIE_;
-		return -1;
-	}
-
-	// Check RSNIE
-	if (IEEE8021X_FUN) {
-		p = get_ie(pbuf, _RSN_IE_2_, &len, limit);
-		if (p == NULL) {
-			*status = __STATS_INVALID_IE_;
-			return -1;
-		}
-
-		// Check AKM
-		if (!isFTAuth(priv, p, len + 2, priv->pmib->dot1180211AuthEntry.dot11EnablePSK)) {
-			*status = __STATS_INVALID_AKMP_;
-			return -1;
-		}
-	}
-
-	return 0;
-}
-
-int ft_check_imd_4way(struct rtl8192cd_priv *priv, struct stat_info *pstat, unsigned char *pbuf, unsigned int limit, unsigned int *status)
-{
-	WPA_STA_INFO *pStaInfo = pstat->wpa_sta_info;
-	unsigned char *p;
-	unsigned int len;
-	struct r1_key_holder *r1kh;
-
-//	panic_printk("==> %s\n", __FUNCTION__);
-
-	// Check MDIE
-	p = get_ie(pbuf, _MOBILITY_DOMAIN_IE_, &len, limit);
-	if (!p || !validateMDIE(priv, p)) {
-		*status = _STATS_INVALID_MDIE_;
-		return -1;
-	}
-
-	// Check RSNIE
-	if (IEEE8021X_FUN) {
-		p = get_ie(pbuf, _RSN_IE_2_, &len, limit);
-		if (p == NULL) {
-			*status = __STATS_INVALID_IE_;
-			return -1;
-		}
-
-		// Check AKM
-		if (!isFTAuth(priv, p, len + 2, priv->pmib->dot1180211AuthEntry.dot11EnablePSK)) {
-			*status = __STATS_INVALID_AKMP_;
-			return -1;
-		}
-
-		// Check PMK-R1-Name
-		r1kh = pStaInfo->r1kh;
-		if (!r1kh || memcmp(r1kh->pmk_r1_name, getPMKID(0, p, len + 2), PMKID_LEN)) {
-			*status = _STATS_INVALID_PMKID_;
-			return -1;
-		}
-	}
-
-	return 0;
-
-}
-
-#ifdef SUPPORT_FAST_CONFIG
-
-void ft_set_unicastCipher(struct rtl8192cd_priv *priv, struct stat_info *pstat)
-{
-	if (priv->pmib->dot1180211AuthEntry.dot11EnablePSK & BIT(1)) {
-		if (priv->pmib->dot1180211AuthEntry.dot11WPA2Cipher == 2)
-			pstat->wpa_sta_info->UnicastCipher = DOT11_ENC_TKIP;
-		else if (priv->pmib->dot1180211AuthEntry.dot11WPA2Cipher == 8)
-			pstat->wpa_sta_info->UnicastCipher = DOT11_ENC_CCMP;
-		else if (priv->pmib->dot1180211AuthEntry.dot11WPA2Cipher == 10)
-			pstat->wpa_sta_info->UnicastCipher = DOT11_ENC_CCMP;
-		else
-			printk("unicastcipher  nothing\n");
-	}
-}
-
-#define STR_LEN MACADDRLEN*2
-void ft_auto_generate_pmk(struct rtl8192cd_priv *priv, struct stat_info *pstat, unsigned char *r0kh_id, unsigned int r0kh_id_len, unsigned char *cur_pmk_r1)
-{
-	WPA_STA_INFO *pStaInfo = pstat->wpa_sta_info;
-	unsigned char *pos;
-	unsigned char tmpBuf[128];
-	unsigned char data[512];
-	unsigned char pmk_r0[PMK_LEN], pmk_r1[PMK_LEN];
-	unsigned char pmk_r0_name[PMKID_LEN], pmk_r1_name[PMKID_LEN];
-	unsigned char salt_buff[PMKID_LEN];
-	unsigned char *data_vec[4];
-	size_t len_vec[4];
-	unsigned pmkBuf[PMK_LEN];
-
-	panic_printk("==> %s\n", __FUNCTION__);
-	
-	// Genererated Previous AP's Key info
-	
-	// Get R0KH-ID(mac addr) from client 
-	unsigned char R0KH_STR[STR_LEN];
-	unsigned R0KH_ID_Buf[MACADDRLEN];
-	strncpy(R0KH_STR, r0kh_id, STR_LEN);
-
-	int retval = rtl_string_to_hex(R0KH_STR, R0KH_ID_Buf, STR_LEN);
-	if(retval == 0)
-		printk(" rtl_string_to_hex() -> Weird! \n"); 
-		
-	// Calc PMK-R0
-	pos = data;
-	*pos++ = (unsigned char)SSID_LEN;
-	memcpy(pos, SSID, SSID_LEN);
-	pos += SSID_LEN;
-	memcpy(pos, MDID, 2);
-	pos += 2;
-	*pos++ = r0kh_id_len;
-	memcpy(pos, r0kh_id, r0kh_id_len);
-	pos += r0kh_id_len;
-	memcpy(pos, pstat->hwaddr, MACADDRLEN);
-	pos += MACADDRLEN;
-	
-	memcpy(pmkBuf, priv->wpa_global_info->PSK, PMK_LEN);	
-	sha256_prf(pmkBuf, PMK_LEN, (unsigned char*)FT_PMKR0_CONST, data, pos - data, tmpBuf, 48);	
-	memcpy(pmk_r0, tmpBuf, PMK_LEN);
-	memcpy(salt_buff, tmpBuf + PMK_LEN, PMKID_LEN);
-
-	// Calc PMK-R0Name
-	data_vec[0] = FT_PMKR0_NAME_CONST;
-	len_vec[0] = FT_PMKR0_NAME_CONST_SIZE;
-	data_vec[1] = salt_buff;
-	len_vec[1] = PMKID_LEN;
-	if (sha256_vector(2, data_vec, len_vec, tmpBuf)) {
-		DEBUG_ERR("Error: sha256 fail\n");
-		return;
-	}
-	memcpy(pmk_r0_name, tmpBuf, PMKID_LEN);	
-		
-	if (store_r0kh(priv, pstat->hwaddr, pmk_r0, pmk_r0_name)) {
-		DEBUG_ERR("Error: can't store r0kh\n");
-		return;
-	}
-	
-	// Calc PMK-R1
-	pos = data;
-	memcpy(pos, R0KH_ID_Buf, MACADDRLEN);
-	pos += MACADDRLEN;
-	memcpy(pos, pstat->hwaddr, MACADDRLEN);
-	pos += MACADDRLEN;
-	sha256_prf(pmk_r0, PMK_LEN, (unsigned char *)FT_PMKR1_CONST, data, pos - data, tmpBuf, 32);
-	memcpy(pmk_r1, tmpBuf, PMK_LEN);
-
-	// Calc PMK-R1Name
-	data_vec[0] = FT_PMKR1_NAME_CONST;
-	len_vec[0] = FT_PMKR1_NAME_CONST_SIZE;
-	data_vec[1] = pmk_r0_name;
-	len_vec[1] = PMKID_LEN;
-	data_vec[2] = R0KH_ID_Buf;
-	len_vec[2] = MACADDRLEN;
-	data_vec[3] = pstat->hwaddr;
-	len_vec[3] = MACADDRLEN;
-	if (sha256_vector(4, data_vec, len_vec, tmpBuf)) {
-		DEBUG_ERR("Error: sha256 fail\n");
-		return;
-	}
-	memcpy(pmk_r1_name, tmpBuf, PMKID_LEN);
-
-#ifdef DEBUG_PSK
-	debug_out("PSK: Generate pmk_r1_name=", pmk_r1_name, PMKID_LEN);
-	debug_out("ft_auto_generate_pmk: PMK_R0_Name= 0", pmk_r0_name, PMKID_LEN);
-	debug_out("ft_auto_generate_pmk: pmk_r1_name=", pmk_r1_name, PMKID_LEN);
-	debug_out("ft_auto_generate_pmk: PMK_R1=", pmk_r1, PMK_LEN);
-#endif
-
-	ft_set_unicastCipher(priv, pstat);
-	//store previous AP R1KH
-	if (store_r1kh(priv, pstat->hwaddr, R0KH_ID_Buf, r0kh_id, r0kh_id_len, 
-		pmk_r1, pmk_r1_name, pmk_r0_name, mapPairwise(pstat->wpa_sta_info->UnicastCipher) )) {
-		panic_printk("Error: fail to store r1kh\n");
-		return;
-	}
-
-	// Calc PMK-R1 of Current AP
-	pos = data;
-	memcpy(pos, BSSID, MACADDRLEN);
-	pos += MACADDRLEN;
-	memcpy(pos, pstat->hwaddr, MACADDRLEN);
-	pos += MACADDRLEN;
-	sha256_prf(pmk_r0, PMK_LEN, (unsigned char *)FT_PMKR1_CONST, data, pos - data, tmpBuf, 32);
-	memcpy(cur_pmk_r1, tmpBuf, PMK_LEN);
-
-#ifdef DEBUG_PSK
-	debug_out("ft_auto_generate_pmk: cur_pmk_r1=", cur_pmk_r1, PMK_LEN);
-#endif
-	
-}
-#endif
-
-int ft_check_ft_auth(struct rtl8192cd_priv *priv, struct stat_info *pstat, unsigned char *pbuf, unsigned int limit, unsigned int *status)
-{
-	WPA_STA_INFO *pStaInfo = pstat->wpa_sta_info;
-	WPA_GLOBAL_INFO *pGblInfo = priv->wpa_global_info;
-	unsigned char *p, *keyid, pmk_r1_id[PMKID_LEN];
-	unsigned int len, r0kh_id_len;
-	unsigned char *r0kh_id;
-	struct r1_key_holder *r1kh = NULL, tmp;
-	int pairwise;
-
-	panic_printk("==> %s\n", __FUNCTION__);
-	
-	// Check MDIE
-	p = get_ie(pbuf, _MOBILITY_DOMAIN_IE_, &len, limit);
-	if (!p || !validateMDIE(priv, p)) {
-		*status = _STATS_INVALID_MDIE_;
-		return -1;
-	}
-
-	// Check RSNIE
-	if (IEEE8021X_FUN) {
-		reset_sta_info(priv, pstat);
-		ft_init_1x(priv, pstat);
-
-		p = get_ie(pbuf, _RSN_IE_2_, &len, limit);
-		if (p == NULL) {
-			*status = __STATS_INVALID_IE_;
-			return -1;
-		}
-
-		// Check AKM
-		if (!isFTAuth(priv, p, len + 2, priv->pmib->dot1180211AuthEntry.dot11EnablePSK)) {
-			*status = __STATS_INVALID_AKMP_;
-			return -1;
-		}
-
-		pairwise = PairwiseEnc(p);
-
-		// Get PMK-R0-Name
-		keyid = getPMKID(0, p, len + 2);
-		if (!keyid) {
-			*status = _STATS_INVALID_PMKID_;
-			return -1;
-		}
-		memcpy(pStaInfo->cache_pmk_r0_id, keyid, PMKID_LEN);
-		derive_ft_pmk_r1_id(priv, pstat, keyid, pmk_r1_id);
-		r1kh = search_r1kh_by_pmkid(priv, pmk_r1_id, 1);
-		
-		p = get_ie(pbuf, _FAST_BSS_TRANSITION_IE_, &len, limit);
-		if (p == NULL) {
-			*status = __STATS_INVALID_IE_;
-			return -1;
-		}
-		
-		INCOctet32_INTEGER(&pGblInfo->Counter);
-		SetNonce(pStaInfo->ANonce, pGblInfo->Counter);
-
-		memcpy(pStaInfo->SNonce.Octet, p + 52, KEY_NONCE_LEN);
-		pStaInfo->SNonce.Length = KEY_NONCE_LEN;
-		
-
-		r0kh_id = getFTIESubElmt(p, len + 2, _FT_R0KH_ID_SUB_IE_, &r0kh_id_len);
-		if (!r0kh_id) {
-			panic_printk("%s: fail to get r0kh_id\n", __FUNCTION__);
-			*status = _STATS_INVALID_FTIE_;
-			return -1;
-		}
-		memcpy(pStaInfo->cache_r0kh_id, r0kh_id, r0kh_id_len);
-		pStaInfo->cache_r0kh_id_len = r0kh_id_len;
-
-	#ifdef SUPPORT_FAST_CONFIG
-		unsigned char cur_pmk_r1[PMK_LEN];
-		if(FT_ENABLE && priv->pmib->dot11FTEntry.dot11FT4way)
-		{
-			ft_auto_generate_pmk(priv, pstat, r0kh_id, r0kh_id_len, cur_pmk_r1);
-			//stored current AP R1KH
-			if (store_r1kh(priv, pstat->hwaddr, BSSID, r0kh_id, R0KH_ID_LEN, 
-				cur_pmk_r1, pmk_r1_id, keyid, mapPairwise(pstat->wpa_sta_info->UnicastCipher) )) {
-					panic_printk("Error: fail to store r1kh\n");
-					return;
-			}
-			r1kh = search_r1kh_by_pmkid(priv, pmk_r1_id, 1);
-		}	
-	#endif
-
-		if (!r1kh) {
-			// pull from other AP.
-			panic_printk("dot11FT4way = %d, (pull from other AP ? ) \n", priv->pmib->dot11FTEntry.dot11FT4way);
-			memset(&tmp, 0, sizeof(struct r1_key_holder));
-			memcpy(tmp.r0kh_id, r0kh_id, r0kh_id_len);
-			tmp.r0kh_id_len = r0kh_id_len;
-			memcpy(tmp.sta_addr, pstat->hwaddr, MACADDRLEN);
-			memcpy(tmp.r1kh_id, BSSID, MACADDRLEN);
-			memcpy(tmp.pmk_r0_name, pStaInfo->cache_pmk_r0_id, PMKID_LEN);
-			debug_out("PMK-R0: ", pStaInfo->cache_pmk_r0_id, PMKID_LEN);
-			FT_IndicateEvent(priv, pstat, DOT11_EVENT_FT_PULL_KEY_IND, &tmp);	
-
-			//*status = _STATS_INVALID_PMKID_;
-			//return -1;
-			return 0;
-		}
-
-		if (r1kh->pairwise != mapPairwise(pairwise)) {
-			DEBUG_WARN("Pairwise cipher %d is different with R0KH(%d)\n", pairwise, r1kh->pairwise);
-			*status = _STATS_INVALID_PAIRWISE_CIPHER_;
-			return -1;
-		}
-	
-		pStaInfo->r1kh = r1kh;	
-		memset(pStaInfo->r1kh->r0kh_id, 0, MAX_R0KHID_LEN);
-		memcpy(pStaInfo->r1kh->r0kh_id, r0kh_id, r0kh_id_len);
-		pStaInfo->r1kh->r0kh_id_len = r0kh_id_len;
-		derive_ft_keys(priv, pstat);
-	}
-
-	return 0;
-
-}
-
-int ft_check_ft_auth_rrq(struct rtl8192cd_priv *priv, struct stat_info *pstat, unsigned char *pbuf, unsigned int limit, unsigned int *status)
-{
-	panic_printk("==> %s\n", __FUNCTION__);
-	panic_printk("FT Resource Request Protocol not support yet\n");
-	*status = _STATS_FAILURE_;
-	return -1;
-}
-
-int ft_check_ft_assoc(struct rtl8192cd_priv *priv, struct stat_info *pstat, unsigned char *pbuf, unsigned int limit, unsigned int *status)
-{
-	WPA_STA_INFO *pStaInfo = pstat->wpa_sta_info;
-	WPA_GLOBAL_INFO *pGblInfo = priv->wpa_global_info;
-	unsigned char *p, *keyid, *r0kh_id, *r1kh_id;
-	unsigned int len, r0kh_id_len, r1kh_id_len;
-	struct ft_ie_elmt_hdr *ftie_hdr, *tmp_ftie_hdr;
-	unsigned char *rsnie, *ftie, *mdie;
-	unsigned int rsnie_len, ftie_len, mdie_len;
-	unsigned char tmp_ftie[512];
-
-	panic_printk("==> %s\n", __FUNCTION__);
-
-	// Check MDIE
-	p = get_ie(pbuf, _MOBILITY_DOMAIN_IE_, &len, limit);
-	if (!p || !validateMDIE(priv, p)) {
-		*status = _STATS_INVALID_MDIE_;
-		return -1;
-	}
-	mdie = p;
-	mdie_len = len + 2;
-
-	// Check RSNIE
-	if (IEEE8021X_FUN) {
-		p = get_ie(pbuf, _RSN_IE_2_, &len, limit);
-		if (p == NULL) {
-			*status = __STATS_INVALID_IE_;
-			return -1;
-		}
-		rsnie = p;
-		rsnie_len = len + 2;
-
-		// Check AKM
-		if (!isFTAuth(priv, p, len + 2, priv->pmib->dot1180211AuthEntry.dot11EnablePSK)) {
-			*status = __STATS_INVALID_AKMP_;
-			return -1;
-		}
-
-		// Get PMK-R0-Name
-		keyid = getPMKID(0, p, len + 2);
-		if (!keyid) {
-			*status = _STATS_INVALID_PMKID_;
-			return -1;
-		}
-
-		// Check PMK ID
-		if (!pStaInfo->r1kh || memcmp(pStaInfo->r1kh->pmk_r1_name, keyid, PMKID_LEN)) {
-			*status = _STATS_INVALID_PMKID_;
-			return -1;
-		}
-
-		// Check FTIE
-		p = get_ie(pbuf, _FAST_BSS_TRANSITION_IE_, &len, limit);
-		if (p == NULL) {
-			*status = __STATS_INVALID_IE_;
-			return -1;
-		}
-		if (len > 512) {
-			*status = _STATS_INVALID_FTIE_;
-			return -1;
-		}
-		memcpy(tmp_ftie, p, len + 2);
-		memset(tmp_ftie + 4, 0, KEY_MIC_LEN);
-		ftie = tmp_ftie;
-		ftie_len = len + 2;
-		tmp_ftie_hdr = (struct ft_ie_elmt_hdr *)(tmp_ftie + 2);
-
-		ftie_hdr = (struct ft_ie_elmt_hdr *)(p + 2);
-		if (memcmp(ftie_hdr->ANonce, pStaInfo->ANonce.Octet, KEY_NONCE_LEN) ||
-			memcmp(ftie_hdr->SNonce, pStaInfo->SNonce.Octet, KEY_NONCE_LEN)) {
-			*status = _STATS_INVALID_FTIE_;
-			return -1;
-		}
-		
-		r0kh_id = getFTIESubElmt(p, len + 2, _FT_R0KH_ID_SUB_IE_, &r0kh_id_len);
-		if (!r0kh_id || memcmp(r0kh_id, pStaInfo->cache_r0kh_id, pStaInfo->cache_r0kh_id_len)) {
-			*status = _STATS_INVALID_FTIE_;
-			return -1;
-		}
-
-		r1kh_id = getFTIESubElmt(p, len + 2, _FT_R1KH_ID_SUB_IE_, &r1kh_id_len);
-		if (!r1kh_id || memcmp(r1kh_id, pStaInfo->r1kh->r1kh_id, MACADDRLEN)) {
-			*status = _STATS_INVALID_FTIE_;
-			return -1;
-		}
-		
-		// Check MIC
-		calc_ft_mic(priv, pstat, rsnie, rsnie_len, mdie, mdie_len, ftie, ftie_len, 5);
-		if (memcmp(ftie_hdr->mic, tmp_ftie_hdr->mic, KEY_MIC_LEN)) {
-			*status = _STATS_FAILURE_;
-			return -1;
-		}
-	}
-
-	return 0;
-
-}
-
-void calc_ft_mic(struct rtl8192cd_priv *priv, struct stat_info *pstat, unsigned char *rsnie, unsigned int rsnie_len, 
-	unsigned char *mdie, unsigned int mdie_len, unsigned char *ftie, unsigned int ftie_len, unsigned int seq)
-{
-	WPA_STA_INFO *pStaInfo = pstat->wpa_sta_info;
-	unsigned char temp[512];
-	unsigned char mic[KEY_MIC_LEN];
-	unsigned char *pos;
-
-	pos = temp;
-	memcpy(pos, pstat->hwaddr, MACADDRLEN);
-	pos += MACADDRLEN;
-	memcpy(pos, BSSID, MACADDRLEN);
-	pos += MACADDRLEN;
-	*pos++ = seq;
-	memcpy(pos, rsnie, rsnie_len);
-	pos += rsnie_len;
-	memcpy(pos, mdie, mdie_len);
-	pos += mdie_len;
-	memcpy(pos, ftie, ftie_len);
-	pos += ftie_len;
-	omac1_aes_128(pStaInfo->PTK, temp, pos - temp, mic);
-	memcpy(ftie + 4, mic, KEY_MIC_LEN);
-}
-
-void derive_ft_keys(struct rtl8192cd_priv *priv, struct stat_info *pstat)
-{
-	printk("===> derive_ft_keys\n");
-	derive_ft_ptk(pstat->wpa_sta_info->r1kh, pstat->wpa_sta_info->SNonce.Octet, 
-		pstat->wpa_sta_info->ANonce.Octet, pstat->wpa_sta_info->PTK, 48);
-
-	UpdateGK(priv);
-}
-
-void install_ft_keys(struct rtl8192cd_priv *priv, struct stat_info *pstat)
-{
-	printk("===> install_ft_keys\n");
-	
-	ToDrv_SetPTK(priv, pstat);
-	ToDrv_SetPort(priv, pstat, DOT11_PortStatus_Authorized);
-	ToDrv_SetGTK(priv);
-}
-
-void ft_enc_gtk(struct rtl8192cd_priv *priv, struct stat_info *pstat, unsigned char *out, unsigned short *outlen)
-{
-	WPA_STA_INFO *pStaInfo = pstat->wpa_sta_info;
-	WPA_GLOBAL_INFO *pGblInfo = priv->wpa_global_info;
-
-	EncGTK(priv, pstat, pStaInfo->PTK + PTK_LEN_EAPOLMIC, PTK_LEN_EAPOLENC, 
-		pGblInfo->GTK[pGblInfo->GN], (pGblInfo->MulticastCipher == DOT11_ENC_TKIP) ? 32 : 16, out, outlen);
-}
-
-void ft_init_1x(struct rtl8192cd_priv *priv, struct stat_info *pstat)
-{
-	if (IEEE8021X_FUN && !priv->pmib->dot1180211AuthEntry.dot11EnablePSK) {
-		reset_sta_info(priv, pstat);
-		pstat->wpa_sta_info->RSNEnabled = 3;
-	}
-}
-#endif
 
 #endif // INCLUDE_WPA_PSK
 

@@ -1,7 +1,7 @@
 /******************************************************************************
  *
  * Copyright(c) 2007 - 2011 Realtek Corporation. All rights reserved.
- *                                        
+ *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of version 2 of the GNU General Public License as
  * published by the Free Software Foundation.
@@ -44,7 +44,7 @@ ODM_Read1Byte(
 #elif(DM_ODM_SUPPORT_TYPE & ODM_WIN)
 	PADAPTER		Adapter = pDM_Odm->Adapter;
 	return	PlatformEFIORead1Byte(Adapter, RegAddr);
-#endif	
+#endif
 
 }
 
@@ -64,7 +64,7 @@ ODM_Read2Byte(
 #elif(DM_ODM_SUPPORT_TYPE & ODM_WIN)
 	PADAPTER		Adapter = pDM_Odm->Adapter;
 	return	PlatformEFIORead2Byte(Adapter, RegAddr);
-#endif	
+#endif
 
 }
 
@@ -84,7 +84,7 @@ ODM_Read4Byte(
 #elif(DM_ODM_SUPPORT_TYPE & ODM_WIN)
 	PADAPTER		Adapter = pDM_Odm->Adapter;
 	return	PlatformEFIORead4Byte(Adapter, RegAddr);
-#endif	
+#endif
 
 }
 
@@ -106,7 +106,7 @@ ODM_Write1Byte(
 	PADAPTER		Adapter = pDM_Odm->Adapter;
 	PlatformEFIOWrite1Byte(Adapter, RegAddr, Data);
 #endif
-	
+
 }
 
 
@@ -126,7 +126,7 @@ ODM_Write2Byte(
 #elif(DM_ODM_SUPPORT_TYPE & ODM_WIN)
 	PADAPTER		Adapter = pDM_Odm->Adapter;
 	PlatformEFIOWrite2Byte(Adapter, RegAddr, Data);
-#endif	
+#endif
 
 }
 
@@ -147,13 +147,13 @@ ODM_Write4Byte(
 #elif(DM_ODM_SUPPORT_TYPE & ODM_WIN)
 	PADAPTER		Adapter = pDM_Odm->Adapter;
 	PlatformEFIOWrite4Byte(Adapter, RegAddr, Data);
-#endif	
+#endif
 
 }
 
 
 VOID
-ODM_SetMACReg(	
+ODM_SetMACReg(
 	IN 	PDM_ODM_T	pDM_Odm,
 	IN	u4Byte		RegAddr,
 	IN	u4Byte		BitMask,
@@ -165,12 +165,12 @@ ODM_SetMACReg(
 #elif(DM_ODM_SUPPORT_TYPE & (ODM_CE|ODM_WIN))
 	PADAPTER		Adapter = pDM_Odm->Adapter;
 	PHY_SetBBReg(Adapter, RegAddr, BitMask, Data);
-#endif	
+#endif
 }
 
 
-u4Byte 
-ODM_GetMACReg(	
+u4Byte
+ODM_GetMACReg(
 	IN 	PDM_ODM_T	pDM_Odm,
 	IN	u4Byte		RegAddr,
 	IN	u4Byte		BitMask
@@ -180,12 +180,12 @@ ODM_GetMACReg(
 	return PHY_QueryBBReg(pDM_Odm->priv, RegAddr, BitMask);
 #elif(DM_ODM_SUPPORT_TYPE & (ODM_WIN|ODM_CE))
 	return PHY_QueryMacReg(pDM_Odm->Adapter, RegAddr, BitMask);
-#endif	
+#endif
 }
 
 
 VOID
-ODM_SetBBReg(	
+ODM_SetBBReg(
 	IN 	PDM_ODM_T	pDM_Odm,
 	IN	u4Byte		RegAddr,
 	IN	u4Byte		BitMask,
@@ -197,12 +197,12 @@ ODM_SetBBReg(
 #elif(DM_ODM_SUPPORT_TYPE & (ODM_CE|ODM_WIN))
 	PADAPTER		Adapter = pDM_Odm->Adapter;
 	PHY_SetBBReg(Adapter, RegAddr, BitMask, Data);
-#endif	
+#endif
 }
 
 
-u4Byte 
-ODM_GetBBReg(	
+u4Byte
+ODM_GetBBReg(
 	IN 	PDM_ODM_T	pDM_Odm,
 	IN	u4Byte		RegAddr,
 	IN	u4Byte		BitMask
@@ -213,12 +213,12 @@ ODM_GetBBReg(
 #elif(DM_ODM_SUPPORT_TYPE & (ODM_CE|ODM_WIN))
 	PADAPTER		Adapter = pDM_Odm->Adapter;
 	return PHY_QueryBBReg(Adapter, RegAddr, BitMask);
-#endif	
+#endif
 }
 
 
 VOID
-ODM_SetRFReg(	
+ODM_SetRFReg(
 	IN 	PDM_ODM_T			pDM_Odm,
 	IN	ODM_RF_RADIO_PATH_E	eRFPath,
 	IN	u4Byte				RegAddr,
@@ -232,14 +232,14 @@ ODM_SetRFReg(
 	PADAPTER		Adapter = pDM_Odm->Adapter;
 	PHY_SetRFReg(Adapter, eRFPath, RegAddr, BitMask, Data);
 	ODM_delay_us(2);
-		
+
 #elif (DM_ODM_SUPPORT_TYPE & ODM_CE)
 	PHY_SetRFReg(pDM_Odm->Adapter, eRFPath, RegAddr, BitMask, Data);
-#endif	
+#endif
 }
 
-u4Byte 
-ODM_GetRFReg(	
+u4Byte
+ODM_GetRFReg(
 	IN 	PDM_ODM_T			pDM_Odm,
 	IN	ODM_RF_RADIO_PATH_E	eRFPath,
 	IN	u4Byte				RegAddr,
@@ -251,7 +251,7 @@ ODM_GetRFReg(
 #elif(DM_ODM_SUPPORT_TYPE & (ODM_CE|ODM_WIN))
 	PADAPTER		Adapter = pDM_Odm->Adapter;
 	return PHY_QueryRFReg(Adapter, eRFPath, RegAddr, BitMask);
-#endif	
+#endif
 }
 
 
@@ -261,7 +261,7 @@ ODM_GetRFReg(
 // ODM Memory relative API.
 //
 VOID
-ODM_AllocateMemory(	
+ODM_AllocateMemory(
 	IN 	PDM_ODM_T	pDM_Odm,
 	OUT	PVOID		*pPtr,
 	IN	u4Byte		length
@@ -274,12 +274,12 @@ ODM_AllocateMemory(
 #elif(DM_ODM_SUPPORT_TYPE & ODM_WIN)
 	PADAPTER		Adapter = pDM_Odm->Adapter;
 	PlatformAllocateMemory(Adapter, pPtr, length);
-#endif	
+#endif
 }
 
 // length could be ignored, used to detect memory leakage.
 VOID
-ODM_FreeMemory(	
+ODM_FreeMemory(
 	IN 	PDM_ODM_T	pDM_Odm,
 	OUT	PVOID		pPtr,
 	IN	u4Byte		length
@@ -287,16 +287,16 @@ ODM_FreeMemory(
 {
 #if (DM_ODM_SUPPORT_TYPE & (ODM_AP))
 	kfree(pPtr);
-#elif (DM_ODM_SUPPORT_TYPE & ODM_CE )	
+#elif (DM_ODM_SUPPORT_TYPE & ODM_CE )
 	rtw_vmfree(pPtr, length);
 #elif(DM_ODM_SUPPORT_TYPE & ODM_WIN)
 	//PADAPTER    Adapter = pDM_Odm->Adapter;
 	PlatformFreeMemory(pPtr, length);
-#endif	
+#endif
 }
 
 VOID
-ODM_MoveMemory(	
+ODM_MoveMemory(
 	IN 	PDM_ODM_T	pDM_Odm,
 	OUT PVOID		pDest,
 	IN  PVOID		pSrc,
@@ -305,11 +305,11 @@ ODM_MoveMemory(
 {
 #if (DM_ODM_SUPPORT_TYPE & ODM_AP)
 	memcpy(pDest, pSrc, Length);
-#elif (DM_ODM_SUPPORT_TYPE & ODM_CE )	
+#elif (DM_ODM_SUPPORT_TYPE & ODM_CE )
 	_rtw_memcpy(pDest, pSrc, Length);
 #elif(DM_ODM_SUPPORT_TYPE & ODM_WIN)
 	PlatformMoveMemory(pDest, pSrc, Length);
-#endif	
+#endif
 }
 
 void ODM_Memory_Set(
@@ -321,7 +321,7 @@ void ODM_Memory_Set(
 {
 #if (DM_ODM_SUPPORT_TYPE & ODM_AP)
 	memset(pbuf, value, length);
-#elif (DM_ODM_SUPPORT_TYPE & ODM_CE )	
+#elif (DM_ODM_SUPPORT_TYPE & ODM_CE )
 	_rtw_memset(pbuf,value, length);
 #elif(DM_ODM_SUPPORT_TYPE & ODM_WIN)
 	PlatformFillMemory(pbuf,length,value);
@@ -336,11 +336,11 @@ s4Byte ODM_CompareMemory(
 {
 #if (DM_ODM_SUPPORT_TYPE & (ODM_AP))
 	return memcmp(pBuf1,pBuf2,length);
-#elif (DM_ODM_SUPPORT_TYPE & ODM_CE )	
+#elif (DM_ODM_SUPPORT_TYPE & ODM_CE )
 	return _rtw_memcmp(pBuf1,pBuf2,length);
-#elif(DM_ODM_SUPPORT_TYPE & ODM_WIN)	
+#elif(DM_ODM_SUPPORT_TYPE & ODM_WIN)
 	return PlatformCompareMemory(pBuf1,pBuf2,length);
-#endif	
+#endif
 }
 
 
@@ -349,23 +349,23 @@ s4Byte ODM_CompareMemory(
 // ODM MISC relative API.
 //
 VOID
-ODM_AcquireSpinLock(	
+ODM_AcquireSpinLock(
 	IN 	PDM_ODM_T			pDM_Odm,
 	IN	RT_SPINLOCK_TYPE	type
 	)
 {
 #if (DM_ODM_SUPPORT_TYPE & (ODM_AP))
-	
+
 #elif(DM_ODM_SUPPORT_TYPE & ODM_CE)
 	PADAPTER Adapter = pDM_Odm->Adapter;
 	rtw_odm_acquirespinlock(Adapter, type);
 #elif(DM_ODM_SUPPORT_TYPE & ODM_WIN)
 	PADAPTER		Adapter = pDM_Odm->Adapter;
 	PlatformAcquireSpinLock(Adapter, type);
-#endif	
+#endif
 }
 VOID
-ODM_ReleaseSpinLock(	
+ODM_ReleaseSpinLock(
 	IN 	PDM_ODM_T			pDM_Odm,
 	IN	RT_SPINLOCK_TYPE	type
 	)
@@ -378,14 +378,14 @@ ODM_ReleaseSpinLock(
 #elif(DM_ODM_SUPPORT_TYPE & ODM_WIN)
 	PADAPTER		Adapter = pDM_Odm->Adapter;
 	PlatformReleaseSpinLock(Adapter, type);
-#endif	
+#endif
 }
 
 //
 // Work item relative API. FOr MP driver only~!
 //
 VOID
-ODM_InitializeWorkItem(	
+ODM_InitializeWorkItem(
 	IN 	PDM_ODM_T					pDM_Odm,
 	IN	PRT_WORK_ITEM				pRtWorkItem,
 	IN	RT_WORKITEM_CALL_BACK		RtWorkItemCallback,
@@ -394,88 +394,88 @@ ODM_InitializeWorkItem(
 	)
 {
 #if (DM_ODM_SUPPORT_TYPE & (ODM_AP))
-	
+
 #elif(DM_ODM_SUPPORT_TYPE & ODM_CE)
-	
+
 #elif(DM_ODM_SUPPORT_TYPE & ODM_WIN)
 	PADAPTER		Adapter = pDM_Odm->Adapter;
 	PlatformInitializeWorkItem(Adapter, pRtWorkItem, RtWorkItemCallback, pContext, szID);
-#endif	
+#endif
 }
 
 
 VOID
-ODM_StartWorkItem(	
+ODM_StartWorkItem(
 	IN	PRT_WORK_ITEM	pRtWorkItem
 	)
 {
 #if (DM_ODM_SUPPORT_TYPE & (ODM_AP))
-	
+
 #elif(DM_ODM_SUPPORT_TYPE & ODM_CE)
 
 #elif(DM_ODM_SUPPORT_TYPE & ODM_WIN)
 	PlatformStartWorkItem(pRtWorkItem);
-#endif	
+#endif
 }
 
 
 VOID
-ODM_StopWorkItem(	
+ODM_StopWorkItem(
 	IN	PRT_WORK_ITEM	pRtWorkItem
 	)
 {
 #if (DM_ODM_SUPPORT_TYPE & (ODM_AP))
-	
+
 #elif(DM_ODM_SUPPORT_TYPE & ODM_CE)
 
 #elif(DM_ODM_SUPPORT_TYPE & ODM_WIN)
 	PlatformStopWorkItem(pRtWorkItem);
-#endif	
+#endif
 }
 
 
 VOID
-ODM_FreeWorkItem(	
+ODM_FreeWorkItem(
 	IN	PRT_WORK_ITEM	pRtWorkItem
 	)
 {
 #if (DM_ODM_SUPPORT_TYPE & (ODM_AP))
-	
+
 #elif(DM_ODM_SUPPORT_TYPE & ODM_CE)
 
 #elif(DM_ODM_SUPPORT_TYPE & ODM_WIN)
 	PlatformFreeWorkItem(pRtWorkItem);
-#endif	
+#endif
 }
 
 
 VOID
-ODM_ScheduleWorkItem(	
+ODM_ScheduleWorkItem(
 	IN	PRT_WORK_ITEM	pRtWorkItem
 	)
 {
 #if (DM_ODM_SUPPORT_TYPE & (ODM_AP))
-	
+
 #elif(DM_ODM_SUPPORT_TYPE & ODM_CE)
 
 #elif(DM_ODM_SUPPORT_TYPE & ODM_WIN)
 	PlatformScheduleWorkItem(pRtWorkItem);
-#endif	
+#endif
 }
 
 
 VOID
-ODM_IsWorkItemScheduled(	
+ODM_IsWorkItemScheduled(
 	IN	PRT_WORK_ITEM	pRtWorkItem
 	)
 {
 #if (DM_ODM_SUPPORT_TYPE & (ODM_AP))
-	
+
 #elif(DM_ODM_SUPPORT_TYPE & ODM_CE)
 
 #elif(DM_ODM_SUPPORT_TYPE & ODM_WIN)
 	PlatformIsWorkItemScheduled(pRtWorkItem);
-#endif	
+#endif
 }
 
 
@@ -484,17 +484,17 @@ ODM_IsWorkItemScheduled(
 // ODM Timer relative API.
 //
 VOID
-ODM_StallExecution(	
+ODM_StallExecution(
 	IN	u4Byte	usDelay
 	)
 {
 #if (DM_ODM_SUPPORT_TYPE & (ODM_AP))
-	
+
 #elif(DM_ODM_SUPPORT_TYPE & ODM_CE)
 	rtw_udelay_os(usDelay);
 #elif(DM_ODM_SUPPORT_TYPE & ODM_WIN)
 	PlatformStallExecution(usDelay);
-#endif	
+#endif
 }
 
 VOID
@@ -506,7 +506,7 @@ ODM_delay_ms(IN u4Byte	ms)
 	rtw_mdelay_os(ms);
 #elif(DM_ODM_SUPPORT_TYPE & ODM_WIN)
 	delay_ms(ms);
-#endif			
+#endif
 }
 
 VOID
@@ -518,35 +518,35 @@ ODM_delay_us(IN u4Byte	us)
 	rtw_udelay_os(us);
 #elif(DM_ODM_SUPPORT_TYPE & ODM_WIN)
 	PlatformStallExecution(us);
-#endif			
+#endif
 }
 
 VOID
 ODM_sleep_ms(IN u4Byte	ms)
 {
 #if (DM_ODM_SUPPORT_TYPE & (ODM_AP))
-	
+
 #elif(DM_ODM_SUPPORT_TYPE & ODM_CE)
 	rtw_msleep_os(ms);
-#elif(DM_ODM_SUPPORT_TYPE & ODM_WIN)	
-#endif		
+#elif(DM_ODM_SUPPORT_TYPE & ODM_WIN)
+#endif
 }
 
 VOID
 ODM_sleep_us(IN u4Byte	us)
 {
 #if (DM_ODM_SUPPORT_TYPE & (ODM_AP))
-	
+
 #elif(DM_ODM_SUPPORT_TYPE & ODM_CE)
 	rtw_usleep_os(us);
-#elif(DM_ODM_SUPPORT_TYPE & ODM_WIN)	
-#endif		
+#elif(DM_ODM_SUPPORT_TYPE & ODM_WIN)
+#endif
 }
 
 VOID
-ODM_SetTimer(	
+ODM_SetTimer(
 	IN 	PDM_ODM_T		pDM_Odm,
-	IN	PRT_TIMER 		pTimer, 
+	IN	PRT_TIMER 		pTimer,
 	IN	u4Byte 			msDelay
 	)
 {
@@ -557,15 +557,15 @@ ODM_SetTimer(
 #elif(DM_ODM_SUPPORT_TYPE & ODM_WIN)
 	PADAPTER		Adapter = pDM_Odm->Adapter;
 	PlatformSetTimer(Adapter, pTimer, msDelay);
-#endif	
+#endif
 
 }
 
 VOID
 ODM_InitializeTimer(
 	IN 	PDM_ODM_T			pDM_Odm,
-	IN	PRT_TIMER 			pTimer, 
-	IN	RT_TIMER_CALL_BACK	CallBackFunc, 
+	IN	PRT_TIMER 			pTimer,
+	IN	RT_TIMER_CALL_BACK	CallBackFunc,
 	IN	PVOID				pContext,
 	IN	const char*			szID
 	)
@@ -581,7 +581,7 @@ ODM_InitializeTimer(
 #elif(DM_ODM_SUPPORT_TYPE & ODM_WIN)
 	PADAPTER Adapter = pDM_Odm->Adapter;
 	PlatformInitializeTimer(Adapter, pTimer, CallBackFunc,pContext,szID);
-#endif	
+#endif
 }
 
 
@@ -616,14 +616,14 @@ ODM_ReleaseTimer(
 
 	PADAPTER Adapter = pDM_Odm->Adapter;
 
-    // <20120301, Kordan> If the initilization fails, InitializeAdapterXxx will return regardless of InitHalDm. 
+    // <20120301, Kordan> If the initilization fails, InitializeAdapterXxx will return regardless of InitHalDm.
     // Hence, uninitialized timers cause BSOD when the driver releases resources since the init fail.
-    if (pTimer == 0) 
+    if (pTimer == 0)
     {
         ODM_RT_TRACE(pDM_Odm, ODM_COMP_INIT, ODM_DBG_SERIOUS, ("=====>ODM_ReleaseTimer(), The timer is NULL! Please check it!\n"));
         return;
     }
-        
+
 	PlatformReleaseTimer(Adapter, pTimer);
 #endif
 }
@@ -646,63 +646,63 @@ phydm_trans_h2c_id(
 				if(pDM_Odm->SupportICType == ODM_RTL8188E)
 					platform_h2c_id = H2C_88E_RSSI_REPORT;
 				else if(pDM_Odm->SupportICType == ODM_RTL8814A)
-					platform_h2c_id =H2C_8814A_RSSI_REPORT;                            
+					platform_h2c_id =H2C_8814A_RSSI_REPORT;
 				else
 					platform_h2c_id = H2C_RSSI_REPORT;
-				
+
 			#elif(DM_ODM_SUPPORT_TYPE & ODM_CE)
 				platform_h2c_id = H2C_RSSI_SETTING;
-				
+
 			#elif(DM_ODM_SUPPORT_TYPE & ODM_AP)
 				#if ((RTL8881A_SUPPORT == 1) || (RTL8192E_SUPPORT == 1) || (RTL8814A_SUPPORT == 1) || (RTL8822B_SUPPORT == 1) || (RTL8197F_SUPPORT == 1))
-				if (pDM_Odm->SupportICType == ODM_RTL8881A || pDM_Odm->SupportICType == ODM_RTL8192E || pDM_Odm->SupportICType & PHYDM_IC_3081_SERIES) 
-					platform_h2c_id = H2C_88XX_RSSI_REPORT;	
+				if (pDM_Odm->SupportICType == ODM_RTL8881A || pDM_Odm->SupportICType == ODM_RTL8192E || pDM_Odm->SupportICType & PHYDM_IC_3081_SERIES)
+					platform_h2c_id = H2C_88XX_RSSI_REPORT;
 				else
 				#endif
-				#if (RTL8812A_SUPPORT == 1) 
+				#if (RTL8812A_SUPPORT == 1)
 					if (pDM_Odm->SupportICType == ODM_RTL8812)
 						platform_h2c_id = H2C_8812_RSSI_REPORT;
 					else
-				#endif				
+				#endif
 					{}
 			#endif
-			
+
 				break;
 
-		//1 [3]	
+		//1 [3]
 		case ODM_H2C_WIFI_CALIBRATION:
 			#if (DM_ODM_SUPPORT_TYPE & ODM_WIN)
 					platform_h2c_id =H2C_WIFI_CALIBRATION;
-			
+
 			#elif (DM_ODM_SUPPORT_TYPE & ODM_CE)
-				#if (RTL8723B_SUPPORT == 1) 
+				#if (RTL8723B_SUPPORT == 1)
 					platform_h2c_id = H2C_8723B_BT_WLAN_CALIBRATION;
 				#endif
-				
+
 			#elif(DM_ODM_SUPPORT_TYPE & ODM_AP)
 			#endif
-				break;		
-	
-			
+				break;
+
+
 		//1 [4]
 		case ODM_H2C_IQ_CALIBRATION:
 			#if(DM_ODM_SUPPORT_TYPE & ODM_WIN)
 				platform_h2c_id =H2C_IQ_CALIBRATION;
-			
+
 			#elif(DM_ODM_SUPPORT_TYPE & ODM_CE)
 				#if((RTL8812A_SUPPORT==1) ||(RTL8821A_SUPPORT==1))
 				platform_h2c_id = H2C_8812_IQ_CALIBRATION;
 				#endif
 			#elif(DM_ODM_SUPPORT_TYPE & ODM_AP)
 			#endif
-			
+
 				break;
 		//1 [5]
 		case ODM_H2C_RA_PARA_ADJUST:
 
 			#if(DM_ODM_SUPPORT_TYPE & ODM_WIN)
 				if (pDM_Odm->SupportICType & (ODM_RTL8814A | ODM_RTL8822B))
-					platform_h2c_id =H2C_8814A_RA_PARA_ADJUST;                            
+					platform_h2c_id =H2C_8814A_RA_PARA_ADJUST;
 				else
 					platform_h2c_id = H2C_RA_PARA_ADJUST;
 			#elif(DM_ODM_SUPPORT_TYPE & ODM_CE)
@@ -712,24 +712,24 @@ phydm_trans_h2c_id(
 					platform_h2c_id = H2C_RA_PARA_ADJUST;
 				#elif(RTL8192E_SUPPORT==1)
 					platform_h2c_id =H2C_8192E_RA_PARA_ADJUST;
-				#elif(RTL8723B_SUPPORT==1) 
+				#elif(RTL8723B_SUPPORT==1)
 					platform_h2c_id =H2C_8723B_RA_PARA_ADJUST;
 				#endif
-				
+
 			#elif(DM_ODM_SUPPORT_TYPE & ODM_AP)
-				#if ((RTL8881A_SUPPORT == 1) || (RTL8192E_SUPPORT == 1) || (RTL8814A_SUPPORT == 1) || (RTL8822B_SUPPORT == 1) || (RTL8197F_SUPPORT == 1)) 
-				if (pDM_Odm->SupportICType == ODM_RTL8881A || pDM_Odm->SupportICType == ODM_RTL8192E || pDM_Odm->SupportICType & PHYDM_IC_3081_SERIES) 
+				#if ((RTL8881A_SUPPORT == 1) || (RTL8192E_SUPPORT == 1) || (RTL8814A_SUPPORT == 1) || (RTL8822B_SUPPORT == 1) || (RTL8197F_SUPPORT == 1))
+				if (pDM_Odm->SupportICType == ODM_RTL8881A || pDM_Odm->SupportICType == ODM_RTL8192E || pDM_Odm->SupportICType & PHYDM_IC_3081_SERIES)
 					platform_h2c_id = H2C_88XX_RA_PARA_ADJUST;
 				else
 				#endif
-				#if(RTL8812A_SUPPORT==1) 
+				#if(RTL8812A_SUPPORT==1)
 					if(pDM_Odm->SupportICType == ODM_RTL8812)
 						platform_h2c_id = H2C_8812_RA_PARA_ADJUST;
 					else
 				#endif
 					{}
 			#endif
-			
+
 				break;
 
 
@@ -750,12 +750,12 @@ phydm_trans_h2c_id(
 				#if(RTL8814A_SUPPORT==1)
 					if( pDM_Odm->SupportICType == ODM_RTL8814A)
 					{
-						platform_h2c_id = H2C_88XX_DYNAMIC_TX_PATH;				
-					} 
+						platform_h2c_id = H2C_88XX_DYNAMIC_TX_PATH;
+					}
 				#endif
 
 			#endif
-			
+
 				break;
 
 		/* [7]*/
@@ -764,9 +764,9 @@ phydm_trans_h2c_id(
 			#if (DM_ODM_SUPPORT_TYPE & ODM_WIN)
 				if (pDM_Odm->SupportICType & (ODM_RTL8814A|ODM_RTL8822B))
 					platform_h2c_id = H2C_8814A_FW_TRACE_EN;
-				else 
+				else
 					platform_h2c_id = H2C_FW_TRACE_EN;
-				
+
 			#elif(DM_ODM_SUPPORT_TYPE & ODM_CE)
 
 				platform_h2c_id = 0x49;
@@ -777,7 +777,7 @@ phydm_trans_h2c_id(
 						platform_h2c_id  = H2C_88XX_FW_TRACE_EN;
 					else
 				#endif
-				#if (RTL8812A_SUPPORT == 1) 
+				#if (RTL8812A_SUPPORT == 1)
 					if (pDM_Odm->SupportICType == ODM_RTL8812)
 						platform_h2c_id = H2C_8812_FW_TRACE_EN;
 					else
@@ -785,7 +785,7 @@ phydm_trans_h2c_id(
 					{}
 
 			#endif
-			
+
 				break;
 
 		case PHYDM_H2C_TXBF:
@@ -795,18 +795,18 @@ phydm_trans_h2c_id(
 		break;
 
 		case PHYDM_H2C_MU:
-			#if (RTL8822B_SUPPORT == 1) 
+			#if (RTL8822B_SUPPORT == 1)
 			platform_h2c_id  = 0x4a;	/*H2C_MU*/
-			#endif			
+			#endif
 		break;
 
 		default:
 			platform_h2c_id = phydm_h2c_id;
-			break;	
-	}	
-	
+			break;
+	}
+
 	return platform_h2c_id;
-	
+
 }
 
 /*ODM FW relative API.*/
@@ -830,25 +830,25 @@ ODM_FillH2CCmd(
 		if (pDM_Odm->SupportICType == ODM_RTL8188E)	{
 			if (!pDM_Odm->RaSupport88E)
 				FillH2CCmd88E(Adapter, platform_h2c_id, CmdLen, pCmdBuffer);
-		} else if (pDM_Odm->SupportICType == ODM_RTL8814A)		
-			FillH2CCmd8814A(Adapter, platform_h2c_id, CmdLen, pCmdBuffer);		
-		else if (pDM_Odm->SupportICType == ODM_RTL8822B)		
+		} else if (pDM_Odm->SupportICType == ODM_RTL8814A)
+			FillH2CCmd8814A(Adapter, platform_h2c_id, CmdLen, pCmdBuffer);
+		else if (pDM_Odm->SupportICType == ODM_RTL8822B)
 #if (RTL8822B_SUPPORT == 1)
 			FillH2CCmd8822B(Adapter, platform_h2c_id, CmdLen, pCmdBuffer);
-#endif		
-		else				
+#endif
+		else
 			FillH2CCmd(Adapter, platform_h2c_id, CmdLen, pCmdBuffer);
 
 #elif(DM_ODM_SUPPORT_TYPE & ODM_CE)
 		rtw_hal_fill_h2c_cmd(Adapter, platform_h2c_id, CmdLen, pCmdBuffer);
 
-#elif(DM_ODM_SUPPORT_TYPE & ODM_AP)	
-#if ((RTL8881A_SUPPORT == 1) || (RTL8192E_SUPPORT == 1) || (RTL8814A_SUPPORT == 1) || (RTL8822B_SUPPORT == 1) || (RTL8197F_SUPPORT == 1)) 
-		if (pDM_Odm->SupportICType == ODM_RTL8881A || pDM_Odm->SupportICType == ODM_RTL8192E || pDM_Odm->SupportICType & PHYDM_IC_3081_SERIES) 
+#elif(DM_ODM_SUPPORT_TYPE & ODM_AP)
+#if ((RTL8881A_SUPPORT == 1) || (RTL8192E_SUPPORT == 1) || (RTL8814A_SUPPORT == 1) || (RTL8822B_SUPPORT == 1) || (RTL8197F_SUPPORT == 1))
+		if (pDM_Odm->SupportICType == ODM_RTL8881A || pDM_Odm->SupportICType == ODM_RTL8192E || pDM_Odm->SupportICType & PHYDM_IC_3081_SERIES)
 			GET_HAL_INTERFACE(pDM_Odm->priv)->FillH2CCmdHandler(pDM_Odm->priv, platform_h2c_id, CmdLen, pCmdBuffer);
 		else
 #endif
-#if (RTL8812A_SUPPORT == 1) 
+#if (RTL8812A_SUPPORT == 1)
 		if (pDM_Odm->SupportICType == ODM_RTL8812)
 			FillH2CCmd8812(pDM_Odm->priv, platform_h2c_id, CmdLen, pCmdBuffer);
 		else
@@ -884,17 +884,17 @@ phydm_c2H_content_parsing(
 	case PHYDM_C2H_RA_PARA_RPT:
 		ODM_C2HRaParaReportHandler(pDM_Odm, tmpBuf, c2hCmdLen);
 		break;
-		
+
 	case PHYDM_C2H_DYNAMIC_TX_PATH_RPT:
 		if (pDM_Odm->SupportICType & (ODM_RTL8814A))
 			phydm_c2h_dtp_handler(pDM_Odm, tmpBuf, c2hCmdLen);
 		break;
-		
+
 	case PHYDM_C2H_IQK_FINISH:
 		#if (DM_ODM_SUPPORT_TYPE == ODM_WIN)
-		
+
 		if (pDM_Odm->SupportICType & (ODM_RTL8812|ODM_RTL8821)) {
-			
+
 			RT_TRACE(COMP_MP, DBG_LOUD, ("== FW IQK Finish ==\n"));
 			PlatformAcquireSpinLock(Adapter, RT_IQK_SPINLOCK);
 			pDM_Odm->RFCalibrateInfo.bIQKInProgress = FALSE;
@@ -902,19 +902,19 @@ phydm_c2H_content_parsing(
 			pDM_Odm->RFCalibrateInfo.IQK_ProgressingTime = 0;
 			pDM_Odm->RFCalibrateInfo.IQK_ProgressingTime = ODM_GetProgressingTime(pDM_Odm, pDM_Odm->RFCalibrateInfo.IQK_StartTime);
 		}
-		
+
 		#endif
 		break;
 
 	case PHYDM_C2H_DBG_CODE:
 		phydm_fw_trace_handler_code(pDM_Odm, tmpBuf, c2hCmdLen);
-		break;	
+		break;
 
 	case PHYDM_C2H_EXTEND:
 		Extend_c2hSubID= tmpBuf[0];
 		if (Extend_c2hSubID == PHYDM_EXTEND_C2H_DBG_PRINT)
 			phydm_fw_trace_handler_8051(pDM_Odm, tmpBuf, c2hCmdLen);
-		
+
 		break;
 
 	default:
@@ -927,7 +927,7 @@ phydm_c2H_content_parsing(
 }
 
 u8Byte
-ODM_GetCurrentTime(	
+ODM_GetCurrentTime(
 	IN 	PDM_ODM_T		pDM_Odm
 	)
 {
@@ -935,13 +935,13 @@ ODM_GetCurrentTime(
 	return  (u8Byte)rtw_get_current_time();
 #elif(DM_ODM_SUPPORT_TYPE & ODM_CE)
 	return (u8Byte)rtw_get_current_time();
-#elif(DM_ODM_SUPPORT_TYPE & ODM_WIN)	
+#elif(DM_ODM_SUPPORT_TYPE & ODM_WIN)
 	return  PlatformGetCurrentTime();
 #endif
 }
 
 u8Byte
-ODM_GetProgressingTime(	
+ODM_GetProgressingTime(
 	IN 	PDM_ODM_T		pDM_Odm,
 	IN	u8Byte			Start_Time
 	)

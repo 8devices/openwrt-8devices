@@ -11,24 +11,13 @@
  */
 #define _8192CD_MIB_C_
 
-#ifdef __KERNEL__
 #include <linux/module.h>
-#elif defined(__ECOS)
-#include <cyg/io/eth/rltk/819x/wrapper/sys_support.h>
-#include <cyg/io/eth/rltk/819x/wrapper/skbuff.h>
-#include <cyg/io/eth/rltk/819x/wrapper/timer.h>
-#include <cyg/io/eth/rltk/819x/wrapper/wrapper.h>
-#endif
 
 #include "./8192cd_cfg.h"
 
 #ifdef SUPPORT_SNMP_MIB
 
-#if defined(__KERNEL__) || defined(__OSK__)
 #include "./ieee802_mib.h"
-#elif defined(__ECOS)
-#include <cyg/io/eth/rltk/819x/wlan/ieee802_mib.h>
-#endif
 #include "./8192cd_headers.h"
 #include "./8192cd_debug.h"
 #include "./8192cd_mib.h"
@@ -112,7 +101,7 @@ struct mib_val dot11_mib_table[]={
 	{ {1, 10, 1, 1, 1, -1}, "dot11RadiusServerIPAddress", MIB_TYPE_VAL, 1, 1},
 	{ {1, 10, 1, 2, 1, -1}, "dot11RadiusServerPort", MIB_TYPE_VAL, 1, 1},
 	{ {1, 10, 1, 3, 1, -1}, "dot11RadiusServerPassword", MIB_TYPE_VAL, 1, 1},
-	{ {1, 10, 1, 4, 1, -1}, "dot11RadiusServerEnable", MIB_TYPE_VAL, 1, 1},	
+	{ {1, 10, 1, 4, 1, -1}, "dot11RadiusServerEnable", MIB_TYPE_VAL, 1, 1},
 	//dot11OperationTable
 	{ {2, 1, 1, 1, 1, -1}, "dot11MACAddress", MIB_TYPE_PRIV, PRIV_OFFSET(dot11OperationEntry.hwaddr), PRIV_SIZE(dot11OperationEntry.hwaddr)},
 	{ {2, 1, 1, 2, 1, -1}, "dot11RTSThreshold", MIB_TYPE_PRIV, PRIV_OFFSET(dot11OperationEntry.dot11RTSThreshold), PRIV_SIZE(dot11OperationEntry.dot11RTSThreshold)},
@@ -128,10 +117,10 @@ struct mib_val dot11_mib_table[]={
 	{ {2, 1, 1, 12, 1, -1}, "dot11WIFISpecific", MIB_TYPE_PRIV,PRIV_OFFSET(dot11OperationEntry.wifi_specific), PRIV_SIZE(dot11OperationEntry.wifi_specific)},
 	{ {2, 1, 1, 13, 1, -1}, "dot11QosEnable", MIB_TYPE_PRIV,PRIV_OFFSET(dot11QosEntry.dot11QosEnable), PRIV_SIZE(dot11QosEntry.dot11QosEnable)},
 	{ {2, 1, 1, 14, 1, -1}, "dot11NetworkType", MIB_TYPE_PRIV,PRIV_OFFSET(dot11BssType.net_work_type), PRIV_SIZE(dot11BssType.net_work_type)},
-	{ {2, 1, 1, 15, 1, -1}, "dot11LedType", MIB_TYPE_PRIV,PRIV_OFFSET(dot11OperationEntry.ledtype), PRIV_SIZE(dot11OperationEntry.ledtype)},						
-	{ {2, 1, 1, 16, 1, -1}, "dot11OperationMode", MIB_TYPE_PRIV,PRIV_OFFSET(dot11OperationEntry.opmode), PRIV_SIZE(dot11OperationEntry.opmode)},	
+	{ {2, 1, 1, 15, 1, -1}, "dot11LedType", MIB_TYPE_PRIV,PRIV_OFFSET(dot11OperationEntry.ledtype), PRIV_SIZE(dot11OperationEntry.ledtype)},
+	{ {2, 1, 1, 16, 1, -1}, "dot11OperationMode", MIB_TYPE_PRIV,PRIV_OFFSET(dot11OperationEntry.opmode), PRIV_SIZE(dot11OperationEntry.opmode)},
 	{ {2, 1, 1, 17, 1, -1}, "dot11BroadCastSSID", MIB_TYPE_PRIV,PRIV_OFFSET(miscEntry.show_hidden_bss), PRIV_SIZE(miscEntry.show_hidden_bss)},
-	{ {2, 1, 1, 18, 1, -1}, "dot11GuestAccess", MIB_TYPE_PRIV,PRIV_OFFSET(dot11OperationEntry.guest_access), PRIV_SIZE(dot11OperationEntry.guest_access)},	
+	{ {2, 1, 1, 18, 1, -1}, "dot11GuestAccess", MIB_TYPE_PRIV,PRIV_OFFSET(dot11OperationEntry.guest_access), PRIV_SIZE(dot11OperationEntry.guest_access)},
 
 	//dot11CountersTable
 	{ {2, 2, 1, 1, 1, -1}, "dot11TransmittedFragmentCount", MIB_TYPE_SNMP, SNMP_OFFSET(dot11TransmittedFragmentCount), SNMP_SIZE(dot11TransmittedFragmentCount)},
@@ -166,9 +155,9 @@ struct mib_val dot11_mib_table[]={
 	{ {4, 1, 1, 1, 1, -1}, "dot11PHYType", MIB_TYPE_VAL, 2, 1},
 	{ {4, 1, 1, 2, 1, -1}, "dot11CurrentRegDomain", MIB_TYPE_SNMP, SNMP_OFFSET(dot11CurrentRegDomain), SNMP_SIZE(dot11CurrentRegDomain)},
 	{ {4, 1, 1, 3, 1, -1}, "dot11TempType", MIB_TYPE_VAL, 1, 1},
-	{ {4, 1, 1, 4, 1, -1}, "dot11ShortPreamble",MIB_TYPE_PRIV, PRIV_OFFSET(dot11RFEntry.shortpreamble), PRIV_SIZE(dot11RFEntry.shortpreamble)},	
-	{ {4, 1, 1, 5, 1, -1}, "dot11PhyBandSelect",MIB_TYPE_PRIV, PRIV_OFFSET(dot11RFEntry.phyBandSelect), PRIV_SIZE(dot11RFEntry.phyBandSelect)},	
-	{ {4, 1, 1, 6, 1, -1}, "dot11TrSwitch",MIB_TYPE_PRIV, PRIV_OFFSET(dot11RFEntry.trswitch), PRIV_SIZE(dot11RFEntry.trswitch)},	
+	{ {4, 1, 1, 4, 1, -1}, "dot11ShortPreamble",MIB_TYPE_PRIV, PRIV_OFFSET(dot11RFEntry.shortpreamble), PRIV_SIZE(dot11RFEntry.shortpreamble)},
+	{ {4, 1, 1, 5, 1, -1}, "dot11PhyBandSelect",MIB_TYPE_PRIV, PRIV_OFFSET(dot11RFEntry.phyBandSelect), PRIV_SIZE(dot11RFEntry.phyBandSelect)},
+	{ {4, 1, 1, 6, 1, -1}, "dot11TrSwitch",MIB_TYPE_PRIV, PRIV_OFFSET(dot11RFEntry.trswitch), PRIV_SIZE(dot11RFEntry.trswitch)},
 	{ {4, 1, 1, 7, 1, -1}, "dot11PowerScale", MIB_TYPE_SNMP, SNMP_OFFSET(dot11PowerScale), SNMP_SIZE(dot11PowerScale)},
 
 	//dot11PhyAntennaTable

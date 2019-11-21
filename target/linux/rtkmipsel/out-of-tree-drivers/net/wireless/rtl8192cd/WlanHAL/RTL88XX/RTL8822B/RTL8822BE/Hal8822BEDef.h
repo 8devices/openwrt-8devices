@@ -6,21 +6,21 @@ Copyright (c) Realtek Semiconductor Corp. All rights reserved.
 
 Module Name:
 	Hal8822BEDef.h
-	
+
 Abstract:
 	Defined HAL 8822BE data structure & Define
-	    
+
 Major Change History:
 	When       Who               What
 	---------- ---------------   -------------------------------
-	2015-06-25 Eric             Create.	
+	2015-06-25 Eric             Create.
 --*/
 
 
 /*RT_STATUS
 InitPON8822BE(
     IN  HAL_PADAPTER    Adapter,
-    IN  u4Byte          ClkSel        
+    IN  u4Byte          ClkSel
 );
 
 RT_STATUS
@@ -35,7 +35,7 @@ ResetHWForSurprise8822BE(
 );
 */
 
-RT_STATUS	
+RT_STATUS
 hal_Associate_8822BE(
 	struct rtl8192cd_priv *priv,
 	BOOLEAN             IsDefaultAdapter
@@ -72,10 +72,10 @@ Beamforming_dym_disable_bf_coeff_8822B(
 );
 
 
-#ifdef CONFIG_VERIWAVE_MU_CHECK	
+#ifdef CONFIG_VERIWAVE_MU_CHECK
 void Beamforming_set_csi_data(
-	struct rtl8192cd_priv *priv, 
-	int idx, 
+	struct rtl8192cd_priv *priv,
+	int idx,
 	int reg_idx);
 #endif
 
@@ -90,7 +90,7 @@ VOID Beamforming_NDPARate_8822B(
 	u1Byte		BW,
 	u1Byte		Rate
 	);
-	
+
 
 #if (MU_BEAMFORMING_SUPPORT == 1)
 VOID
@@ -105,7 +105,7 @@ C2HTxBeamformingHandler_8822B(
 		pu1Byte			CmdBuf,
 		u1Byte			CmdLen
 );
-#endif 
+#endif
 
 
 #endif  //__HAL8822BE_DEF_H__

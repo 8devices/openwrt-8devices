@@ -12,16 +12,13 @@
 
 #define _8192CD_PSK_C_
 
-#ifdef __KERNEL__
 #include <linux/module.h>
 #include <linux/netdevice.h>
 #include <linux/timer.h>
 #include <linux/random.h>
-#endif
 
 #include "./8192cd_cfg.h"
 
-#if defined(WIFI_HAPD) && !defined(HAPD_DRV_PSK_WPS) || defined(RTK_NL80211)
 
 #include "./8192cd.h"
 #include "./wifi.h"
@@ -33,9 +30,6 @@
 #include "./8192cd_psk.h"
 #include "./1x_rc4.h"
 
-#ifndef __KERNEL__
-#include "./sys-support.h"
-#endif
 
 //#define DEBUG_PSK
 
@@ -306,7 +300,6 @@ void ConstructIE(struct rtl8192cd_priv *priv, unsigned char *pucOut, int *usOutL
         memset(pDot11RSNPairwiseSuite, 0, sizeof(DOT11_RSN_IE_COUNT_SUITE));
 		usSuitCount = 0;
 
-#ifdef RTK_NL80211
         for (ulIndex=0; ulIndex<priv->wpa_global_info->NumOfUnicastCipher; ulIndex++)
         {
         	int i = ulIndex<priv->wpa_global_info->NumOfUnicastCipher - ulIndex - 1;
@@ -316,16 +309,6 @@ void ConstructIE(struct rtl8192cd_priv *priv, unsigned char *pucOut, int *usOutL
 			pDot11RSNPairwiseSuite->dot11RSNIESuite[usSuitCount].Type = priv->wpa_global_info->UnicastCipher[i];
 			usSuitCount++;
         }
-#else
-        for (ulIndex=0; ulIndex<priv->wpa_global_info->NumOfUnicastCipher; ulIndex++)
-        {
-			pDot11RSNPairwiseSuite->dot11RSNIESuite[usSuitCount].OUI[0] = 0x00;
-			pDot11RSNPairwiseSuite->dot11RSNIESuite[usSuitCount].OUI[1] = 0x50;
-			pDot11RSNPairwiseSuite->dot11RSNIESuite[usSuitCount].OUI[2] = 0xF2;
-			pDot11RSNPairwiseSuite->dot11RSNIESuite[usSuitCount].Type = priv->wpa_global_info->UnicastCipher[ulIndex];
-			usSuitCount++;
-        }
-#endif
 		pDot11RSNPairwiseSuite->SuiteCount = cpu_to_le16(usSuitCount);
         ulPairwiseLength = sizeof(pDot11RSNPairwiseSuite->SuiteCount) + usSuitCount*sizeof(DOT11_RSN_IE_SUITE);
         ulIELength += ulPairwiseLength;
@@ -423,26 +406,15 @@ void ConstructIE(struct rtl8192cd_priv *priv, unsigned char *pucOut, int *usOutL
         pDot11RSNPairwiseSuite = &countSuite;
         memset(pDot11RSNPairwiseSuite, 0, sizeof(DOT11_RSN_IE_COUNT_SUITE));
 		usSuitCount = 0;
-#ifdef RTK_NL80211
 		for (ulIndex=0; ulIndex<priv->wpa_global_info->NumOfUnicastCipherWPA2; ulIndex++)
 		{
-			int i = priv->wpa_global_info->NumOfUnicastCipherWPA2 - ulIndex - 1; 
+			int i = priv->wpa_global_info->NumOfUnicastCipherWPA2 - ulIndex - 1;
 			pDot11RSNPairwiseSuite->dot11RSNIESuite[usSuitCount].OUI[0] = 0x00;
 			pDot11RSNPairwiseSuite->dot11RSNIESuite[usSuitCount].OUI[1] = 0x0F;
 			pDot11RSNPairwiseSuite->dot11RSNIESuite[usSuitCount].OUI[2] = 0xAC;
 			pDot11RSNPairwiseSuite->dot11RSNIESuite[usSuitCount].Type = priv->wpa_global_info->UnicastCipherWPA2[i];
 			usSuitCount++;
 		}
-#else
-		for (ulIndex=0; ulIndex<priv->wpa_global_info->NumOfUnicastCipherWPA2; ulIndex++)
-        {
-			pDot11RSNPairwiseSuite->dot11RSNIESuite[usSuitCount].OUI[0] = 0x00;
-			pDot11RSNPairwiseSuite->dot11RSNIESuite[usSuitCount].OUI[1] = 0x0F;
-			pDot11RSNPairwiseSuite->dot11RSNIESuite[usSuitCount].OUI[2] = 0xAC;
-			pDot11RSNPairwiseSuite->dot11RSNIESuite[usSuitCount].Type = priv->wpa_global_info->UnicastCipherWPA2[ulIndex];
-			usSuitCount++;
-        }
-#endif
 		pDot11RSNPairwiseSuite->SuiteCount = cpu_to_le16(usSuitCount);
         ulPairwiseLength = sizeof(pDot11RSNPairwiseSuite->SuiteCount) + usSuitCount*sizeof(DOT11_RSN_IE_SUITE);
         ulIELength += ulPairwiseLength;
@@ -998,9 +970,7 @@ void ToDrv_SetIE(struct rtl8192cd_priv *priv)
 static void reset_sta_info(struct rtl8192cd_priv *priv, struct stat_info *pstat)
 {
 	WPA_STA_INFO *pInfo = pstat->wpa_sta_info;
-#ifndef SMP_SYNC
 	unsigned long flags;
-#endif
 
 	SAVE_INT_AND_CLI(flags);
 
@@ -1132,67 +1102,6 @@ void psk_init(struct rtl8192cd_priv *priv)
 	ToDrv_SetIE(priv);
 }
 
-#if	(defined(WIFI_HAPD) || defined(RTK_NL80211)) && defined(WDS)
-void wds_psk_set(struct rtl8192cd_priv *priv, int idx, unsigned char *key)
-{
-#if !defined(WIFI_HAPD) // && !defined(RTK_NL80211)
-	unsigned char pchar[40];
-
-	if (key == NULL) {
-		if (strlen(priv->pmib->dot11WdsInfo.wdsPskPassPhrase) == 64) // hex
-			get_array_val(priv->pmib->dot11WdsInfo.wdsMapingKey[idx], priv->pmib->dot11WdsInfo.wdsPskPassPhrase, 64);	
-		else {		
-			memset(pchar, 0, sizeof(unsigned char)*40);
-				PasswordHash(priv->pmib->dot11WdsInfo.wdsPskPassPhrase,"REALTEK", strlen("REALTEK"), pchar);
-			memcpy(priv->pmib->dot11WdsInfo.wdsMapingKey[idx], pchar, sizeof(unsigned char)*32);			
-			}
-		}
-	else
-		memcpy(priv->pmib->dot11WdsInfo.wdsMapingKey[idx], key, sizeof(unsigned char)*32);
-	
-	priv->pmib->dot11WdsInfo.wdsMappingKeyLen[idx] = 32;
-	priv->pmib->dot11WdsInfo.wdsMappingKeyLen[idx] |= 0x80000000;  //set bit to protect the key	
-#endif
-}
-
-void wds_psk_init(struct rtl8192cd_priv *priv)
-{
-	unsigned char *key;
-	int i;
-
-	if ( !(OPMODE & WIFI_AP_STATE))
-		return;
-
-	for (i = 0; i < priv->pmib->dot11WdsInfo.wdsNum; i++) {
-		if (i==0)
-			key = NULL;
-		else
-			key = priv->pmib->dot11WdsInfo.wdsMapingKey[0];
-			
-		wds_psk_set(priv, i, key);
-	}
-}
-void hapd_set_wdskey(struct net_device *dev, char *wdsPskPassPhrase, char *ssid, int wds_num)
-{
-	struct rtl8192cd_priv *priv = GET_DEV_PRIV(dev);
-	int idx = 0;
-	unsigned char pchar[40];
-
-	memcpy(priv->pmib->dot11WdsInfo.wdsPskPassPhrase, wdsPskPassPhrase, strlen(wdsPskPassPhrase));	
-	priv->pmib->dot11WdsInfo.wdsPskPassPhrase[strlen(wdsPskPassPhrase)] = '\0';
-
-	memset(pchar, 0, sizeof(unsigned char)*40);
-	PasswordHash(wdsPskPassPhrase, ssid, strlen(ssid), pchar);
-
-	for(idx =0; idx<wds_num; idx++)
-	{
-		memcpy(priv->pmib->dot11WdsInfo.wdsMapingKey[idx], pchar, sizeof(unsigned char)*32);		
-		priv->pmib->dot11WdsInfo.wdsMappingKeyLen[idx] = 32;
-		priv->pmib->dot11WdsInfo.wdsMappingKeyLen[idx] |= 0x80000000;  //set bit to protect the key	
-	}
-
-}
-#endif
 
 int psk_indicate_evt(struct rtl8192cd_priv *priv, int id, unsigned char *mac, unsigned char *msg, int len)
 {
@@ -1306,12 +1215,11 @@ int psk_indicate_evt(struct rtl8192cd_priv *priv, int id, unsigned char *mac, un
 	case DOT11_EVENT_MIC_FAILURE:
 		// do nothing
 		break;
-		
+
 	}
 
 			return 0;
 }
 
-#endif
 
 

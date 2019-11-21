@@ -37,7 +37,7 @@ phydm_soml_on_off(
 	struct _ADAPTIVE_SOML_	*p_dm_soml_table = &(p_dm_odm->dm_soml_table);
 
 	if (swch == SOML_ON) {
-		
+
 		ODM_RT_TRACE(p_dm_odm, ODM_COMP_ADAPTIVE_SOML, ODM_DBG_LOUD, ("(( Turn on )) SOML\n"));
 #if	(RTL8822B_SUPPORT == 1)
 		if (p_dm_odm->SupportICType == ODM_RTL8822B) {
@@ -48,12 +48,12 @@ phydm_soml_on_off(
 			ODM_SetBBReg(p_dm_odm, 0x998, BIT(6), swch);
 		}
 	} else if (swch == SOML_OFF) {
-	
+
 		ODM_RT_TRACE(p_dm_odm, ODM_COMP_ADAPTIVE_SOML, ODM_DBG_LOUD, ("(( Turn off )) SOML\n"));
 #if	(RTL8822B_SUPPORT == 1)
 		if (p_dm_odm->SupportICType == ODM_RTL8822B) {
 			phydm_somlrxhp_setting(p_dm_odm, FALSE);
-		} else 
+		} else
 #endif
 		if (p_dm_odm->SupportICType == ODM_RTL8197F) {
 			ODM_SetBBReg(p_dm_odm, 0x998, BIT(6), swch);
@@ -110,7 +110,7 @@ phydm_adaptive_soml_callback(
 {
 	PDM_ODM_T				p_dm_odm = (PDM_ODM_T)pDM_VOID;
 	//struct _ADAPTIVE_SOML_	*p_dm_soml_table = &(p_dm_odm->dm_soml_table);
-	
+
 	ODM_RT_TRACE(p_dm_odm, ODM_COMP_ADAPTIVE_SOML, ODM_DBG_LOUD, ("******SOML_Callback******\n"));
 	phydm_adsl(p_dm_odm);
 
@@ -213,21 +213,21 @@ phydm_soml_debug_print(
 			p_dm_soml_table->num_ht_bytes[rate_ss_shift + 4], p_dm_soml_table->num_ht_bytes[rate_ss_shift + 5],
 			p_dm_soml_table->num_ht_bytes[rate_ss_shift + 6], p_dm_soml_table->num_ht_bytes[rate_ss_shift + 7]));
 	}
-	
+
 	for (i = 0; i < HT_RATE_IDX; i++) {
 		byte_total += p_dm_soml_table->num_ht_bytes[i];
 	}
-	
+
 	ODM_RT_TRACE(p_dm_odm, ODM_COMP_ADAPTIVE_SOML, ODM_DBG_LOUD, ("[ byte_total = %d ]\n", byte_total));
 	ODM_MoveMemory(p_dm_odm, p_dm_soml_table->num_ht_bytes, ht_reset, HT_RATE_IDX*size);
 
-	} 
-#if	ODM_IC_11AC_SERIES_SUPPORT	
+	}
+#if	ODM_IC_11AC_SERIES_SUPPORT
 else if (p_dm_odm->SupportICType == ODM_RTL8822B) {
 
 	for (i = 0; i < rate_num; i++) {
 		rate_ss_shift = (i << 3);
-	
+
 		ODM_RT_TRACE(p_dm_odm, ODM_COMP_ADAPTIVE_SOML, ODM_DBG_LOUD, ("*num_ht_bytes  HT MCS[%d :%d ] = {%d, %d, %d, %d, %d, %d, %d, %d}\n",
 			(rate_ss_shift), (rate_ss_shift+7),
 			p_dm_soml_table->num_vht_bytes[rate_ss_shift + 0], p_dm_soml_table->num_vht_bytes[rate_ss_shift + 1],
@@ -235,11 +235,11 @@ else if (p_dm_odm->SupportICType == ODM_RTL8822B) {
 			p_dm_soml_table->num_vht_bytes[rate_ss_shift + 4], p_dm_soml_table->num_vht_bytes[rate_ss_shift + 5],
 			p_dm_soml_table->num_vht_bytes[rate_ss_shift + 6], p_dm_soml_table->num_vht_bytes[rate_ss_shift + 7]));
 	}
-	
+
 	for (i = 0; i < VHT_RATE_IDX; i++) {
 		byte_total += p_dm_soml_table->num_ht_bytes[i];
 	}
-	
+
 	ODM_RT_TRACE(p_dm_odm, ODM_COMP_ADAPTIVE_SOML, ODM_DBG_LOUD, ("[ byte_total = %d ]\n", byte_total));
 	ODM_MoveMemory(p_dm_odm, p_dm_soml_table->num_vht_bytes, vht_reset, VHT_RATE_IDX*size);
 	}
@@ -258,7 +258,7 @@ phydm_soml_statistics(
 
 	u8	i;
 	u32	num_bytes_diff;
-	
+
 	if (p_dm_odm->SupportICType == ODM_RTL8197F) {
 		if (on_off_state == SOML_ON) {
 			for (i = 0; i < HT_RATE_IDX; i++) {
@@ -274,7 +274,7 @@ phydm_soml_statistics(
 			}
 		}
 	}
-#if	ODM_IC_11AC_SERIES_SUPPORT	
+#if	ODM_IC_11AC_SERIES_SUPPORT
 	else if (p_dm_odm->SupportICType == ODM_RTL8822B) {
 		if (on_off_state == SOML_ON) {
 			for (i = 0; i < VHT_RATE_IDX; i++) {
@@ -290,7 +290,7 @@ phydm_soml_statistics(
 			}
 		}
 	}
-#endif	
+#endif
 }
 
 void
@@ -300,7 +300,7 @@ phydm_adsl(
 {
 	PDM_ODM_T				p_dm_odm = (PDM_ODM_T)pDM_VOID;
 	struct _ADAPTIVE_SOML_	*p_dm_soml_table = &(p_dm_odm->dm_soml_table);
-	
+
 	u8	i;
 	u8	next_on_off;
 	u8	rate_num = 1, rate_ss_shift = 0;
@@ -331,7 +331,7 @@ phydm_adsl(
 						ODM_MoveMemory(p_dm_odm, p_dm_soml_table->num_ht_bytes_off, ht_reset, HT_RATE_IDX*size);
 
 					}
-#if	ODM_IC_11AC_SERIES_SUPPORT					
+#if	ODM_IC_11AC_SERIES_SUPPORT
 					else if (p_dm_odm->SupportICType == ODM_RTL8822B) {
 
 						ODM_MoveMemory(p_dm_odm, p_dm_soml_table->num_vht_bytes, vht_reset, VHT_RATE_IDX*size);
@@ -343,18 +343,18 @@ phydm_adsl(
 					p_dm_soml_table->soml_state_cnt++;
 					next_on_off = (p_dm_soml_table->soml_on_off == SOML_ON) ? SOML_ON : SOML_OFF;
 					phydm_soml_on_off(p_dm_odm, next_on_off);
-					
+
 					ODM_SetTimer(p_dm_odm, &p_dm_soml_table->phydm_adaptive_soml_timer, p_dm_soml_table->soml_delay_time); //delay 40 ms
 				} else if ((p_dm_soml_table->soml_state_cnt %2) != 0) {
 					p_dm_soml_table->soml_state_cnt++;
 					if (p_dm_odm->SupportICType == ODM_RTL8197F) {
 						ODM_MoveMemory(p_dm_odm, p_dm_soml_table->pre_num_ht_bytes, p_dm_soml_table->num_ht_bytes, HT_RATE_IDX*size);
 					}
-#if	ODM_IC_11AC_SERIES_SUPPORT					
+#if	ODM_IC_11AC_SERIES_SUPPORT
 					else if (p_dm_odm->SupportICType == ODM_RTL8822B) {
 						ODM_MoveMemory(p_dm_odm, p_dm_soml_table->pre_num_vht_bytes, p_dm_soml_table->num_vht_bytes, VHT_RATE_IDX*size);
 					}
-#endif					
+#endif
 					ODM_SetTimer(p_dm_odm, &p_dm_soml_table->phydm_adaptive_soml_timer, p_dm_soml_table->soml_intvl); //turn on/off 150ms
 				} else if ((p_dm_soml_table->soml_state_cnt %2) == 0) {
 					p_dm_soml_table->soml_state_cnt++;
@@ -401,11 +401,11 @@ phydm_adsl(
 					}
 
 				}
-#if	ODM_IC_11AC_SERIES_SUPPORT				
+#if	ODM_IC_11AC_SERIES_SUPPORT
 				else if (p_dm_odm->SupportICType == ODM_RTL8822B) {
 					for (i = 0; i < rate_num; i++) {
 						rate_ss_shift = 10 * i;
-						
+
 						ODM_RT_TRACE(p_dm_odm, ODM_COMP_ADAPTIVE_SOML, ODM_DBG_LOUD, ("* num_vht_bytes_on  VHT-%d ss MCS[0:9] = {%d, %d, %d, %d, %d, %d, %d, %d, %d, %d}\n",
 							(i + 1),
 							p_dm_soml_table->num_vht_bytes_on[rate_ss_shift + 0], p_dm_soml_table->num_vht_bytes_on[rate_ss_shift + 1],
@@ -448,7 +448,7 @@ phydm_adsl(
 					ODM_RT_TRACE(p_dm_odm, ODM_COMP_ADAPTIVE_SOML, ODM_DBG_LOUD, ("[ stay at soml_last_state ]\n"));
 					next_on_off = p_dm_soml_table->soml_last_state;
 				}
-				 
+
 				ODM_RT_TRACE(p_dm_odm, ODM_COMP_ADAPTIVE_SOML, ODM_DBG_LOUD, ("[ Final decisoin ] : "));
 				phydm_soml_on_off(p_dm_odm, next_on_off);
 				p_dm_soml_table->soml_last_state = next_on_off;
@@ -514,7 +514,7 @@ phydm_adaptive_soml(
 #if (CONFIG_ADAPTIVE_SOML)
 	PDM_ODM_T					p_dm_odm = (PDM_ODM_T)pDM_VOID;
 	struct _ADAPTIVE_SOML_	*p_dm_soml_table = &(p_dm_odm->dm_soml_table);
-	
+
 	if (!(p_dm_odm->SupportAbility & ODM_BB_ADAPTIVE_SOML)) {
 		ODM_RT_TRACE(p_dm_odm, ODM_COMP_ADAPTIVE_SOML, ODM_DBG_LOUD, ("[Return!!!]   Not Support Adaptive SOML Function\n"));
 		return;

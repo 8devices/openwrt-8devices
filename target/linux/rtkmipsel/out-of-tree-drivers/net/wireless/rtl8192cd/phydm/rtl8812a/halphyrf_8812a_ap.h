@@ -39,7 +39,7 @@ void ConfigureTxpowerTrack_8812A(
 void DoIQK_8812A(
 	PVOID		pDM_VOID,
 	u1Byte 		DeltaThermalIndex,
-	u1Byte		ThermalValue,	
+	u1Byte		ThermalValue,
 	u1Byte 		Threshold
 	);
 
@@ -58,16 +58,16 @@ ODM_TxPwrTrackSetPwr8812A(
 
 #if 0
 
-void	
-PHY_IQCalibrate_8812A(	
-	IN	PADAPTER	pAdapter,	
+void
+PHY_IQCalibrate_8812A(
+	IN	PADAPTER	pAdapter,
 	IN	BOOLEAN 	bReCovery
 );
 
 #else
 
-                         
-VOID	
+
+VOID
 phy_IQCalibrate_8812A(
 	IN PDM_ODM_T		pDM_Odm,
 	IN u1Byte		Channel
@@ -79,7 +79,7 @@ phy_IQCalibrate_8812A(
 //
 // LC calibrate
 //
-void	
+void
 PHY_LCCalibrate_8812A(
 	IN PDM_ODM_T		pDM_Odm
 );
@@ -87,15 +87,15 @@ PHY_LCCalibrate_8812A(
 //
 // AP calibrate
 //
-void	
-PHY_APCalibrate_8812A(		
+void
+PHY_APCalibrate_8812A(
 #if (DM_ODM_SUPPORT_TYPE & ODM_AP)
 	IN PDM_ODM_T		pDM_Odm,
 #else
 	IN	PADAPTER	pAdapter,
 #endif
 							IN 	s1Byte		delta);
-void	
+void
 PHY_DigitalPredistortion_8812A(		IN	PADAPTER	pAdapter);
 
 
@@ -132,7 +132,7 @@ _PHY_MACSettingCalibration(
 	IN	PADAPTER	pAdapter,
 #endif
 	IN	pu4Byte		MACReg,
-	IN	pu4Byte		MACBackup	
+	IN	pu4Byte		MACBackup
 	);
 
 
@@ -148,6 +148,6 @@ _PHY_PathAStandBy(
 
 #endif
 
-								
-#endif	// #ifndef __HAL_PHY_RF_8812A_H__								
+
+#endif	// #ifndef __HAL_PHY_RF_8812A_H__
 

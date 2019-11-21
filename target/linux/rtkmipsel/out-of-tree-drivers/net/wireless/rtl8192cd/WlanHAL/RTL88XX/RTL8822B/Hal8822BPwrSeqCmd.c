@@ -3,23 +3,19 @@ Copyright (c) Realtek Semiconductor Corp. All rights reserved.
 
 Module Name:
 	Hal8822BPwrSeqCmd.c
-	
+
 Abstract:
-	This file includes all kinds of Power Action event for RTL8822B and 
+	This file includes all kinds of Power Action event for RTL8822B and
 	corresponding hardware configurtions which are released from HW SD.
-	    
+
 Major Change History:
 	When       Who               What
 	---------- ---------------   -------------------------------
 	2015-06-25 Eric             Create.
-	
+
 --*/
 
-#ifndef __ECOS
 #include "HalPrecomp.h"
-#else
-#include "../../HalPrecomp.h"
-#endif
 /*
  *	drivers should parse below arrays and do the corresponding actions
  */
@@ -76,7 +72,7 @@ WLAN_PWR_CFG rtl8822B_resume_flow[RTL8822B_TRANS_ACT_TO_CARDEMU_STEPS+RTL8822B_T
 WLAN_PWR_CFG rtl8822B_hwpdn_flow[RTL8822B_TRANS_ACT_TO_CARDEMU_STEPS+RTL8822B_TRANS_CARDEMU_TO_PDN_STEPS+RTL8822B_TRANS_END_STEPS]=
 {
 	RTL8822B_TRANS_ACT_TO_CARDEMU
-	RTL8822B_TRANS_CARDEMU_TO_PDN	
+	RTL8822B_TRANS_CARDEMU_TO_PDN
 	RTL8822B_TRANS_END
 };
 
@@ -84,7 +80,7 @@ WLAN_PWR_CFG rtl8822B_hwpdn_flow[RTL8822B_TRANS_ACT_TO_CARDEMU_STEPS+RTL8822B_TR
 WLAN_PWR_CFG rtl8822B_enter_lps_flow[RTL8822B_TRANS_ACT_TO_LPS_STEPS+RTL8822B_TRANS_END_STEPS]=
 {
 	//FW behavior
-	RTL8822B_TRANS_ACT_TO_LPS	
+	RTL8822B_TRANS_ACT_TO_LPS
 	RTL8822B_TRANS_END
 };
 

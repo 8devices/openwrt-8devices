@@ -35,7 +35,7 @@ void ConfigureTxpowerTrack_8821A(
 void DoIQK_8821A(
 	PVOID pDM_VOID,
 	u1Byte 		DeltaThermalIndex,
-	u1Byte		ThermalValue,	
+	u1Byte		ThermalValue,
 	u1Byte 		Threshold
 	);
 
@@ -49,9 +49,9 @@ ODM_TxPwrTrackSetPwr8821A(
 
 //1 7.	IQK
 
-void	
-PHY_IQCalibrate_8821A(	
-	IN	PADAPTER	pAdapter,	
+void
+PHY_IQCalibrate_8821A(
+	IN	PADAPTER	pAdapter,
 	IN	BOOLEAN 	bReCovery
 );
 
@@ -66,7 +66,7 @@ GetDeltaSwingTable_8821A(
 	OUT pu1Byte 			*TemperatureUP_A,
 	OUT pu1Byte 			*TemperatureDOWN_A,
 	OUT pu1Byte 			*TemperatureUP_B,
-	OUT pu1Byte 			*TemperatureDOWN_B	
+	OUT pu1Byte 			*TemperatureDOWN_B
 );
-#endif	// #ifndef __HAL_PHY_RF_8821A_H__								
+#endif	// #ifndef __HAL_PHY_RF_8821A_H__
 

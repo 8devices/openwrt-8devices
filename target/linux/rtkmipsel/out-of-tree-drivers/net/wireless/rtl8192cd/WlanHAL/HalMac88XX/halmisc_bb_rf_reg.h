@@ -17,11 +17,11 @@
 
 //============Programming guide Start=====================
 /*
-    BB REG define rules 
+    BB REG define rules
     1. For all reg define, it should be prefixed by " REG_BB"
 
 
-    RF REG define rules 
+    RF REG define rules
     1. For all reg define, it should be prefixed by " REG_RF"
 
 */
@@ -30,11 +30,11 @@
 #define    REG_BB_RXPATH_AC                              0x808    // Rx antenna
 #define    REG_BB_TXPATH_AC                              0x80c    // Tx antenna
 #define    REG_BB_AGC_TABLE_AC                           0x82c   // AGC tabel select
-#define    REG_BB_PWED_TH_AC                             0x830   
+#define    REG_BB_PWED_TH_AC                             0x830
 #define    REG_BB_BWINDICATION_AC                        0x834
 #define    REG_BB_CCAONSEC_AC                            0x838
 #define    REG_BB_L1PEAKTH_AC                            0x848
-#define    REG_BB_FC_AREA_AC                             0x860   // fc_area 
+#define    REG_BB_FC_AREA_AC                             0x860   // fc_area
 #define    REG_BB_FPGA0_XB_RFINTERFACEOE_AC              0x864
 #define    REG_BB_FPGA0_XAB_RFINTERFACESW_AC             0x870    // RF Interface Software Control
 #define    REG_BB_FPGA0_XCD_RFINTERFACESW_AC             0x874
@@ -46,11 +46,11 @@
 #define    REG_BB_FPGA0_ADDACLOCKEN_AC                   0x888    // enable ad/da clock1 for dual-phy
 #define    REG_BB_FPGA0_ANALOGPARAMETER4_AC              0x88c
 #define    REG_BB_EDCCA_AC                               0x8a4 // EDCCA
-#define    REG_BB_RFMOD_AC                               0x8ac    //RF mode 
+#define    REG_BB_RFMOD_AC                               0x8ac    //RF mode
 #define    REG_BB_HSSIREAD_AC                            0x8b0  // RF read addr
 #define    REG_BB_FC_ENABL_VHT_AC                        0x8c0
 #define    REG_BB_VHTLEN_USE_LSIG_AC                     0x8c3    // Use LSIG for VHT length
-#define    REG_BB_ADC_BUF_CLK_AC                         0x8c4  
+#define    REG_BB_ADC_BUF_CLK_AC                         0x8c4
 
 /**** page 9 ****/
 #define    REG_BB_SINGLETONE_CONTTX_AC                   0x914
@@ -71,16 +71,16 @@
 // RSSI Dump
 #define    REG_BB_A_RSSIDUMP_AC                          0xBF0
 #define    REG_BB_B_RSSIDUMP_AC                          0xBF1
-#define    REG_BB_S1_RXEVMDUMP_AC                        0xBF4 
+#define    REG_BB_S1_RXEVMDUMP_AC                        0xBF4
 #define    REG_BB_S2_RXEVMDUMP_AC                        0xBF5
 #define    REG_BB_A_RXSNRDUMP_AC                         0xBF6
 #define    REG_BB_B_RXSNRDUMP_AC                         0xBF7
-#define    REG_BB_A_CFOSHORTDUMP_AC                      0xBF8 
+#define    REG_BB_A_CFOSHORTDUMP_AC                      0xBF8
 #define    REG_BB_B_CFOSHORTDUMP_AC                      0xBFA
 #define    REG_BB_A_CFOLONGDUMP_AC                       0xBEC
 #define    REG_BB_B_CFOLONGDUMP_AC                       0xBEE
 // YN: mask the following register definition temporarily
-//#define    REG_BB_PDP_ANTA_AC                          0xb00  
+//#define    REG_BB_PDP_ANTA_AC                          0xb00
 //#define    REG_BB_PDP_ANTA_4_AC                        0xb04
 //#define    REG_BB_CONFIG_PMPD_ANTA_AC                  0xb28
 //#define    REG_BB_CONFIG_ANTA_AC                       0xb68
@@ -95,7 +95,7 @@
 #define    REG_BB_A_RXIQC_CD_AC                           0xc14  //RxIQ imblance matrix coeff. C & D
 #define    REG_BB_AGC_TABLE_AC_V1                         0xc1c
 
-// TX AGC 
+// TX AGC
 #define    REG_BB_TXAGC_A_CCK11_CCK1_AC                   0xc20
 #define    REG_BB_TXAGC_A_OFDM18_OFDM6_AC                 0xc24
 #define    REG_BB_TXAGC_A_OFDM54_OFDM24_AC                0xc28
@@ -142,7 +142,7 @@
 #define    REG_BB_B_RXIQC_AB_AC                           0xe10  //RxIQ imblance matrix coeff. A & B
 #define    REG_BB_B_RXIQC_CD_AC                           0xe14  //RxIQ imblance matrix coeff. C & D
 
-// TX AGC 
+// TX AGC
 #define    REG_BB_TXAGC_B_CCK11_CCK1_AC                   0xe20
 #define    REG_BB_TXAGC_B_OFDM18_OFDM6_AC                 0xe24
 #define    REG_BB_TXAGC_B_OFDM54_OFDM24_AC                0xe28
@@ -168,8 +168,8 @@
 // DIG-related
 #define    REG_BB_OFDM_FALSEALARM1_AC                     0xf48  // counter for break
 #define    REG_BB_OFDM_FALSEALARM2_AC                     0xf4c  // counter for spoofing
-// Report-related                                     
-#define    REG_BB_OFDM_SHORTCFOAB_AC                      0xf60  
+// Report-related
+#define    REG_BB_OFDM_SHORTCFOAB_AC                      0xf60
 #define    REG_BB_OFDM_LONGCFOAB_AC                       0xf64
 #define    REG_BB_OFDM_ENDCFOAB_AC                        0xf70
 #define    REG_BB_OFDM_AGCREPORT_AC                       0xf84
@@ -178,7 +178,7 @@
 #define    REG_BB_OFDM_SIGREPORT_AC                       0xf90
 
 /**** page 18 ****/
-// TX AGC 
+// TX AGC
 #define    REG_BB_TXAGC_C_CCK11_CCK1_AC                   0x1820
 #define    REG_BB_TXAGC_C_OFDM18_OFDM6_AC                 0x1824
 #define    REG_BB_TXAGC_C_OFDM54_OFDM24_AC                0x1828
@@ -197,7 +197,7 @@
 
 
 /**** page 1a ****/
-// TX AGC 
+// TX AGC
 #define    REG_BB_TXAGC_D_CCK11_CCK1_AC                   0x1a20
 #define    REG_BB_TXAGC_D_OFDM18_OFDM6_AC                 0x1a24
 #define    REG_BB_TXAGC_D_OFDM54_OFDM24_AC                0x1a28
@@ -222,16 +222,16 @@
 
 // RF Register
 //
-#define    REG_RF_AC_AC                                    0x00     
-#define    REG_RF_RF_TOP_AC                                0x07     
-#define    REG_RF_TXLOK_AC                                 0x08     
+#define    REG_RF_AC_AC                                    0x00
+#define    REG_RF_RF_TOP_AC                                0x07
+#define    REG_RF_TXLOK_AC                                 0x08
 #define    REG_RF_TXAPK_AC                                 0x0B
 #define    REG_RF_CHNLBW_AC                                0x18    // RF channel and BW switch
 #define    REG_RF_TXLCTANK_AC                              0x54
 #define    REG_RF_APK_AC                                   0x63
 #define    REG_BRF_CHNLBW_MOD_AG_AC                        0x70300
 #define    REG_BRF_CHNLBW_BW_AC                            0xc00
-#define    REG_RF_RCK1_AC                                  0x1c    
+#define    REG_RF_RCK1_AC                                  0x1c
 #define    REG_RF_RCK2_AC                                  0x1d
 #define    REG_RF_RCK3_AC                                  0x1e
 #define    REG_RF_LCK_AC                                   0xB4
@@ -334,12 +334,12 @@
 #define    REG_BB_OFDM0_XARXIQIMBALANCE_N        0xc14  //RxIQ imblance matrix
 #define    REG_BB_OFDM0_XBRXAFE_N                0xc18
 #define    REG_BB_OFDM0_XBRXIQIMBALANCE_N        0xc1c
-/*                                             
+/*
 #define    REG_BB_OFDM0_XCRXAFE_N                0xc20
 #define    REG_BB_OFDM0_XCRXIQIMBALANCE_N        0xc24
 #define    REG_BB_OFDM0_XDRXAFE_N                0xc28
 #define    REG_BB_OFDM0_XDRXIQIMBALANCE_N        0xc2c
-*/                                             
+*/
 #define    REG_BB_OFDM0_RXDETECTOR1_N            0xc30  //PD,BW & SBD    // DM tune init gain
 #define    REG_BB_OFDM0_RXDETECTOR2_N            0xc34  //SBD & Fame Sync.
 #define    REG_BB_OFDM0_RXDETECTOR3_N            0xc38  //Frame Sync.
@@ -352,7 +352,7 @@
 #define    REG_BB_OFDM0_XAAGCCORE2_N             0xc54
 #define    REG_BB_OFDM0_XBAGCCORE1_N             0xc58
 #define    REG_BB_OFDM0_XBAGCCORE2_N             0xc5c
-/*                                             
+/*
 #define    REG_BB_OFDM0_XCAGCCORE1_N             0xc60
 #define    REG_BB_OFDM0_XCAGCCORE2_N             0xc64
 #define    REG_BB_OFDM0_XDAGCCORE1_N             0xc68

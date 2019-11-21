@@ -3,14 +3,14 @@ Copyright (c) Realtek Semiconductor Corp. All rights reserved.
 
 Module Name:
 	Hal8814APhyCfg.c
-	
+
 Abstract:
 	Defined HAL 8814A PHY BB setting functions
-	    
+
 Major Change History:
 	When       Who               What
 	---------- ---------------   -------------------------------
-	2013-05-28 Filen              Create.	
+	2013-05-28 Filen              Create.
 --*/
 #if !defined(__ECOS) && !defined(CPTCFG_CFG80211_MODULE)
 #include "HalPrecomp.h"
@@ -19,7 +19,7 @@ Major Change History:
 #endif
 
 // TODO: this function should be modified
-void 
+void
 TXPowerTracking_ThermalMeter_Tmp8814A(
     IN  HAL_PADAPTER    Adapter
 )
@@ -54,8 +54,8 @@ PHY_QueryRFReg_8814(
 	HAL_SAVE_INT_AND_CLI(flags);
 
 	u4Byte	DataAndAddr = 0;
-	u4Byte	Direct_Addr;	
-	
+	u4Byte	Direct_Addr;
+
 	RegAddr &= 0xff;
 	switch(eRFPath){
 		case RF88XX_PATH_A:
@@ -71,11 +71,11 @@ PHY_QueryRFReg_8814(
 			Direct_Addr = 0x3c00+RegAddr*4;
 		break;
 	}
-	
+
 
 	BitMask &= bRFRegOffsetMask;
-	
-	Readback_Value = PHY_QueryBBReg(Adapter, Direct_Addr, BitMask);		
+
+	Readback_Value = PHY_QueryBBReg(Adapter, Direct_Addr, BitMask);
 
 	HAL_RESTORE_INT(flags);
 
@@ -93,13 +93,13 @@ PHY_Set_SecCCATH_by_RXANT_8814A(
 	HAL_PADAPTER	priv	 = Adapter;
 
 	u1Byte Current_band;
-    
+
 	if (HAL_VAR_DOT11CHANNEL <= CHANNEL_MAX_NUMBER_2G)
 		Current_band = RF88XX_BAND_ON_2_4G;
 	else
 		Current_band = RF88XX_BAND_ON_5G;
-	
-	
+
+
 	if(priv->pshare->CurrentChannelBW == HT_CHANNEL_WIDTH_80){
 		PHY_SetBBReg(priv, REG_BB_PWED_TH_AC, 0x7C0000, 0x8);           // 830[22:18] reset default
 		PHY_SetBBReg(priv, REG_BB_CCAONSEC_AC, 0x0000FF00, 0x76);       // 838[15:8] reset default
@@ -150,7 +150,7 @@ PHY_Set_SecCCATH_by_RXANT_8814A(
 		    printk("Unknown Rx antenna.\n");
 		    break;
 		}
-	}else if(priv->pshare->CurrentChannelBW == HT_CHANNEL_WIDTH_20_40){	
+	}else if(priv->pshare->CurrentChannelBW == HT_CHANNEL_WIDTH_20_40){
 		PHY_SetBBReg(priv, REG_BB_CCAONSEC_AC, 0x0FFF0000, 0x666);         // 838[27:16] reset default
 		PHY_SetBBReg(priv, REG_BB_L1_Weight_Jaguar, 0x0000F000, 0x7);      // 840[15:12] reset default
 		PHY_SetBBReg(priv, REG_BB_CCAONSEC_AC, 0x1, 0x1);                  // 838[0] =0x1
@@ -175,20 +175,20 @@ PHY_Set_SecCCATH_by_RXANT_8814A(
 	        PHY_SetBBReg(priv, 0x844, 0x0F000000, 0xd);                     //0x844[27:24]=0xd
 	        PHY_SetBBReg(priv, REG_BB_PWED_TH_AC, 0xFFFFFFFF, 0x79A0EA0A);
 	        break;
-		
+
 		default:
 			PHY_SetBBReg(priv, REG_BB_PWED_TH_AC, 0x7C0000, 0xa);           // 830[22:18] = 5b'01010
 	        PHY_SetBBReg(priv, 0x844, 0x0F000000, 0xd);                     //0x844[27:24]=0xd
 	        PHY_SetBBReg(priv, REG_BB_CCAONSEC_AC, 0x0000FF00, 0x22);      // 0x839
 	        if(Current_band == RF88XX_BAND_ON_2_4G) {
-				PHY_SetBBReg(priv, REG_BB_AGC_TABLE_AC, 0xFFFF0000, 0x7596);								
+				PHY_SetBBReg(priv, REG_BB_AGC_TABLE_AC, 0xFFFF0000, 0x7596);
 				PHY_SetBBReg(priv, REG_BB_PWED_TH_AC, 0xFFFFFFFF, 0x79A8EA0B);
 	        }else{
 	        	if (ulAntennaRx==ANTENNA_ABCD)
 					PHY_SetBBReg(priv, REG_BB_AGC_TABLE_AC, 0xFFFF0000, 0x7555);
 				else
 					PHY_SetBBReg(priv, REG_BB_AGC_TABLE_AC, 0xFFFF0000, 0x7598);
-				
+
 				//PHY_SetBBReg(priv, REG_BB_AGC_TABLE_AC, 0xFFFF0000, 0x7398);		 // 82C[23:16]	reset default
 				PHY_SetBBReg(priv, REG_BB_PWED_TH_AC, 0xFFFFFFFF, 0x79A8EA08);     // 0x830
 			}
@@ -215,18 +215,18 @@ PHY_Set_SecCCATH_by_RXANT_8814A(
 		case ANTENNA_BD:
 		case ANTENNA_CD:
 			if(Current_band == RF88XX_BAND_ON_2_4G){
-				//PHY_SetBBReg(priv, REG_BB_AGC_TABLE_AC, 0xFFFF0000, 0x7343);      // 0x82f, 0x82e	
+				//PHY_SetBBReg(priv, REG_BB_AGC_TABLE_AC, 0xFFFF0000, 0x7343);      // 0x82f, 0x82e
 				PHY_SetBBReg(priv, REG_BB_PWED_TH_AC, 0xFFFFFFFF, 0x79A0EA08);   // 0x830
 			}else{
-				//PHY_SetBBReg(priv, REG_BB_AGC_TABLE_AC, 0xFFFF0000, 0x7543);      // 0x82f, 0x82e	
+				//PHY_SetBBReg(priv, REG_BB_AGC_TABLE_AC, 0xFFFF0000, 0x7543);      // 0x82f, 0x82e
 				PHY_SetBBReg(priv, REG_BB_PWED_TH_AC, 0xFFFFFFFF, 0x79A0EA0A);      // 0x830
 			}
-			break;		
+			break;
 		default:
 			PHY_SetBBReg(priv, REG_BB_PWED_TH_AC, 0x000000FF, 0x08);      // 0x830
 			if (ulAntennaRx==ANTENNA_ABCD){
 				if(Current_band == RF88XX_BAND_ON_2_4G) {
-					PHY_SetBBReg(priv, REG_BB_AGC_TABLE_AC, 0x0000F000, 0x2);      // 0x82c					
+					PHY_SetBBReg(priv, REG_BB_AGC_TABLE_AC, 0x0000F000, 0x2);      // 0x82c
 					PHY_SetBBReg(priv, REG_BB_PWED_TH_AC, 0xFFFFFFFF, 0x79A0EA08);      // 0x830
 		        }else{
 		        	PHY_SetBBReg(priv, REG_BB_PWED_TH_AC, 0xFFFFFFFF, 0x79a14a0a);
@@ -234,7 +234,7 @@ PHY_Set_SecCCATH_by_RXANT_8814A(
 				}
 			}else
 				PHY_SetBBReg(priv, REG_BB_PWED_TH_AC, 0xFFFFFFFF, 0x79A0EA08);
-			//PHY_SetBBReg(priv, REG_BB_AGC_TABLE_AC, 0xFFFF0000, 0x7343);      // 0x82f, 0x82e							
+			//PHY_SetBBReg(priv, REG_BB_AGC_TABLE_AC, 0xFFFF0000, 0x7343);      // 0x82f, 0x82e
 			break;
 		}
     }
@@ -250,7 +250,7 @@ phy_SpurCalibration_8814A(
 {
 	BOOLEAN         Reset_NBI_CSI = TRUE;
 	BOOLEAN         Temp_Flag = TRUE;
-	
+
 	if(HAL_VAR_CURRENTCHANNELBW == HT_CHANNEL_WIDTH_20 && HAL_VAR_WORKING_CHANNEL == 153){
 		PHY_SetBBReg(Adapter, rNBI_Setting_Jaguar, 0x000fe000, 0xf);
 		PHY_SetBBReg(Adapter, rCSI_Mask_Setting1_Jaguar, BIT(0), 1); // CSI Mask by reg
@@ -258,13 +258,13 @@ phy_SpurCalibration_8814A(
 		PHY_SetBBReg(Adapter, rCSI_Fix_Mask1_Jaguar, BIT_MASK_SET_MASKDWORD_COMMON, 0);
 		PHY_SetBBReg(Adapter, rCSI_Fix_Mask6_Jaguar, BIT_MASK_SET_MASKDWORD_COMMON, 0);
 		PHY_SetBBReg(Adapter, rCSI_Fix_Mask7_Jaguar, BIT(16), 1);
-		
+
 			if (((Adapter->pshare->rf_ft_var.mp_specific==1)&&((Adapter->pshare->mp_antenna_rx==ANTENNA_A)||(Adapter->pshare->mp_antenna_rx==ANTENNA_B)||(Adapter->pshare->mp_antenna_rx==ANTENNA_C)||(Adapter->pshare->mp_antenna_rx==ANTENNA_D)))
 				||	((Adapter->pshare->rf_ft_var.mp_specific==0)&&(get_rf_mimo_mode(Adapter)==MIMO_1T1R))){
 				PHY_SetBBReg(Adapter, REG_BB_AGC_TABLE_AC, 0x0000F000, 0x3);
 				Temp_Flag=FALSE;
 			}
-		
+
 		Reset_NBI_CSI = FALSE;
 	}else if(HAL_VAR_CURRENTCHANNELBW == HT_CHANNEL_WIDTH_20_40 && HAL_VAR_WORKING_CHANNEL == 151){
 		PHY_SetBBReg(Adapter, rNBI_Setting_Jaguar, 0x000fe000, 0xf);
@@ -288,7 +288,7 @@ phy_SpurCalibration_8814A(
 		PHY_SetBBReg(Adapter, rCSI_Fix_Mask1_Jaguar, BIT_MASK_SET_MASKDWORD_COMMON, 0);
 		PHY_SetBBReg(Adapter, rCSI_Fix_Mask6_Jaguar, BIT(16), 1);
 		PHY_SetBBReg(Adapter, rCSI_Fix_Mask7_Jaguar, BIT_MASK_SET_MASKDWORD_COMMON, 0);
-	
+
 		Reset_NBI_CSI = FALSE;
 	}
 
@@ -307,7 +307,7 @@ phy_SpurCalibration_8814A(
 					PHY_SetBBReg(Adapter, REG_BB_AGC_TABLE_AC, 0x000F0000, 0x6);
 					Temp_Flag=FALSE;
 				}
-				
+
 				Reset_NBI_CSI = FALSE;
 			}
 			break;
@@ -333,7 +333,7 @@ phy_SpurCalibration_8814A(
 		PHY_SetBBReg(Adapter, rCSI_Fix_Mask1_Jaguar, BIT_MASK_SET_MASKDWORD_COMMON, 0);
 		PHY_SetBBReg(Adapter, rCSI_Fix_Mask6_Jaguar, BIT_MASK_SET_MASKDWORD_COMMON, 0);
 		PHY_SetBBReg(Adapter, rCSI_Fix_Mask7_Jaguar, BIT_MASK_SET_MASKDWORD_COMMON, 0);
-		
+
 	}
 	if(Temp_Flag){
 		if(HAL_VAR_CURRENTCHANNELBW==HT_CHANNEL_WIDTH_20){
@@ -341,14 +341,14 @@ phy_SpurCalibration_8814A(
 				||	((Adapter->pshare->rf_ft_var.mp_specific==0)&&(get_rf_mimo_mode(Adapter)==MIMO_3T3R))){
 				PHY_SetBBReg(Adapter, REG_BB_AGC_TABLE_AC, 0x0000F000, 0x3);
 			}else{
-				PHY_SetBBReg(Adapter, REG_BB_AGC_TABLE_AC, 0x0000F000, 0x7);	
+				PHY_SetBBReg(Adapter, REG_BB_AGC_TABLE_AC, 0x0000F000, 0x7);
 			}
 		}else if(HAL_VAR_CURRENTCHANNELBW==HT_CHANNEL_WIDTH_20_40)
 			if (((Adapter->pshare->rf_ft_var.mp_specific==1)&&(Adapter->pshare->mp_antenna_rx==ANTENNA_ABCD))
 				||	((Adapter->pshare->rf_ft_var.mp_specific==0)&&(get_rf_mimo_mode(Adapter)==MIMO_3T3R))){
 				PHY_SetBBReg(Adapter, REG_BB_AGC_TABLE_AC, 0x000F0000, 0x5);
 			}else{
-				PHY_SetBBReg(Adapter, REG_BB_AGC_TABLE_AC, 0x000F0000, 0x8);	
+				PHY_SetBBReg(Adapter, REG_BB_AGC_TABLE_AC, 0x000F0000, 0x8);
 			}
 		 else if(HAL_VAR_CURRENTCHANNELBW==HT_CHANNEL_WIDTH_80)
 			if (((Adapter->pshare->rf_ft_var.mp_specific==1)&&((Adapter->pshare->mp_antenna_rx==ANTENNA_A)||(Adapter->pshare->mp_antenna_rx==ANTENNA_B)||(Adapter->pshare->mp_antenna_rx==ANTENNA_C)||(Adapter->pshare->mp_antenna_rx==ANTENNA_D)))
@@ -360,7 +360,7 @@ phy_SpurCalibration_8814A(
 			} else if (((Adapter->pshare->rf_ft_var.mp_specific==1)&&(Adapter->pshare->mp_antenna_rx==ANTENNA_ABCD))
 				||	((Adapter->pshare->rf_ft_var.mp_specific==0)&&(get_rf_mimo_mode(Adapter)==MIMO_3T3R))){
 				PHY_SetBBReg(Adapter, REG_BB_AGC_TABLE_AC, 0x00FF0000, 0x66);
-			} else { 
+			} else {
 				PHY_SetBBReg(Adapter, REG_BB_AGC_TABLE_AC, 0x00FF0000, 0x98);
 			}
 	}

@@ -1,10 +1,10 @@
 /*
-* Copyright c                  Realtek Semiconductor Corporation, 2002  
-* All rights reserved.                                                    
-* 
+* Copyright c                  Realtek Semiconductor Corporation, 2002
+* All rights reserved.
+*
 * Program : The header file of realtek type definition
-* Abstract :                                                           
-* Author :              
+* Abstract :
+* Author :
 * $Id: rtl_types.h,v 1.2 2008-01-18 07:53:11 hyking_liu Exp $
 * $Log: not supported by cvs2svn $
 * Revision 1.1  2007/12/21 10:29:52  davidhsu
@@ -238,7 +238,6 @@
  * not possible for a machine/compiler combination.
  */
 #ifdef __linux__
-#ifdef __KERNEL__
 #include <linux/version.h>
 #if (LINUX_VERSION_CODE < KERNEL_VERSION(2,6,0))
 #include <linux/config.h>
@@ -247,7 +246,6 @@
 #include <linux/module.h>
 //#include <linux/string.h>
 
-#endif /*__KERNEL__*/
 #endif /*__linux__*/
 
 /* ===============================================================================
@@ -351,13 +349,8 @@
 #undef __MIPS16
 
 #if defined(__linux__)&&defined(__KERNEL__)&&defined(CONFIG_RTL_819X) && !defined(CONFIG_RTL_8196C)
-#ifndef CONFIG_WIRELESS_LAN_MODULE  //mark_wrt eric-sync ??
-	#define __NOMIPS16			__attribute__((nomips16))	/* Inidcate to prevent from MIPS16 */
-	#define __MIPS16			__attribute__((mips16))		/* Inidcate to use MIPS16 */
-#else
 	#define __NOMIPS16
 	#define __MIPS16
-#endif
 #else
 	#define __NOMIPS16
 	#define __MIPS16
@@ -367,7 +360,7 @@
 		print macro
     =============================================================================== */
 #if	defined(__linux__)&&defined(__KERNEL__)
-	
+
 	#define rtlglue_printf	panic_printk
 
 #else	/* defined(__linux__)&&defined(__KERNEL__) */
@@ -411,7 +404,7 @@ typedef __u8		uint8;
 typedef __s8			int8;
 #endif
 
-typedef uint32		memaddr;	
+typedef uint32		memaddr;
 typedef uint32          ipaddr_t;
 typedef struct {
     uint16      mac47_32;
@@ -428,13 +421,8 @@ typedef struct ether_addr_s {
 #define MBUF_LEN	1700
 #define CROSS_LAN_MBUF_LEN		(MBUF_LEN+RX_OFFSET+10)
 
-#if defined(CONFIG_RTL_819X)
-	#if defined(CONFIG_RTL_ETH_PRIV_SKB)
-	#define DELAY_REFILL_ETH_RX_BUF	1
-	#endif
-#endif
 
-/* 
+/*
 	CN SD6 Mantis issue #1085: NIC RX can't work correctly after runout.
 	this bug still happened in RTL8196B
  */
@@ -541,7 +529,7 @@ typedef struct ether_addr_s {
 #define RTL_STATIC_INLINE   static __inline__
 
 #define ASSERT_CSP(x) if (!(x)) {rtlglue_printf("\nAssert Fail: %s %d", __FILE__, __LINE__); while(1);}
- 
+
 
 #if defined(RTL865X_TEST)||defined(RTL865X_MODEL_USER)
 #define UNCACHE_MASK		0
@@ -558,26 +546,9 @@ typedef struct ether_addr_s {
 #define TOTAL_VLAN_PRIORITY_NUM	8
 #define RTL8651_RATELIMITTBL_SIZE			32
 
-#if defined(CONFIG_RTL_8196C)
-#define CONFIG_RTL8196C_ETH_IOT         1
-#ifdef CONFIG_MP_PSD_SUPPORT
-#undef CONFIG_RTL8196C_GREEN_ETHERNET
-#else
-//#define CONFIG_RTL_8196C_ESD            1 
-#endif
-#endif
 
-#if defined(CONFIG_RTL_8198) && !defined(CONFIG_RTL_819XD)
-#define CONFIG_RTL_8198_ESD        1
-#endif 
 
-#if defined(CONFIG_RTL_8198)
-#define RTL8198_EEE_MAC 	1
-#endif
 
-#if defined(CONFIG_RTL_819XD) || defined(CONFIG_RTL_8196E)
-#define CONFIG_RTL_8197D_DYN_THR		1
-#endif
 
 #define DYN_THR_LINK_UP_PORTS			3
 
@@ -624,33 +595,33 @@ extern struct RTL_LOG_MODULE_MASK
 #define LOG_ERROR(fmt, args...) do{ \
 	if(RTL_LogTypeMask.ERROR&&LOG_LIMIT)scrlog_printk("ERROR:"fmt, ## args); \
 		}while(0)
-		
+
 #define LOG_MEM_ERROR(fmt, args...) do{ \
 	if(RTL_LogTypeMask.ERROR&&RTL_LogErrorMask.MEM&&LOG_LIMIT)scrlog_printk("ERROR:"fmt, ## args); \
 		}while(0)
-		
+
 #define LOG_SKB_ERROR(fmt, args...) do{ \
 		if(RTL_LogTypeMask.ERROR&&RTL_LogErrorMask.SKB&&LOG_LIMIT)scrlog_printk("ERROR:"fmt, ## args); \
 			}while(0)
-			
+
 #define LOG_WARN(fmt, args...) do{ \
 		if(RTL_LogTypeMask.WARN&&LOG_LIMIT)scrlog_printk("WARN:"fmt, ## args); \
 			}while(0)
-			
+
 #define LOG_INFO(fmt, args...) do{ \
 		if(RTL_LogTypeMask.INFO&&LOG_LIMIT)scrlog_printk("INFO:"fmt, ## args); \
 			}while(0)
 
 #else
 
-#define LOG_ERROR(fmt, args...) 
-#define LOG_MEM_ERROR(fmt, args...) 
+#define LOG_ERROR(fmt, args...)
+#define LOG_MEM_ERROR(fmt, args...)
 #define LOG_SKB_ERROR(fmt, args...)
 #define LOG_WARN(fmt, args...)
 #define LOG_INFO(fmt, args...)
 
-#endif 
+#endif
 
-#endif 
+#endif
 
 

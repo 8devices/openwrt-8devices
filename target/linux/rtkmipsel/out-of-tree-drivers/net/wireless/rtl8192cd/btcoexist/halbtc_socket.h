@@ -25,7 +25,7 @@
 #define NETLINK_USER 31
 #define CONNECT_PORT 30000
 #define CONNECT_PORT_BT 30001
-#define KERNEL_SOCKET_OK 0x01	
+#define KERNEL_SOCKET_OK 0x01
 #define NETLINK_SOCKET_OK 0x02
 
 #define OTHER 0
@@ -80,12 +80,12 @@ typedef struct _HCI_PHY_LINK_BSS_INFO{
 	u16						bdCap;			// capability information
 
 	// Qos related. Added by Annie, 2005-11-01.
-	//BSS_QOS						BssQos;		
-	
+	//BSS_QOS						BssQos;
+
 }HCI_PHY_LINK_BSS_INFO, *PHCI_PHY_LINK_BSS_INFO;
 
 typedef enum _BT_CONNECT_TYPE{
-	BT_CONNECT_AUTH_REQ								=0x00,	
+	BT_CONNECT_AUTH_REQ								=0x00,
 	BT_CONNECT_AUTH_RSP								=0x01,
 	BT_CONNECT_ASOC_REQ								=0x02,
 	BT_CONNECT_ASOC_RSP								=0x03,
@@ -225,10 +225,10 @@ typedef enum HCI_EXTENSION_COMMANDS{
 	HCI_BT_PATCH_VERSION_NOTIFY						=0x0108,
 	HCI_BT_AFH_MAP_NOTIFY							=0x0109,
 	HCI_BT_REGISTER_VALUE_NOTIFY					=0x010a,
-	
+
 	//The following is for IVT
-	HCI_WIFI_CURRENT_CHANNEL						=0x0300,	
-	HCI_WIFI_CURRENT_BANDWIDTH						=0x0301,		
+	HCI_WIFI_CURRENT_CHANNEL						=0x0300,
+	HCI_WIFI_CURRENT_BANDWIDTH						=0x0301,
 	HCI_WIFI_CONNECTION_STATUS						=0x0302
 }RTW_HCI_EXT_CMD;
 
@@ -248,11 +248,11 @@ typedef enum _BT_TRAFFIC_MODE{
 } BT_TRAFFIC_MODE;
 
 typedef enum _BT_TRAFFIC_MODE_PROFILE{
-	BT_PROFILE_NONE,	
+	BT_PROFILE_NONE,
 	BT_PROFILE_A2DP,
 	BT_PROFILE_PAN	,
 	BT_PROFILE_HID,
-	BT_PROFILE_SCO		
+	BT_PROFILE_SCO
 } BT_TRAFFIC_MODE_PROFILE;
 
 typedef struct _BT_MGNT{
@@ -261,12 +261,12 @@ typedef struct _BT_MGNT{
 	bool				bPhyLinkInProgress;
 	bool				bPhyLinkInProgressStartLL;
 	u8				BtCurrentPhyLinkhandle;
-	u16				BtCurrentLogLinkhandle;	
+	u16				BtCurrentLogLinkhandle;
 	u8				CurrentConnectEntryNum;
 	u8				DisconnectEntryNum;
 	u8				CurrentBTConnectionCnt;
 	BT_CONNECT_TYPE		BTCurrentConnectType;
-	BT_CONNECT_TYPE		BTReceiveConnectPkt;	
+	BT_CONNECT_TYPE		BTReceiveConnectPkt;
 	u8				BTAuthCount;
 	u8				BTAsocCount;
 	bool				bStartSendSupervisionPkt;
@@ -291,9 +291,9 @@ typedef struct _BT_MGNT{
 #define SOCK_STORE_MAX 10
 struct bt_coex_info {
 	/* For Kernel Socket */
-	struct socket *udpsock; 
-	struct sockaddr_in sin; 
-	struct sockaddr_in bt_addr; 
+	struct socket *udpsock;
+	struct sockaddr_in sin;
+	struct sockaddr_in bt_addr;
 	/* For Netlink Socket */
 	struct sock *nl_sk;
 	u32 pid;
@@ -302,7 +302,7 @@ struct bt_coex_info {
 #endif
 	/* store which socket is OK */
 	u8 sock_open;
-		
+
 	u8 BT_attend;
 //	u8 WIFI_leave;
 	u8 is_exist; // socket exist

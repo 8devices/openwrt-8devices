@@ -32,7 +32,7 @@ phydm_la_buffer_allocate(
 	PRT_ADCSMP_STRING	ADCSmpBuf = &(AdcSmp->ADCSmpBuf);
 
 	DbgPrint("[LA mode BufferAllocate]\n");
-	
+
 	if (ADCSmpBuf->Length == 0) {
 
 		#if (DM_ODM_SUPPORT_TYPE & ODM_WIN)
@@ -82,8 +82,8 @@ phydm_la_get_tx_pkt_buf(
 		/*Stop DMA*/
 		backup_DMA = ODM_GetMACReg(pDM_Odm, 0x300, bMaskLWord);
 		ODM_SetMACReg(pDM_Odm, 0x300, 0x7fff, backup_DMA|0x7fff);
-		
-		/*move LA mode content from IMEM to TxPktBuffer 
+
+		/*move LA mode content from IMEM to TxPktBuffer
 			Source : OCPBASE_IMEM 0x00000000
 			Destination : OCPBASE_TXBUF 0x18780000
 			Length : 64K*/
@@ -97,7 +97,7 @@ phydm_la_get_tx_pkt_buf(
 		smp_number = ((ADCSmpBuf->buffer_size)>>3);	/*Byte to 64Byte*/
 	} else	 {
 		Addr = ADCSmpBuf->start_pos;
-		
+
 		Addr_8byte = Addr>>3;
 		if(Addr_8byte > Finish_Addr)
 			smp_number = Addr_8byte - Finish_Addr;
@@ -105,9 +105,9 @@ phydm_la_get_tx_pkt_buf(
 			smp_number = Finish_Addr - Addr_8byte;
 
 		DbgPrint("bRoundUp = ((%d)), Finish_Addr=((0x%x * 8Byte)), Start_Addr = ((0x%x * 8Byte)), smp_number = ((%d))\n", bRoundUp, Finish_Addr, Addr_8byte, smp_number);
-		
+
 	}
-	/*	
+	/*
 	DbgPrint("bRoundUp = %d, Finish_Addr=0x%x, value32=0x%x\n", bRoundUp, Finish_Addr, value32);
 	DbgPrint("End_Addr = %x, ADCSmpBuf->start_pos = 0x%x, ADCSmpBuf->buffer_size = 0x%x\n", End_Addr, ADCSmpBuf->start_pos, ADCSmpBuf->buffer_size);
 	*/
@@ -120,7 +120,7 @@ phydm_la_get_tx_pkt_buf(
 			DataL = ODM_GetBBReg(pDM_Odm, 0x8000+(Addr&0xfff), bMaskDWord);
 			DataH = ODM_GetBBReg(pDM_Odm, 0x8000+(Addr&0xfff)+4, bMaskDWord);
 
-			DbgPrint("%08x%08x\n", DataH, DataL);		
+			DbgPrint("%08x%08x\n", DataH, DataL);
 		}
 	} else {
 		while (Addr != (Finish_Addr<<3)) {
@@ -146,9 +146,9 @@ phydm_la_get_tx_pkt_buf(
 				RT_TRACE_EX(COMP_LA_MODE, DBG_LOUD, ("%08x%08x\n", ADCSmpBuf->Octet[i], ADCSmpBuf->Octet[i+1]));
 				#endif
 			#endif
-			
+
 			i = i + 2;
-			
+
 			if ((Addr+8) >= End_Addr)
 				Addr = ADCSmpBuf->start_pos;
 			else
@@ -163,13 +163,13 @@ phydm_la_get_tx_pkt_buf(
 		RT_TRACE_EX(COMP_LA_MODE, DBG_LOUD, ("smp_cnt = ((%d))\n", smp_cnt));
 		#endif
 	}
-	
+
 #if (DM_ODM_SUPPORT_TYPE & ODM_AP)
-	if (pDM_Odm->SupportICType & ODM_RTL8197F) 
+	if (pDM_Odm->SupportICType & ODM_RTL8197F)
 		ODM_SetMACReg(pDM_Odm, 0x300, 0x7fff, backup_DMA);	/*Resume DMA*/
 #endif
-	
-}	
+
+}
 
 VOID
 phydm_la_mode_set_mac_iq_dump(
@@ -188,16 +188,16 @@ phydm_la_mode_set_mac_iq_dump(
 		AdcSmp->is_bb_trigger = 0;
 		ODM_SetMACReg(pDM_Odm, 0x7c0, BIT2, 1); /*polling bit for MAC mode*/
 		ODM_SetMACReg(pDM_Odm, 0x7c0, BIT4|BIT3, AdcSmp->la_trigger_edge); /*trigger mode for MAC*/
-		
+
 		DbgPrint("[MAC_trig] ref_mask = ((0x%x)), ref_value = ((0x%x)), dbg_port = ((0x%x))\n", AdcSmp->la_mac_ref_mask, AdcSmp->la_TrigSigSel, AdcSmp->la_dbg_port);
 		/*[Set MAC Debug Port]*/
 		ODM_SetMACReg(pDM_Odm, 0xF4, BIT16, 1);
 		ODM_SetMACReg(pDM_Odm, 0x38, 0xff0000, AdcSmp->la_dbg_port);
 		ODM_SetMACReg(pDM_Odm, 0x7c4, bMaskDWord, AdcSmp->la_mac_ref_mask);
 		ODM_SetMACReg(pDM_Odm, 0x7c8, bMaskDWord, AdcSmp->la_TrigSigSel);
-		
+
 	} else {
-	
+
 		AdcSmp->is_bb_trigger = 1;
 		ODM_SetMACReg(pDM_Odm, 0x7c0, BIT1, 1); /*polling bit for BB ADC mode*/
 
@@ -205,18 +205,18 @@ phydm_la_mode_set_mac_iq_dump(
 
 			ODM_SetMACReg(pDM_Odm, 0x7c0, BIT3, 1); /*polling bit for MAC trigger event*/
 			ODM_SetMACReg(pDM_Odm, 0x7c0, BIT7|BIT6, AdcSmp->la_TrigSigSel);
-			
-			if (AdcSmp->la_TrigSigSel == ADCSMP_TRIG_REG)			
+
+			if (AdcSmp->la_TrigSigSel == ADCSMP_TRIG_REG)
 				ODM_SetMACReg(pDM_Odm, 0x7c0, BIT5, 1); /* manual trigger 0x7C0[5] = 0 -> 1*/
-		} 
+		}
 	}
 
 	reg_value = ODM_GetBBReg(pDM_Odm, 0x7c0, 0xff);
 	DbgPrint("4. [Set MAC IQ dump] 0x7c0[7:0] = ((0x%x))\n", reg_value);
 	#if (DM_ODM_SUPPORT_TYPE & ODM_WIN)
 	RT_TRACE_EX(COMP_LA_MODE, DBG_LOUD, ("4. [Set MAC IQ dump] 0x7c0[7:0] = ((0x%x))\n", reg_value));
-	#endif	
-	
+	#endif
+
 }
 
 void
@@ -230,7 +230,7 @@ phydm_la_mode_set_dma_type(
 	DbgPrint("2. [LA mode DMA setting] Dma_type = ((%d))\n", la_dma_type);
 	#if (DM_ODM_SUPPORT_TYPE & ODM_WIN)
 	RT_TRACE_EX(COMP_LA_MODE, DBG_LOUD, ("2. [LA mode DMA setting] Dma_type = ((%d))\n", la_dma_type));
-	#endif	
+	#endif
 
 	if (pDM_Odm->SupportICType & ODM_IC_11AC_SERIES)
 		ODM_SetBBReg(pDM_Odm , ODM_ADC_TRIGGER_Jaguar2, 0xf00, la_dma_type);	/*0x95C[11:8]*/
@@ -244,14 +244,14 @@ phydm_adc_smp_start(
 	)
 {
 	PDM_ODM_T				pDM_Odm = (PDM_ODM_T)pDM_VOID;
-	PRT_ADCSMP				AdcSmp = &(pDM_Odm->adcsmp);	
+	PRT_ADCSMP				AdcSmp = &(pDM_Odm->adcsmp);
 	u1Byte					tmpU1b;
 	u1Byte					while_cnt = 0;
 	u1Byte					polling_ok = FALSE, target_polling_bit;
 
 	phydm_la_mode_bb_setting(pDM_Odm);
 	phydm_la_mode_set_dma_type(pDM_Odm, AdcSmp->la_dma_type);
-	phydm_la_mode_set_trigger_time(pDM_Odm, AdcSmp->la_TriggerTime);	
+	phydm_la_mode_set_trigger_time(pDM_Odm, AdcSmp->la_TriggerTime);
 
 	if (pDM_Odm->SupportICType & ODM_RTL8197F)
 		ODM_SetBBReg(pDM_Odm, 0xd00, BIT26, 0x1);
@@ -260,7 +260,7 @@ phydm_adc_smp_start(
 		ODM_Write1Byte(pDM_Odm, 0x8b4, 0x80);
 		//ODM_SetBBReg(pDM_Odm, 0x8b4, BIT7, 1);
 	}
-	
+
 	phydm_la_mode_set_mac_iq_dump(pDM_Odm);
 //return;
 #if (DM_ODM_SUPPORT_TYPE & ODM_AP)
@@ -274,7 +274,7 @@ phydm_adc_smp_start(
 		if (AdcSmp->ADCSmpState != ADCSMP_STATE_SET) {
 			DbgPrint("[State Error] ADCSmpState != ADCSMP_STATE_SET\n");
 			break;
-			
+
 		} else if (tmpU1b & target_polling_bit) {
 			ODM_delay_ms(100);
 			while_cnt = while_cnt + 1;
@@ -285,14 +285,14 @@ phydm_adc_smp_start(
 			break;
 		}
 	} while (while_cnt < 20);
-	
+
 	if (AdcSmp->ADCSmpState == ADCSMP_STATE_SET) {
 
 		if (polling_ok)
 			phydm_la_get_tx_pkt_buf(pDM_Odm);
 		else {
 			DbgPrint("[Polling timeout]\n");
-		}	
+		}
 	}
 
 #if (DM_ODM_SUPPORT_TYPE & ODM_AP)
@@ -309,15 +309,15 @@ phydm_adc_smp_start(
 	RT_TRACE_EX(COMP_LA_MODE, DBG_LOUD, ("[LA mode] la_count = ((%d))\n", AdcSmp->la_count));
 	#endif
 
-	
+
 	ADCSmp_Stop(pDM_Odm);
-	
+
 	if (AdcSmp->la_count == 0) {
 		DbgPrint("LA Dump finished ---------->\n\n\n");
 		/**/
 	} else {
 		AdcSmp->la_count --;
-		DbgPrint("LA Dump more ---------->\n\n\n");		
+		DbgPrint("LA Dump more ---------->\n\n\n");
 		ADCSmp_Set(pDM_Odm, AdcSmp->la_trig_mode, AdcSmp->la_TrigSigSel, AdcSmp->la_dma_type, AdcSmp->la_TriggerTime, 0);
 	}
 
@@ -367,9 +367,9 @@ ADCSmp_Set(
 
 	if (is_set_success) {
 		AdcSmp->ADCSmpState = ADCSMP_STATE_SET;
-		
+
 		DbgPrint("[LA Set Success] LA_State=((%d))\n", AdcSmp->ADCSmpState);
-		
+
 		#if (DM_ODM_SUPPORT_TYPE & ODM_WIN)
 
 		DbgPrint("ADCSmp_work_item_index = ((%d))\n", AdcSmp->la_work_item_index);
@@ -385,17 +385,17 @@ ADCSmp_Set(
 		#endif
 	} else {
 		DbgPrint("[LA Set Fail] LA_State=((%d))\n", AdcSmp->ADCSmpState);
-	}	
+	}
 
-	
+
 }
 
 #if (DM_ODM_SUPPORT_TYPE & ODM_WIN)
 RT_STATUS
 ADCSmp_Query(
 	IN	PVOID				pDM_VOID,
-	IN	ULONG				InformationBufferLength, 
-	OUT	PVOID				InformationBuffer, 
+	IN	ULONG				InformationBufferLength,
+	OUT	PVOID				InformationBuffer,
 	OUT	PULONG				BytesWritten
 	)
 {
@@ -436,7 +436,7 @@ ADCSmp_Query(
 	IN	pu4Byte		pused
 	)
 {
-	PDM_ODM_T			pDM_Odm = (PDM_ODM_T)pDM_VOID;	
+	PDM_ODM_T			pDM_Odm = (PDM_ODM_T)pDM_VOID;
 	PRT_ADCSMP			AdcSmp = &(pDM_Odm->adcsmp);
 	PRT_ADCSMP_STRING	ADCSmpBuf = &(AdcSmp->ADCSmpBuf);
 	u4Byte used = *pused;
@@ -476,7 +476,7 @@ ADCSmp_Query_SingleData(
 	IN	u4Byte		index
 	)
 {
-	PDM_ODM_T		pDM_Odm = (PDM_ODM_T)pDM_VOID;	
+	PDM_ODM_T		pDM_Odm = (PDM_ODM_T)pDM_VOID;
 	PRT_ADCSMP		AdcSmp = &(pDM_Odm->adcsmp);
 	PRT_ADCSMP_STRING	ADCSmpBuf = &(AdcSmp->ADCSmpBuf);
 	u4Byte used = 0;
@@ -502,7 +502,7 @@ ADCSmp_Stop(
 	IN		PVOID			pDM_VOID
 	)
 {
-	PDM_ODM_T			pDM_Odm = (PDM_ODM_T)pDM_VOID;	
+	PDM_ODM_T			pDM_Odm = (PDM_ODM_T)pDM_VOID;
 	PRT_ADCSMP			AdcSmp = &(pDM_Odm->adcsmp);
 
 	AdcSmp->ADCSmpState = ADCSMP_STATE_IDLE;
@@ -514,7 +514,7 @@ ADCSmp_Init(
 	IN		PVOID			pDM_VOID
 	)
 {
-	PDM_ODM_T			pDM_Odm = (PDM_ODM_T)pDM_VOID;	
+	PDM_ODM_T			pDM_Odm = (PDM_ODM_T)pDM_VOID;
 	PRT_ADCSMP			AdcSmp = &(pDM_Odm->adcsmp);
 	PRT_ADCSMP_STRING	ADCSmpBuf = &(AdcSmp->ADCSmpBuf);
 
@@ -522,18 +522,18 @@ ADCSmp_Init(
 
 	if (pDM_Odm->SupportICType & ODM_RTL8814A) {
 		ADCSmpBuf->start_pos = 0x30000;
-		ADCSmpBuf->buffer_size = 0x10000;	
+		ADCSmpBuf->buffer_size = 0x10000;
 	} else if (pDM_Odm->SupportICType & ODM_RTL8822B) {
 		ADCSmpBuf->start_pos = 0x20000;
-		ADCSmpBuf->buffer_size = 0x20000;	
+		ADCSmpBuf->buffer_size = 0x20000;
 	} else if (pDM_Odm->SupportICType & ODM_RTL8197F) {
 		ADCSmpBuf->start_pos = 0x00000;
-		ADCSmpBuf->buffer_size = 0x10000;	
+		ADCSmpBuf->buffer_size = 0x10000;
 	} else if (pDM_Odm->SupportICType & ODM_RTL8821C) {
 		ADCSmpBuf->start_pos = 0x8000;
-		ADCSmpBuf->buffer_size = 0x8000;	
+		ADCSmpBuf->buffer_size = 0x8000;
 	}
-	
+
 }
 
 #if (DM_ODM_SUPPORT_TYPE & (ODM_WIN | ODM_CE))
@@ -552,7 +552,7 @@ ADCSmp_DeInit(
 		ODM_FreeMemory(pDM_Odm, ADCSmpBuf->Octet, ADCSmpBuf->Length);
 		ADCSmpBuf->Length = 0x0;
 	}
-}	
+}
 
 #endif
 
@@ -605,7 +605,7 @@ phydm_la_mode_bb_setting(
 			(a:) '{dbg_ofdm}'
 			(b:) '{dbg_cck}'
 		*/
-		
+
 		ODM_SetBBReg(pDM_Odm, 0x198C , BIT2|BIT1|BIT0, 7); /*disable dbg clk gating*/
 
 		/*dword= ODM_GetBBReg(pDM_Odm, 0x8FC, bMaskDWord);*/
@@ -653,29 +653,29 @@ phydm_la_mode_set_trigger_time(
 	if (TriggerTime_mu_sec < 128) {
 		time_unit = 0; /*unit: 1mu sec*/
 	} else if (TriggerTime_mu_sec < 256) {
-		time_unit = 1; /*unit: 2mu sec*/	
+		time_unit = 1; /*unit: 2mu sec*/
 	} else if (TriggerTime_mu_sec < 512) {
-		time_unit = 2; /*unit: 4mu sec*/	
+		time_unit = 2; /*unit: 4mu sec*/
 	} else if (TriggerTime_mu_sec < 1024) {
-		time_unit = 3; /*unit: 8mu sec*/	
+		time_unit = 3; /*unit: 8mu sec*/
 	} else if (TriggerTime_mu_sec < 2048) {
-		time_unit = 4; /*unit: 16mu sec*/	
+		time_unit = 4; /*unit: 16mu sec*/
 	} else if (TriggerTime_mu_sec < 4096) {
-		time_unit = 5; /*unit: 32mu sec*/	
+		time_unit = 5; /*unit: 32mu sec*/
 	} else if (TriggerTime_mu_sec < 8192) {
-		time_unit = 6; /*unit: 64mu sec*/	
+		time_unit = 6; /*unit: 64mu sec*/
 	}
-	
+
 	TriggerTime_unit_num = (u1Byte)(TriggerTime_mu_sec>>time_unit);
-	
+
 	DbgPrint("3. [Set Trigger Time] Trig_Time = ((%d)) * unit = ((2^%d us))\n", TriggerTime_unit_num, time_unit);
 	#if (DM_ODM_SUPPORT_TYPE & ODM_WIN)
 	RT_TRACE_EX(COMP_LA_MODE, DBG_LOUD, ("3. [Set Trigger Time] Trig_Time = ((%d)) * unit = ((2^%d us))\n", TriggerTime_unit_num, time_unit));
-	#endif	
-	
+	#endif
+
 	ODM_SetMACReg(pDM_Odm, 0x7cc , BIT20|BIT19|BIT18, time_unit);
 	ODM_SetMACReg(pDM_Odm, 0x7c0, 0x7f00, (TriggerTime_unit_num& 0x7f));
-	
+
 }
 
 
@@ -698,12 +698,12 @@ phydm_lamode_trigger_setting(
 		u4Byte		mac_ref_signal_mask;
 		u1Byte		sampling_rate = 0, i;
 		char 		help[] = "-h";
-		u4Byte 			var1[10] = {0};	
+		u4Byte 			var1[10] = {0};
 		u4Byte used = *_used;
-		u4Byte out_len = *_out_len;		
-		
+		u4Byte out_len = *_out_len;
+
 		if (pDM_Odm->SupportICType & PHYDM_IC_SUPPORT_LA_MODE) {
-			
+
 			PHYDM_SSCANF(input[1], DCMD_DECIMAL, &var1[0]);
 			bEnableLaMode = (BOOLEAN)var1[0];
 			/*DbgPrint("echo cmd input_num = %d\n", input_num);*/
@@ -712,18 +712,18 @@ phydm_lamode_trigger_setting(
 				PHYDM_SNPRINTF((output+used, out_len-used, "{En} {0:BB,1:BB_MAC,2:RF0,3:RF1,4:MAC} \n {BB:DbgPort[bit],BB_MAC:0-ok/1-fail/2-cca,MAC:ref} {DMA type} {TrigTime} \n {PollingTime/ref_mask} {DbgPort} {0:P_Edge, 1:N_Edge} {SpRate:0-80M,1-40M,2-20M} {Capture num}\n"));
 				/**/
 			} else if ((bEnableLaMode == 1)) {
-			
+
 				PHYDM_SSCANF(input[2], DCMD_DECIMAL, &var1[1]);
-				
+
 				trig_mode = (u1Byte)var1[1];
-				
+
 				if (trig_mode == PHYDM_MAC_TRIG) {
 					PHYDM_SSCANF(input[3], DCMD_HEX, &var1[2]);
 				} else {
 					PHYDM_SSCANF(input[3], DCMD_DECIMAL, &var1[2]);
 				}
 				TrigSigSel = var1[2];
-				
+
 				PHYDM_SSCANF(input[4], DCMD_DECIMAL, &var1[3]);
 				PHYDM_SSCANF(input[5], DCMD_DECIMAL, &var1[4]);
 				PHYDM_SSCANF(input[6], DCMD_HEX, &var1[5]);
@@ -746,7 +746,7 @@ phydm_lamode_trigger_setting(
 				#if (DM_ODM_SUPPORT_TYPE & ODM_WIN)
 				RT_TRACE_EX(COMP_LA_MODE, DBG_LOUD, ("echo lamode %d %d %d %d %d %d %x %d %d %d\n", var1[0], var1[1], var1[2], var1[3], var1[4], var1[5], var1[6], var1[7], var1[8], var1[9]));
 				#endif
-				
+
 				PHYDM_SNPRINTF((output+used, out_len-used, "a.En= ((1)),  b.mode = ((%d)), c.Trig_Sel = ((0x%x)), d.Dma_type = ((%d))\n", trig_mode, TrigSigSel, DmaDataSigSel));
 				PHYDM_SNPRINTF((output+used, out_len-used, "e.Trig_Time = ((%dus)), f.mac_ref_mask = ((0x%x)), g.dbg_port = ((0x%x))\n", TriggerTime_mu_sec, AdcSmp->la_mac_ref_mask, AdcSmp->la_dbg_port));
 				PHYDM_SNPRINTF((output+used, out_len-used, "h.Trig_edge = ((%d)), i.smp rate = ((%d MHz)), j.Cap_num = ((%d))\n", AdcSmp->la_trigger_edge, (80>>AdcSmp->la_smp_rate), AdcSmp->la_count ));
@@ -757,7 +757,7 @@ phydm_lamode_trigger_setting(
 				ADCSmp_Stop(pDM_Odm);
 				PHYDM_SNPRINTF((output+used, out_len-used, "Disable LA mode\n"));
 			}
-		} 
+		}
 	}
 
 #endif	/*endif PHYDM_LA_MODE_SUPPORT == 1*/

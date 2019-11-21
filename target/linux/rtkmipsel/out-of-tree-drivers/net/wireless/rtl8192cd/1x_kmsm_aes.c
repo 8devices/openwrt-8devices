@@ -20,24 +20,12 @@
 #include <assert.h>
 #endif
 
-#ifdef __KERNEL__
 #include <linux/time.h>
 #include <linux/string.h>
 #include <linux/slab.h>
-#elif defined(__ECOS)
-#include <cyg/hal/plf_intr.h>
-#include <cyg/io/eth/rltk/819x/wrapper/sys_support.h>
-#include <cyg/io/eth/rltk/819x/wrapper/skbuff.h>
-#include <cyg/io/eth/rltk/819x/wrapper/timer.h>
-#include <cyg/io/eth/rltk/819x/wrapper/wrapper.h>
-#endif
 
 #include "./8192cd_cfg.h"
-#ifdef __OSK__
-#include "./8192cd.h"
-#endif
 
-#ifdef INCLUDE_WPA_PSK
 #ifdef RTL_WPA2
 //#define MODULE_TEST
 
@@ -86,9 +74,6 @@ typedef unsigned short  u16b; /* a 16 bit unsigned integer type   */
 typedef unsigned int	u32b; /* a 32 bit unsigned integer type   */
 
 #ifndef _RTL_WPA_WINDOW
-#if !defined(__LINUX_2_6__) && !defined(__ECOS) && !defined(__OSK__)
-typedef int bool;
-#endif
 #endif
 
 /* 2. Standard interface for AES cryptographic routines             */
@@ -725,5 +710,4 @@ void TestAESWRAP()
 }
 #endif
 #endif // RTL_WPA2
-#endif // INCLUDE_WPA_PSK
 

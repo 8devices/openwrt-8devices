@@ -1,7 +1,7 @@
 /******************************************************************************
  *
  * Copyright(c) 2007 - 2011 Realtek Corporation. All rights reserved.
- *                                        
+ *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of version 2 of the GNU General Public License as
  * published by the Free Software Foundation.
@@ -19,7 +19,7 @@
  ******************************************************************************/
 #ifndef __INC_ODM_REGCONFIG_H_8723D
 #define __INC_ODM_REGCONFIG_H_8723D
- 
+
 #if (RTL8723D_SUPPORT == 1)
 
 void
@@ -31,28 +31,28 @@ odm_ConfigRFReg_8723D(
 	IN	u4Byte				    RegAddr
 	);
 
-void 
+void
 odm_ConfigRF_RadioA_8723D(
 	IN 	PDM_ODM_T 				pDM_Odm,
 	IN 	u4Byte 					Addr,
 	IN 	u4Byte 					Data
 	);
 
-void 
+void
 odm_ConfigRF_RadioB_8723D(
 	IN 	PDM_ODM_T 				pDM_Odm,
 	IN 	u4Byte 					Addr,
 	IN 	u4Byte 					Data
 	);
 
-void 
+void
 odm_ConfigMAC_8723D(
  	IN 	PDM_ODM_T 	pDM_Odm,
  	IN 	u4Byte 		Addr,
  	IN 	u1Byte 		Data
  	);
 
-void 
+void
 odm_ConfigBB_AGC_8723D(
     IN 	PDM_ODM_T 	pDM_Odm,
     IN 	u4Byte 		Addr,
@@ -71,14 +71,14 @@ odm_ConfigBB_PHY_REG_PG_8723D(
     IN 	u4Byte 		Data
     );
 
-void 
+void
 odm_ConfigBB_PHY_8723D(
 	IN 	PDM_ODM_T 	pDM_Odm,
     IN 	u4Byte 		Addr,
     IN 	u4Byte 		Bitmask,
     IN 	u4Byte 		Data
     );
-	
+
 void
 odm_ConfigBB_TXPWR_LMT_8723D(
 	IN	PDM_ODM_T	pDM_Odm,
@@ -90,8 +90,8 @@ odm_ConfigBB_TXPWR_LMT_8723D(
 	IN	pu1Byte 	Channel,
 	IN	pu1Byte 	PowerLimit
 	);
-	
-	
+
+
 #endif
 #endif // end of SUPPORT
 

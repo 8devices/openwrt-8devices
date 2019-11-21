@@ -5,14 +5,14 @@ Copyright (c) Realtek Semiconductor Corp. All rights reserved.
 
 Module Name:
 	RateAdaptive.h
-	
+
 Abstract:
 	Prototype of RA and related data structure.
-	    
+
 Major Change History:
 	When       Who               What
 	---------- ---------------   -------------------------------
-	2011-08-12 Page            Create.	
+	2011-08-12 Page            Create.
 --*/
 
 // Rate adaptive define
@@ -48,64 +48,64 @@ ODM_RASupport_Init(
 	IN	PDM_ODM_T	pDM_Odm
 	);
 
-int 
+int
 ODM_RAInfo_Init_all(
 	IN    PDM_ODM_T		pDM_Odm
 	);
 
-int 
+int
 ODM_RAInfo_Init(
 	IN 	PDM_ODM_T 	pDM_Odm,
-	IN	u4Byte		MacID	
+	IN	u4Byte		MacID
 	);
 
-u1Byte 
+u1Byte
 ODM_RA_GetShortGI_8188E(
-	IN 	PDM_ODM_T 	pDM_Odm, 
+	IN 	PDM_ODM_T 	pDM_Odm,
 	IN 	u1Byte 		MacID
 	);
 
-u1Byte 
+u1Byte
 ODM_RA_GetDecisionRate_8188E(
-	IN 	PDM_ODM_T 	pDM_Odm, 
+	IN 	PDM_ODM_T 	pDM_Odm,
 	IN 	u1Byte 		MacID
 	);
 
 u1Byte
 ODM_RA_GetHwPwrStatus_8188E(
-	IN 	PDM_ODM_T 	pDM_Odm, 
+	IN 	PDM_ODM_T 	pDM_Odm,
 	IN 	u1Byte 		MacID
 	);
-VOID 
+VOID
 ODM_RA_UpdateRateInfo_8188E(
 	IN PDM_ODM_T pDM_Odm,
 	IN u1Byte MacID,
-	IN u1Byte RateID, 
+	IN u1Byte RateID,
 	IN u4Byte RateMask,
 	IN u1Byte SGIEnable
 	);
 
-VOID 
+VOID
 ODM_RA_SetRSSI_8188E(
-	IN 	PDM_ODM_T 		pDM_Odm, 
-	IN 	u1Byte 			MacID, 
+	IN 	PDM_ODM_T 		pDM_Odm,
+	IN 	u1Byte 			MacID,
 	IN 	u1Byte 			Rssi
 	);
 
 VOID
-ODM_RA_TxRPT2Handle_8188E(	
+ODM_RA_TxRPT2Handle_8188E(
 	IN	PDM_ODM_T		pDM_Odm,
 	IN	pu1Byte			TxRPT_Buf,
 	IN	u2Byte			TxRPT_Len,
 	IN	u4Byte			MacIDValidEntry0,
 	IN	u4Byte			MacIDValidEntry1
 	);
-	
 
-VOID 
+
+VOID
 ODM_RA_Set_TxRPT_Time(
 	IN	PDM_ODM_T		pDM_Odm,
 	IN	u2Byte 			minRptTime
-	);	
+	);
 #endif
 

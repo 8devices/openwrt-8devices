@@ -44,14 +44,6 @@
 
 #define WLAN_LLC_HEADER_SIZE	6
 
-#ifdef CONFIG_RTK_MESH
-// Define mesh header length, But 11s data 11s mgt frame header length different, So have two type.
-#define WLAN_HDR_A4_MESH_DATA_LEN 34		// WLAN_HDR_A4_LEN + MeshHeader_Len(4 bytes)
-#define WLAN_HDR_A6_MESH_DATA_LEN 46		// WLAN_HDR_A4_LEN + MeshHeader_Len(16 bytes)
-#define WLAN_HDR_A4_MESH_DATA_LEN_QOS 36	// WLAN_HDR_A4_LEN + MeshHeader_Len(4 bytes) + QOS
-#define WLAN_HDR_A6_MESH_DATA_LEN_QOS 48	// WLAN_HDR_A4_LEN + MeshHeader_Len(16 bytes) + QOS
-// #define WLAN_HDR_A4_MESH_MGT_LEN 34		// always processed by daemon (raw socket)
-#endif // CONFIG_RTK_MESH
 
 #define WLAN_MIN_ETHFRM_LEN	60
 #define WLAN_MAX_ETHFRM_LEN	1514
@@ -62,65 +54,6 @@
 #if defined(GREEN_HILL) || defined(PACK_STRUCTURE) || defined(__ECOS)
 #pragma pack(1)
 #endif
-#ifdef NOT_RTK_BSP
-__PACK struct wlan_ethhdr_t
-{
-	UINT8	daddr[WLAN_ETHADDR_LEN]		;
-	UINT8	saddr[WLAN_ETHADDR_LEN]		;
-	UINT16	type						__WLAN_ATTRIB_PACK__;
-} __WLAN_ATTRIB_PACK__;
-
-__PACK struct wlan_llc_t
-{
-	UINT8	dsap						;
-	UINT8	ssap						;
-	UINT8	ctl							;
-} __WLAN_ATTRIB_PACK__;
-
-/* local snap header type */
-__PACK struct wlan_snap_t
-{
-	UINT8	oui[WLAN_IEEE_OUI_LEN]		;
-	UINT16	type						__WLAN_ATTRIB_PACK__;
-} __WLAN_ATTRIB_PACK__;
-
-__PACK struct llc_snap {
-	struct wlan_llc_t	llc_hdr;
-	struct wlan_snap_t	snap_hdr;
-} __WLAN_ATTRIB_PACK__;
-
-__PACK struct ht_cap_elmt
-{
-	UINT16	ht_cap_info					__WLAN_ATTRIB_PACK__;
-	UINT8	ampdu_para					;
-	UINT8	support_mcs[16]				;
-	UINT16	ht_ext_cap					__WLAN_ATTRIB_PACK__;
-	UINT32	txbf_cap					__WLAN_ATTRIB_PACK__;
-	UINT8	asel_cap					;
-} __WLAN_ATTRIB_PACK__;
-
-__PACK struct ht_info_elmt
-{
-	UINT8	primary_ch					;
-	UINT8	info0						;
-	UINT16	info1						__WLAN_ATTRIB_PACK__;
-	UINT16	info2						__WLAN_ATTRIB_PACK__;
-	UINT8	basic_mcs[16]				;
-} __WLAN_ATTRIB_PACK__;
-
-__PACK struct vht_cap_elmt
-{
-	UINT32	vht_cap_info				__WLAN_ATTRIB_PACK__;
-	UINT32	vht_support_mcs[2]			__WLAN_ATTRIB_PACK__;
-} __WLAN_ATTRIB_PACK__;
-
-__PACK struct vht_oper_elmt
-{
-	UINT8	vht_oper_info[3]			;
-	UINT16	vht_basic_msc				__WLAN_ATTRIB_PACK__;
-} __WLAN_ATTRIB_PACK__;
-
-#else
 
 __PACK struct wlan_ethhdr_t
 {
@@ -187,7 +120,6 @@ __PACK struct vht_oper_elmt
 	UINT16	vht_basic_msc				__WLAN_ATTRIB_PACK__;
 } __WLAN_ATTRIB_PACK__;
 
-#endif
 
 #ifdef WIFI_11N_2040_COEXIST
 __PACK struct obss_scan_para_elmt
@@ -202,15 +134,6 @@ __PACK struct obss_scan_para_elmt
 } __WLAN_ATTRIB_PACK__;
 #endif
 
-#ifdef CONFIG_IEEE80211R
-__PACK struct ft_ie_elmt_hdr
-{
-	UINT16	mic_control				__WLAN_ATTRIB_PACK__;
-	UINT8	mic[16]					__WLAN_ATTRIB_PACK__;
-	UINT8	ANonce[32]				__WLAN_ATTRIB_PACK__;
-	UINT8	SNonce[32]				__WLAN_ATTRIB_PACK__;
-} __WLAN_ATTRIB_PACK__;
-#endif
 
 #if defined(GREEN_HILL) || defined(PACK_STRUCTURE) || defined(__ECOS)
 #pragma pack()
@@ -225,10 +148,6 @@ enum WIFI_FRAME_TYPE {
 	WIFI_CTRL_TYPE =	(BIT(2)),
 	WIFI_DATA_TYPE =	(BIT(3)),
 
-#ifdef CONFIG_RTK_MESH
-	// Hardware of 8186 doesn't support it. Confirm by David, 2007/1/5
-	WIFI_EXT_TYPE  =	(BIT(2) | BIT(3))	///< 11 is 802.11S Extended Type
-#endif
 };
 
 /**
@@ -251,9 +170,6 @@ enum WIFI_FRAME_SUBTYPE {
     WIFI_AUTH           = (BIT(7) | BIT(5) | BIT(4) | WIFI_MGT_TYPE),
     WIFI_DEAUTH         = (BIT(7) | BIT(6) | WIFI_MGT_TYPE),
     WIFI_WMM_ACTION		= (BIT(7) | BIT(6) | BIT(4) | WIFI_MGT_TYPE),
-#ifdef CONFIG_RTK_MESH
-	WIFI_MULTIHOP_ACTION 	= (BIT(7) | BIT(6) | BIT(5) |BIT(4) | WIFI_MGT_TYPE),	// (Refer: Draft 1.06, Page 8, 7.1.3.1.2, Table 7-1, 2007/08/13 by popen)
-#endif
 
     // below is for control frame
     WIFI_BLOCKACK_REQ	= (BIT(7) | WIFI_CTRL_TYPE),
@@ -276,27 +192,10 @@ enum WIFI_FRAME_SUBTYPE {
     WIFI_CF_POLL        = (BIT(6) | BIT(5) | WIFI_DATA_TYPE),
     WIFI_CF_ACKPOLL     = (BIT(6) | BIT(5) | BIT(4) | WIFI_DATA_TYPE),
 
-#ifdef CONFIG_RTK_MESH    // (CAUTION!! Below not exist in D1.06!!)
-	// Because hardware of RTL8186 doen's support TYPE=11, we use BIT(7) | WIFI_DATA_TYPE to
-	// simulate TYPE=11, 2007/1/8
-    WIFI_11S_MESH	    = (BIT(7) | WIFI_DATA_TYPE),	// CAUTION!! Below not exist in D1.06!!
-    WIFI_11S_MESH_ACTION = (BIT(5) | WIFI_11S_MESH),	///< Mesh Action
-#endif
 
 };
 
 
-#ifdef P2P_SUPPORT
-#define CATEGORY_P2P_PUBLIC_ACTION  		4 	
-#define ACTIONY_P2P_PUBLIC_ACTION  			9 	
-#define	_P2P_PUBLIC_ACTION_FIELD_			9		
-#define _P2P_PUBLIC_ACTION_IE_OFFSET_		8
-#define _P2P_ACTION_IE_OFFSET_				7
-#define _P2P_IE_							221
-#define _SUPPORTED_RATES_NO_CCK_ 			2
-
-
-#endif
 /* cfg p2p*/
 #define _VENDOR_SPECIFIC_IE_	221
 
@@ -326,7 +225,7 @@ enum WIFI_REASON_CODE	{
 	_RSON_ASOC_NOT_AUTH_			= 9,	// Request assiciate or reassociate, before authenticate
 	// 10,11,12 for 802.11h
 	// WPA reason
-	_RSON_DISASSOC_DUE_BSS_TRANSITION = 12,	//Disassociated due to BSS Transition Management	
+	_RSON_DISASSOC_DUE_BSS_TRANSITION = 12,	//Disassociated due to BSS Transition Management
 	_RSON_INVALID_IE_				= 13,
 	_RSON_MIC_FAILURE_				= 14,
 	_RSON_4WAY_HNDSHK_TIMEOUT_		= 15,
@@ -368,10 +267,6 @@ enum WIFI_STATUS_CODE {
 	_STATS_AUTH_TIMEOUT_			= 16,	// Denial authenticate, timeout.
 	_STATS_UNABLE_HANDLE_STA_		= 17,	// Denial authenticate, BS resoruce insufficient.
 	_STATS_RATE_FAIL_				= 18,	// Denial authenticate, STA not support BSS request datarate.
-#ifdef CONFIG_IEEE80211R
-	_STATS_INVALID_PAIRWISE_CIPHER_	= 19,
-	_STATUS_R0KH_UNREACHABLE_		= 28,	
-#endif
 	_STATS_ASSOC_REJ_TEMP_			= 30,	// Association request rejected temporarily; try again later
 	_STATS_REQ_DECLINED_		= 37,
 /*#if defined(CONFIG_RTL_WAPI_SUPPORT)*/
@@ -384,18 +279,6 @@ enum WIFI_STATUS_CODE {
 	__STATS_INVALID_WAPI_CAPABILITY_ = 50,
 /*#endif*/
 
-#ifdef CONFIG_IEEE80211R
-	_STATS_INVALID_FT_ACTION_FRAME_COUNT_	= 52,
-	_STATS_INVALID_PMKID_					= 53,
-	_STATS_INVALID_MDIE_					= 54,
-	_STATS_INVALID_FTIE_					= 55,
-#endif
-#ifdef CONFIG_RTK_MESH	// CATUTION: below undefine !! (Refer: Draft 1.06, Page 17, 7.3.1.9, Table 7-23, 2007/08/13 by popen)
-	_STATS_MESH_LINK_ESTABLISHED_	= 55,	//The mesh peer link has been successfully
-	_STATS_MESH_LINK_CLOSED_		= 56,	// The mesh peer link has been closed completely
-	_STATS_MESH_UNDEFINE1_			= 57,	// No listed Key Holder Transport type is supported.
-	_STATS_MESH_UNDEFINE2_			= 58,	// The Mesh Key Holder Security Handshake message was malformed.
-#endif
 #ifdef CONFIG_IEEE80211V
 	_STATS_REJ_BSS_TRANSITION		= 82	,	//Rejected with Suggested BSS Transition
 #endif
@@ -424,24 +307,6 @@ enum WIFI_REG_DOMAIN {
 	DOMAIN_MAX
 };
 
-#ifdef DOT11K
-enum MEASUREMENT_TYPE {
-    MEASUREMENT_TYPE_BASIC = 0,
-    MEASUREMENT_TYPE_CCA = 1,
-    MEASUREMENT_TYPE_RPI = 2,
-    MEASUREMENT_TYPE_CHANNEL_LOAD = 3,
-    MEASUREMENT_TYPE_NOISE = 4,
-    MEASUREMENT_TYPE_BEACON = 5,
-    MEASUREMENT_TYPE_FRAME = 6,
-    MEASUREMENT_TYPE_STA_STATISTIC = 7,
-    MEASUREMENT_TYPE_LCI = 8, 
-    MEASUREMENT_TYPE_XMIT_CATEGORY = 9,       
-    MEASUREMENT_TYPE_MCAST_DIAGNOSTICS = 10,    
-    MEASUREMENT_TYPE_LOC_CIVIC = 11,       
-    MEASUREMENT_TYPE_LOC_IDENTIFIER = 12,
-    MEASUREMENT_TYPE_PAUSE = 255,                           
-};
-#endif
 
 #define _TO_DS_		BIT(8)
 #define _FROM_DS_	BIT(9)
@@ -605,27 +470,7 @@ enum MEASUREMENT_TYPE {
 #define GetQosControl(pbuf) (unsigned char *)((unsigned long)(pbuf) + (((GetToDs(pbuf)<<1)|GetFrDs(pbuf))==3?30:24))
 
 
-#ifdef CONFIG_RTK_MESH
-#define GetMeshHeaderFlagWithoutQOS(pbuf)	((unsigned char *)(pbuf) + 30)
 
-#define GetMeshHeaderTTLWithOutQOS(pbuf)	((unsigned char *)(pbuf) + 31)  	// mesh header ttl
-
-#define GetMeshHeaderSeqNumWithoutQOS(pbuf)	((unsigned short *)((unsigned long)(pbuf) + 32))	// Don't use cpu_to_le16(Other not use cpu_to_le16)
-#define SetMeshHeaderSeqNum(pbuf, num) \
-	do {    \
-		*(unsigned short *)((unsigned long)(pbuf) + 34) = \
-			((*(unsigned short *)((unsigned long)(pbuf) + 34)) & le16_to_cpu((unsigned short)~0xffff)) | \
-			le16_to_cpu((unsigned short)(0xffff & num )); \
-	} while(0)
-
-#endif // CONFIG_RTK_MESH
-
-#ifdef CONFIG_IEEE80211R
-#define GetFTMDID(pbuf)		((unsigned char *)pbuf + 2)
-#define GetFTOverDS(pbuf)	(((*(unsigned char *)((unsigned long)pbuf + 4)) & BIT(0)) != 0)
-#define GetFTResReq(pbuf)	(((*(unsigned char *)((unsigned long)pbuf + 4)) & BIT(1)) != 0)
-#define SetFTMICCtrl(pbuf, v)	(*(unsigned char *)((unsigned long)pbuf + 1)) = v
-#endif
 /*-----------------------------------------------------------------------------
 			Below is for the security related definition
 ------------------------------------------------------------------------------*/
@@ -652,12 +497,6 @@ enum MEASUREMENT_TYPE {
 #define _BEACON_IE_OFFSET_		12
 #define _BEACON_CAP_OFFSET_	34
 
-#ifdef CONFIG_RTK_MESH
-#define	_DISASS_IE_OFFSET_			2	// 2 octets, reason code
-#define	_MESH_HEADER_WITH_AE_		16	// mesh header with AE(Address Extension)
-#define	_MESH_HEADER_WITHOUT_AE_	4	// mesh header without AE(Address Extension)
-#define	_MESH_ACTIVE_FIELD_OFFSET_	2	// mesh active field Category+Action length
-#endif
 
 /* information element ID ,See textbook Table 4.7 */
 #define _SSID_IE_				0
@@ -687,9 +526,6 @@ enum MEASUREMENT_TYPE {
 #define _AP_CHANNEL_REPORT_IE_      51
 #define _NEIGHBOR_REPORT_IE_        52
 #define _MOBILITY_DOMAIN_IE_		54
-#if defined(CONFIG_RTL_WAPI_SUPPORT)
-#define	_EID_WAPI_                  68
-#endif
 #define _RM_ENABLE_CAP_IE_          70
 #define _WPS_IE_                    221
 #define _VENDOR_SPEC_IE_            221
@@ -701,7 +537,7 @@ enum MEASUREMENT_TYPE {
 #define PMF_CAP					0x400
 #define PMF_NONE				0x200
 
-#define BIP_HEADER_LEN			26 
+#define BIP_HEADER_LEN			26
 #define MMIC_TAG_IE				1
 #define MMIC_TAG_LEN			1
 #define MMIC_CRC_LEN 			4
@@ -806,7 +642,7 @@ enum MEASUREMENT_TYPE {
 #define _DELBA_ACTION_ID_			2
 #define _VENDOR_ACTION_ID_			0x7f	// add for P2P_SUPPORT
 
-/*-----------------------------------------------------------------------------			
+/*-----------------------------------------------------------------------------
 				Below is for PMF related definition
 ------------------------------------------------------------------------------*/
 #define _SA_QUERY_CATEGORY_ID_		8
@@ -819,22 +655,6 @@ enum MEASUREMENT_TYPE {
 /*-----------------------------------------------------------------------------
 				Below is for Fast BSS Transition related definition
 ------------------------------------------------------------------------------*/
-#ifdef CONFIG_IEEE80211R
-#define _FAST_BSS_TRANSITION_IE_	55
-#define _TIMEOUT_INTERVAL_IE_		56
-#define _RIC_DATA_IE_				57
-#define _RIC_DESCRIPTOR_IE_			75
-#define _FT_R1KH_ID_SUB_IE_			1
-#define _FT_GTK_SUB_IE_				2
-#define _FT_R0KH_ID_SUB_IE_			3
-#define TIE_TYPE_REASSOC_DEADLINE	1
-#define TIE_TYPE_KEY_LIFETIME		2
-#define _FAST_BSS_TRANSITION_CATEGORY_ID_	6
-#define _FT_REQUEST_ACTION_ID_		1
-#define _FT_RESPONSE_ACTION_ID_		2
-#define _FT_CONFIRM_ACTION_ID_		3
-#define _FT_ACK_ACTION_ID_			4
-#endif
 
 /*-----------------------------------------------------------------------------
 				Below is for 11v BSS Transition related definition
@@ -850,13 +670,13 @@ enum MEASUREMENT_TYPE {
 
 #define _WNM_PREFERED_BSS_TRANS_LIST_INCLUDED_	19
 
-#define _WNM_BSS_TRANS_SUPPORT_			BIT(3)		
+#define _WNM_BSS_TRANS_SUPPORT_			BIT(3)
 
 #define _WNM_PREFERRED_CANDIDATE_LIST_ 	BIT(0)		// 1: process
-#define _WNM_ABRIDGED_					BIT(1)		// 0: no recommandation or against 
+#define _WNM_ABRIDGED_					BIT(1)		// 0: no recommandation or against
 #define _WNM_DIASSOC_IMMINENT_			BIT(2)		// 1: diassoc from current AP
 #define _WNM_BSS_TERMINATION_INCLUDED_	BIT(3)		// 1: bss is shutting down
-#define _WNM_ESS_DIASSOC_IMMINENT_		BIT(4)		
+#define _WNM_ESS_DIASSOC_IMMINENT_		BIT(4)
 
 #define MAX_LIST_LEN						2304
 
@@ -951,8 +771,8 @@ enum bss_trans_mgmt_status_code {
 #endif
 
 #if (BEAMFORMING_SUPPORT == 1)
-#define _HTCAP_RECEIVED_NDP            BIT(3)    
-#define _HTCAP_TRANSMIT_NDP           BIT(4)    
+#define _HTCAP_RECEIVED_NDP            BIT(3)
+#define _HTCAP_TRANSMIT_NDP           BIT(4)
 #endif
 
 #define _HTCAP_AMPDU_FAC_8K_		0
@@ -991,7 +811,7 @@ enum bss_trans_mgmt_status_code {
  ------------------------------------------------------------------------------*/
 #define _DLS_CATEGORY_ID_			2
 #define _DLS_REQ_ACTION_ID_			0
-#define _DLS_RSP_ACTION_ID_			1	
+#define _DLS_RSP_ACTION_ID_			1
 #define _TDLS_CATEGORY_ID_ 			12
 
 #define	_TDLS_PROHIBITED_			BIT(6)
@@ -1047,7 +867,7 @@ enum mgmt_type {
 	MGMT_PROBERSP = 1,
 	MGMT_ASSOCRSP = 2,
 	MGMT_ASSOCREQ = 3,
-	MGMT_PROBEREQ = 4,	
+	MGMT_PROBEREQ = 4,
 };
 /*-----------------------------------------------------------------------------
             Below is for Spectrum Management  related definition
@@ -1069,13 +889,13 @@ enum mgmt_type {
 #define _NEIGHBOR_REPORT_REQEST_ACTION_ID_	    4
 #define _NEIGHBOR_REPORT_RESPONSE_ACTION_ID_	5
 
-#define _FRAME_BODY_SUBIE_		    1 
-#define _REPORT_DETAIL_SUBIE_		2 
+#define _FRAME_BODY_SUBIE_		    1
+#define _REPORT_DETAIL_SUBIE_		2
 #define MAX_BEACON_SUBLEMENT_LEN    226
 
 #ifdef SUPPORT_MONITOR
 #define PTK_LEN_UPPER_BOUND 256
-#define PTK_FILTER_LEN 		252	
+#define PTK_FILTER_LEN 		252
 #define WLAN_802_2_LEN		8
 #define WLAN_IP_HDR_LEN	20
 #define WLAN_UDP_LEN		8

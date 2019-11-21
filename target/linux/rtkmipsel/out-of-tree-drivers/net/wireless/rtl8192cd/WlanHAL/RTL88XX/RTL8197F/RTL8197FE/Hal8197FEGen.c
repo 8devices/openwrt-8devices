@@ -3,14 +3,14 @@ Copyright (c) Realtek Semiconductor Corp. All rights reserved.
 
 Module Name:
 	Hal88XXGen.c
-	
+
 Abstract:
 	Defined RTL8192EE HAL Function
-	    
+
 Major Change History:
 	When       Who               What
 	---------- ---------------   -------------------------------
-	2012-03-23 Filen            Create.	
+	2012-03-23 Filen            Create.
 --*/
 
 #include "../../../HalPrecomp.h"
@@ -44,8 +44,8 @@ SetBeamformRfMode8197F(
 
 	PHY_SetRFReg(priv, ODM_RF_PATH_A, RF_WE_LUT, 0x80000,0x1);	/*RF Mode table write enable*/
 	PHY_SetRFReg(priv, ODM_RF_PATH_B, RF_WE_LUT, 0x80000,0x1);	/*RF Mode table write enable*/
-	
-	if (bSelfBeamformer) { 
+
+	if (bSelfBeamformer) {
 		ODM_RT_TRACE(ODMPTR, PHYDM_COMP_TXBF, ODM_DBG_LOUD, ("%s set TX IQ gen\n", __FUNCTION__));
 		/*Paath_A*/
 		PHY_SetRFReg(priv, ODM_RF_PATH_A, RF_RCK_OS, 0xfffff, 0x08000);	/*Select Standby mode	0x30=0x08000*/
@@ -62,7 +62,7 @@ SetBeamformRfMode8197F(
 		PHY_SetRFReg(priv, ODM_RF_PATH_B, RF_TXPA_G1, 0xfffff, 0x00040);
 		PHY_SetRFReg(priv, ODM_RF_PATH_B, RF_TXPA_G2, 0xfffff, 0x71fc2);
 	}
-	
+
 	PHY_SetRFReg(priv, ODM_RF_PATH_A, RF_WE_LUT, 0x80000,0x0);	/*RF Mode table write disable*/
 	PHY_SetRFReg(priv, ODM_RF_PATH_B, RF_WE_LUT, 0x80000,0x0);	/*RF Mode table write disable*/
 
@@ -98,7 +98,7 @@ SetBeamformEnter8197F(
 	if ((pBeamformingInfo->BeamformCap & BEAMFORMEE_CAP) && (BFerIdx < BEAMFORMER_ENTRY_NUM)) {
 		BeamformerEntry = pBeamformingInfo->BeamformerEntry[BFerIdx];
 
-		RTL_W8( REG_SND_PTCL_CTRL, 0xDB);	
+		RTL_W8( REG_SND_PTCL_CTRL, 0xDB);
 
 		/*MAC addresss/Partial AID of Beamformer*/
 		if (BFerIdx == 0) {
@@ -114,7 +114,7 @@ SetBeamformEnter8197F(
 		}
 
 		/*CSI report parameters of Beamformer*/
-		
+
 		if (BFerIdx == 0)
 			RTL_W16(REG_TX_CSI_RPT_PARAM_BW20, 0x0309);
 		else
@@ -127,15 +127,15 @@ SetBeamformEnter8197F(
 
 		BeamformeeEntry = pBeamformingInfo->BeamformeeEntry[BFeeIdx];
 		SetBeamformRfMode8197F(priv, pBeamformingInfo, BFeeIdx);
-		
+
 		if(OPMODE & WIFI_ADHOC_STATE)
 			STAid = BeamformeeEntry.AID;
-		else 
+		else
 			STAid = BeamformeeEntry.P_AID;
 
 		/*P_AID of Beamformee & enable NDPA transmission*/
 		if (BFeeIdx == 0) {
-			RTL_W16( REG_TXBF_CTRL, STAid);	
+			RTL_W16( REG_TXBF_CTRL, STAid);
 			RTL_W8( REG_TXBF_CTRL+3, RTL_R8( REG_TXBF_CTRL+3)|BIT6|BIT7|BIT4);
 		} else
 			RTL_W16( REG_TXBF_CTRL+2, STAid |BIT14| BIT15|BIT12);
@@ -151,7 +151,7 @@ SetBeamformEnter8197F(
 			RTL_W16( REG_ASSOCIATED_BFMEE_SEL+2, STAid | 0xE200);
 		}
 		RTL_W16( REG_TXBF_CTRL, RTL_R16(REG_TXBF_CTRL)|BIT15);	/*disable NDP/NDPA packet use beamforming */
-		
+
 		Beamforming_Notify(priv);
 	}
 
@@ -173,7 +173,7 @@ SetBeamformLeave8197F(
 		BeamformerEntry = pBeamformingInfo->BeamformerEntry[Idx];
 	} else
 		return;
-	
+
 	/*	Clear P_AID of Beamformee
 	* 	Clear MAC addresss of Beamformer
 	*	Clear Associated Bfmee Sel
@@ -185,9 +185,9 @@ SetBeamformLeave8197F(
 		} else {
 			RTL_W16(REG_TXBF_CTRL+2, RTL_R16( REG_TXBF_CTRL+2) & 0xF000);
 			RTL_W16(REG_ASSOCIATED_BFMEE_SEL+2,	RTL_R16( REG_ASSOCIATED_BFMEE_SEL+2) & 0x60);
-		}	
+		}
 	}
-	
+
 	if (BeamformerEntry.BeamformEntryCap == BEAMFORMING_CAP_NONE) {
 		if(Idx == 0) {
 			RTL_W32( REG_ASSOCIATED_BFMER0_INFO, 0);
@@ -197,7 +197,7 @@ SetBeamformLeave8197F(
 			RTL_W32( REG_ASSOCIATED_BFMER1_INFO, 0);
 			RTL_W16( REG_ASSOCIATED_BFMER1_INFO+4, 0);
 			RTL_W16( REG_TX_CSI_RPT_PARAM_BW20+2, 0);
-		}	
+		}
 	}
 
 	if (((pBeamformingInfo->BeamformerEntry[0]).BeamformEntryCap == BEAMFORMING_CAP_NONE)
@@ -225,7 +225,7 @@ SetBeamformStatus8197F(
 
 	if (OPMODE & WIFI_ADHOC_STATE)
 		BeamCtrlVal = BeamformEntry.MacId;
-	else 
+	else
 		BeamCtrlVal = BeamformEntry.P_AID;
 
 	if (Idx == 0)
@@ -242,13 +242,13 @@ SetBeamformStatus8197F(
 			BeamCtrlVal |= (BIT9 | BIT10);
 		else if (BeamformEntry.BW == HT_CHANNEL_WIDTH_80)
 			BeamCtrlVal |= (BIT9 | BIT10 | BIT11);
-	} else 
+	} else
 		BeamCtrlVal &= ~(BIT9|BIT10|BIT11|BIT8|BIT7|BIT6|BIT5|BIT4|BIT3|BIT2|BIT1|BIT0);
-	
+
 	RTL_W16(BeamCtrlReg, BeamCtrlVal);
 	RTL_W16( REG_TXBF_CTRL, RTL_R16(REG_TXBF_CTRL)|BIT15);	/*disable NDP/NDPA packet use beamforming */
 
-	ODM_RT_TRACE(ODMPTR, PHYDM_COMP_TXBF, ODM_DBG_LOUD, 
+	ODM_RT_TRACE(ODMPTR, PHYDM_COMP_TXBF, ODM_DBG_LOUD,
 		("%s Idx %d BeamCtrlReg %x BeamCtrlVal %x, bw=%d\n", __FUNCTION__, Idx, BeamCtrlReg, BeamCtrlVal, BeamformEntry.BW));
 
 }
@@ -271,7 +271,7 @@ VOID Beamforming_NDPARate_8197F(
 	}
 
 	if(NDPARate < ODM_MGN_MCS0)
-		BW = HT_CHANNEL_WIDTH_20;	
+		BW = HT_CHANNEL_WIDTH_20;
 
 	RTL_W8(REG_NDPA_OPT_CTRL, BW & 0x3);
 	RTL_W8(REG_NDPA_RATE, NDPARate);

@@ -19,7 +19,7 @@ extern char diag_log_buff[DIAGNOSTIC_LOG_SIZE];
 extern char tmp_log[128];
 #endif
 #if 1
-//#define	_MESH_MOD_	
+//#define	_MESH_MOD_
 #define printMac(da)	printk("%02X:%02X:%02X:%02X:%02X:%02X\n",  0xff&*(da), 0xff&*(da+1), 0xff&*(da+2), 0xff&*(da+3), 0xff&*(da+4), 0xff&*(da+5));
 
 #define printMac4(pframe) 		{\
@@ -66,7 +66,7 @@ enum _module_define_ {
 	_MP_ =			0x00004000,
 	_MIB_ =			0x00008000,
 	_LED_ =			0x00010000,
-	_WPS_ =			0x00020000,	
+	_WPS_ =			0x00020000,
 	_DHW_ =			0x00040000,
 	_HAL_ =			0x00080000,
 	_DM_ =			0x00100000,
@@ -173,7 +173,7 @@ enum _module_define_ {
 #elif defined(_MESH_TX_C_)
 	#define _MODULE_DEFINE _MESH_TX_
 	#define _MODULE_NAME	"mesh_tx"
-	
+
 #elif defined(_MESH_RX_C_)
 	#define _MODULE_DEFINE _MESH_RX_
 	#define _MODULE_NAME	"mehs_rx"
@@ -200,7 +200,7 @@ enum _module_define_ {
 
 #elif defined(_MESH_11KV_C_)
 	//not yet
-	
+
 #elif defined(_HAL8192CDM_C_)
 	#define _MODULE_DEFINE _DM_
 	#define _MODULE_NAME    "DM"
@@ -216,7 +216,7 @@ enum _module_define_ {
 #elif defined(_8812_HW_C_)
 	#define _MODULE_DEFINE _OTHER_
     #define _MODULE_NAME    "8812_hw"
-	
+
 #elif defined(_8192CD_HOST_C_)
 	#define _MODULE_DEFINE _HOST_
 	#define _MODULE_NAME	"host"
@@ -238,20 +238,6 @@ enum _module_define_ {
 /* Macro for DEBUG_ERR(), DEBUG_TRACE(), DEBUG_WARN(), DEBUG_INFO() */
 
 #ifdef __GNUC__
-#ifdef CONFIG_RTL8671
-#define DEBUG_ERR		printk
-#define DEBUG_TRACE		printk
-#define DEBUG_INFO		printk
-#define DEBUG_WARN		printk
-
-#define _DEBUG_ERR		printk
-#define _DEBUG_INFO		printk
-
-#define DBFENTER
-#define DBFEXIT
-#define PRINT_INFO		printk
-
-#else
 #ifdef CONFIG_RTL_WLAN_DIAGNOSTIC
 #define output_diag_log(log)\
 if(rtl8192cd_wlan_diagnostic){\
@@ -263,7 +249,7 @@ if(rtl8192cd_wlan_diagnostic){\
 		strcat(diag_log_buff,log);}\
 else{\
 	printk(log);}
-		
+
 #define __DEBUG_ERR(name, fmt, args...) \
 	if (rtl8192cd_debug_err&_MODULE_DEFINE) {\
 		sprintf(tmp_log,"%s-"_MODULE_NAME"-err: " fmt, name, ## args);\
@@ -307,7 +293,6 @@ else{\
 #define DBFENTER	printk("----->%s\n", (char *)__FUNCTION__)
 #define DBFEXIT		printk("%s----->\n", (char *)__FUNCTION__)
 #define PRINT_INFO(fmt, args...)	printk(fmt, ## args)
-#endif
 #endif	// __GNUC__
 
 /*

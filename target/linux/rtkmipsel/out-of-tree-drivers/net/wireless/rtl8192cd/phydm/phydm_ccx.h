@@ -43,7 +43,7 @@ typedef struct _CCX_INFO{
 	u2Byte					CLM_period_restore;				/* 4us per unit */
 	NHM_INEXCLUDE_TXON		NHM_inexclude_txon_restore;
 	NHM_INEXCLUDE_CCA		NHM_inexclude_cca_restore;
-	
+
 	/*Report*/
 	u1Byte		NHM_result[12];
 	u1Byte		NHM_result_total;
@@ -55,7 +55,7 @@ typedef struct _CCX_INFO{
 	BOOLEAN		echo_NHM_en;
 	BOOLEAN		echo_CLM_en;
 	u1Byte		echo_IGI;
-	
+
 }CCX_INFO, *PCCX_INFO;
 
 /*NHM*/
@@ -114,7 +114,7 @@ phydm_getCLMresult(
 VOID
 phydm_ccx_lna_chk_setting(
 	IN		PVOID			pDM_VOID
-	
+
 );
 
 void

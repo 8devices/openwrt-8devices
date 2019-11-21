@@ -1,7 +1,7 @@
 /******************************************************************************
  *
  * Copyright(c) 2007 - 2011 Realtek Corporation. All rights reserved.
- *                                        
+ *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of version 2 of the GNU General Public License as
  * published by the Free Software Foundation.
@@ -42,23 +42,23 @@ ODM_EdcaTurboInit(
 	Adapter=pDM_Odm->Adapter;
 	pHalData=GET_HAL_DATA(Adapter);
 
-	pDM_Odm->DM_EDCA_Table.bCurrentTurboEDCA = FALSE;	
+	pDM_Odm->DM_EDCA_Table.bCurrentTurboEDCA = FALSE;
 	pDM_Odm->DM_EDCA_Table.bIsCurRDLState = FALSE;
 	pHalData->bIsAnyNonBEPkts = FALSE;
-	
+
 #elif(DM_ODM_SUPPORT_TYPE==ODM_CE)
-	PADAPTER	Adapter = pDM_Odm->Adapter;	
-	pDM_Odm->DM_EDCA_Table.bCurrentTurboEDCA = FALSE;	
+	PADAPTER	Adapter = pDM_Odm->Adapter;
+	pDM_Odm->DM_EDCA_Table.bCurrentTurboEDCA = FALSE;
 	pDM_Odm->DM_EDCA_Table.bIsCurRDLState = FALSE;
 	Adapter->recvpriv.bIsAnyNonBEPkts =FALSE;
 
-#endif	
+#endif
 	ODM_RT_TRACE(pDM_Odm,ODM_COMP_EDCA_TURBO,ODM_DBG_LOUD,("Orginial VO PARAM: 0x%x\n",ODM_Read4Byte(pDM_Odm,ODM_EDCA_VO_PARAM)));
 	ODM_RT_TRACE(pDM_Odm,ODM_COMP_EDCA_TURBO,ODM_DBG_LOUD,("Orginial VI PARAM: 0x%x\n",ODM_Read4Byte(pDM_Odm,ODM_EDCA_VI_PARAM)));
 	ODM_RT_TRACE(pDM_Odm,ODM_COMP_EDCA_TURBO,ODM_DBG_LOUD,("Orginial BE PARAM: 0x%x\n",ODM_Read4Byte(pDM_Odm,ODM_EDCA_BE_PARAM)));
 	ODM_RT_TRACE(pDM_Odm,ODM_COMP_EDCA_TURBO,ODM_DBG_LOUD,("Orginial BK PARAM: 0x%x\n",ODM_Read4Byte(pDM_Odm,ODM_EDCA_BK_PARAM)));
 
-	
+
 }	// ODM_InitEdcaTurbo
 
 VOID
@@ -66,7 +66,7 @@ odm_EdcaTurboCheck(
 	IN 	PVOID	 	pDM_VOID
 	)
 {
-	// 
+	//
 	// For AP/ADSL use prtl8192cd_priv
 	// For CE/NIC use PADAPTER
 	//
@@ -169,7 +169,7 @@ odm_EdcaTurboCheckCE(
 		{
 			if (cur_tx_bytes > (cur_rx_bytes << 2))
 			{ // Uplink TP is present.
-				trafficIndex = UP_LINK; 
+				trafficIndex = UP_LINK;
 			}
 			else
 			{ // Balance TP is present.
@@ -201,7 +201,7 @@ odm_EdcaTurboCheckCE(
 				EDCA_BE_DL = edca_setting_DL[IOTPeer];
 				EDCA_BE_UL = edca_setting_UL[IOTPeer];
 			}
-			//merge from 92s_92c_merge temp brunch v2445    20120215 
+			//merge from 92s_92c_merge temp brunch v2445    20120215
 			else if((IOTPeer == HT_IOT_PEER_CISCO) &&((WirelessMode==ODM_WM_G)||(WirelessMode==(ODM_WM_B|ODM_WM_G))||(WirelessMode==ODM_WM_A)||(WirelessMode==ODM_WM_B)))
 			{
 				EDCA_BE_DL = edca_setting_DL_GMode[IOTPeer];
@@ -217,7 +217,7 @@ odm_EdcaTurboCheckCE(
 			}
 			else if(IOTPeer == HT_IOT_PEER_ATHEROS)
 			{
-				// Set DL EDCA for Atheros peer to 0x3ea42b. Suggested by SD3 Wilson for ASUS TP issue. 
+				// Set DL EDCA for Atheros peer to 0x3ea42b. Suggested by SD3 Wilson for ASUS TP issue.
 				EDCA_BE_DL = edca_setting_DL[IOTPeer];
 			}
 
@@ -238,7 +238,7 @@ odm_EdcaTurboCheckCE(
 
 			pDM_Odm->DM_EDCA_Table.prv_traffic_idx = trafficIndex;
 		}
-		
+
 		pDM_Odm->DM_EDCA_Table.bCurrentTurboEDCA = _TRUE;
 	}
 	else
@@ -274,13 +274,13 @@ odm_EdcaTurboCheckMP(
 	PSTA_QOS			pStaQos = Adapter->MgntInfo.pStaQos;
 	//[Win7 Count Tx/Rx statistic for Extension Port] odm_CheckEdcaTurbo's Adapter is always Default. 2009.08.20, by Bohn
 	u8Byte				Ext_curTxOkCnt = 0;
-	u8Byte				Ext_curRxOkCnt = 0;	
-	//For future Win7  Enable Default Port to modify AMPDU size dynamically, 2009.08.20, Bohn.	
+	u8Byte				Ext_curRxOkCnt = 0;
+	//For future Win7  Enable Default Port to modify AMPDU size dynamically, 2009.08.20, Bohn.
 	u1Byte TwoPortStatus = (u1Byte)TWO_PORT_STATUS__WITHOUT_ANY_ASSOCIATE;
 
 	// Keep past Tx/Rx packet count for RT-to-RT EDCA turbo.
 	u8Byte				curTxOkCnt = 0;
-	u8Byte				curRxOkCnt = 0;	
+	u8Byte				curRxOkCnt = 0;
 	u4Byte				EDCA_BE_UL = 0x5ea42b;//Parameter suggested by Scott  //edca_setting_UL[pMgntInfo->IOTPeer];
 	u4Byte				EDCA_BE_DL = 0x5ea42b;//Parameter suggested by Scott  //edca_setting_DL[pMgntInfo->IOTPeer];
 	u4Byte                         EDCA_BE = 0x5ea42b;
@@ -290,7 +290,7 @@ odm_EdcaTurboCheckMP(
 	BOOLEAN				 bBiasOnRx=FALSE;
 	BOOLEAN				bEdcaTurboOn=FALSE;
 	u1Byte				TxRate = 0xFF;
-	u8Byte				value64;	
+	u8Byte				value64;
 
 	ODM_RT_TRACE(pDM_Odm,ODM_COMP_EDCA_TURBO,ODM_DBG_LOUD,("odm_EdcaTurboCheckMP========================>"));
 	ODM_RT_TRACE(pDM_Odm,ODM_COMP_EDCA_TURBO,ODM_DBG_LOUD,("Orginial BE PARAM: 0x%x\n",ODM_Read4Byte(pDM_Odm,ODM_EDCA_BE_PARAM)));
@@ -299,9 +299,9 @@ odm_EdcaTurboCheckMP(
 ////list paramter for different platform
 ////===============================
 	bLastIsCurRDLState=pDM_Odm->DM_EDCA_Table.bIsCurRDLState;
-	pbIsCurRDLState=&(pDM_Odm->DM_EDCA_Table.bIsCurRDLState);	
+	pbIsCurRDLState=&(pDM_Odm->DM_EDCA_Table.bIsCurRDLState);
 
-	//2012/09/14 MH Add 
+	//2012/09/14 MH Add
 	if (pMgntInfo->NumNonBePkt > pMgntInfo->RegEdcaThresh && !(Adapter->MgntInfo.bWiFiConfg & RT_WIFI_LOGO))
 		pHalData->bIsAnyNonBEPkts = TRUE;
 
@@ -312,7 +312,7 @@ odm_EdcaTurboCheckMP(
 	curRxOkCnt = pDM_Odm->curRxOkCnt;
 
 
-	if(pExtAdapter == NULL) 
+	if(pExtAdapter == NULL)
 		pExtAdapter = pDefaultAdapter;
 
 	Ext_curTxOkCnt = pExtAdapter->TxStats.NumTxBytesUnicast - pMgntInfo->Ext_lastTxOkCnt;
@@ -373,7 +373,7 @@ odm_EdcaTurboCheckMP(
 					if(!pMgntInfo->ForcedDataRate) //auto rate
 					{
 						if(pDM_Odm->TxRate != 0xFF)
-							TxRate = Adapter->HalFunc.GetHwRateFromMRateHandler(pDM_Odm->TxRate); 
+							TxRate = Adapter->HalFunc.GetHwRateFromMRateHandler(pDM_Odm->TxRate);
 					}
 					else //force rate
 					{
@@ -432,7 +432,7 @@ odm_EdcaTurboCheckMP(
 								break;
 							}
 						}
-					}				
+					}
 				}
 				else
 				{
@@ -448,7 +448,7 @@ odm_EdcaTurboCheckMP(
 					if(!pMgntInfo->ForcedDataRate) //auto rate
 					{
 						if(pDM_Odm->TxRate != 0xFF)
-							TxRate = Adapter->HalFunc.GetHwRateFromMRateHandler(pDM_Odm->TxRate); 
+							TxRate = Adapter->HalFunc.GetHwRateFromMRateHandler(pDM_Odm->TxRate);
 					}
 					else //force rate
 					{
@@ -469,16 +469,16 @@ odm_EdcaTurboCheckMP(
 							switch (TxRate)
 							{
 								case MGN_VHT2SS_MCS9:
-								case MGN_VHT1SS_MCS9:									
+								case MGN_VHT1SS_MCS9:
 								case MGN_VHT1SS_MCS8:
 								case MGN_MCS15:
-								case MGN_MCS7:									
-									ODM_Write4Byte(pDM_Odm,ODM_EDCA_BE_PARAM,0x1ea44f);							
+								case MGN_MCS7:
+									ODM_Write4Byte(pDM_Odm,ODM_EDCA_BE_PARAM,0x1ea44f);
 								case MGN_VHT2SS_MCS8:
 								case MGN_VHT1SS_MCS7:
 								case MGN_MCS14:
 								case MGN_MCS6:
-								case MGN_54M:									
+								case MGN_54M:
 									ODM_Write4Byte(pDM_Odm,ODM_EDCA_BE_PARAM,0xa44f);
 								case MGN_VHT2SS_MCS7:
 								case MGN_VHT2SS_MCS6:
@@ -492,33 +492,33 @@ odm_EdcaTurboCheckMP(
 								case MGN_VHT2SS_MCS5:
 								case MGN_VHT2SS_MCS4:
 								case MGN_VHT1SS_MCS4:
-								case MGN_VHT1SS_MCS3:	
+								case MGN_VHT1SS_MCS3:
 								case MGN_MCS12:
-								case MGN_MCS4:	
-								case MGN_MCS3:	
+								case MGN_MCS4:
+								case MGN_MCS3:
 								case MGN_36M:
-								case MGN_24M:	
+								case MGN_24M:
 									ODM_Write4Byte(pDM_Odm,ODM_EDCA_BE_PARAM,0xa730);
 								break;
 								case MGN_VHT2SS_MCS3:
 								case MGN_VHT2SS_MCS2:
 								case MGN_VHT2SS_MCS1:
 								case MGN_VHT1SS_MCS2:
-								case MGN_VHT1SS_MCS1:	
-								case MGN_MCS11:	
-								case MGN_MCS10:	
-								case MGN_MCS9:		
-								case MGN_MCS2:	
+								case MGN_VHT1SS_MCS1:
+								case MGN_MCS11:
+								case MGN_MCS10:
+								case MGN_MCS9:
+								case MGN_MCS2:
 								case MGN_MCS1:
-								case MGN_18M:	
+								case MGN_18M:
 								case MGN_12M:
 									ODM_Write4Byte(pDM_Odm,ODM_EDCA_BE_PARAM,0xa830);
 								break;
 								case MGN_VHT2SS_MCS0:
 								case MGN_VHT1SS_MCS0:
-								case MGN_MCS0:	
+								case MGN_MCS0:
 								case MGN_MCS8:
-								case MGN_9M:	
+								case MGN_9M:
 								case MGN_6M:
 									ODM_Write4Byte(pDM_Odm,ODM_EDCA_BE_PARAM,0xa87f);
 								break;
@@ -527,7 +527,7 @@ odm_EdcaTurboCheckMP(
 								break;
 							}
 						}
-					}				
+					}
 				}
 				else
 				{
@@ -540,7 +540,7 @@ odm_EdcaTurboCheckMP(
 		ODM_RT_TRACE(pDM_Odm,ODM_COMP_EDCA_TURBO,ODM_DBG_LOUD,("EDCA Turbo on: EDCA_BE:0x%lx\n",EDCA_BE));
 
 		pDM_Odm->DM_EDCA_Table.bCurrentTurboEDCA = TRUE;
-		
+
 		ODM_RT_TRACE(pDM_Odm,ODM_COMP_EDCA_TURBO,ODM_DBG_LOUD,("EDCA_BE_DL : 0x%lx  EDCA_BE_UL : 0x%lx  EDCA_BE : 0x%lx  \n",EDCA_BE_DL,EDCA_BE_UL,EDCA_BE));
 
 	}
@@ -593,14 +593,14 @@ odm_IsEdcaTurboDisable(
 		ODM_RT_TRACE(pDM_Odm, ODM_COMP_EDCA_TURBO,ODM_DBG_LOUD, ("IOTAction:EdcaTurboDisable\n"));
 		return	TRUE;
 		}
-		
+
 	return	FALSE;
-	
+
 
 }
 
 //add iot case here: for MP/CE
-VOID 
+VOID
 ODM_EdcaParaSelByIot(
 	IN 	PVOID	 	pDM_VOID,
 	OUT	u4Byte		*EDCA_BE_UL,
@@ -619,7 +619,7 @@ ODM_EdcaParaSelByIot(
 
 	if(pDM_Odm->pWirelessMode!=NULL)
 		WirelessMode=*(pDM_Odm->pWirelessMode);
-		
+
 ///////////////////////////////////////////////////////////
 ////list paramter for different platform
 
@@ -629,25 +629,25 @@ ODM_EdcaParaSelByIot(
 
 ////============================
 /// IOT case for MP
-////============================	
+////============================
 	if (pDM_Odm->SupportInterface == ODM_ITRF_PCIE) {
 			(*EDCA_BE_UL) = 0x6ea42b;
 			(*EDCA_BE_DL) = 0x6ea42b;
 	}
- 
+
 	if(TwoPortStatus == TWO_PORT_STATUS__EXTENSION_ONLY)
 	{
 		(*EDCA_BE_UL) = 0x5ea42b;//Parameter suggested by Scott  //edca_setting_UL[ExtAdapter->MgntInfo.IOTPeer];
 		(*EDCA_BE_DL) = 0x5ea42b;//Parameter suggested by Scott  //edca_setting_DL[ExtAdapter->MgntInfo.IOTPeer];
 	}
-     
+
 	#if (INTEL_PROXIMITY_SUPPORT == 1)
 	if(pMgntInfo->IntelClassModeInfo.bEnableCA == TRUE)
 	{
 		(*EDCA_BE_UL) = (*EDCA_BE_DL) = 0xa44f;
 	}
 	else
-	#endif		
+	#endif
 	{
 		if((pMgntInfo->IOTAction & (HT_IOT_ACT_FORCED_ENABLE_BE_TXOP|HT_IOT_ACT_AMSDU_ENABLE)))
 		{// To check whether we shall force turn on TXOP configuration.
@@ -656,14 +656,14 @@ ODM_EdcaParaSelByIot(
 			if(!((*EDCA_BE_DL) & 0xffff0000))
 				(*EDCA_BE_DL) |= 0x005e0000; // Force TxOP limit to 0x005e for DL.
 		}
-		
+
 		//92D txop can't be set to 0x3e for cisco1250
 		if ((IOTPeer == HT_IOT_PEER_CISCO) && (WirelessMode == ODM_WM_N24G))
 		{
 			(*EDCA_BE_DL) = edca_setting_DL[IOTPeer];
 			(*EDCA_BE_UL) = edca_setting_UL[IOTPeer];
 		}
-		//merge from 92s_92c_merge temp brunch v2445    20120215 
+		//merge from 92s_92c_merge temp brunch v2445    20120215
 		else if((IOTPeer == HT_IOT_PEER_CISCO) &&((WirelessMode==ODM_WM_G)||(WirelessMode==(ODM_WM_B|ODM_WM_G))||(WirelessMode==ODM_WM_A)||(WirelessMode==ODM_WM_B)))
 		{
 			(*EDCA_BE_DL) = edca_setting_DL_GMode[IOTPeer];
@@ -680,7 +680,7 @@ ODM_EdcaParaSelByIot(
 		}
 		else if(IOTPeer == HT_IOT_PEER_ATHEROS && IOTPeerSubType != HT_IOT_PEER_TPLINK_AC1750)
 		{
-			// Set DL EDCA for Atheros peer to 0x3ea42b. Suggested by SD3 Wilson for ASUS TP issue. 
+			// Set DL EDCA for Atheros peer to 0x3ea42b. Suggested by SD3 Wilson for ASUS TP issue.
 			if(WirelessMode==ODM_WM_G)
 				(*EDCA_BE_DL) = edca_setting_DL_GMode[IOTPeer];
 			else
@@ -688,7 +688,7 @@ ODM_EdcaParaSelByIot(
 
 			if(ICType == ODM_RTL8821)
 				 (*EDCA_BE_DL) = 0x5ea630;
-			
+
 		}
 	}
 
@@ -714,19 +714,19 @@ ODM_EdcaParaSelByIot(
 
 
 VOID
-odm_EdcaChooseTrafficIdx( 
+odm_EdcaChooseTrafficIdx(
 	IN 	PVOID	 	pDM_VOID,
-	IN	u8Byte  			cur_tx_bytes,  
-	IN	u8Byte  			cur_rx_bytes, 
+	IN	u8Byte  			cur_tx_bytes,
+	IN	u8Byte  			cur_rx_bytes,
 	IN	BOOLEAN 		bBiasOnRx,
 	OUT BOOLEAN 		*pbIsCurRDLState
 	)
-{	
+{
 	PDM_ODM_T		pDM_Odm = (PDM_ODM_T)pDM_VOID;
-	
+
 	if(bBiasOnRx)
 	{
-	  
+
 		if(cur_tx_bytes>(cur_rx_bytes*4))
 		{
 			*pbIsCurRDLState=FALSE;

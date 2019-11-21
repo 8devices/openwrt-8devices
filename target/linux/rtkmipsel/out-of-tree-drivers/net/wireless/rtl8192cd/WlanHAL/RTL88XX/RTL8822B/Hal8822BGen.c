@@ -3,21 +3,17 @@ Copyright (c) Realtek Semiconductor Corp. All rights reserved.
 
 Module Name:
 	Hal8822BGen.c
-	
+
 Abstract:
 	Defined RTL8822B HAL Function
-	    
+
 Major Change History:
 	When       Who               What
 	---------- ---------------   -------------------------------
-	2015-06-25 Eric             Create.	
+	2015-06-25 Eric             Create.
 --*/
 
-#ifndef __ECOS
 #include "HalPrecomp.h"
-#else
-#include "../../HalPrecomp.h"
-#endif
 
 // TestChip
 #include "data_AGC_TAB_8822B.c"

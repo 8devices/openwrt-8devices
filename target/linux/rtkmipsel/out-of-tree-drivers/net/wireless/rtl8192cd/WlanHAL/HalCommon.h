@@ -6,14 +6,14 @@ Copyright (c) Realtek Semiconductor Corp. All rights reserved.
 
 Module Name:
 	HalCommon.h
-	
+
 Abstract:
 	Defined HAL Common
-	    
+
 Major Change History:
 	When       Who               What
 	---------- ---------------   -------------------------------
-	2012-05-18  Lun-Wu            Create.	
+	2012-05-18  Lun-Wu            Create.
 --*/
 
 // Total 32bytes, we need control in 8bytes
@@ -40,7 +40,7 @@ Default: 00b.
 #define	MSR_AP					0x03
 
 //----------------------------------------------------------------------------
-//      (PBP) Packet Buffer Page Register	(Offset 0x104[7:4], 4 bits)  
+//      (PBP) Packet Buffer Page Register	(Offset 0x104[7:4], 4 bits)
 //----------------------------------------------------------------------------
 #define PBP_UNIT                128
 
@@ -56,7 +56,7 @@ HalGeneralDummy(
 );
 
 
-RT_STATUS 
+RT_STATUS
 HAL_ReadTypeID(
 	INPUT	HAL_PADAPTER	Adapter
 );
@@ -74,16 +74,16 @@ DecreaseHALIndex(
 RT_STATUS
 HalAssociateNic(
     HAL_PADAPTER        Adapter,
-    BOOLEAN			IsDefaultAdapter    
+    BOOLEAN			IsDefaultAdapter
 );
 
 RT_STATUS
 HalDisAssociateNic(
     HAL_PADAPTER        Adapter,
-    BOOLEAN			    IsDefaultAdapter    
+    BOOLEAN			    IsDefaultAdapter
 );
 
-VOID 
+VOID
 SoftwareCRC32 (
     IN  pu1Byte     pBuf,
     IN  u2Byte      byteNum,
@@ -91,7 +91,7 @@ SoftwareCRC32 (
 );
 
 
-u1Byte 
+u1Byte
 GetXorResultWithCRC (
     IN  u1Byte      a,
     IN  u1Byte      b
@@ -103,29 +103,29 @@ CRC5 (
     IN u1Byte       len
 );
 
-VOID 
+VOID
 SoftwareCRC32_RXBuffGather (
     IN  pu1Byte     pPktBufAddr,
-    IN  pu2Byte     pPktBufLen,  
+    IN  pu2Byte     pPktBufLen,
     IN  u2Byte      pktNum,
     OUT pu4Byte     pCRC32
 );
 
-RT_STATUS 
+RT_STATUS
 GetTxRPTBuf88XX(
     IN	HAL_PADAPTER        Adapter,
     IN	u4Byte              macID,
-    IN  u1Byte              variable,  
+    IN  u1Byte              variable,
     IN 	u1Byte				byteoffset,
     OUT pu1Byte             val
 );
 
-RT_STATUS 
+RT_STATUS
 SetTxRPTBuf88XX(
     IN	HAL_PADAPTER        Adapter,
     IN	u4Byte              macID,
     IN  u1Byte              variable,
-    IN  pu1Byte             val    
+    IN  pu1Byte             val
 );
 
 VOID
@@ -134,7 +134,7 @@ SetCRC5ToRPTBuffer88XX(
     IN	u1Byte              val,
     IN	u4Byte              macID,
     IN  u1Byte              bValid
-    
+
 );
 
 RT_STATUS

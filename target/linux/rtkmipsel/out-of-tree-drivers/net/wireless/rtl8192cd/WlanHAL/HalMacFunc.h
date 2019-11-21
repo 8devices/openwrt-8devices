@@ -6,24 +6,24 @@ Copyright (c) Realtek Semiconductor Corp. All rights reserved.
 
 Module Name:
 	HalMacFunc.h
-	
+
 Abstract:
-	Define MAC function support 
+	Define MAC function support
 	for Driver
-	    
+
 Major Change History:
 	When       Who               What
 	---------- ---------------   -------------------------------
-	2015-04-29 Eric            Create.	
+	2015-04-29 Eric            Create.
 --*/
 
 
-void 
+void
 MACFM_software_init(
     struct rtl8192cd_priv *priv
 );
 
-void 
+void
 MACHAL_version_init(
 IN  HAL_PADAPTER Adapter
 );
@@ -31,8 +31,8 @@ IN  HAL_PADAPTER Adapter
 typedef struct _MAC_VERSION_
 {
     unsigned char is_MAC_v1;
-    unsigned char is_MAC_v2;    
-    unsigned char MACHALSupport;        
+    unsigned char is_MAC_v2;
+    unsigned char MACHALSupport;
 }MAC_VERSION,*PMAC_VERSION;
 
 typedef enum _MACFun_Support_Ability_Definition
@@ -48,18 +48,18 @@ typedef enum _MACFun_Support_Ability_Definition
 	MAC_FUN_HW_HW_DETEC_POWER_STATE				= BIT5,
 	MAC_FUN_HW_SUPPORT_MULTICAST_BMC_ENHANCE	= BIT6,
 	MAC_FUN_HW_SUPPORT_TX_AMSDU             	= BIT7,
-	MAC_FUN_HW_SUPPORT_H2C_PACKET             	= BIT8,	
-    MAC_FUN_HW_SUPPORT_AXI_EXCEPTION           	= BIT9,		
+	MAC_FUN_HW_SUPPORT_H2C_PACKET             	= BIT8,
+    MAC_FUN_HW_SUPPORT_AXI_EXCEPTION           	= BIT9,
 	MAC_FUN_HW_SUPPORT_AP_OFFLOAD               = BIT10,
-	
+
 }MACFUN_SUPPORT_ABILITY,*PMACFUN_SUPPORT_ABILITY;
 
 #define IS_SUPPORT_WLAN_HAL_HW_TX_SHORTCUT_REUSE_TXDESC(priv)	\
     (priv->pshare->hal_SupportMACfunction & MAC_FUN_HW_TX_SHORTCUT_REUSE_TXDESC)
 
 #define IS_SUPPORT_WLAN_HAL_HW_TX_SHORTCUT_HDR_CONV(priv)	\
-    (priv->pshare->hal_SupportMACfunction & MAC_FUN_HW_TX_SHORTCUT_HDR_CONV)    
-    
+    (priv->pshare->hal_SupportMACfunction & MAC_FUN_HW_TX_SHORTCUT_HDR_CONV)
+
 #define IS_SUPPORT_EACH_VAP_INT(priv)	\
     (priv->pshare->hal_SupportMACfunction & MAC_FUN_HW_SUPPORT_EACH_VAP_INT)
 
@@ -84,7 +84,7 @@ typedef enum _MACFun_Support_Ability_Definition
 #define IS_SUPPORT_AXI_EXCEPTION(priv)	\
     (priv->pshare->hal_SupportMACfunction & MAC_FUN_HW_SUPPORT_AXI_EXCEPTION)
 #define IS_SUPPORT_AP_OFFLOAD(priv)	\
-    (priv->pshare->hal_SupportMACfunction & MAC_FUN_HW_SUPPORT_AP_OFFLOAD)        
+    (priv->pshare->hal_SupportMACfunction & MAC_FUN_HW_SUPPORT_AP_OFFLOAD)
 #endif //__HALMACFUNC_H__
 
 

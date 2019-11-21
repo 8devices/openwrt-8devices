@@ -1,7 +1,7 @@
 /******************************************************************************
  *
  * Copyright(c) 2007 - 2011 Realtek Corporation. All rights reserved.
- *                                        
+ *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of version 2 of the GNU General Public License as
  * published by the Free Software Foundation.
@@ -116,7 +116,7 @@ u1Byte	CCKSwingTable_Ch14[CCK_TABLE_SIZE][8] = {
 	{0x24, 0x23, 0x1f, 0x12, 0x00, 0x00, 0x00, 0x00},	/* 7, -3.5dB  */
 	{0x22, 0x21, 0x1d, 0x11, 0x00, 0x00, 0x00, 0x00},	/* 8, -4.0dB  */
 	{0x20, 0x20, 0x1b, 0x10, 0x00, 0x00, 0x00, 0x00},	/* 9, -4.5dB*/
-	{0x1f, 0x1e, 0x1a, 0x0f, 0x00, 0x00, 0x00, 0x00},	/* 10, -5.0dB */ 
+	{0x1f, 0x1e, 0x1a, 0x0f, 0x00, 0x00, 0x00, 0x00},	/* 10, -5.0dB */
 	{0x1d, 0x1c, 0x18, 0x0e, 0x00, 0x00, 0x00, 0x00},	/* 11, -5.5dB*/
 	{0x1b, 0x1a, 0x17, 0x0e, 0x00, 0x00, 0x00, 0x00},	/* 12, -6.0dB  <== default*/
 	{0x1a, 0x19, 0x16, 0x0d, 0x00, 0x00, 0x00, 0x00},	/* 13, -6.5dB */
@@ -147,7 +147,7 @@ u4Byte OFDMSwingTable_New[OFDM_TABLE_SIZE] = {
 	0x0c000030, /* 1,  -14.5dB*/
 	0x0cc00033, /* 2,  -14.0dB*/
 	0x0d800036, /* 3,  -13.5dB*/
-	0x0e400039, /* 4,  -13.0dB  */  
+	0x0e400039, /* 4,  -13.0dB  */
 	0x0f00003c, /* 5,  -12.5dB*/
 	0x10000040, /* 6,  -12.0dB*/
 	0x11000044, /* 7,  -11.5dB*/
@@ -186,7 +186,7 @@ u4Byte OFDMSwingTable_New[OFDM_TABLE_SIZE] = {
 	0x71c001c7, /* 40, +5.0dB*/
 	0x788001e2, /* 41, +5.5dB*/
 	0x7f8001fe  /* 42, +6.0dB*/
-};               
+};
 
 
 u1Byte CCKSwingTable_Ch1_Ch14_88F[CCK_TABLE_SIZE_88F][16] = {
@@ -298,7 +298,7 @@ u1Byte CCKSwingTable_Ch1_Ch13_New[CCK_TABLE_SIZE][8] = {
 	{0x30, 0x2f, 0x29, 0x21, 0x19, 0x10, 0x08, 0x03},	/*  30, -1.0dB*/
 	{0x33, 0x32, 0x2b, 0x23, 0x1a, 0x11, 0x08, 0x04},	/*  31, -0.5dB*/
 	{0x36, 0x35, 0x2e, 0x25, 0x1c, 0x12, 0x09, 0x04} 	/*  32, +0dB*/
-};                                                                  
+};
 
 
 u1Byte CCKSwingTable_Ch14_New[CCK_TABLE_SIZE][8]= {
@@ -338,46 +338,46 @@ u1Byte CCKSwingTable_Ch14_New[CCK_TABLE_SIZE][8]= {
 };
 u4Byte CCKSwingTable_Ch1_Ch14_8723D[CCK_TABLE_SIZE_8723D] = {
 	0x0CD,          /*0 ,    -20dB*/
-	0x0D9,         
-	0x0E6,         
-	0x0F3,        
-	0x102,        
-	0x111,        
-	0x121,         
-	0x132,        
-	0x144,         
-	0x158,        
-	0x16C,        
-	0x182,         
-	0x198,        
-	0x1B1,        
-	0x1CA,        
-	0x1E5,        
-	0x202,        
-	0x221,         
-	0x241,        
-	0x263,        
-	0x287,         
-	0x2AE,        
-	0x2D6,         
-	0x301,        
-	0x32F,         
-	0x35F,    
-	0x392,         
-	0x3C9,      
-	0x402,       
-	0x43F,        
-	0x47F,         
-	0x4C3,         
-	0x50C,         
-	0x558,      
-	0x5A9,         
-	0x5FF,        
-	0x65A,         
-	0x6BA,         
-	0x720,        
-	0x78C,        
-	0x7FF,         
+	0x0D9,
+	0x0E6,
+	0x0F3,
+	0x102,
+	0x111,
+	0x121,
+	0x132,
+	0x144,
+	0x158,
+	0x16C,
+	0x182,
+	0x198,
+	0x1B1,
+	0x1CA,
+	0x1E5,
+	0x202,
+	0x221,
+	0x241,
+	0x263,
+	0x287,
+	0x2AE,
+	0x2D6,
+	0x301,
+	0x32F,
+	0x35F,
+	0x392,
+	0x3C9,
+	0x402,
+	0x43F,
+	0x47F,
+	0x4C3,
+	0x50C,
+	0x558,
+	0x5A9,
+	0x5FF,
+	0x65A,
+	0x6BA,
+	0x720,
+	0x78C,
+	0x7FF,
 };
 
 
@@ -469,7 +469,7 @@ unsigned int TxPwrTrk_OFDM_SwingTbl[TxPwrTrk_OFDM_SwingTbl_Len] = {
 
 VOID
 odm_TXPowerTrackingInit(
-	IN	PVOID	pDM_VOID 
+	IN	PVOID	pDM_VOID
 	)
 {
 	PDM_ODM_T		pDM_Odm = (PDM_ODM_T)pDM_VOID;
@@ -479,11 +479,11 @@ odm_TXPowerTrackingInit(
 #endif
 
 	odm_TXPowerTrackingThermalMeterInit(pDM_Odm);
-}	
+}
 
-u1Byte 
+u1Byte
 getSwingIndex(
-	IN	PVOID	pDM_VOID 
+	IN	PVOID	pDM_VOID
 	)
 {
 	PDM_ODM_T		pDM_Odm = (PDM_ODM_T)pDM_VOID;
@@ -520,7 +520,7 @@ getSwingIndex(
 
 	for (i = 0; i < swingTableSize; ++i) {
 		u4Byte tableValue = pSwingTable[i];
-		
+
 		if (tableValue >= 0x100000 )
 			tableValue >>= 22;
 		if (bbSwing == tableValue)
@@ -555,13 +555,13 @@ odm_TXPowerTrackingThermalMeterInit(
 	if(pDM_Odm->mp_mode == FALSE)
 		pRFCalibrateInfo->TxPowerTrackControl = _TRUE;
 	else
-		pRFCalibrateInfo->TxPowerTrackControl = _FALSE;	
+		pRFCalibrateInfo->TxPowerTrackControl = _FALSE;
 
 	if(pDM_Odm->mp_mode == FALSE)
 		pRFCalibrateInfo->TxPowerTrackControl = _TRUE;
 
 	ODM_RT_TRACE(pDM_Odm, ODM_COMP_CALIBRATION, ODM_DBG_LOUD, ("pDM_Odm TxPowerTrackControl = %d\n", pRFCalibrateInfo->TxPowerTrackControl));
-	
+
 #elif (DM_ODM_SUPPORT_TYPE & (ODM_AP))
 	#ifdef RTL8188E_SUPPORT
 	{
@@ -576,14 +576,14 @@ odm_TXPowerTrackingThermalMeterInit(
 	//pDM_Odm->RFCalibrateInfo.TxPowerTrackControl = TRUE;
 	pRFCalibrateInfo->ThermalValue = pHalData->EEPROMThermalMeter;
 	pRFCalibrateInfo->ThermalValue_IQK = pHalData->EEPROMThermalMeter;
-	pRFCalibrateInfo->ThermalValue_LCK = pHalData->EEPROMThermalMeter;	
+	pRFCalibrateInfo->ThermalValue_LCK = pHalData->EEPROMThermalMeter;
 
 	if (pRFCalibrateInfo->DefaultBbSwingIndexFlag != TRUE) {
 		/*The index of "0 dB" in SwingTable.*/
 		if (pDM_Odm->SupportICType == ODM_RTL8188E || pDM_Odm->SupportICType == ODM_RTL8723B ||
 			pDM_Odm->SupportICType == ODM_RTL8192E || pDM_Odm->SupportICType == ODM_RTL8703B) {
 			pRFCalibrateInfo->DefaultOfdmIndex = (defaultSwingIndex >= OFDM_TABLE_SIZE) ? 30 : defaultSwingIndex;
-			pRFCalibrateInfo->DefaultCckIndex = 20;	
+			pRFCalibrateInfo->DefaultCckIndex = 20;
 		} else if (pDM_Odm->SupportICType == ODM_RTL8188F) {          /*add by Mingzhi.Guo  2015-03-23*/
 			pRFCalibrateInfo->DefaultOfdmIndex = 28;							/*OFDM: -1dB*/
 			pRFCalibrateInfo->DefaultCckIndex = 20;							/*CCK:-6dB*/
@@ -592,24 +592,24 @@ odm_TXPowerTrackingThermalMeterInit(
 			pRFCalibrateInfo->DefaultCckIndex = 28;							/*CCK:   -6dB*/
 		} else {
 			pRFCalibrateInfo->DefaultOfdmIndex = (defaultSwingIndex >= TXSCALE_TABLE_SIZE) ? 24 : defaultSwingIndex;
-			pRFCalibrateInfo->DefaultCckIndex = 24;	
+			pRFCalibrateInfo->DefaultCckIndex = 24;
 		}
 		pRFCalibrateInfo->DefaultBbSwingIndexFlag = TRUE;
 	}
 
 	pRFCalibrateInfo->BbSwingIdxCckBase = pRFCalibrateInfo->DefaultCckIndex;
 	pRFCalibrateInfo->CCK_index = pRFCalibrateInfo->DefaultCckIndex;
-	
+
 	for (p = ODM_RF_PATH_A; p < MAX_RF_PATH; ++p)
 	{
-		pRFCalibrateInfo->BbSwingIdxOfdmBase[p] = pRFCalibrateInfo->DefaultOfdmIndex;		
-		pRFCalibrateInfo->OFDM_index[p] = pRFCalibrateInfo->DefaultOfdmIndex;		
+		pRFCalibrateInfo->BbSwingIdxOfdmBase[p] = pRFCalibrateInfo->DefaultOfdmIndex;
+		pRFCalibrateInfo->OFDM_index[p] = pRFCalibrateInfo->DefaultOfdmIndex;
 		pRFCalibrateInfo->DeltaPowerIndex[p] = 0;
 		pRFCalibrateInfo->DeltaPowerIndexLast[p] = 0;
 		pRFCalibrateInfo->PowerIndexOffset[p] = 0;
 	}
-	pRFCalibrateInfo->Modify_TxAGC_Value_OFDM = 0;			
-	pRFCalibrateInfo->Modify_TxAGC_Value_CCK = 0;			
+	pRFCalibrateInfo->Modify_TxAGC_Value_OFDM = 0;
+	pRFCalibrateInfo->Modify_TxAGC_Value_CCK = 0;
 
 }
 
@@ -634,11 +634,11 @@ ODM_TXPowerTrackingCheck(
 			break;
 
 		case	ODM_AP:
-			odm_TXPowerTrackingCheckAP(pDM_Odm);		
-			break;		
+			odm_TXPowerTrackingCheckAP(pDM_Odm);
+			break;
 
 		default:
-			break;	
+			break;
 	}
 
 }
@@ -656,7 +656,7 @@ odm_TXPowerTrackingCheckCE(
 		return;
 
 	if (!pDM_Odm->RFCalibrateInfo.TM_Trigger) {
-		
+
 		if (IS_HARDWARE_TYPE_8188E(Adapter) || IS_HARDWARE_TYPE_8188F(Adapter) || IS_HARDWARE_TYPE_8192E(Adapter)
 			|| IS_HARDWARE_TYPE_8723B(Adapter)
 			|| IS_HARDWARE_TYPE_JAGUAR(Adapter) || IS_HARDWARE_TYPE_8814A(Adapter)
@@ -666,20 +666,20 @@ odm_TXPowerTrackingCheckCE(
 		} else {
 			ODM_SetRFReg(pDM_Odm, ODM_RF_PATH_A, RF_T_METER_OLD, bRFRegOffsetMask, 0x60);
 		}
-		
-	
-		
+
+
+
 		pDM_Odm->RFCalibrateInfo.TM_Trigger = 1;
 		return;
 	}
 	else
 	{
-		
+
 		ODM_TXPowerTrackingCallback_ThermalMeter(Adapter);
 		pDM_Odm->RFCalibrateInfo.TM_Trigger = 0;
 	}
 
-#endif	
+#endif
 }
 
 VOID
@@ -691,7 +691,7 @@ odm_TXPowerTrackingCheckMP(
 #if (DM_ODM_SUPPORT_TYPE == ODM_WIN)
 	PADAPTER	Adapter = pDM_Odm->Adapter;
 
-	if (ODM_CheckPowerStatus(Adapter) == FALSE) 
+	if (ODM_CheckPowerStatus(Adapter) == FALSE)
 	{
 		RT_TRACE(COMP_POWER_TRACKING, DBG_LOUD, ("===>ODM_CheckPowerStatus() return FALSE\n"));
 		return;
@@ -699,7 +699,7 @@ odm_TXPowerTrackingCheckMP(
 
 	odm_TXPowerTrackingThermalMeterCheck(Adapter);
 #endif
-	
+
 }
 
 
@@ -713,7 +713,7 @@ odm_TXPowerTrackingCheckAP(
 	prtl8192cd_priv	priv		= pDM_Odm->priv;
 
 	return;
-	
+
 #endif
 }
 
@@ -734,19 +734,19 @@ odm_TXPowerTrackingThermalMeterCheck(
 
 	if (!TM_Trigger) {
 		if (IS_HARDWARE_TYPE_8188E(Adapter) || IS_HARDWARE_TYPE_JAGUAR(Adapter) || IS_HARDWARE_TYPE_8192E(Adapter) ||
-				IS_HARDWARE_TYPE_8723B(Adapter) || IS_HARDWARE_TYPE_8814A(Adapter) || IS_HARDWARE_TYPE_8188F(Adapter) 
+				IS_HARDWARE_TYPE_8723B(Adapter) || IS_HARDWARE_TYPE_8814A(Adapter) || IS_HARDWARE_TYPE_8188F(Adapter)
 				|| IS_HARDWARE_TYPE_8703B(Adapter) || IS_HARDWARE_TYPE_8723D(Adapter))
 			PHY_SetRFReg(Adapter, ODM_RF_PATH_A, RF_T_METER_88E, BIT17 | BIT16, 0x03);
 		else
 			PHY_SetRFReg(Adapter, ODM_RF_PATH_A, RF_T_METER, bRFRegOffsetMask, 0x60);
-		
+
 		RT_TRACE(COMP_POWER_TRACKING, DBG_LOUD,("Trigger Thermal Meter!!\n"));
-		
+
 		TM_Trigger = 1;
 		return;
 	} else {
-		RT_TRACE(COMP_POWER_TRACKING, DBG_LOUD,("Schedule TxPowerTracking direct call!!\n"));		
-		odm_TXPowerTrackingDirectCall(Adapter); 
+		RT_TRACE(COMP_POWER_TRACKING, DBG_LOUD,("Schedule TxPowerTracking direct call!!\n"));
+		odm_TXPowerTrackingDirectCall(Adapter);
 		TM_Trigger = 0;
 	}
 #endif

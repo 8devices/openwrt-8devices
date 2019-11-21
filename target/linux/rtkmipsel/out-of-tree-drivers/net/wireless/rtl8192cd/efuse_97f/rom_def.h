@@ -22,7 +22,7 @@
 #if 0
 #ifndef BOOLEAN
 typedef unsigned char		    BOOLEAN,*PBOOLEAN;
-#endif 
+#endif
 
 #ifndef u1Byte
 typedef unsigned char			u1Byte,*pu1Byte;
@@ -36,7 +36,7 @@ typedef signed int				s4Byte,*ps4Byte;
 typedef signed long long		s8Byte,*ps8Byte;
 #endif
 typedef unsigned long long		ULONG64,*PULONG64;
-#endif 
+#endif
 
 #if 0
 /* In ARM platform, system would use the type -- "char" as "unsigned char"*/
@@ -73,7 +73,7 @@ typedef signed long long	INT64;
 #define TRUE        1
 #define FALSE       0
 
-typedef enum _ROM_STATUS_ 
+typedef enum _ROM_STATUS_
 {
     ROM_STATUS_FAIL     = -1,
     ROM_STATUS_SUCCESS  = 0
@@ -177,14 +177,14 @@ u2Byte verify_checksum(pu1Byte buf, u4Byte len);
 //////////////////////////////////////////
 
 // RTL8196F bus architecture
-// LX0 slave: switch, NFBI, Parallel-NAND-Flash, Timer, GPIO, ISR, sys reg?, efuse, SPI-NAND-Flash, 
-// LX1 slave: PCM, I2S, SD/MMC, IPSec, 
-// LX2 slave: USB2 host, PCIe_RC, 
-// LX0 master:  NFBI, Paralle-NAND-Flash, SPI-NAND-Flash, 
+// LX0 slave: switch, NFBI, Parallel-NAND-Flash, Timer, GPIO, ISR, sys reg?, efuse, SPI-NAND-Flash,
+// LX1 slave: PCM, I2S, SD/MMC, IPSec,
+// LX2 slave: USB2 host, PCIe_RC,
+// LX0 master:  NFBI, Paralle-NAND-Flash, SPI-NAND-Flash,
 // LX1 master: PCM, I2S, SD/MMC, IPSec,
 // LX2 master: switch
-// AHB: GDMA, USB2 host, USB2 otg, 
-// APB: SPI, I2C, GTimer, UART, WiFi, 
+// AHB: GDMA, USB2 host, USB2 otg,
+// APB: SPI, I2C, GTimer, UART, WiFi,
 // TLP: PCIe_RC
 // AXI3: WiFi
 

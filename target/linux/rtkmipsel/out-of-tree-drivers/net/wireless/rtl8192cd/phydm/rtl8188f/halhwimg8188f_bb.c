@@ -1,21 +1,21 @@
-/****************************************************************************** 
-* 
-* Copyright(c) 2007 - 2011 Realtek Corporation. All rights reserved. 
-* 
-* This program is free software; you can redistribute it and/or modify it 
-* under the terms of version 2 of the GNU General Public License as 
-* published by the Free Software Foundation. 
-* 
-* This program is distributed in the hope that it will be useful, but WITHOUT 
-* ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or 
-* FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for 
-* more details. 
-* 
-* You should have received a copy of the GNU General Public License along with 
-* this program; if not, write to the Free Software Foundation, Inc., 
-* 51 Franklin Street, Fifth Floor, Boston, MA 02110, USA 
-* 
-* 
+/******************************************************************************
+*
+* Copyright(c) 2007 - 2011 Realtek Corporation. All rights reserved.
+*
+* This program is free software; you can redistribute it and/or modify it
+* under the terms of version 2 of the GNU General Public License as
+* published by the Free Software Foundation.
+*
+* This program is distributed in the hope that it will be useful, but WITHOUT
+* ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+* FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
+* more details.
+*
+* You should have received a copy of the GNU General Public License along with
+* this program; if not, write to the Free Software Foundation, Inc.,
+* 51 Franklin Street, Fifth Floor, Boston, MA 02110, USA
+*
+*
 ******************************************************************************/
 
 /*Image2HeaderVersion: 2.18*/
@@ -33,23 +33,23 @@ CheckPositive(
 )
 {
 	u1Byte    _BoardType = ((pDM_Odm->BoardType & BIT4) >> 4) << 0 | /* _GLNA*/
-				((pDM_Odm->BoardType & BIT3) >> 3) << 1 | /* _GPA*/ 
+				((pDM_Odm->BoardType & BIT3) >> 3) << 1 | /* _GPA*/
 				((pDM_Odm->BoardType & BIT7) >> 7) << 2 | /* _ALNA*/
 				((pDM_Odm->BoardType & BIT6) >> 6) << 3 | /* _APA */
-				((pDM_Odm->BoardType & BIT2) >> 2) << 4;  /* _BT*/  
+				((pDM_Odm->BoardType & BIT2) >> 2) << 4;  /* _BT*/
 
 	u4Byte	cond1   = Condition1, cond2 = Condition2, cond3 = Condition3, cond4 = Condition4;
-	u4Byte    driver1 = pDM_Odm->CutVersion       << 24 | 
-				(pDM_Odm->SupportInterface & 0xF0) << 16 | 
-				pDM_Odm->SupportPlatform  << 16 | 
-				pDM_Odm->PackageType      << 12 | 
+	u4Byte    driver1 = pDM_Odm->CutVersion       << 24 |
+				(pDM_Odm->SupportInterface & 0xF0) << 16 |
+				pDM_Odm->SupportPlatform  << 16 |
+				pDM_Odm->PackageType      << 12 |
 				(pDM_Odm->SupportInterface & 0x0F) << 8  |
 				_BoardType;
 
-	u4Byte    driver2 = (pDM_Odm->TypeGLNA & 0xFF) <<  0 |  
-				(pDM_Odm->TypeGPA & 0xFF)  <<  8 | 
-				(pDM_Odm->TypeALNA & 0xFF) << 16 | 
-				(pDM_Odm->TypeAPA & 0xFF)  << 24; 
+	u4Byte    driver2 = (pDM_Odm->TypeGLNA & 0xFF) <<  0 |
+				(pDM_Odm->TypeGPA & 0xFF)  <<  8 |
+				(pDM_Odm->TypeALNA & 0xFF) << 16 |
+				(pDM_Odm->TypeAPA & 0xFF)  << 24;
 
 u4Byte    driver3 = 0;
 
@@ -58,20 +58,20 @@ u4Byte    driver3 = 0;
 				(pDM_Odm->TypeALNA & 0xFF00) << 8 |
 				(pDM_Odm->TypeAPA & 0xFF00)  << 16;
 
-	ODM_RT_TRACE(pDM_Odm, ODM_COMP_INIT, ODM_DBG_TRACE, 
+	ODM_RT_TRACE(pDM_Odm, ODM_COMP_INIT, ODM_DBG_TRACE,
 	("===> CheckPositive (cond1, cond2, cond3, cond4) = (0x%X 0x%X 0x%X 0x%X)\n", cond1, cond2, cond3, cond4));
-	ODM_RT_TRACE(pDM_Odm, ODM_COMP_INIT, ODM_DBG_TRACE, 
+	ODM_RT_TRACE(pDM_Odm, ODM_COMP_INIT, ODM_DBG_TRACE,
 	("===> CheckPositive (driver1, driver2, driver3, driver4) = (0x%X 0x%X 0x%X 0x%X)\n", driver1, driver2, driver3, driver4));
 
-	ODM_RT_TRACE(pDM_Odm, ODM_COMP_INIT, ODM_DBG_TRACE, 
+	ODM_RT_TRACE(pDM_Odm, ODM_COMP_INIT, ODM_DBG_TRACE,
 	("	(Platform, Interface) = (0x%X, 0x%X)\n", pDM_Odm->SupportPlatform, pDM_Odm->SupportInterface));
-	ODM_RT_TRACE(pDM_Odm, ODM_COMP_INIT, ODM_DBG_TRACE, 
+	ODM_RT_TRACE(pDM_Odm, ODM_COMP_INIT, ODM_DBG_TRACE,
 	("	(Board, Package) = (0x%X, 0x%X)\n", pDM_Odm->BoardType, pDM_Odm->PackageType));
 
 
 	/*============== Value Defined Check ===============*/
 	/*QFN Type [15:12] and Cut Version [27:24] need to do value check*/
-	
+
 	if (((cond1 & 0x0000F000) != 0) && ((cond1 & 0x0000F000) != (driver1 & 0x0000F000)))
 		return FALSE;
 	if (((cond1 & 0x0F000000) != 0) && ((cond1 & 0x0F000000) != (driver1 & 0x0F000000)))
@@ -80,8 +80,8 @@ u4Byte    driver3 = 0;
 	/*=============== Bit Defined Check ================*/
 	/* We don't care [31:28] */
 
-	cond1   &= 0x00FF0FFF; 
-	driver1 &= 0x00FF0FFF; 
+	cond1   &= 0x00FF0FFF;
+	driver1 &= 0x00FF0FFF;
 
 	if ((cond1 & driver1) == cond1) {
 		u4Byte bitMask = 0;
@@ -119,7 +119,7 @@ CheckNegative(
 *                           AGC_TAB.TXT
 ******************************************************************************/
 
-u4Byte Array_MP_8188F_AGC_TAB[] = { 
+u4Byte Array_MP_8188F_AGC_TAB[] = {
 		0xC78, 0xFC000001,
 		0xC78, 0xFB010001,
 		0xC78, 0xFA020001,
@@ -199,7 +199,7 @@ ODM_ReadAndConfig_MP_8188F_AGC_TAB(
 	BOOLEAN bMatched = TRUE, bSkipped = FALSE;
 	u4Byte     ArrayLen    = sizeof(Array_MP_8188F_AGC_TAB)/sizeof(u4Byte);
 	pu4Byte    Array       = Array_MP_8188F_AGC_TAB;
-	
+
 	u4Byte	v1 = 0, v2 = 0, pre_v1 = 0, pre_v2 = 0;
 
 	ODM_RT_TRACE(pDM_Odm, ODM_COMP_INIT, ODM_DBG_LOUD, ("===> ODM_ReadAndConfig_MP_8188F_AGC_TAB\n"));
@@ -253,7 +253,7 @@ ODM_GetVersion_MP_8188F_AGC_TAB(void)
 *                           PHY_REG.TXT
 ******************************************************************************/
 
-u4Byte Array_MP_8188F_PHY_REG[] = { 
+u4Byte Array_MP_8188F_PHY_REG[] = {
 		0x800, 0x83045700,
 		0x804, 0x00000001,
 		0x808, 0x0000FC00,
@@ -482,7 +482,7 @@ ODM_ReadAndConfig_MP_8188F_PHY_REG(
 	BOOLEAN bMatched = TRUE, bSkipped = FALSE;
 	u4Byte     ArrayLen    = sizeof(Array_MP_8188F_PHY_REG)/sizeof(u4Byte);
 	pu4Byte    Array       = Array_MP_8188F_PHY_REG;
-	
+
 	u4Byte	v1 = 0, v2 = 0, pre_v1 = 0, pre_v2 = 0;
 
 	ODM_RT_TRACE(pDM_Odm, ODM_COMP_INIT, ODM_DBG_LOUD, ("===> ODM_ReadAndConfig_MP_8188F_PHY_REG\n"));
@@ -536,7 +536,7 @@ ODM_GetVersion_MP_8188F_PHY_REG(void)
 *                           PHY_REG_PG.TXT
 ******************************************************************************/
 
-u4Byte Array_MP_8188F_PHY_REG_PG[] = { 
+u4Byte Array_MP_8188F_PHY_REG_PG[] = {
 	0, 0, 0, 0x00000e08, 0x0000ff00, 0x00003200,
 	0, 0, 0, 0x0000086c, 0xffffff00, 0x32323200,
 	0, 0, 0, 0x00000e00, 0xffffffff, 0x34363636,

@@ -54,17 +54,9 @@ EXTERN void BssTrans_ValidatePrefListTimer(struct rtl8192cd_priv *priv);
 EXTERN void BssTrans_TerminationTimer(struct rtl8192cd_priv *priv);
 
 
-#ifdef CONFIG_RTL_PROC_NEW
 EXTERN int rtl8192cd_proc_transition_list_read(struct seq_file *s, void *data);
-#else
-EXTERN int rtl8192cd_proc_transition_list_read(char *buf, char **start, off_t offset, int length, int *eof, void *data);
-#endif
 
-#ifdef __ECOS
-EXTERN int rtl8192cd_proc_transition_list_write(char *tmp, void *data)
-#else
 EXTERN int rtl8192cd_proc_transition_list_write(struct file *file, const char *buffer, unsigned long count, void *data);
-#endif
 
 #ifdef CONFIG_IEEE80211V_CLI
 EXTERN void OnBSSTransReq(struct rtl8192cd_priv *priv, struct stat_info *pstat, unsigned char *pframe, int frame_len);

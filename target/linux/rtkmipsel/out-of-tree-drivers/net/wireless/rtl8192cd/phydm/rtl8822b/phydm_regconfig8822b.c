@@ -1,7 +1,7 @@
 /******************************************************************************
  *
  * Copyright(c) 2007 - 2011 Realtek Corporation. All rights reserved.
- *                                        
+ *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of version 2 of the GNU General Public License as
  * published by the Free Software Foundation.
@@ -21,7 +21,7 @@
 #include "mp_precomp.h"
 #include "../phydm_precomp.h"
 
-#if (RTL8822B_SUPPORT == 1)  
+#if (RTL8822B_SUPPORT == 1)
 
 void
 odm_ConfigRFReg_8822B(
@@ -35,7 +35,7 @@ odm_ConfigRFReg_8822B(
 	if ((Addr == 0xfe) || (Addr == 0xffe)) {
 		#ifdef CONFIG_LONG_DELAY_ISSUE
 		ODM_sleep_ms(50);
-		#else		
+		#else
 		ODM_delay_ms(50);
 		#endif
 	} else {
@@ -43,10 +43,10 @@ odm_ConfigRFReg_8822B(
 
 		/* Add 1us delay between BB/RF register setting. */
 		ODM_delay_us(1);
-	}	
+	}
 }
 
-void 
+void
 odm_ConfigRF_RadioA_8822B(
 	IN	PDM_ODM_T				pDM_Odm,
 	IN	u4Byte					Addr,
@@ -61,7 +61,7 @@ odm_ConfigRF_RadioA_8822B(
 	ODM_RT_TRACE(pDM_Odm, ODM_COMP_INIT, ODM_DBG_TRACE, ("===> ODM_ConfigRFWithHeaderFile: [RadioA] %08X %08X\n", Addr, Data));
 }
 
-void 
+void
 odm_ConfigRF_RadioB_8822B(
 	IN	PDM_ODM_T				pDM_Odm,
 	IN	u4Byte					Addr,
@@ -72,11 +72,11 @@ odm_ConfigRF_RadioB_8822B(
 	u4Byte	maskforPhySet = (u4Byte)(content&0xE000);
 
 	odm_ConfigRFReg_8822B(pDM_Odm, Addr, Data, ODM_RF_PATH_B, Addr|maskforPhySet);
-	
+
 	ODM_RT_TRACE(pDM_Odm, ODM_COMP_INIT, ODM_DBG_TRACE, ("===> ODM_ConfigRFWithHeaderFile: [RadioB] %08X %08X\n", Addr, Data));
 }
 
-void 
+void
 odm_ConfigMAC_8822B(
 	IN	PDM_ODM_T				pDM_Odm,
 	IN	u4Byte					Addr,
@@ -111,15 +111,15 @@ odm_UpdateAgcBigJumpLmt_8822B(
 			isLimit = TRUE;
 			pDM_DigTable->bigJumpLmt[agcTableIdx] = bbGainIdx - 2;
 			ODM_RT_TRACE(pDM_Odm, ODM_COMP_DIG, ODM_DBG_TRACE, ("===> [AGC_TAB] bigJumpLmt [%d] = 0x%x\n", agcTableIdx, pDM_DigTable->bigJumpLmt[agcTableIdx]));
-		} 
+		}
 	} else
 		isLimit = FALSE;
-	
+
 	pDM_DigTable->rfGainIdx = rfGainIdx;
-	
+
 }
 
-void 
+void
 odm_ConfigBB_AGC_8822B(
 	IN	PDM_ODM_T				pDM_Odm,
 	IN	u4Byte					Addr,
@@ -129,7 +129,7 @@ odm_ConfigBB_AGC_8822B(
 {
 	odm_UpdateAgcBigJumpLmt_8822B(pDM_Odm, Addr, Data);
 
-	ODM_SetBBReg(pDM_Odm, Addr, Bitmask, Data);		
+	ODM_SetBBReg(pDM_Odm, Addr, Bitmask, Data);
 
 	/* Add 1us delay between BB/RF register setting. */
 	ODM_delay_us(1);
@@ -147,11 +147,11 @@ odm_ConfigBB_PHY_REG_PG_8822B(
 	IN	u4Byte					Bitmask,
 	IN	u4Byte					Data
 	)
-{    
+{
 	if (Addr == 0xfe || Addr == 0xffe) {
 		#ifdef CONFIG_LONG_DELAY_ISSUE
 		ODM_sleep_ms(50);
-		#else		
+		#else
 		ODM_delay_ms(50);
 		#endif
 	} else {
@@ -163,18 +163,18 @@ odm_ConfigBB_PHY_REG_PG_8822B(
 	ODM_RT_TRACE(pDM_Odm, ODM_COMP_INIT, ODM_DBG_LOUD, ("===> ODM_ConfigBBWithHeaderFile: [PHY_REG] %08X %08X %08X\n", Addr, Bitmask, Data));
 }
 
-void 
+void
 odm_ConfigBB_PHY_8822B(
 	IN	PDM_ODM_T				pDM_Odm,
 	IN	u4Byte					Addr,
 	IN	u4Byte					Bitmask,
 	IN	u4Byte					Data
 	)
-{    
+{
 	if (Addr == 0xfe)
 		#ifdef CONFIG_LONG_DELAY_ISSUE
 		ODM_sleep_ms(50);
-		#else		
+		#else
 		ODM_delay_ms(50);
 		#endif
 	else if (Addr == 0xfd)
@@ -189,7 +189,7 @@ odm_ConfigBB_PHY_8822B(
 		ODM_delay_us(1);
 	else
 		ODM_SetBBReg(pDM_Odm, Addr, Bitmask, Data);
-	
+
 	/* Add 1us delay between BB/RF register setting. */
 	ODM_delay_us(1);
 	ODM_RT_TRACE(pDM_Odm, ODM_COMP_INIT, ODM_DBG_TRACE, ("===> ODM_ConfigBBWithHeaderFile: [PHY_REG] %08X %08X\n", Addr, Data));

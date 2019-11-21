@@ -6,21 +6,21 @@ Copyright (c) Realtek Semiconductor Corp. All rights reserved.
 
 Module Name:
 	Hal8192EEDef.h
-	
+
 Abstract:
 	Defined HAL 8192EE data structure & Define
-	    
+
 Major Change History:
 	When       Who               What
 	---------- ---------------   -------------------------------
-	2012-03-23 Filen            Create.	
+	2012-03-23 Filen            Create.
 --*/
 
 /*
 RT_STATUS
 InitPON8192EE(
     IN  HAL_PADAPTER Adapter,
-    IN  u4Byte   	ClkSel        
+    IN  u4Byte   	ClkSel
 );
 
 RT_STATUS
@@ -29,7 +29,7 @@ StopHW8192EE(
 );
 
 
-RT_STATUS	
+RT_STATUS
 hal_Associate_8192EE(
     HAL_PADAPTER            Adapter,
     BOOLEAN			    IsDefaultAdapter
@@ -66,7 +66,7 @@ SetBeamformStatus92E(
 );
 
 
-VOID 
+VOID
 Beamforming_NDPARate_92E(
 	struct rtl8192cd_priv *priv,
 	BOOLEAN		Mode,
@@ -84,7 +84,7 @@ C2HTxBeamformingHandler_92E(
 VOID
 _C2HContentParsing92E(
 	struct rtl8192cd_priv *priv,
-		u1Byte			c2hCmdId, 
+		u1Byte			c2hCmdId,
 		u1Byte			c2hCmdLen,
 		pu1Byte 			tmpBuf
 );
@@ -109,7 +109,7 @@ VOID HW_VAR_HW_REG_TIMER_STOP_92E(
 	struct rtl8192cd_priv *priv
 );
 
-RT_STATUS	
+RT_STATUS
 hal_Associate_8192EE(
 	struct rtl8192cd_priv *priv,
     BOOLEAN                 IsDefaultAdapter

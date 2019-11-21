@@ -12,11 +12,9 @@
 
 #define _8192CD_A4_STA_C_
 
-#ifdef __KERNEL__
 #include <linux/slab.h>
 #include <linux/sched.h>
 #include <linux/timer.h>
-#endif
 
 #include "./8192cd_cfg.h"
 #include "./8192cd.h"
@@ -123,9 +121,6 @@ void a4_sta_del(struct rtl8192cd_priv *priv,  unsigned char *mac)
     {
         if (!memcmp(db->mac, mac, ETH_ALEN))
         {
-            #if defined(BR_SHORTCUT) && defined(RTL_CACHED_BR_STA)
-            release_brsc_cache(db->mac);
-            #endif           
             mac_hash_unlink(db);
             free_entry(priv, db);
 #ifdef A4_STA_DEBUG
@@ -167,7 +162,6 @@ void a4_sta_update(struct rtl8192cd_priv *root_priv, struct rtl8192cd_priv *priv
         a4_sta_del(current_priv, mac);
     }
 
-#ifdef MBSSID
     if (root_priv->pmib->miscEntry.vap_enable)
     {
         for (j=0; j<RTL8192CD_NUM_VWLAN; j++)
@@ -179,14 +173,11 @@ void a4_sta_update(struct rtl8192cd_priv *root_priv, struct rtl8192cd_priv *priv
             }
         }
     }
-#endif
-#ifdef UNIVERSAL_REPEATER
     current_priv = GET_VXD_PRIV(root_priv);
     if(IS_DRV_OPEN(current_priv) && priv != current_priv)
     {
         a4_sta_del(current_priv, mac);
     }
-#endif
 
 }
 
@@ -226,9 +217,6 @@ void a4_sta_cleanup(struct rtl8192cd_priv *priv, struct stat_info * pstat)
         {
             g = f->next_hash;
             if(f->stat == pstat) {
-                #if defined(BR_SHORTCUT) && defined(RTL_CACHED_BR_STA)
-                release_brsc_cache(f->mac);
-                #endif                
                 mac_hash_unlink(f);
                 free_entry(priv, f);
             }
@@ -274,9 +262,6 @@ void a4_sta_expire(struct rtl8192cd_priv *priv)
                                  f->stat->hwaddr[5]);
 #endif
 
-                    #if defined(BR_SHORTCUT) && defined(RTL_CACHED_BR_STA)
-                    release_brsc_cache(f->mac);
-                    #endif    
                     mac_hash_unlink(f);
                     free_entry(priv, f);
                 }
@@ -310,7 +295,7 @@ void a4_sta_add(struct rtl8192cd_priv *priv, struct stat_info *pstat, unsigned c
 
     if(memcmp(pstat->hwaddr, mac, MACADDRLEN)) {
         sprintf((char *)tmpbuf, "%02x%02x%02x%02x%02x%02xno", mac[0], mac[1], mac[2], mac[3], mac[4], mac[5]);
-        del_sta(priv, tmpbuf); 
+        del_sta(priv, tmpbuf);
     }
 
     db = alloc_entry(priv);
@@ -464,11 +449,7 @@ void a4_tx_unknown_unicast(struct rtl8192cd_priv *priv, struct sk_buff *skb)
             if (newskb)
             {
                 newskb->cb[2] = (char)0xff;         // not do aggregation
-                #if defined(CONFIG_RTK_MESH)
-                __rtl8192cd_start_xmit_out(newskb, pstat, NULL);
-                #else                
                 __rtl8192cd_start_xmit_out(newskb, pstat);
-                #endif
             }
             else
             {
@@ -509,11 +490,7 @@ unsigned char a4_tx_mcast_to_unicast(struct rtl8192cd_priv *priv, struct sk_buff
                 {
                     newskb->cb[2] = (char)0xff;         // not do aggregation
 
-                    #if defined(CONFIG_RTK_MESH)
-                    __rtl8192cd_start_xmit_out(newskb, pstat, NULL);
-                    #else                      
                     __rtl8192cd_start_xmit_out(newskb, pstat);
-                    #endif
                 }
                 else
                 {
@@ -535,9 +512,7 @@ unsigned char a4_tx_mcast_to_unicast(struct rtl8192cd_priv *priv, struct sk_buff
 }
 
 int a4_rx_dispatch(struct rtl8192cd_priv *priv, struct rx_frinfo *pfrinfo
-#ifdef MBSSID
                    ,int vap_idx
-#endif
                   )
 {
 
@@ -545,12 +520,10 @@ int a4_rx_dispatch(struct rtl8192cd_priv *priv, struct rx_frinfo *pfrinfo
     unsigned char *pframe = get_pframe(pfrinfo);
     int reuse = 1;
 
-#ifdef MBSSID
     if (GET_ROOT(priv)->pmib->miscEntry.vap_enable && (vap_idx >= 0))
     {
         priv = priv->pvap_priv[vap_idx];
     }
-#endif
 
     opmode = OPMODE;
 
@@ -567,7 +540,6 @@ int a4_rx_dispatch(struct rtl8192cd_priv *priv, struct rx_frinfo *pfrinfo
 #endif
         if (opmode & WIFI_AP_STATE)
         {
-#ifdef UNIVERSAL_REPEATER
             if(IS_DRV_OPEN(GET_VXD_PRIV(priv)) && IS_BSSID(GET_VXD_PRIV(priv), GetAddr2Ptr(pframe)))
             {
                 reuse = a4_rx_check_reuse(GET_VXD_PRIV(priv), pfrinfo, GET_MY_HWADDR);
@@ -577,7 +549,6 @@ int a4_rx_dispatch(struct rtl8192cd_priv *priv, struct rx_frinfo *pfrinfo
                 }
             }
             else
-#endif
                 if (IS_BSSID(priv, GetAddr1Ptr(pframe)))
                 {
                     reuse = 0;
@@ -641,17 +612,17 @@ unsigned char a4_rx_check_reuse(struct rtl8192cd_priv *priv, struct rx_frinfo *p
         if(pstat->state & WIFI_A4_STA)   /*A4 AP*/
         {
             /* when a4_enable = 1,  also recieve 3-address from an A4 AP*/
-            if(pfrinfo->to_fr_ds == 1 && priv->pshare->rf_ft_var.a4_enable == 1) {                                    
+            if(pfrinfo->to_fr_ds == 1 && priv->pshare->rf_ft_var.a4_enable == 1) {
 
-                if(IS_MCAST(pfrinfo->da)) {                   
+                if(IS_MCAST(pfrinfo->da)) {
                     /*filter*/
                     reuse = 0;
                     fdb = fdb_find_for_driver(GET_BR_PORT(priv->dev)->br, pfrinfo->sa);
-                    if(fdb) {                       
+                    if(fdb) {
                         /*if sa is recorded in other interface, it may be a loop packet, drop it*/
                         if(strcmp(fdb->dst->dev->name, priv->dev->name))
-                            reuse = 1;                            
-                    }       
+                            reuse = 1;
+                    }
                 }
                 else if(isEqualMACAddr(pfrinfo->da, myhwaddr)){ /*unicast*/
                     reuse = 0;
@@ -681,13 +652,7 @@ unsigned char a4_rx_check_reuse(struct rtl8192cd_priv *priv, struct rx_frinfo *p
 }
 #endif
 
-#ifndef __OSK__
-#ifdef CONFIG_RTL_PROC_NEW
 int a4_dump_sta_info(struct seq_file *s, void *data)
-#else
-int a4_dump_sta_info(char *buf, char **start, off_t offset,
-                     int length, int *eof, void *data)
-#endif
 {
     struct net_device *dev = PROC_GET_DEV();
     struct rtl8192cd_priv *priv = GET_DEV_PRIV(dev);
@@ -712,7 +677,6 @@ int a4_dump_sta_info(char *buf, char **start, off_t offset,
 
     return pos;
 }
-#endif
 
 #endif /* A4_STA */
 

@@ -122,7 +122,7 @@
 #define		MBIST_DONE			0x178	// MACTOP BIST DONE.
 #define		MBIST_FAIL			0x17C	// MACTOP BIST FAIL.
 
-#define		C2H_SYNC_BYTE		0x1AF	// 8051 set to 0xFF, Driver set to 0x0 after read C2H content 
+#define		C2H_SYNC_BYTE		0x1AF	// 8051 set to 0xFF, Driver set to 0x0 after read C2H content
 #define		MCUTST_I			0x1C0	// MCU Firmware TST-I.
 #define		MCUTST_II			0x1C4	// MCU Firmware TST-II.
 #define		MCU_UNLOCK		 0x01C7	// is used for Unlock MCU infinite-loop
@@ -496,69 +496,6 @@
 #define		EEDO				BIT(0)	// reflect the state of the EEDO.
 
 
-#ifdef EN_EFUSE
-#define		CmdEEPROM_En						BIT(5)	 // EEPROM enable when set 1
-#define		CmdEERPOMSEL						BIT(4) // System EEPROM select, 0: boot from E-FUSE, 1: The EEPROM used is 9346
-#define		AutoLoadEEPROM						(CmdEEPROM_En|CmdEERPOMSEL)
-#define		AutoLoadEFUSE						CmdEEPROM_En
-
-
-#ifdef CONFIG_RTL_92C_SUPPORT
-
-#ifdef CONFIG_PCI_HCI
-#define EEPROM_VID					0x0A // SE Vendor ID.A-B
-#define EEPROM_DID					0x0C // SE Device ID. C-D
-#define EEPROM_SVID					0x0E // SE Vendor ID.E-F
-#define EEPROM_SMID					0x10 // SE PCI Subsystem ID. 10-11
-#endif
-#define EEPROM_TxPowerCCK			0x5A // CCK Tx Power base
-#define EEPROM_TxPowerHT40_1S		0x60 // HT40 Tx Power base
-#define EEPROM_TxPowerHT40_2SDiff	0x66 // HT40 Tx Power diff
-#define EEPROM_TxPowerHT20Diff		0x69 // HT20 Tx Power diff
-#define EEPROM_TxPowerOFDMDiff		0x6C // OFDM Tx Power diff
-#define EEPROM_MACADDRESS			0x16
-
-#define EEPROM_CHANNEL_PLAN		0x75
-#define EEPROM_TSSI_A				0x76
-#define EEPROM_TSSI_B				0x77
-#define EEPROM_THERMAL_METER		0x78 //[4:0]
-#define EEPROM_RF_OPT1				0x79
-#define EEPROM_RF_OPT2				0x7A
-#define EEPROM_RF_OPT3				0x7B
-#define EEPROM_RF_OPT4				0x7C
-#define EEPROM_VERSION				0x7E
-#define EEPROM_CUSTOMER_ID			0x7F
-
-#define EEPROM_NORMAL_BoardType	EEPROM_RF_OPT1	//[7:5]
-
-#ifdef CONFIG_USB_HCI
-
-#define EEPROM_VID								0x0A
-#define EEPROM_PID								0x0C
-#define EEPROM_SUBCUSTOMER_ID					0x59
-
-//should be renamed and moved to another file
-typedef enum _BOARD_TYPE_8192CUSB{
-	BOARD_USB_DONGLE 			= 0,		// USB dongle
-	BOARD_USB_High_PA 		= 1,		// USB dongle with high power PA
-	BOARD_MINICARD		  	= 2,		// Minicard
-	BOARD_USB_SOLO 		 	= 3,		// USB solo-Slim module
-	BOARD_USB_COMBO			= 4,		// USB Combo-Slim module
-} BOARD_TYPE_8192CUSB, *PBOARD_TYPE_8192CUSB;
-
-#endif // CONFIG_USB_HCI
-#endif // CONFIG_RTL_92C_SUPPORT
-
-#ifdef CONFIG_USB_HCI
-#define BOARD_TYPE_NORMAL_MASK		0xE0
-
-#define EEPROM_Default_PID				0x1234
-#define EEPROM_Default_VID				0x5678
-#define EEPROM_Default_CustomerID			0xAB
-#define EEPROM_Default_SubCustomerID		0xCD
-#endif // CONFIG_USB_HCI
-
-#endif // EN_EFUSE
 
 
 //----------------------------------------------------------------------------

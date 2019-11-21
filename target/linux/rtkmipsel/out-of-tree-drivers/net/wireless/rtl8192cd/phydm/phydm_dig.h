@@ -1,7 +1,7 @@
 /******************************************************************************
  *
  * Copyright(c) 2007 - 2011 Realtek Corporation. All rights reserved.
- *                                        
+ *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of version 2 of the GNU General Public License as
  * published by the Free Software Foundation.
@@ -17,7 +17,7 @@
  *
  *
  ******************************************************************************/
- 
+
 #ifndef	__PHYDMDIG_H__
 #define    __PHYDMDIG_H__
 
@@ -64,7 +64,7 @@ typedef enum tag_DIG_GoUpCheck_Level {
 	DIG_GOUPCHECK_LEVEL_0,
 	DIG_GOUPCHECK_LEVEL_1,
 	DIG_GOUPCHECK_LEVEL_2
-	
+
 } DIG_GOUPCHECK_LEVEL;
 
 typedef struct _Dynamic_Initial_Gain_Threshold_
@@ -75,7 +75,7 @@ typedef struct _Dynamic_Initial_Gain_Threshold_
 
 	u1Byte		Dig_Enable_Flag;
 	u1Byte		Dig_Ext_Port_Stage;
-	
+
 	int		   	RssiLowThresh;
 	int		    	RssiHighThresh;
 
@@ -96,12 +96,12 @@ typedef struct _Dynamic_Initial_Gain_Threshold_
 
 	/*phydm_rx_gain_min_check*/
 	u1Byte		rx_gain_min_check_state[2];		//for tdma use
-	u1Byte		stay_check_state_cnt[2];		// check state	
+	u1Byte		stay_check_state_cnt[2];		// check state
 	u1Byte		goto_lock_state_cnt[2];		// check state
 	u1Byte		goto_release_state_cnt[2];	// lock state
 	u1Byte		stay_release_state_cnt[2];	// release state
 #endif
-	
+
 	u1Byte		BackupIGValue;		//MP DIG
 	u1Byte		BT30_CurIGI;
 	u1Byte		IGIBackup;
@@ -171,7 +171,7 @@ typedef struct _Dynamic_Initial_Gain_Threshold_
 	u1Byte		tdma_dig_block_cnt;		// for high/low state false alarm statistics
 	bool		one_sec_dump;
 	u1Byte		pre_tdma_dig_cnt;
-#endif	
+#endif
 	u1Byte		normalize_1sec_factor;
 	u4Byte		pre_tsf;
 	u4Byte		cur_tsf;
@@ -296,7 +296,7 @@ typedef enum tag_DIG_EXT_PORT_ALGO_Definition
 
 typedef enum tag_DIG_Connect_Definition
 {
-	DIG_STA_DISCONNECT = 0,	
+	DIG_STA_DISCONNECT = 0,
 	DIG_STA_CONNECT = 1,
 	DIG_STA_BEFORE_CONNECT = 2,
 	DIG_MultiSTA_DISCONNECT = 3,
@@ -413,7 +413,7 @@ ODM_ChangeDynamicInitGainThresh(
 
 VOID
 ODM_Write_DIG(
-	IN		PVOID					pDM_VOID, 	
+	IN		PVOID					pDM_VOID,
 	IN		u1Byte					CurrentIGI
 	);
 
@@ -430,7 +430,7 @@ odm_DIGInit(
 	IN		PVOID					pDM_VOID
 	);
 
-VOID	
+VOID
 odm_DIG(
 	IN		PVOID					pDM_VOID
 	);
@@ -483,17 +483,17 @@ phydm_dig_current_igi_by_fa_th(
 	u1Byte				is_high_low_sel
 	);
 
-BOOLEAN 
+BOOLEAN
 odm_DigAbort(
 	IN		PVOID			pDM_VOID
 	);
-	
+
 VOID
 odm_DIGbyRSSI_LPS(
 	IN		PVOID					pDM_VOID
 	);
 
-VOID 
+VOID
 odm_FalseAlarmCounterStatistics(
 	IN		PVOID					pDM_VOID
 	);
@@ -515,12 +515,12 @@ phydm_tdma_dig_timers(
 	u8		state
 	);
 
-VOID 
+VOID
 phydm_tdma_low_dig(
 	IN		PVOID		pDM_VOID
 	);
 
-VOID 
+VOID
 phydm_tdma_high_dig(
 	IN		PVOID		pDM_VOID
 	);
@@ -535,7 +535,7 @@ phydm_tdma_dig_call_back(
 	IN		PVOID		pDM_VOID
 	);
 
-VOID 
+VOID
 phydm_TDMA_FalseAlarmCounterCheck(
 	IN		PVOID		pDM_VOID
 	);
@@ -547,7 +547,7 @@ odm_FalseAlarmCounterAcc(
 	bool				high_low_state
 	);
 
-VOID 
+VOID
 odm_FalseAlarmCounterAccReset(
 	IN		PVOID		pDM_VOID,
 	u8				high_low_idx
@@ -555,7 +555,7 @@ odm_FalseAlarmCounterAccReset(
 
 #endif	//#if (PHYDM_TDMA_DIG_SUPPORT == 1)
 
-VOID 
+VOID
 odm_FalseAlarmCounterReset(
 	IN		PVOID		pDM_VOID
 	);
@@ -579,14 +579,14 @@ odm_PauseCCKPacketDetection(
 	IN		u1Byte					CCKPDThreshold
 	);
 
-VOID 
+VOID
 odm_CCKPacketDetectionThresh(
 	IN		PVOID					pDM_VOID
 	);
 
-VOID 
+VOID
 ODM_Write_CCK_CCA_Thres(
-	IN		PVOID					pDM_VOID, 
+	IN		PVOID					pDM_VOID,
 	IN		u1Byte					CurCCK_CCAThres
 	);
 

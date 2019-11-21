@@ -3,14 +3,14 @@ Copyright (c) Realtek Semiconductor Corp. All rights reserved.
 
 Module Name:
 	HalCfg.c
-	
+
 Abstract:
-	Defined Mapping Function for each Driver 
-	    
+	Defined Mapping Function for each Driver
+
 Major Change History:
 	When       Who               What
 	---------- ---------------   -------------------------------
-	2012-04-11 Filen            Create.	
+	2012-04-11 Filen            Create.
 --*/
 
 #include "HalPrecomp.h"
@@ -24,7 +24,7 @@ MappingVariable88XX(
     //PHAL_DATA_TYPE      pHalData = _GET_HAL_DATA(Adapter);
 
     //pHalData->
-    
+
 
 }
 
@@ -40,7 +40,7 @@ MappingTxQueue88XX(
         HCI_TX_DMA_QUEUE_BK,
         HCI_TX_DMA_QUEUE_BE,
         HCI_TX_DMA_QUEUE_VI,
-        HCI_TX_DMA_QUEUE_VO,       
+        HCI_TX_DMA_QUEUE_VO,
         HCI_TX_DMA_QUEUE_HI0,
         HCI_TX_DMA_QUEUE_HI1,
         HCI_TX_DMA_QUEUE_HI2,
@@ -49,12 +49,12 @@ MappingTxQueue88XX(
         HCI_TX_DMA_QUEUE_HI5,
         HCI_TX_DMA_QUEUE_HI6,
         HCI_TX_DMA_QUEUE_HI7,
-        HCI_TX_DMA_QUEUE_CMD,        
+        HCI_TX_DMA_QUEUE_CMD,
         HCI_TX_DMA_QUEUE_BCN};
-      
+
 
     if ( HCI_TX_DMA_QUEUE_MAX_NUM <= TxQNum ) {
-        RT_TRACE_F(COMP_SEND, DBG_WARNING, ("Unknown Queue Mapping\n"));        
+        RT_TRACE_F(COMP_SEND, DBG_WARNING, ("Unknown Queue Mapping\n"));
         return HCI_TX_DMA_QUEUE_BE;
     }
     else {

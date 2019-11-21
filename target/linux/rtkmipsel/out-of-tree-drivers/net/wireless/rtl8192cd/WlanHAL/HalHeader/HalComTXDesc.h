@@ -1,6 +1,6 @@
 #ifndef __HAL_COM_TXDESC_H__
 #define __HAL_COM_TXDESC_H__
-/*-------------------------Modification Log-----------------------------------    
+/*-------------------------Modification Log-----------------------------------
 -------------------------Modification Log-----------------------------------*/
 
 /*--------------------------Include File--------------------------------------*/
@@ -503,7 +503,7 @@
 #define TXDESC_QSEL_TID6        6
 #define TXDESC_QSEL_TID7        7
 #define TXDESC_QSEL_TID8        8
-#define TXDESC_QSEL_TID9        9         
+#define TXDESC_QSEL_TID9        9
 
 #define TXDESC_QSEL_TID10       10
 #define TXDESC_QSEL_TID11       11
@@ -650,7 +650,7 @@
 #define TXDESC_QSEL_TID6        6
 #define TXDESC_QSEL_TID7        7
 #define TXDESC_QSEL_TID8        8
-#define TXDESC_QSEL_TID9        9         
+#define TXDESC_QSEL_TID9        9
 
 #define TXDESC_QSEL_TID10       10
 #define TXDESC_QSEL_TID11       11
@@ -683,7 +683,7 @@
 
 #define TX_DW9_GROUPBIT_IE_ENABLE_MSK   0x1
 #define TX_DW9_GROUPBIT_IE_ENABLE_SH    7
-#endif 
+#endif
 
 #endif  //__HAL_COM_TXDESC_H__
 

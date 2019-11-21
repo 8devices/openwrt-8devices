@@ -20,7 +20,7 @@
 #ifndef	__PHYDMSOML_H__
 #define    __PHYDMSOML_H__
 
-#define ADAPTIVE_SOML_VERSION	"1.0" 
+#define ADAPTIVE_SOML_VERSION	"1.0"
 
 #define ODM_ADAPTIVE_SOML_SUPPORT_IC	(ODM_RTL8822B | ODM_RTL8197F)
 
@@ -60,7 +60,7 @@ struct _ADAPTIVE_SOML_ {
 	u32			num_vht_bytes_on[VHT_RATE_IDX];
 	u32			num_vht_bytes_off[VHT_RATE_IDX];
 	#endif
-	
+
 #if (DM_ODM_SUPPORT_TYPE == ODM_WIN)
 #if USE_WORKITEM
 	RT_WORK_ITEM	phydm_adaptive_soml_workitem;

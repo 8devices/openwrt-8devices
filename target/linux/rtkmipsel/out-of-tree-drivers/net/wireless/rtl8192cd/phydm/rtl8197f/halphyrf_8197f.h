@@ -33,7 +33,7 @@
 #define DPK_THRESHOLD_8197F		7
 
 
-void 
+void
 ConfigureTxpowerTrack_8197F(
 	PTXPWRTRACK_CFG	pConfig
 	);

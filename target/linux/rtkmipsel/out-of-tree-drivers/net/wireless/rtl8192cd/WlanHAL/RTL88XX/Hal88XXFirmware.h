@@ -6,14 +6,14 @@ Copyright (c) Realtek Semiconductor Corp. All rights reserved.
 
 Module Name:
 	Hal88XXFirmware.h
-	
+
 Abstract:
 	Defined HAL 88XX Firmware data structure & Define
-	    
+
 Major Change History:
 	When       Who               What
 	---------- ---------------   -------------------------------
-	2012-04-11 Filen            Create.	
+	2012-04-11 Filen            Create.
 --*/
 
 #define H2C_PACKET_PAYLOAD_MAX_SIZE 32
@@ -27,23 +27,23 @@ Major Change History:
 typedef struct _Ctrl_Info_ {
 	u1Byte	SGI: 1;
 	u1Byte Data_Rate: 7;
-	u1Byte	PKT_DROP: 1;    
-	u1Byte	TRY_RATE: 1;    
-	u1Byte	Rsvd: 1;    
-	u1Byte	DATA_BW: 2;    
+	u1Byte	PKT_DROP: 1;
+	u1Byte	TRY_RATE: 1;
+	u1Byte	Rsvd: 1;
+	u1Byte	DATA_BW: 2;
 	u1Byte	PWRSTS: 3;
-	u1Byte	RTY_PKT_1SS_ANT_INFO_EN: 4;    
-	u1Byte	Rsvd2: 1;    
-	u1Byte	GROUP_TABLE_ID: 3;    
-	u1Byte	RTY_LOW_RATE_EN: 1;    
-	u1Byte	DATA_RTY_LOW_RATE: 7;    
-	u1Byte	RTY_LMT_EN: 1;  
-	u1Byte	RTS_RT_LOW_RATE: 7;    
-	u1Byte	Rsvd3: 1;      
-	u1Byte	PKT_TX_ONE_SEL: 1;  
-	u1Byte	DATA_RT_LMT: 6;    
-	u1Byte	Rsvd4: 8;          
-	u1Byte	Rsvd5: 8;          
+	u1Byte	RTY_PKT_1SS_ANT_INFO_EN: 4;
+	u1Byte	Rsvd2: 1;
+	u1Byte	GROUP_TABLE_ID: 3;
+	u1Byte	RTY_LOW_RATE_EN: 1;
+	u1Byte	DATA_RTY_LOW_RATE: 7;
+	u1Byte	RTY_LMT_EN: 1;
+	u1Byte	RTS_RT_LOW_RATE: 7;
+	u1Byte	Rsvd3: 1;
+	u1Byte	PKT_TX_ONE_SEL: 1;
+	u1Byte	DATA_RT_LMT: 6;
+	u1Byte	Rsvd4: 8;
+	u1Byte	Rsvd5: 8;
 } Ctrl_Info , *PCtrl_Info;
 
 
@@ -58,7 +58,7 @@ typedef enum _RTL88XX_C2H_EVT
 	C2H_88XX_BT_MP = 11,
 #ifdef TXRETRY_CNT
 	C2H_88XX_TX_RETRY = 13, //0x0D
-#endif	
+#endif
 	C2H_88XX_RA_PARA_RPT=14,
 	C2H_88XX_RA_DYNAMIC_TX_PATH_RPT = 15,
 	C2H_88XX_STATISTIC_RPT = 41,
@@ -69,16 +69,16 @@ typedef enum _RTL88XX_C2H_EVT
 typedef enum _RTL88XX_EXTEND_C2H_EVT
 {
 	EXTEND_C2H_88XX_DBG_PRINT = 0,
-	EXTEND_C2H_88XX_CCX_RPT = 0xf,	
+	EXTEND_C2H_88XX_CCX_RPT = 0xf,
 
 }RTL88XX_EXTEND_C2H_EVT;
 
 typedef struct _TXRPT_
 {
     u1Byte RPT_MACID;
-    u2Byte RPT_TXOK;    
-    u2Byte RPT_TXFAIL;        
-    u1Byte RPT_InitialRate;  
+    u2Byte RPT_TXOK;
+    u2Byte RPT_TXFAIL;
+    u1Byte RPT_InitialRate;
 }__attribute__ ((packed)) TXRPT,*PTXRPT ;
 
 
@@ -95,7 +95,7 @@ typedef struct _APREQTXRPT_
 
 struct cmdobj {
 	u4Byte	        parmsize;
-	VOID            (*c2hfuns)(IN HAL_PADAPTER Adapter,u1Byte *pbuf);	
+	VOID            (*c2hfuns)(IN HAL_PADAPTER Adapter,u1Byte *pbuf);
 };
 
 
@@ -117,7 +117,7 @@ struct cmdobj {
 
 
 
-typedef struct _RTL88XX_FW_HDR_ 
+typedef struct _RTL88XX_FW_HDR_
 {
     u2Byte      signature;
     u1Byte       category;
@@ -139,10 +139,10 @@ typedef struct _RTL88XX_FW_HDR_
     u4Byte        rsvd5;
     u4Byte        rsvd6;
     u4Byte        rsvd7;
-    
+
 }RTL88XX_FW_HDR, *PRTL88XX_FW_HDR;
 
-typedef struct _RTL88XX_MIPS_FW_HDR_ 
+typedef struct _RTL88XX_MIPS_FW_HDR_
 {
     //offset0
     u2Byte  signature;
@@ -178,7 +178,7 @@ typedef struct _RTL88XX_MIPS_FW_HDR_
     u2Byte  FW_ATTR_SZ;
     //offset40
     u4Byte  IROM_SZ;
-    u4Byte  EROM_SZ;           
+    u4Byte  EROM_SZ;
     //offset 48
     u4Byte  IRAM_SZ;
     u4Byte  ERAM_SZ;
@@ -188,20 +188,20 @@ typedef struct _RTL88XX_MIPS_FW_HDR_
 }RTL88XX_MIPS_FW_HDR, *PRTL88XX_MIPS_FW_HDR;
 
 // TODO: Filen, check below
-typedef enum _RTL88XX_H2C_CMD 
+typedef enum _RTL88XX_H2C_CMD
 {
 //	H2C_88XX_RSVDPAGE               = 0,
-	H2C_88XX_MSRRPT             	= 0x1,	
+	H2C_88XX_MSRRPT             	= 0x1,
 //	H2C_88XX_KEEP_ALIVE_CTRL    	= 0x3,
 //	H2C_88XX_WO_WLAN            	= 0x5,	// Wake on Wlan.
-//	H2C_88XX_REMOTE_WAKEUP      	= 0x7, 
+//	H2C_88XX_REMOTE_WAKEUP      	= 0x7,
 	H2C_88XX_AP_OFFLOAD         	= 0x8,
 	H2C_88XX_BCN_RSVDPAGE       	= 0x9,
 	H2C_88XX_PROBE_RSVDPAGE     	= 0xa,
 	H2C_88XX_APPS_OFFLOAD_SETTING   = 0xc,
-    H2C_88XX_APPS_OFFLOAD_CTRL      = 0xd,	
-	H2C_88XX_WAKEUP_PIN         	= 0x13,	
-//	H2C_88XX_SETPWRMODE         	= 0x20,		
+    H2C_88XX_APPS_OFFLOAD_CTRL      = 0xd,
+	H2C_88XX_WAKEUP_PIN         	= 0x13,
+//	H2C_88XX_SETPWRMODE         	= 0x20,
 //	H2C_88XX_P2P_PS_MODE        	= 0x24,
 	H2C_88XX_SAP_PS             	= 0x26,
 	H2C_88XX_RA_MASK            	= 0x40,
@@ -212,11 +212,11 @@ typedef enum _RTL88XX_H2C_CMD
 	H2C_88XX_DYNAMIC_TX_PATH	= 0x48,
 	H2C_88XX_FW_TRACE_EN		= 0x49,
 
-#ifdef BT_COEXIST	
+#ifdef BT_COEXIST
 	H2C_88XX_BT_TDMA				= 0x60, /* BT TDMA */
 	H2C_88XX_BT_INFO				= 0x61, /* BT info */
 	H2C_88XX_BT_63					= 0x63,
-#endif	
+#endif
     H2C_88XX_APREQ_STATISTIC_RPT    = 0xB9, //for FW report statistic counter
 	H2C_88XX_NHM					= 0xC1,
 	H2C_88XX_BCN_IGNORE_EDCCA	= 0xC2,
@@ -225,16 +225,16 @@ typedef enum _RTL88XX_H2C_CMD
 }RTL88XX_H2C_CMD;
 
 
-typedef enum _RTL88XX_C2H_CMD 
+typedef enum _RTL88XX_C2H_CMD
 {
 //	C2H_88XX_DBG                = 0,
-//	C2H_88XX_C2H_LB             = 0x1,	
+//	C2H_88XX_C2H_LB             = 0x1,
 //	C2H_88XX_SND_TXBF           = 0x2,
 //	C2H_88XX_CCXRPT             = 0x3,
 	C2H_88XX_APREQTXRPT         = 0x4,
 //	C2H_88XX_INITIALRATE        = 0x5,
 //	C2H_88XX_PSD_RPT            = 0x6,
-//	C2H_88XX_SCAN_COMPLETE      = 0x7, 
+//	C2H_88XX_SCAN_COMPLETE      = 0x7,
 //	C2H_88XX_PSD_CONTROL        = 0x8,
 //	C2H_88XX_BT_INFO            = 0x9,
 //	C2H_88XX_BT_LOOPBACK        = 0xa,
@@ -297,32 +297,32 @@ FillH2CCmd88XX(
 #ifdef CFG_HAL_WLAN_SUPPORT_H2C_PACKET
 VOID
 SetH2CPacketHeader88XX(
-    IN VOID *pDriver_adapter, 
-	OUT u8 *pHal_h2c_hdr, 
+    IN VOID *pDriver_adapter,
+	OUT u8 *pHal_h2c_hdr,
 	IN u8 ack,
 	IN u16 totallength,
 	IN u8 category,
 	IN u8 CMDID,
 	IN u16 sub_CMDID
 );
-u8 
+u8
 SendH2CPacket88XX(
-    IN VOID *pDriver_adapter, 
-    IN u8 *pBuf, 
+    IN VOID *pDriver_adapter,
+    IN u8 *pBuf,
     IN u32 size
 );
 #endif
-u8 
+u8
 ParseC2HPacket88XX(
-    IN VOID *pDriver_adapter, 
-	IN u8 *pbuf, 
+    IN VOID *pDriver_adapter,
+	IN u8 *pbuf,
 	IN u32 c2hsize
 );
 
 
 VOID
 UpdateHalRAMask88XX(
-	IN HAL_PADAPTER         Adapter,	
+	IN HAL_PADAPTER         Adapter,
 	HAL_PSTAINFO            pEntry,
 	u1Byte				    rssi_level
 );
@@ -354,7 +354,7 @@ SetAPOffload88XX(
 	IN HAL_PADAPTER     Adapter,
 	u1Byte              bEn,
 	u1Byte              numOfAP,
-	u1Byte              bHidden,	
+	u1Byte              bHidden,
 	u1Byte              bDenyAny,
 	pu1Byte             loc_bcn,
 	pu1Byte             loc_probe
@@ -363,23 +363,23 @@ SetAPOffload88XX(
 #ifdef AP_PS_Offlaod
 void
 SetAPPSOffload88XX(
-	IN HAL_PADAPTER     Adapter, 
-    u1Byte _PS_offload_En, 
-    u1Byte _phase, 
+	IN HAL_PADAPTER     Adapter,
+    u1Byte _PS_offload_En,
+    u1Byte _phase,
     u1Byte _pause_Qnum_limit,
     u1Byte _timeout_time
 );
 
-void 
+void
 APPSOffloadMacidPauseCtrl88XX(
-    IN HAL_PADAPTER     Adapter,  
+    IN HAL_PADAPTER     Adapter,
     u1Byte macid,
     u1Byte setPause
 );
 #endif
 
 VOID SetSAPPS88XX
-(    
+(
 	IN HAL_PADAPTER     Adapter,
         u1Byte en,
         u1Byte duration
@@ -387,18 +387,18 @@ VOID SetSAPPS88XX
 
 VOID
 SetRsvdPage88XX
-( 
+(
 	IN  IN HAL_PADAPTER     Adapter,
     IN  pu1Byte             prsp,
-    IN  pu4Byte             beaconbuf,    
-    IN  u4Byte              pktLen,  
+    IN  pu4Byte             beaconbuf,
+    IN  u4Byte              pktLen,
     IN  u4Byte              bigPktLen,
     IN  u4Byte              bcnLen
 );
 
 u4Byte
 GetRsvdPageLoc88XX
-( 
+(
 	IN  IN HAL_PADAPTER     Adapter,
     IN  u4Byte              frlen,
     OUT pu1Byte             loc_page
@@ -406,11 +406,11 @@ GetRsvdPageLoc88XX
 
 BOOLEAN
 DownloadRsvdPage88XX
-( 
+(
 	IN HAL_PADAPTER     Adapter,
-    IN  pu4Byte         beaconbuf,    
+    IN  pu4Byte         beaconbuf,
     IN  u4Byte          beaconPktLen,
-    IN  u1Byte          bReDownload    
+    IN  u1Byte          bReDownload
 );
 
 void C2HHandler88XX(
@@ -427,18 +427,18 @@ VOID
 C2HEventHandler88XX
 (
     IN HAL_PADAPTER     Adapter,
-    IN u1Byte			c2hCmdId, 
+    IN u1Byte			c2hCmdId,
     IN u1Byte			c2hCmdLen,
-    IN pu1Byte 			tmpBuf    			
+    IN pu1Byte 			tmpBuf
 );
 
 VOID
 C2HExtEventHandler88XX
 (
     IN HAL_PADAPTER     Adapter,
-    IN u1Byte			c2hCmdId, 
+    IN u1Byte			c2hCmdId,
     IN u1Byte			c2hCmdLen,
-    IN pu1Byte 			tmpBuf    			
+    IN pu1Byte 			tmpBuf
 );
 
 #if (BEAMFORMING_SUPPORT == 1)

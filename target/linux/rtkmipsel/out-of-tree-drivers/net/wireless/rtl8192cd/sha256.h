@@ -30,7 +30,7 @@
  * @mac: Buffer for the hash
  * Returns: 0 on success, -1 on failure
  */
- 
+
 #define WPA_GET_BE16(a) ((u2Byte) (((a)[0] << 8) | (a)[1]))
 #define WPA_PUT_BE16(a, val)			\
 	do {					\
@@ -103,10 +103,8 @@ int sha256_vector(size_t num_elem, const unsigned char *addr[], const size_t *le
 
 int hmac_sha256_vector(const unsigned char *key, size_t key_len, size_t num_elem,
 		      const unsigned char *addr[], const size_t *len, unsigned char *mac);
-#ifndef __ECOS
 int hmac_sha256(const unsigned char *key, size_t key_len, const unsigned char *data,
 		 size_t data_len, unsigned char *mac);
-#endif
 void sha256_prf(const unsigned char *key, size_t key_len, const char *label,
 	      const unsigned char *data, size_t data_len, unsigned char *buf, size_t buf_len);
 

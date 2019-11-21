@@ -47,8 +47,8 @@ typedef struct _HAL_TXBF_INFO {
 	u1Byte				Rate;
 
 	RT_TIMER			Txbf_FwNdpaTimer;
-#if (DM_ODM_SUPPORT_TYPE == ODM_WIN)	
-	RT_WORK_ITEM		Txbf_EnterWorkItem;  
+#if (DM_ODM_SUPPORT_TYPE == ODM_WIN)
+	RT_WORK_ITEM		Txbf_EnterWorkItem;
 	RT_WORK_ITEM		Txbf_LeaveWorkItem;
 	RT_WORK_ITEM		Txbf_FwNdpaWorkItem;
 	RT_WORK_ITEM		Txbf_ClkWorkItem;
@@ -72,7 +72,7 @@ halComTxbf_ConfigGtab(
 	IN PVOID			pDM_VOID
 	);
 
-VOID 
+VOID
 halComTxbf_EnterWorkItemCallback(
 #if (DM_ODM_SUPPORT_TYPE == ODM_WIN)
 	IN	PADAPTER		Adapter
@@ -81,7 +81,7 @@ halComTxbf_EnterWorkItemCallback(
 #endif
 	);
 
-VOID 
+VOID
 halComTxbf_LeaveWorkItemCallback(
 #if (DM_ODM_SUPPORT_TYPE == ODM_WIN)
 	IN	PADAPTER		Adapter
@@ -90,7 +90,7 @@ halComTxbf_LeaveWorkItemCallback(
 #endif
 	);
 
-VOID 
+VOID
 halComTxbf_FwNdpaWorkItemCallback(
 #if (DM_ODM_SUPPORT_TYPE == ODM_WIN)
 	IN	PADAPTER		Adapter
@@ -127,7 +127,7 @@ halComTxbf_GetTxRateWorkItemCallback(
 	);
 
 VOID
-halComTxbf_RateWorkItemCallback(	
+halComTxbf_RateWorkItemCallback(
 #if (DM_ODM_SUPPORT_TYPE == ODM_WIN)
 	IN	PADAPTER		Adapter
 #else
@@ -135,7 +135,7 @@ halComTxbf_RateWorkItemCallback(
 #endif
 	);
 
-VOID 
+VOID
 halComTxbf_FwNdpaTimerCallback(
 	IN	PRT_TIMER		pTimer
 	);
@@ -176,6 +176,6 @@ HalComTxbf_Get(
 #define HalComTxbf_Get(_Adapter, _getType, _pOutBuf)
 
 #endif
-							
-#endif	// #ifndef __HAL_COM_TXBF_H__								
+
+#endif	// #ifndef __HAL_COM_TXBF_H__
 

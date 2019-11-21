@@ -1,19 +1,19 @@
 #ifndef __HAL88XX_PWRSEQCMD_H__
 #define __HAL88XX_PWRSEQCMD_H__
- 
+
  /*++
  Copyright (c) Realtek Semiconductor Corp. All rights reserved.
- 
+
  Module Name:
      Hal88XXPwrSeqCmd.h
-     
+
  Abstract:
      Defined HAL 88XX Power Sequence Command
-         
+
  Major Change History:
      When       Who               What
      ---------- ---------------   -------------------------------
-     2012-04-03 Filen            Create. 
+     2012-04-03 Filen            Create.
  --*/
 
 #if 0
@@ -95,11 +95,11 @@ typedef enum _PWRSEQ_CMD_DELAY_UNIT_
 typedef struct _WL_PWR_CFG_
 {
 	unsigned short 	offset;
-	unsigned char 	cut_msk; 		
-	unsigned char 	fab_msk:4; 		
-	unsigned char 	interface_msk:4; 		
-	unsigned char 	base:4; 	
-	unsigned char 	cmd:4; 	
+	unsigned char 	cut_msk;
+	unsigned char 	fab_msk:4;
+	unsigned char 	interface_msk:4;
+	unsigned char 	base:4;
+	unsigned char 	cmd:4;
 	unsigned char 	msk;
 	unsigned char 	value;
 } WLAN_PWR_CFG, *PWLAN_PWR_CFG;
@@ -121,9 +121,9 @@ typedef struct _WL_PWR_CFG_
 BOOLEAN
 HalPwrSeqCmdParsing88XX(
     IN      HAL_PADAPTER        Adapter,
-    IN      u1Byte              CutVersion, 
-    IN      u1Byte              FabVersion, 
-    IN      u1Byte              InterfaceType, 
+    IN      u1Byte              CutVersion,
+    IN      u1Byte              FabVersion,
+    IN      u1Byte              InterfaceType,
     IN      WLAN_PWR_CFG        PwrSeqCmd[]
 );
 

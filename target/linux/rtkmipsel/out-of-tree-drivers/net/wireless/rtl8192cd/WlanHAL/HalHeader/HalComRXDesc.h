@@ -1,6 +1,6 @@
 #ifndef __HAL_COM_RXDESC_H__
 #define __HAL_COM_RXDESC_H__
-/*-------------------------Modification Log-----------------------------------    
+/*-------------------------Modification Log-----------------------------------
 -------------------------Modification Log-----------------------------------*/
 
 /*--------------------------Include File--------------------------------------*/
@@ -304,7 +304,7 @@
 //Dword 3 SHIFT
 #define RXBD_DW3_PHYADDR_RSVD_SH        0
 
-#endif 
+#endif
 
 
 #endif  //__HAL_COM_RXDESC_H__

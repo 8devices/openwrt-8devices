@@ -3,16 +3,16 @@ Copyright (c) Realtek Semiconductor Corp. All rights reserved.
 
 Module Name:
 	Hal8881APwrSeqCmd.c
-	
+
 Abstract:
-	This file includes all kinds of Power Action event for RTL8881A and 
+	This file includes all kinds of Power Action event for RTL8881A and
 	corresponding hardware configurtions which are released from HW SD.
-	    
+
 Major Change History:
 	When       Who               What
 	---------- ---------------   -------------------------------
 	2012-04-03 Filen            Create.
-	
+
 --*/
 
 #if !defined(__ECOS) && !defined(CPTCFG_CFG80211_MODULE)
@@ -80,7 +80,7 @@ WLAN_PWR_CFG rtl8881A_resume_flow[RTL8881A_TRANS_ACT_TO_CARDEMU_STEPS+RTL8881A_T
 WLAN_PWR_CFG rtl8881A_hwpdn_flow[RTL8881A_TRANS_ACT_TO_CARDEMU_STEPS+RTL8881A_TRANS_CARDEMU_TO_PDN_STEPS+RTL8881A_TRANS_END_STEPS]=
 {
 	RTL8881A_TRANS_ACT_TO_CARDEMU
-	RTL8881A_TRANS_CARDEMU_TO_PDN	
+	RTL8881A_TRANS_CARDEMU_TO_PDN
 	RTL8881A_TRANS_END
 };
 
@@ -88,7 +88,7 @@ WLAN_PWR_CFG rtl8881A_hwpdn_flow[RTL8881A_TRANS_ACT_TO_CARDEMU_STEPS+RTL8881A_TR
 WLAN_PWR_CFG rtl8881A_enter_lps_flow[RTL8881A_TRANS_ACT_TO_LPS_STEPS+RTL8881A_TRANS_END_STEPS]=
 {
 	//FW behavior
-	RTL8881A_TRANS_ACT_TO_LPS	
+	RTL8881A_TRANS_ACT_TO_LPS
 	RTL8881A_TRANS_END
 };
 

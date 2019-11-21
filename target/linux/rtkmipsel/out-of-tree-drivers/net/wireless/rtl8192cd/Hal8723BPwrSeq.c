@@ -4,15 +4,15 @@ Copyright (c) Realtek Semiconductor Corp. All rights reserved.
 
 Module Name:
 	Hal8821PwrSeq.c
-	
+
 Abstract:
 	This file includes all kinds of Power Action event for RTL8723B and corresponding hardware configurtions which are released from HW SD.
-	    
+
 Major Change History:
 	When       Who               What
 	---------- ---------------   -------------------------------
 	2011-08-08 Roger            Create.
-	
+
 --*/
 
 //#include "Mp_Precomp.h"		//CONFIG_RTL_8723B_SUPPORT
@@ -20,7 +20,7 @@ Major Change History:
 #include "HalPwrSeqCmd.h"
 #include "Hal8723BPwrSeq.h"
 
-/* 
+/*
     drivers should parse below arrays and do the corresponding actions
 */
 //3 Power on  Array
@@ -49,7 +49,7 @@ WLAN_PWR_CFG rtl8723B_card_disable_flow[RTL8723B_TRANS_ACT_TO_CARDEMU_STEPS+RTL8
 WLAN_PWR_CFG rtl8723B_card_enable_flow[RTL8723B_TRANS_ACT_TO_CARDEMU_STEPS+RTL8723B_TRANS_CARDEMU_TO_ACT_STEPS+RTL8723B_TRANS_END_STEPS]=
 {
 	RTL8723B_TRANS_CARDDIS_TO_CARDEMU
-	RTL8723B_TRANS_CARDEMU_TO_ACT		
+	RTL8723B_TRANS_CARDEMU_TO_ACT
 	RTL8723B_TRANS_END
 };
 
@@ -75,19 +75,19 @@ WLAN_PWR_CFG rtl8723B_resume_flow[RTL8723B_TRANS_SUS_TO_CARDEMU_STEPS+RTL8723B_T
 WLAN_PWR_CFG rtl8723B_hwpdn_flow[RTL8723B_TRANS_ACT_TO_CARDEMU_STEPS+RTL8723B_TRANS_CARDEMU_TO_PDN_STEPS+RTL8723B_TRANS_END_STEPS]=
 {
 	RTL8723B_TRANS_ACT_TO_CARDEMU
-	RTL8723B_TRANS_CARDEMU_TO_PDN		
+	RTL8723B_TRANS_CARDEMU_TO_PDN
 	RTL8723B_TRANS_END
 };
 
-//3 Enter LPS 
+//3 Enter LPS
 WLAN_PWR_CFG rtl8723B_enter_lps_flow[RTL8723B_TRANS_ACT_TO_LPS_STEPS+RTL8723B_TRANS_END_STEPS]=
 {
 	//FW behavior
-	RTL8723B_TRANS_ACT_TO_LPS	
+	RTL8723B_TRANS_ACT_TO_LPS
 	RTL8723B_TRANS_END
 };
 
-//3 Leave LPS 
+//3 Leave LPS
 WLAN_PWR_CFG rtl8723B_leave_lps_flow[RTL8723B_TRANS_LPS_TO_ACT_STEPS+RTL8723B_TRANS_END_STEPS]=
 {
 	//FW behavior

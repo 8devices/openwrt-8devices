@@ -6,14 +6,14 @@ Copyright (c) Realtek Semiconductor Corp. All rights reserved.
 
 Module Name:
 	Hal8192EDef.h
-	
+
 Abstract:
 	Defined HAL 8192E data structure & Define
-	    
+
 Major Change History:
 	When       Who               What
 	---------- ---------------   -------------------------------
-	2012-04-16 Filen            Create.	
+	2012-04-16 Filen            Create.
 --*/
 
 extern u1Byte *data_AGC_TAB_8192E_start,    *data_AGC_TAB_8192E_end;
@@ -33,7 +33,7 @@ extern u1Byte *data_RadioB_8192E_start,     *data_RadioB_8192E_end;
 //High Power
 
 #if CFG_HAL_HIGH_POWER_EXT_PA
-#ifdef PWR_BY_RATE_92E_HP			
+#ifdef PWR_BY_RATE_92E_HP
 extern u1Byte *data_PHY_REG_PG_8192Emp_hp_start, *data_PHY_REG_PG_8192Emp_hp_end;
 #endif
 #if CFG_HAL_HIGH_POWER_EXT_LNA
@@ -53,7 +53,7 @@ extern u1Byte *data_RadioB_8192E_extpa_start,     *data_RadioB_8192E_extpa_end;
 extern u1Byte *data_AGC_TAB_8192E_extlna_start,    *data_AGC_TAB_8192E_extlna_end;
 extern u1Byte *data_AGC_TAB_8192E_extlna_type1_start,   *data_AGC_TAB_8192E_extlna_type1_end;
 extern u1Byte *data_AGC_TAB_8192E_extlna_type2_start,   *data_AGC_TAB_8192E_extlna_type2_end;
-extern u1Byte *data_AGC_TAB_8192E_extlna_type3_start,   *data_AGC_TAB_8192E_extlna_type3_end;	
+extern u1Byte *data_AGC_TAB_8192E_extlna_type3_start,   *data_AGC_TAB_8192E_extlna_type3_end;
 extern u1Byte *data_PHY_REG_8192E_extlna_start,    *data_PHY_REG_8192E_extlna_end;
 extern u1Byte *data_RadioA_8192E_extlna_start,     *data_RadioA_8192E_extlna_end;
 extern u1Byte *data_RadioB_8192E_extlna_start,     *data_RadioB_8192E_extlna_end;
@@ -74,7 +74,7 @@ extern u1Byte *data_RadioA_8192Eb_start,     *data_RadioA_8192Eb_end;
 extern u1Byte *data_RadioB_8192Eb_start,     *data_RadioB_8192Eb_end;
 #endif
 
-// MP chip 
+// MP chip
 #if IS_EXIST_PCI
 extern u1Byte *data_AGC_TAB_8192Emp_start,    *data_AGC_TAB_8192Emp_end;
 extern u1Byte *data_RadioA_8192Emp_start,     *data_RadioA_8192Emp_end;

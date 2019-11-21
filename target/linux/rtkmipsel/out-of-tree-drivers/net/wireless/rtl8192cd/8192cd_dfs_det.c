@@ -18,10 +18,9 @@
 #include "./8192cd_debug.h"
 
 
-#if defined(DFS) && !defined(CONFIG_RTL_92D_SUPPORT)
 extern u2Byte dB_Invert_Table[8][12];
 
-static u4Byte 
+static u4Byte
 ConvertTo_dB(
 	u4Byte 	Value)
 {
@@ -30,7 +29,7 @@ ConvertTo_dB(
 	u4Byte dB;
 
 	Value = Value & 0xFFFF;
-	
+
 	for (i=0;i<8;i++)
 	{
 		if (Value <= dB_Invert_Table[i][11])
@@ -66,7 +65,7 @@ GetPSDData_8812(
 {
 	int	psd_report;
 	struct rtl8192cd_priv *priv=pDM_Odm->priv;
-	
+
 	//Set DCO frequency index, offset=(40MHz/SamplePts)*point
 	ODM_SetBBReg(pDM_Odm, 0x910, 0x3FF, point);
 
@@ -87,11 +86,11 @@ GetPSDData_8812(
 			psd_report = 8;
 	}
 	else{
-		psd_report = (int)(ConvertTo_dB((u4Byte)psd_report));		
+		psd_report = (int)(ConvertTo_dB((u4Byte)psd_report));
 	}
 
 	return psd_report;
-	
+
 }
 
 
@@ -113,7 +112,7 @@ void Scan_BB_PSD(
 	// set DFS ST_TH to max value
 	ST_TH_origin = RTL_R8(0x91c);
 	RTL_W8(0x91c, 0x4e);
-	
+
 	// Turn off CCK
 	ODM_SetBBReg(pDM_Odm, 0x808, BIT28, 0);   //808[28]
 
@@ -129,7 +128,7 @@ void Scan_BB_PSD(
 	else{
 		ODM_SetBBReg(pDM_Odm, 0x838, BIT3, 0x1); //838[3] 設為1
 	}
-	
+
 	// PHYTXON while loop
 	PHY_SetBBReg(priv, 0x8fc, 0xfff, 0);
 	i = 0;
@@ -160,7 +159,7 @@ void Scan_BB_PSD(
 		SwBWMode(priv, HT_CHANNEL_WIDTH_20, 0);
 		priv->pshare->No_RF_Write = 1;
 	}
-	
+
 	if (priv->pshare->rf_ft_var.dfs_scan_inband) {
 		int PSD_report_inband[20];
 		for (tone_idx=0;tone_idx<len;tone_idx++)
@@ -185,7 +184,7 @@ void Scan_BB_PSD(
 
 	for (tone_idx=0;tone_idx<len;tone_idx++)
 		PSD_report_right[tone_idx] = GetPSDData_8812(pDM_Odm, idx[tone_idx], initial_gain);
-	
+
 	// scan left(lower) neighbor channel
 	if (priv->pshare->CurrentChannelBW == HT_CHANNEL_WIDTH_20)
 		channel = channel_org - 4;
@@ -199,7 +198,7 @@ void Scan_BB_PSD(
 
 	for (tone_idx=0;tone_idx<len;tone_idx++)
 		PSD_report_left[tone_idx] = GetPSDData_8812(pDM_Odm, idx[tone_idx], initial_gain);
-	
+
 
 	// restore originl center frequency
 	if(BW_org != priv->pshare->CurrentChannelBW){
@@ -226,7 +225,7 @@ void Scan_BB_PSD(
 	else{
 		ODM_SetBBReg(pDM_Odm, 0x838, BIT3, 0); //838[3] 設為0
 	}
-	
+
 
 	// Turn on TX
 	// Resume TX Queue
@@ -235,8 +234,8 @@ void Scan_BB_PSD(
 
 	// CCK on
 	if (priv->pmib->dot11RFEntry.phyBandSelect == PHY_BAND_2G)
-	ODM_SetBBReg(pDM_Odm, 0x808, BIT28, 1); //808[28]	
-	
+	ODM_SetBBReg(pDM_Odm, 0x808, BIT28, 1); //808[28]
+
 	// Resume DFS ST_TH
 	RTL_W8(0x91c, ST_TH_origin);
 }
@@ -283,14 +282,11 @@ void rtl8192cd_dfs_det_chk(struct rtl8192cd_priv *priv)
 		mod_timer(&priv->dfs_det_chk_timer, jiffies + RTL_MILISECONDS_TO_JIFFIES(priv->pshare->rf_ft_var.dfs_det_period*10));
 		return;
 	}
-	
+
 	throughput = priv->ext_stats.tx_avarage+priv->ext_stats.rx_avarage;
-#ifdef UNIVERSAL_REPEATER
 	if (GET_VXD_PRIV(priv) && (GET_VXD_PRIV(priv)->drv_state & DRV_STATE_OPEN))
 		throughput += (GET_VXD_PRIV(priv)->ext_stats.tx_avarage + GET_VXD_PRIV(priv)->ext_stats.rx_avarage);
-#endif
 
-#ifdef MBSSID
 	if (priv->pmib->miscEntry.vap_enable) {
 		for (j=0; j<RTL8192CD_NUM_VWLAN; j++) {
 			if (IS_DRV_OPEN(priv->pvap_priv[j])) {
@@ -298,7 +294,6 @@ void rtl8192cd_dfs_det_chk(struct rtl8192cd_priv *priv)
 			}
 		}
 	}
-#endif
 
 	// Get FA count during past 100ms
 	FA_count_cur = PHY_QueryBBReg(priv, 0xf48, 0x0000ffff);
@@ -311,21 +306,21 @@ void rtl8192cd_dfs_det_chk(struct rtl8192cd_priv *priv)
 		FA_count_inc = FA_count_cur;
 	priv->FA_count_pre = FA_count_cur;
 
-	priv->fa_inc_hist[priv->mask_idx] = FA_count_inc;	
-	for (i=0; i<5; i++) {		
-		total_fa_in_hist = total_fa_in_hist + priv->fa_inc_hist[i];		
-		if (priv->fa_inc_hist[i] > max_fa_in_hist)			
-			max_fa_in_hist = priv->fa_inc_hist[i];	
-	}	
-	if (priv->mask_idx >= priv->pshare->rf_ft_var.dfs_det_flag_offset)		
+	priv->fa_inc_hist[priv->mask_idx] = FA_count_inc;
+	for (i=0; i<5; i++) {
+		total_fa_in_hist = total_fa_in_hist + priv->fa_inc_hist[i];
+		if (priv->fa_inc_hist[i] > max_fa_in_hist)
+			max_fa_in_hist = priv->fa_inc_hist[i];
+	}
+	if (priv->mask_idx >= priv->pshare->rf_ft_var.dfs_det_flag_offset)
 		index = priv->mask_idx - priv->pshare->rf_ft_var.dfs_det_flag_offset;
-	else		
-		index = priv->pshare->rf_ft_var.dfs_det_hist_len + priv->mask_idx - priv->pshare->rf_ft_var.dfs_det_flag_offset;	
-	if (index == 0)		
-		pre_post_now_acc_fa_in_hist = priv->fa_inc_hist[index] + priv->fa_inc_hist[index+1] + priv->fa_inc_hist[4];	
-	else if (index == 4)		
-		pre_post_now_acc_fa_in_hist = priv->fa_inc_hist[index] + priv->fa_inc_hist[0] + priv->fa_inc_hist[index-1];	
-	else		
+	else
+		index = priv->pshare->rf_ft_var.dfs_det_hist_len + priv->mask_idx - priv->pshare->rf_ft_var.dfs_det_flag_offset;
+	if (index == 0)
+		pre_post_now_acc_fa_in_hist = priv->fa_inc_hist[index] + priv->fa_inc_hist[index+1] + priv->fa_inc_hist[4];
+	else if (index == 4)
+		pre_post_now_acc_fa_in_hist = priv->fa_inc_hist[index] + priv->fa_inc_hist[0] + priv->fa_inc_hist[index-1];
+	else
 		pre_post_now_acc_fa_in_hist = priv->fa_inc_hist[index] + priv->fa_inc_hist[index+1] + priv->fa_inc_hist[index-1];
 
 	// Get VHT CRC32 ok count during past 100ms
@@ -420,7 +415,7 @@ void rtl8192cd_dfs_det_chk(struct rtl8192cd_priv *priv)
 		RTL_W32(0x924, RTL_R32(0x924) & ~BIT(15));
 		RTL_W32(0x924, RTL_R32(0x924) | BIT(15));
 		// MKK
-		if (priv->pshare->rf_ft_var.manual_dfs_regdomain == 2) {	
+		if (priv->pshare->rf_ft_var.manual_dfs_regdomain == 2) {
 			if ((priv->pmib->dot11RFEntry.dot11channel >= 52) &&
 				(priv->pmib->dot11RFEntry.dot11channel <= 64)) {
 				DFS_tri_long_pulse = 0;
@@ -440,11 +435,11 @@ void rtl8192cd_dfs_det_chk(struct rtl8192cd_priv *priv)
 	if (priv->pshare->rf_ft_var.dfs_det_print3)
 		panic_printk("max_sht_pusle_cnt_th = %d\n", max_sht_pusle_cnt_th);
 
-	if(priv->idle_flag == 1){		
+	if(priv->idle_flag == 1){
 		if(priv->pshare->rf_ft_var.dfs_psd_idle_on == 1){
 			SAVE_INT_AND_CLI(flags);
 			SMP_LOCK(flags);
-			Scan_BB_PSD(ODMPTR, PSD_report_right, PSD_report_left, 20, 0x3e);	
+			Scan_BB_PSD(ODMPTR, PSD_report_right, PSD_report_left, 20, 0x3e);
 			SMP_UNLOCK(flags);
 			RESTORE_INT(flags);
 		}
@@ -453,13 +448,13 @@ void rtl8192cd_dfs_det_chk(struct rtl8192cd_priv *priv)
 				PSD_report_right[i] = 0;
 				PSD_report_left[i] = 0;
 			}
-		}		
+		}
 	}
 	else{
 		if(priv->pshare->rf_ft_var.dfs_psd_TP_on == 1){
 			SAVE_INT_AND_CLI(flags);
 			SMP_LOCK(flags);
-			Scan_BB_PSD(ODMPTR, PSD_report_right, PSD_report_left, 20, 0x3e);	
+			Scan_BB_PSD(ODMPTR, PSD_report_right, PSD_report_left, 20, 0x3e);
 			SMP_UNLOCK(flags);
 			RESTORE_INT(flags);
 		}
@@ -470,7 +465,7 @@ void rtl8192cd_dfs_det_chk(struct rtl8192cd_priv *priv)
 			}
 		}
 	}
-	
+
 	for (i=0; i<20; i++) {
 		PSD_report_right[i] = (-110 + 0x3e) - 39 + PSD_report_right[i];
 		PSD_report_left[i] = (-110 + 0x3e) - 39 + PSD_report_left[i];
@@ -498,19 +493,19 @@ void rtl8192cd_dfs_det_chk(struct rtl8192cd_priv *priv)
 		fa_mask_mid_th = priv->pshare->rf_ft_var.dfs_fa_cnt_mid;
 		fa_mask_lower_th = priv->pshare->rf_ft_var.dfs_fa_cnt_lower;
 	}
-	if (max_fa_in_hist >= fa_mask_mid_th || total_fa_in_hist >= priv->pshare->rf_ft_var.dfs_fa_hist || pre_post_now_acc_fa_in_hist >= fa_mask_mid_th){		
-		/*if (priv->mask_idx >= priv->pshare->rf_ft_var.dfs_det_flag_offset)			
-			index = priv->mask_idx - priv->pshare->rf_ft_var.dfs_det_flag_offset;		
-		else			
-			index = priv->pshare->rf_ft_var.dfs_det_hist_len + priv->mask_idx - priv->pshare->rf_ft_var.dfs_det_flag_offset;	*/	
-		priv->radar_det_mask_hist[index] = 1;		
-		if (priv->pulse_flag_hist[index] == 1){			
-			priv->pulse_flag_hist[index] = 0;			
-			if (priv->pshare->rf_ft_var.dfs_det_print4){				
-				panic_printk("Radar is masked : FA mask case3\n");						
-			}		
-		}				
-		fa_flag = 1;	
+	if (max_fa_in_hist >= fa_mask_mid_th || total_fa_in_hist >= priv->pshare->rf_ft_var.dfs_fa_hist || pre_post_now_acc_fa_in_hist >= fa_mask_mid_th){
+		/*if (priv->mask_idx >= priv->pshare->rf_ft_var.dfs_det_flag_offset)
+			index = priv->mask_idx - priv->pshare->rf_ft_var.dfs_det_flag_offset;
+		else
+			index = priv->pshare->rf_ft_var.dfs_det_hist_len + priv->mask_idx - priv->pshare->rf_ft_var.dfs_det_flag_offset;	*/
+		priv->radar_det_mask_hist[index] = 1;
+		if (priv->pulse_flag_hist[index] == 1){
+			priv->pulse_flag_hist[index] = 0;
+			if (priv->pshare->rf_ft_var.dfs_det_print4){
+				panic_printk("Radar is masked : FA mask case3\n");
+			}
+		}
+		fa_flag = 1;
 	}
 	if (((FA_count_inc >= priv->pshare->rf_ft_var.dfs_dpt_fa_th_upper) && (short_pulse_cnt_inc > max_sht_pusle_cnt_th)) ||
 		(priv->ini_gain_cur >= priv->pshare->rf_ft_var.dpt_ini_gain_th)) {
@@ -521,14 +516,14 @@ void rtl8192cd_dfs_det_chk(struct rtl8192cd_priv *priv)
 		if (priv->pulse_flag_hist[priv->mask_idx] == 1){
 			priv->pulse_flag_hist[priv->mask_idx] = 0;
 			if (priv->pshare->rf_ft_var.dfs_det_print4){
-				panic_printk("Radar is masked : FA mask case1\n");			
+				panic_printk("Radar is masked : FA mask case1\n");
 			}
 		}
 		fa_flag = 1;
 	}
 	else if (((FA_count_inc >= fa_mask_mid_th) ||
 				((FA_count_inc >= fa_mask_lower_th) &&
-					(FA_count_inc >= priv->pshare->rf_ft_var.dfs_fa_cnt_inc_ratio * priv->FA_count_inc_pre))) 
+					(FA_count_inc >= priv->pshare->rf_ft_var.dfs_fa_cnt_inc_ratio * priv->FA_count_inc_pre)))
 		&& (short_pulse_cnt_inc > max_sht_pusle_cnt_th)) {
 		if (priv->pshare->rf_ft_var.dfs_dpt_st_l2h_add)
 			st_L2H_new += 2;
@@ -538,12 +533,12 @@ void rtl8192cd_dfs_det_chk(struct rtl8192cd_priv *priv)
 		if (priv->pulse_flag_hist[priv->mask_idx] == 1){
 			priv->pulse_flag_hist[priv->mask_idx] = 0;
 			if (priv->pshare->rf_ft_var.dfs_det_print4){
-				panic_printk("Radar is masked : FA mask case2\n");			
+				panic_printk("Radar is masked : FA mask case2\n");
 			}
 		}
 		fa_flag = 1;
 	}
-	else 
+	else
 	{
 		if (((FA_CRCOK_ratio > priv->pshare->rf_ft_var.dfs_fa_ratio_th) &&
 				(FA_count_inc >= priv->pshare->rf_ft_var.dfs_fa_cnt_lower) &&
@@ -564,10 +559,10 @@ void rtl8192cd_dfs_det_chk(struct rtl8192cd_priv *priv)
 		panic_printk("pulse_flag_hist: ");
 		for (i=0; i<priv->pshare->rf_ft_var.dfs_det_hist_len; i++)
 			panic_printk("%d ", priv->pulse_flag_hist[i]);
-		panic_printk("fa_inc_hist: ");		
-		for (i=0; i<5; i++)			
-			panic_printk("%d ", priv->fa_inc_hist[i]);		
-		panic_printk("\n");		
+		panic_printk("fa_inc_hist: ");
+		for (i=0; i<5; i++)
+			panic_printk("%d ", priv->fa_inc_hist[i]);
+		panic_printk("\n");
 		panic_printk("max_fa_in_hist: %d pre_post_now_acc_fa_in_hist: %d ",max_fa_in_hist,pre_post_now_acc_fa_in_hist);
 	}
 
@@ -597,7 +592,7 @@ void rtl8192cd_dfs_det_chk(struct rtl8192cd_priv *priv)
 		if(RTL_ABS(avg_1, avg_2) <= 3)
 			right_index_start=2;
 		else
-			right_index_start=11;								
+			right_index_start=11;
 		for (i=right_index_start; i<20; i++) {
 				if ((i != 10) && (max_right < priv->max_hold_right[i]))
 					max_right = priv->max_hold_right[i];
@@ -607,9 +602,9 @@ void rtl8192cd_dfs_det_chk(struct rtl8192cd_priv *priv)
 		avg_2 = (priv->max_hold_left[17]+priv->max_hold_left[18]+priv->max_hold_left[19])/3;
 		max_left = -1000;
 		if (RTL_ABS(avg_1, avg_2) <= 3)
-			left_index_end=20;								
+			left_index_end=20;
 		else
-			left_index_end=8;		
+			left_index_end=8;
 		for (i=0; i<left_index_end; i++) {
 			if ((i != 10) && (max_left < priv->max_hold_left[i]))
 				max_left = priv->max_hold_left[i];
@@ -648,7 +643,7 @@ void rtl8192cd_dfs_det_chk(struct rtl8192cd_priv *priv)
 		index = priv->mask_idx - priv->pshare->rf_ft_var.dfs_det_flag_offset;
 	else
 		index = priv->pshare->rf_ft_var.dfs_det_hist_len + priv->mask_idx - priv->pshare->rf_ft_var.dfs_det_flag_offset;*/
-		
+
 	// use PSD detection result
 	if ((max_right > (0-(int)priv->pshare->rf_ft_var.dfs_psd_pw_th)) || (max_left > (0-(int)priv->pshare->rf_ft_var.dfs_psd_pw_th))) {
 		if (priv->pshare->rf_ft_var.dfs_dpt_st_l2h_add) {
@@ -666,7 +661,7 @@ void rtl8192cd_dfs_det_chk(struct rtl8192cd_priv *priv)
 		if (priv->pulse_flag_hist[index] == 1){
 			priv->pulse_flag_hist[index] = 0;
 			if (priv->pshare->rf_ft_var.dfs_det_print4){
-				panic_printk("Radar is masked : PSD mask\n");			
+				panic_printk("Radar is masked : PSD mask\n");
 			}
 		}
 		priv->radar_det_mask_hist[index] = 1;
@@ -688,7 +683,7 @@ void rtl8192cd_dfs_det_chk(struct rtl8192cd_priv *priv)
 	{
 		//if ((sum <= priv->pshare->rf_ft_var.dfs_det_sum_th) &&
 		//	(fa_flag == 0))
-		if (sum <= priv->pshare->rf_ft_var.dfs_det_sum_th) 
+		if (sum <= priv->pshare->rf_ft_var.dfs_det_sum_th)
 		{
 			priv->pmib->dot11DFSEntry.DFS_detected = 1 ; // DFS detect
 			panic_printk("%s %d %d DFS detected\n", __FUNCTION__, __LINE__,radar_type);
@@ -696,7 +691,7 @@ void rtl8192cd_dfs_det_chk(struct rtl8192cd_priv *priv)
 		else {
 			fault_flag_det = 1;
 			if (priv->pshare->rf_ft_var.dfs_det_print4){
-				panic_printk("Radar is masked : mask_hist large than thd\n");			
+				panic_printk("Radar is masked : mask_hist large than thd\n");
 			}
 		}
 	}
@@ -733,16 +728,16 @@ void rtl8192cd_dfs_det_chk(struct rtl8192cd_priv *priv)
 			else
 				st_L2H_new = priv->pshare->rf_ft_var.dfs_dpt_st_l2h_min;
 		}
-	 }	
+	 }
 	else{
-		
-		
+
+
 		if (priv->pshare->rf_ft_var.dfs_dpt_st_l2h_add)
 			st_L2H_new += 2;
 		if (priv->pshare->rf_ft_var.dfs_det_print3)
 			panic_printk("[7] st_L2H_new %x\n", st_L2H_new);
-		
-		
+
+
 		if (DFS_tri_short_pulse) {
 			//RTL_W32(0x920, RTL_R32(0x920) | (BIT(24) | BIT(28)));
 			//RTL_W32(0x920, RTL_R32(0x920) & ~(BIT(24) | BIT(28)));
@@ -789,7 +784,7 @@ void rtl8192cd_dfs_det_chk(struct rtl8192cd_priv *priv)
 	if (priv->pshare->rf_ft_var.dfs_det_print2) {
 		panic_printk("fault_flag_det[%d], fault_flag_psd[%d], DFS_detected [%d]\n",fault_flag_det, fault_flag_psd, priv->pmib->dot11DFSEntry.DFS_detected );
 	}
-	
+
 	priv->FA_count_inc_pre = FA_count_inc;
 }
 
@@ -798,7 +793,7 @@ void rtl8192cd_dfs_dynamic_setting(struct rtl8192cd_priv *priv)
 {
 	unsigned char peak_th_cur=0, short_pulse_cnt_th_cur=0, long_pulse_cnt_th_cur=0, three_peak_opt_cur=0, three_peak_th2_cur=0;
 	unsigned char peak_window_cur=0, nb2wb_th_cur=0;
-	
+
 	if ((priv->idle_flag == 1)) { // idle (no traffic)
 		peak_th_cur = 3;
 		short_pulse_cnt_th_cur = 6;
@@ -814,7 +809,7 @@ void rtl8192cd_dfs_dynamic_setting(struct rtl8192cd_priv *priv)
 				short_pulse_cnt_th_cur = priv->pshare->rf_ft_var.dfs_pc0_th_idle_w53;
 				long_pulse_cnt_th_cur = 15;
 				nb2wb_th_cur = 3;
-				three_peak_th2_cur = 0;                
+				three_peak_th2_cur = 0;
 			}
 			else {
 				short_pulse_cnt_th_cur = priv->pshare->rf_ft_var.dfs_pc0_th_idle_w56;
@@ -834,12 +829,12 @@ void rtl8192cd_dfs_dynamic_setting(struct rtl8192cd_priv *priv)
 				peak_th_cur = 2;
 				nb2wb_th_cur = 3;
 				three_peak_opt_cur = 1;
-				three_peak_th2_cur = 0;	
+				three_peak_th2_cur = 0;
 				short_pulse_cnt_th_cur = 7;
 			}
 			else{
 				three_peak_opt_cur = 1;
-				three_peak_th2_cur = 0;	
+				three_peak_th2_cur = 0;
 				short_pulse_cnt_th_cur = 7;
 				nb2wb_th_cur = 3;
 			}
@@ -861,7 +856,7 @@ void rtl8192cd_dfs_dynamic_setting(struct rtl8192cd_priv *priv)
 			(priv->pmib->dot11RFEntry.dot11channel <= 64)) {
 				long_pulse_cnt_th_cur = 15;
 				short_pulse_cnt_th_cur = 5; // for high duty cycle
-				three_peak_th2_cur = 0;			
+				three_peak_th2_cur = 0;
 			}
 			else {
 				three_peak_opt_cur = 0;
@@ -881,28 +876,28 @@ void rtl8192cd_dfs_dynamic_setting(struct rtl8192cd_priv *priv)
 		else{
 		}
 	}
-	if((priv->peak_th != peak_th_cur)){		
+	if((priv->peak_th != peak_th_cur)){
 		PHY_SetBBReg(priv, 0x918, 0x00030000, peak_th_cur);
 	}
-	if((priv->short_pulse_cnt_th != short_pulse_cnt_th_cur)){		
+	if((priv->short_pulse_cnt_th != short_pulse_cnt_th_cur)){
 		PHY_SetBBReg(priv, 0x920, 0x000f0000, short_pulse_cnt_th_cur);
 	}
-	if((priv->long_pulse_cnt_th != long_pulse_cnt_th_cur)){		
+	if((priv->long_pulse_cnt_th != long_pulse_cnt_th_cur)){
 		PHY_SetBBReg(priv, 0x920, 0x00f00000, long_pulse_cnt_th_cur);
 	}
-	if((priv->peak_window != peak_window_cur)){		
+	if((priv->peak_window != peak_window_cur)){
 		PHY_SetBBReg(priv, 0x920, 0x00000300, peak_window_cur);
 	}
-	if((priv->nb2wb_th != nb2wb_th_cur)){		
+	if((priv->nb2wb_th != nb2wb_th_cur)){
 		PHY_SetBBReg(priv, 0x920, 0x0000e000, nb2wb_th_cur);
 	}
-	if((priv->three_peak_opt != three_peak_opt_cur)){		
+	if((priv->three_peak_opt != three_peak_opt_cur)){
 		PHY_SetBBReg(priv, 0x924, 0x00000180, three_peak_opt_cur);
 	}
-	if((priv->three_peak_th2 != three_peak_th2_cur)){		
+	if((priv->three_peak_th2 != three_peak_th2_cur)){
 		PHY_SetBBReg(priv, 0x924, 0x00007000, three_peak_th2_cur);
 	}
-	
+
     priv->peak_th = peak_th_cur;
 	priv->short_pulse_cnt_th = short_pulse_cnt_th_cur;
 	priv->long_pulse_cnt_th = long_pulse_cnt_th_cur;
@@ -912,7 +907,6 @@ void rtl8192cd_dfs_dynamic_setting(struct rtl8192cd_priv *priv)
 	priv->three_peak_th2 = three_peak_th2_cur;
 }
 
-#if defined(CONFIG_WLAN_HAL_8814AE) || defined(CONFIG_WLAN_HAL_8822BE)
 void rtl8192cd_radar_type_differentiation(struct rtl8192cd_priv *priv)
 {
 	unsigned char i, need_reset, g_ti_cur[16], g_pw_cur[6], g_pri_cur[6], g_ti_inc[16], g_pw_inc[6], g_pri_inc[6];	// ti = tone index, pw = pulse width, pri = pulse repetition interval
@@ -924,7 +918,7 @@ void rtl8192cd_radar_type_differentiation(struct rtl8192cd_priv *priv)
 	DFS_tri_short_pulse = (regf98_value & BIT(17))? 1 : 0;
 	DFS_tri_long_pulse = (regf98_value & BIT(19))? 1 : 0;
 	short_pulse_th = PHY_QueryBBReg(priv, 0x920, 0x000f0000);
-	
+
 	PHY_SetBBReg(priv, 0x19b8, 0x40, 0);  // switch 0xf5c & 0xf74 to DFS report
 	// read peak index hist report
 	PHY_SetBBReg(priv, 0x19e4, 0x00c00000, 0);  // report selection = 0 (peak index)
@@ -934,105 +928,105 @@ void rtl8192cd_radar_type_differentiation(struct rtl8192cd_priv *priv)
 	else
 		g_ti_inc[0] = g_ti_cur[0];
 	priv->g_ti_pre[0] = g_ti_cur[0];
-	
+
 	g_ti_cur[1] = PHY_QueryBBReg(priv, 0xf74, 0x0f000000);
 	if (g_ti_cur[1] >= priv->g_ti_pre[1])
 		g_ti_inc[1] = g_ti_cur[1] - priv->g_ti_pre[1];
 	else
 		g_ti_inc[1] = g_ti_cur[1];
 	priv->g_ti_pre[1] = g_ti_cur[1];
-	
+
 	g_ti_cur[2] = PHY_QueryBBReg(priv, 0xf74, 0x00f00000);
 	if (g_ti_cur[2] >= priv->g_ti_pre[2])
 		g_ti_inc[2] = g_ti_cur[2] - priv->g_ti_pre[2];
 	else
 		g_ti_inc[2] = g_ti_cur[2];
 	priv->g_ti_pre[2] = g_ti_cur[2];
-	
+
 	g_ti_cur[3] = PHY_QueryBBReg(priv, 0xf74, 0x000f0000);
 	if (g_ti_cur[3] >= priv->g_ti_pre[3])
 		g_ti_inc[3] = g_ti_cur[3] - priv->g_ti_pre[3];
 	else
 		g_ti_inc[3] = g_ti_cur[3];
 	priv->g_ti_pre[3] = g_ti_cur[3];
-	
+
 	g_ti_cur[4] = PHY_QueryBBReg(priv, 0xf74, 0x0000f000);
 	if (g_ti_cur[4] >= priv->g_ti_pre[4])
 		g_ti_inc[4] = g_ti_cur[4] - priv->g_ti_pre[4];
 	else
 		g_ti_inc[4] = g_ti_cur[4];
 	priv->g_ti_pre[4] = g_ti_cur[4];
-	
+
 	g_ti_cur[5] = PHY_QueryBBReg(priv, 0xf74, 0x00000f00);
 	if (g_ti_cur[5] >= priv->g_ti_pre[5])
 		g_ti_inc[5] = g_ti_cur[5] - priv->g_ti_pre[5];
 	else
 		g_ti_inc[5] = g_ti_cur[5];
 	priv->g_ti_pre[5] = g_ti_cur[5];
-	
+
 	g_ti_cur[6] = PHY_QueryBBReg(priv, 0xf74, 0x000000f0);
 	if (g_ti_cur[6] >= priv->g_ti_pre[6])
 		g_ti_inc[6] = g_ti_cur[6] - priv->g_ti_pre[6];
 	else
 		g_ti_inc[6] = g_ti_cur[6];
 	priv->g_ti_pre[6] = g_ti_cur[6];
-	
+
 	g_ti_cur[7] = PHY_QueryBBReg(priv, 0xf74, 0x0000000f);
 	if (g_ti_cur[7] >= priv->g_ti_pre[7])
 		g_ti_inc[7] = g_ti_cur[7] - priv->g_ti_pre[7];
 	else
 		g_ti_inc[7] = g_ti_cur[7];
 	priv->g_ti_pre[7] = g_ti_cur[7];
-	
+
 	g_ti_cur[8] = PHY_QueryBBReg(priv, 0xf5c, 0xf0000000);
 	if (g_ti_cur[8] >= priv->g_ti_pre[8])
 		g_ti_inc[8] = g_ti_cur[8] - priv->g_ti_pre[8];
 	else
 		g_ti_inc[8] = g_ti_cur[8];
 	priv->g_ti_pre[8] = g_ti_cur[8];
-	
+
 	g_ti_cur[9] = PHY_QueryBBReg(priv, 0xf5c, 0x0f000000);
 	if (g_ti_cur[9] >= priv->g_ti_pre[9])
 		g_ti_inc[9] = g_ti_cur[9] - priv->g_ti_pre[9];
 	else
 		g_ti_inc[9] = g_ti_cur[9];
 	priv->g_ti_pre[9] = g_ti_cur[9];
-	
+
 	g_ti_cur[10] = PHY_QueryBBReg(priv, 0xf5c, 0x00f00000);
 	if (g_ti_cur[10] >= priv->g_ti_pre[10])
 		g_ti_inc[10] = g_ti_cur[10] - priv->g_ti_pre[10];
 	else
 		g_ti_inc[10] = g_ti_cur[10];
 	priv->g_ti_pre[10] = g_ti_cur[10];
-	
+
 	g_ti_cur[11] = PHY_QueryBBReg(priv, 0xf5c, 0x000f0000);
 	if (g_ti_cur[11] >= priv->g_ti_pre[0])
 		g_ti_inc[11] = g_ti_cur[11] - priv->g_ti_pre[11];
 	else
 		g_ti_inc[11] = g_ti_cur[11];
 	priv->g_ti_pre[11] = g_ti_cur[11];
-	
+
 	g_ti_cur[12] = PHY_QueryBBReg(priv, 0xf5c, 0x0000f000);
 	if (g_ti_cur[12] >= priv->g_ti_pre[12])
 		g_ti_inc[12] = g_ti_cur[12] - priv->g_ti_pre[12];
 	else
 		g_ti_inc[12] = g_ti_cur[12];
 	priv->g_ti_pre[12] = g_ti_cur[12];
-	
+
 	g_ti_cur[13] = PHY_QueryBBReg(priv, 0xf5c, 0x00000f00);
 	if (g_ti_cur[13] >= priv->g_ti_pre[13])
 		g_ti_inc[13] = g_ti_cur[13] - priv->g_ti_pre[13];
 	else
 		g_ti_inc[13] = g_ti_cur[13];
 	priv->g_ti_pre[13] = g_ti_cur[13];
-	
+
 	g_ti_cur[14] = PHY_QueryBBReg(priv, 0xf5c, 0x000000f0);
 	if (g_ti_cur[14] >= priv->g_ti_pre[14])
 		g_ti_inc[14] = g_ti_cur[14] - priv->g_ti_pre[14];
 	else
 		g_ti_inc[14] = g_ti_cur[14];
 	priv->g_ti_pre[14] = g_ti_cur[14];
-	
+
 	g_ti_cur[15] = PHY_QueryBBReg(priv, 0xf5c, 0x0000000f);
 	if (g_ti_cur[15] >= priv->g_ti_pre[15])
 		g_ti_inc[15] = g_ti_cur[15] - priv->g_ti_pre[15];
@@ -1049,35 +1043,35 @@ void rtl8192cd_radar_type_differentiation(struct rtl8192cd_priv *priv)
 	else
 		g_pw_inc[0] = g_pw_cur[0];
 	priv->g_pw_pre[0] = g_pw_cur[0];
-	
+
 	g_pw_cur[1] = PHY_QueryBBReg(priv, 0xf74, 0x00ff0000);
 	if (g_pw_cur[1] >= priv->g_pw_pre[1])
 		g_pw_inc[1] = g_pw_cur[1] - priv->g_pw_pre[1];
 	else
 		g_pw_inc[1] = g_pw_cur[1];
 	priv->g_pw_pre[1] = g_pw_cur[1];
-	
+
 	g_pw_cur[2] = PHY_QueryBBReg(priv, 0xf74, 0x0000ff00);
 	if (g_pw_cur[2] >= priv->g_pw_pre[2])
 		g_pw_inc[2] = g_pw_cur[2] - priv->g_pw_pre[2];
 	else
 		g_pw_inc[2] = g_pw_cur[2];
 	priv->g_pw_pre[2] = g_pw_cur[2];
-	
+
 	g_pw_cur[3] = PHY_QueryBBReg(priv, 0xf74, 0x000000ff);
 	if (g_pw_cur[3] >= priv->g_pw_pre[3])
 		g_pw_inc[3] = g_pw_cur[3] - priv->g_pw_pre[3];
 	else
 		g_pw_inc[3] = g_pw_cur[3];
 	priv->g_pw_pre[3] = g_pw_cur[3];
-	
+
 	g_pw_cur[4] = PHY_QueryBBReg(priv, 0xf5c, 0xff000000);
 	if (g_pw_cur[4] >= priv->g_pw_pre[4])
 		g_pw_inc[4] = g_pw_cur[4] - priv->g_pw_pre[4];
 	else
 		g_pw_inc[4] = g_pw_cur[4];
 	priv->g_pw_pre[4] = g_pw_cur[4];
-	
+
 	g_pw_cur[5] = PHY_QueryBBReg(priv, 0xf5c, 0x00ff0000);
 	if (g_pw_cur[5] >= priv->g_pw_pre[5])
 		g_pw_inc[5] = g_pw_cur[5] - priv->g_pw_pre[5];
@@ -1107,48 +1101,48 @@ void rtl8192cd_radar_type_differentiation(struct rtl8192cd_priv *priv)
 	else
 		g_pri_inc[0] = g_pri_cur[0];
 	priv->g_pri_pre[0] = g_pri_cur[0];
-	
+
 	g_pri_cur[1] = PHY_QueryBBReg(priv, 0xf74, 0x00ff0000);
 	if (g_pri_cur[1] >= priv->g_pri_pre[1])
 		g_pri_inc[1] = g_pri_cur[1] - priv->g_pri_pre[1];
 	else
 		g_pri_inc[1] = g_pri_cur[1];
 	priv->g_pri_pre[1] = g_pri_cur[1];
-	
+
 	g_pri_cur[2] = PHY_QueryBBReg(priv, 0xf74, 0x0000ff00);
 	if (g_pri_cur[2] >= priv->g_pri_pre[2])
 		g_pri_inc[2] = g_pri_cur[2] - priv->g_pri_pre[2];
 	else
 		g_pri_inc[2] = g_pri_cur[2];
 	priv->g_pri_pre[2] = g_pri_cur[2];
-	
+
 	g_pri_cur[3] = PHY_QueryBBReg(priv, 0xf74, 0x000000ff);
 	if (g_pri_cur[3] >= priv->g_pri_pre[3])
 		g_pri_inc[3] = g_pri_cur[3] - priv->g_pri_pre[3];
 	else
 		g_pri_inc[3] = g_pri_cur[3];
 	 priv->g_pri_pre[3] = g_pri_cur[3];
-	
+
 	g_pri_cur[4] = PHY_QueryBBReg(priv, 0xf5c, 0xff000000);
 	if (g_pri_cur[4] >= priv->g_pri_pre[4])
 		g_pri_inc[4] = g_pri_cur[4] - priv->g_pri_pre[4];
 	else
 		g_pri_inc[4] = g_pri_cur[4];
 	priv->g_pri_pre[4] = g_pri_cur[4];
-	
+
 	g_pri_cur[5] = PHY_QueryBBReg(priv, 0xf5c, 0x00ff0000);
 	if (g_pri_cur[5] >= priv->g_pri_pre[5])
 		g_pri_inc[5] = g_pri_cur[5] - priv->g_pri_pre[5];
 	else
 		g_pri_inc[5] = g_pri_cur[5];
 	priv->g_pri_pre[5] = g_pri_cur[5];
-	
+
 	need_reset = 0;
 	for(i = 0; i < 6; i++){
 		if((priv->g_pw_pre[i]==255) || (priv->g_pri_pre[i] == 255)){
 			need_reset = 1;
-		}			
-	}	
+		}
+	}
 	if(need_reset){
 		PHY_SetBBReg(priv, 0x19b4, 0x10000000, 1);  // reset histogram report
 		PHY_SetBBReg(priv, 0x19b4, 0x10000000, 0);  // continue histogram report
@@ -1158,7 +1152,7 @@ void rtl8192cd_radar_type_differentiation(struct rtl8192cd_priv *priv)
 		}
 		for(i = 0; i < 16; i++){
 			priv->g_ti_pre[i]=0;
-		}		
+		}
 	}
 
 	if(DFS_tri_short_pulse || DFS_tri_long_pulse){
@@ -1166,18 +1160,18 @@ void rtl8192cd_radar_type_differentiation(struct rtl8192cd_priv *priv)
 			panic_printk("peak index hist\n");
 			panic_printk("g0 = %d, g1 = %d, g2 = %d, g3 = %d, g4 = %d, g5 = %d, g6 = %d, g7 = %d\n", g_ti_inc[0], g_ti_inc[1], g_ti_inc[2], g_ti_inc[3], g_ti_inc[4], g_ti_inc[5], g_ti_inc[6], g_ti_inc[7]);
 			panic_printk("g8 = %d, g9 = %d, g10 = %d, g11 = %d, g12 = %d, g13 = %d, g14 = %d, g15 = %d\n", g_ti_inc[8], g_ti_inc[9], g_ti_inc[10], g_ti_inc[11], g_ti_inc[12], g_ti_inc[13], g_ti_inc[14], g_ti_inc[15]);
-			panic_printk("pulse width hist\n");		
+			panic_printk("pulse width hist\n");
 			panic_printk("g0 = %d, g1 = %d, g2 = %d, g3 = %d, g4 = %d, g5 = %d\n",g_pw_inc[0], g_pw_inc[1], g_pw_inc[2], g_pw_inc[3], g_pw_inc[4], g_pw_inc[5]);
 			panic_printk("g0_ratio = %d, g1_ratio = %d, g2_ratio = %d, g3_ratio = %d, g4_ratio = %d, g5_ratio = %d\n", g0_ratio, g1_ratio, g2_ratio, g3_ratio, g4_ratio, g5_ratio);
 			panic_printk("pulse repetition interval hist\n");
 			panic_printk("g0 = %d, g1 = %d, g2 = %d, g3 = %d, g4 = %d, g5 = %d\n",g_pri_inc[0], g_pri_inc[1], g_pri_inc[2], g_pri_inc[3], g_pri_inc[4], g_pri_inc[5]);
 		}
-		
+
 		// MKK
 		if(priv->pshare->rf_ft_var.manual_dfs_regdomain == 2) {
 			if((priv->pmib->dot11RFEntry.dot11channel >= 52) && (priv->pmib->dot11RFEntry.dot11channel <= 64)){
 				// classify radar by pulse width hist
-				if(g_pw_inc[1] >= short_pulse_th + 1){ 
+				if(g_pw_inc[1] >= short_pulse_th + 1){
 					if(priv->pshare->rf_ft_var.dfs_radar_diff_print){
 						panic_printk("MKK w53 radar type1 is detected!\n");
 					}
@@ -1272,11 +1266,9 @@ void rtl8192cd_radar_type_differentiation(struct rtl8192cd_priv *priv)
 			}
 		}
 		else{
-		} 
-	}	
-	
-}
-#endif //#if defined(CONFIG_WLAN_HAL_8814AE)
+		}
+	}
 
-#endif
+}
+
 

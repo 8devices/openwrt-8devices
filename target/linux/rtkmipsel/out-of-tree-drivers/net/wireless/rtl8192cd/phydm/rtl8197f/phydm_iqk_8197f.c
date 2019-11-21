@@ -32,7 +32,7 @@
 void DoIQK_8197F(
 	PVOID		pDM_VOID,
 	u1Byte		DeltaThermalIndex,
-	u1Byte		ThermalValue,	
+	u1Byte		ThermalValue,
 	u1Byte		Threshold
 	)
 {
@@ -41,19 +41,19 @@ void DoIQK_8197F(
 	PADAPTER	Adapter = pDM_Odm->Adapter;
 	HAL_DATA_TYPE	*pHalData = GET_HAL_DATA(Adapter);
 
-	ODM_ResetIQKResult(pDM_Odm);		
+	ODM_ResetIQKResult(pDM_Odm);
 
 	pDM_Odm->RFCalibrateInfo.ThermalValue_IQK = ThermalValue;
-	
+
 	PHY_IQCalibrate_8197F(pDM_Odm, FALSE);
-	
+
 }
 #else
 /*Originally pConfig->DoIQK is hooked PHY_IQCalibrate_8197F, but DoIQK_8197F and PHY_IQCalibrate_8197F have different arguments*/
 void DoIQK_8197F(
 	PVOID		pDM_VOID,
 	u1Byte		DeltaThermalIndex,
-	u1Byte		ThermalValue,	
+	u1Byte		ThermalValue,
 	u1Byte		Threshold
 	)
 {
@@ -78,7 +78,7 @@ do_dpk_8197f(
 #endif
 	BOOLEAN		is2T,
 	u1Byte		k
-	
+
 )
 {
 	PDM_ODM_T		pDM_Odm	= (PDM_ODM_T)pDM_VOID;
@@ -95,7 +95,7 @@ do_dpk_8197f(
 
 	u1Byte			i = 0;
 	u4Byte			tmp_rf_a_18, tmp_rf_b_18;
-	
+
 	tmp_rf_a_18 = ODM_GetRFReg(pDM_Odm, ODM_RF_PATH_A, 0x18, 0x00fff);
 	tmp_rf_b_18 = ODM_GetRFReg(pDM_Odm, ODM_RF_PATH_B, 0x18, 0x00fff);
 
@@ -107,31 +107,31 @@ do_dpk_8197f(
 			ODM_SetRFReg(pDM_Odm, ODM_RF_PATH_B, 0x18, 0x00fff, 0xc01);
 			ODM_RT_TRACE(pDM_Odm, ODM_COMP_CALIBRATION, ODM_DBG_LOUD, ("[DPK] switch to 20M-CH3!!!!\n"));
 			break;
-	
+
 		case 1: /*channel 7*/
 			ODM_SetRFReg(pDM_Odm, ODM_RF_PATH_A, 0x18, 0x00fff, 0xc07);
 			ODM_SetRFReg(pDM_Odm, ODM_RF_PATH_B, 0x18, 0x00fff, 0xc07);
 			ODM_RT_TRACE(pDM_Odm, ODM_COMP_CALIBRATION, ODM_DBG_LOUD, ("[DPK] switch to 20M-CH7!!!!\n"));
 			break;
-	
+
 		case 2: /*channel 11*/
 			ODM_SetRFReg(pDM_Odm, ODM_RF_PATH_A, 0x18, 0x00fff, 0xc0b);
 			ODM_SetRFReg(pDM_Odm, ODM_RF_PATH_B, 0x18, 0x00fff, 0xc0b);
 			ODM_RT_TRACE(pDM_Odm, ODM_COMP_CALIBRATION, ODM_DBG_LOUD, ("[DPK] switch to 20M-CH11!!!!\n"));
 			break;
 	}
-#endif	
-	ODM_RT_TRACE(pDM_Odm, ODM_COMP_CALIBRATION, ODM_DBG_LOUD, ("[DPK] 0x18@ path_A = 0x%x, path_B = 0x%x\n", 
+#endif
+	ODM_RT_TRACE(pDM_Odm, ODM_COMP_CALIBRATION, ODM_DBG_LOUD, ("[DPK] 0x18@ path_A = 0x%x, path_B = 0x%x\n",
 	ODM_GetRFReg(pDM_Odm, ODM_RF_PATH_A, 0x18, bRFRegOffsetMask), ODM_GetRFReg(pDM_Odm, ODM_RF_PATH_B, 0x18, bRFRegOffsetMask)));
 
 	for (i = 0; i < 6; i++)
 	{
 		//printk("[DPK] Retry DPK i=%d\n", i);
-		ODM_RT_TRACE(pDM_Odm, ODM_COMP_CALIBRATION, ODM_DBG_LOUD, ("[DPK] Retry DPK i=%d\n", i)); 
+		ODM_RT_TRACE(pDM_Odm, ODM_COMP_CALIBRATION, ODM_DBG_LOUD, ("[DPK] Retry DPK i=%d\n", i));
 		if (phy_dpcalibrate_8197f(pDM_Odm, TRUE, k) == 1)
 			break;
 	}
-	
+
 	ODM_SetRFReg(pDM_Odm, ODM_RF_PATH_A, 0x18, 0x00fff, tmp_rf_a_18);
 	ODM_SetRFReg(pDM_Odm, ODM_RF_PATH_B, 0x18, 0x00fff, tmp_rf_b_18);
 
@@ -164,7 +164,7 @@ phy_dpk_track_8197f(
 	#endif
 	#endif
 
-	prtl8192cd_priv		priv = pDM_Odm->priv;	
+	prtl8192cd_priv		priv = pDM_Odm->priv;
 	s1Byte		pwsf_a, pwsf_b;
 	u1Byte		offset, delta_DPK, is_increase, ThermalValue = 0, ThermalValue_DPK_AVG_count = 0, i = 0, k = 0;
 	u4Byte		ThermalValue_DPK_AVG = 0;
@@ -184,10 +184,10 @@ phy_dpk_track_8197f(
 	ODM_SetRFReg(pDM_Odm, RF_PATH_A, RF_T_METER_8197F, BIT17 | BIT16, 0x3);		/*thermal meter trigger*/
 	ODM_delay_ms(1);
 	ThermalValue = (u1Byte)ODM_GetRFReg(pDM_Odm, RF_PATH_A, RF_T_METER_8197F, 0xfc00);		/*get thermal meter*/
-	
+
 	pDM_Odm->RFCalibrateInfo.ThermalValue_DPK_AVG[pDM_Odm->RFCalibrateInfo.ThermalValue_DPK_AVG_index] = ThermalValue;
 	pDM_Odm->RFCalibrateInfo.ThermalValue_DPK_AVG_index++;
-	
+
 	if (pDM_Odm->RFCalibrateInfo.ThermalValue_DPK_AVG_index == Thermal_DPK_AVG_num)   /*Average times */
 		pDM_Odm->RFCalibrateInfo.ThermalValue_DPK_AVG_index = 0;
 
@@ -202,11 +202,11 @@ phy_dpk_track_8197f(
 		ODM_RT_TRACE(pDM_Odm, ODM_COMP_CALIBRATION, ODM_DBG_LOUD,
 			("[DPK_track] ThermalValue_DPK_AVG=0x%x(%d)  ThermalValue_DPK_AVG_count = %d\n"
 			, ThermalValue_DPK_AVG, ThermalValue_DPK_AVG, ThermalValue_DPK_AVG_count));
-		
+
 		ThermalValue = (u1Byte)(ThermalValue_DPK_AVG / ThermalValue_DPK_AVG_count);
 
 		ODM_RT_TRACE(pDM_Odm, ODM_COMP_CALIBRATION, ODM_DBG_LOUD,
-			("[DPK_track] AVG Thermal Meter = 0x%X(%d), PG Thermal Meter = 0x%X(%d)\n", 
+			("[DPK_track] AVG Thermal Meter = 0x%X(%d), PG Thermal Meter = 0x%X(%d)\n",
 			ThermalValue, ThermalValue, priv->pmib->dot11RFEntry.ther, priv->pmib->dot11RFEntry.ther));
 	}
 
@@ -230,22 +230,22 @@ phy_dpk_track_8197f(
 
 	if ((pwsf_b>>4) != 0)
 	pwsf_b = (pwsf_b | 0xe0);
-	
+
 	if (is_increase) {
-		
+
 		pwsf_a = pwsf_a + offset;
 		pwsf_b = pwsf_b + offset;
-			
+
 	} else {
 
 		pwsf_a = pwsf_a - offset;
 		pwsf_b = pwsf_b - offset;
-		
-	}		
+
+	}
 
 	ODM_SetBBReg(pDM_Odm, 0xb68, 0x00007C00, pwsf_a);
 	ODM_SetBBReg(pDM_Odm, 0xb6c, 0x00007C00, pwsf_b);
-	ODM_RT_TRACE(pDM_Odm, ODM_COMP_CALIBRATION, ODM_DBG_LOUD, ("[DPK track] pwsf_a after tracking is %d (0x%x), 0xb68 = 0x%x\n", pwsf_a, (pwsf_a & 0x1f), ODM_GetBBReg(pDM_Odm, 0xb68, bMaskDWord)));	
+	ODM_RT_TRACE(pDM_Odm, ODM_COMP_CALIBRATION, ODM_DBG_LOUD, ("[DPK track] pwsf_a after tracking is %d (0x%x), 0xb68 = 0x%x\n", pwsf_a, (pwsf_a & 0x1f), ODM_GetBBReg(pDM_Odm, 0xb68, bMaskDWord)));
 	ODM_RT_TRACE(pDM_Odm, ODM_COMP_CALIBRATION, ODM_DBG_LOUD, ("[DPK track] pwsf_b after tracking is %d (0x%x), 0xb6c = 0x%x\n", pwsf_b, (pwsf_b & 0x1f), ODM_GetBBReg(pDM_Odm, 0xb6c, bMaskDWord)));
 
 }
@@ -284,7 +284,7 @@ phy_dpkoff_8197f(
 	ODM_Write1Byte(pDM_Odm, 0xb9b, 0x80);
 	ODM_Write1Byte(pDM_Odm, 0xb9b, 0x00);
 	ODM_delay_ms(10);
-	
+
 }
 
 VOID
@@ -331,7 +331,7 @@ phy_dpkon_8197f(
 
 	ODM_Write1Byte(pDM_Odm, 0xb77, 0x77);
 	ODM_SetBBReg(pDM_Odm, 0xb78, bMaskDWord, 0x4c104c10);  /*1.5dB*/
-	
+
 }
 
 
@@ -366,8 +366,8 @@ phy_PathA_IQK_8197F(
 
 	if (pDM_Odm->ExtPA) {
 		ODM_SetRFReg(pDM_Odm, ODM_RF_PATH_A, 0xdf, 0x00800, 0x1);
-		ODM_SetRFReg(pDM_Odm, ODM_RF_PATH_A, 0x56, 0x003ff, 0x71);	
-	} else if (pDM_Odm->ExtPA == 0 && pDM_Odm->CutVersion != ODM_CUT_A) {	
+		ODM_SetRFReg(pDM_Odm, ODM_RF_PATH_A, 0x56, 0x003ff, 0x71);
+	} else if (pDM_Odm->ExtPA == 0 && pDM_Odm->CutVersion != ODM_CUT_A) {
 		ODM_SetRFReg(pDM_Odm, ODM_RF_PATH_A, 0xdf, 0x00800, 0x1);
 		ODM_SetRFReg(pDM_Odm, ODM_RF_PATH_A, 0x56, 0x003ff, 0xe8);
 	}
@@ -385,14 +385,14 @@ phy_PathA_IQK_8197F(
 	ODM_SetBBReg(pDM_Odm, rTx_IQK_Tone_B, bMaskDWord, 0x38008c0c);
 	ODM_SetBBReg(pDM_Odm, rRx_IQK_Tone_B, bMaskDWord, 0x38008c0c);
 
-	if (pDM_Odm->CutVersion == ODM_CUT_A) { 
+	if (pDM_Odm->CutVersion == ODM_CUT_A) {
 		if (pDM_Odm->ExtPA)
 			ODM_SetBBReg(pDM_Odm, rTx_IQK_PI_A, bMaskDWord, 0x8214400f);
 		else
 			ODM_SetBBReg(pDM_Odm, rTx_IQK_PI_A, bMaskDWord, 0x82140002);
 	} else
 		ODM_SetBBReg(pDM_Odm, rTx_IQK_PI_A, bMaskDWord, 0x8214000f);
-	
+
 	ODM_SetBBReg(pDM_Odm, rRx_IQK_PI_A, bMaskDWord, 0x28140000);
 
 	/*ODM_RT_TRACE(pDM_Odm,ODM_COMP_CALIBRATION, ODM_DBG_LOUD, ("[IQK] LO calibration setting!\n"));*/
@@ -426,7 +426,7 @@ phy_PathA_IQK_8197F(
 		(((regE9C & 0x03FF0000) >> 16) != 0x42))
 		result |= 0x01;
 	else
-		ODM_RT_TRACE(pDM_Odm, ODM_COMP_CALIBRATION, ODM_DBG_LOUD, ("[IQK] path A TXIQK is not success\n"));	
+		ODM_RT_TRACE(pDM_Odm, ODM_COMP_CALIBRATION, ODM_DBG_LOUD, ("[IQK] path A TXIQK is not success\n"));
 	return result;
 
 }
@@ -466,7 +466,7 @@ phy_PathA_RxIQK_97F(
 
 	if (pDM_Odm->CutVersion == ODM_CUT_A) {
 		RXPGA = ODM_GetRFReg(pDM_Odm, ODM_RF_PATH_A, 0x8f, bRFRegOffsetMask);
-		
+
 		if (pDM_Odm->ExtPA)
 			ODM_SetRFReg(pDM_Odm, ODM_RF_PATH_A, 0x8f, bRFRegOffsetMask, 0xa8000);
 		else
@@ -521,7 +521,7 @@ phy_PathA_RxIQK_97F(
 
 
 	return result;
-	
+
 	}
 
 	u4tmp = 0x80007C00 | (regE94 & 0x3FF0000)  | ((regE9C & 0x3FF0000) >> 16);
@@ -537,11 +537,11 @@ phy_PathA_RxIQK_97F(
 	ODM_SetBBReg(pDM_Odm, rFPGA0_IQK, 0xffffff00, 0x000000);
 
 
-	/*PA/PAD control by 0x56, and set = 0x0*/	
+	/*PA/PAD control by 0x56, and set = 0x0*/
 	if (pDM_Odm->CutVersion == ODM_CUT_A) {
-		
+
 		RXPGA = ODM_GetRFReg(pDM_Odm, ODM_RF_PATH_A, 0x8f, bRFRegOffsetMask);
-		
+
 		if (pDM_Odm->ExtPA) {
 			ODM_SetRFReg(pDM_Odm, ODM_RF_PATH_A, 0xdf, 0x00800, 0x1);
 			ODM_SetRFReg(pDM_Odm, ODM_RF_PATH_A, 0x56, 0x003e0, 0x3);
@@ -567,7 +567,7 @@ phy_PathA_RxIQK_97F(
 	ODM_SetBBReg(pDM_Odm, rTx_IQK_Tone_B, bMaskDWord, 0x38008c0c);
 	ODM_SetBBReg(pDM_Odm, rRx_IQK_Tone_B, bMaskDWord, 0x38008c0c);
 	ODM_SetBBReg(pDM_Odm, rTx_IQK_PI_A, bMaskDWord, 0x82170000);
-	
+
 	if (pDM_Odm->ExtPA == 1 && pDM_Odm->CutVersion == ODM_CUT_A)
 		ODM_SetBBReg(pDM_Odm, rRx_IQK_PI_A, bMaskDWord, 0x28170c00);
 	else
@@ -646,8 +646,8 @@ phy_PathB_IQK_8197F(
 
 	if (pDM_Odm->ExtPA) {
 		ODM_SetRFReg(pDM_Odm, ODM_RF_PATH_B, 0xdf, 0x00800, 0x1);
-		ODM_SetRFReg(pDM_Odm, ODM_RF_PATH_B, 0x56, 0x003ff, 0x71);	
-	} else if (pDM_Odm->ExtPA == 0 && pDM_Odm->CutVersion != ODM_CUT_A) {	
+		ODM_SetRFReg(pDM_Odm, ODM_RF_PATH_B, 0x56, 0x003ff, 0x71);
+	} else if (pDM_Odm->ExtPA == 0 && pDM_Odm->CutVersion != ODM_CUT_A) {
 		ODM_SetRFReg(pDM_Odm, ODM_RF_PATH_B, 0xdf, 0x00800, 0x1);
 		ODM_SetRFReg(pDM_Odm, ODM_RF_PATH_B, 0x56, 0x003ff, 0xe8);
 	}
@@ -662,7 +662,7 @@ phy_PathB_IQK_8197F(
 	ODM_SetBBReg(pDM_Odm, rTx_IQK_Tone_B, bMaskDWord, 0x18008c0c);
 	ODM_SetBBReg(pDM_Odm, rRx_IQK_Tone_B, bMaskDWord, 0x38008c0c);
 
-	if (pDM_Odm->CutVersion == ODM_CUT_A) { 
+	if (pDM_Odm->CutVersion == ODM_CUT_A) {
 		if (pDM_Odm->ExtPA)
 			ODM_SetBBReg(pDM_Odm, rTx_IQK_PI_B, bMaskDWord, 0x8214400f);
 		else
@@ -704,7 +704,7 @@ phy_PathB_IQK_8197F(
 		(((regEB4 & 0x03FF0000) >> 16) != 0x142) &&
 		(((regEBC & 0x03FF0000) >> 16) != 0x42))
 		result |= 0x01;
-	else 
+	else
 		ODM_RT_TRACE(pDM_Odm, ODM_COMP_CALIBRATION, ODM_DBG_LOUD, ("[IQK] Path B TXIQK is not success\n"));
 	return result;
 
@@ -743,19 +743,19 @@ phy_PathB_RxIQK_97F(
 	/*ODM_RT_TRACE(pDM_Odm,ODM_COMP_CALIBRATION, ODM_DBG_LOUD, ("[IQK] Path B RXIQK modify RXIQK mode table!\n"));*/
 	ODM_SetBBReg(pDM_Odm, rFPGA0_IQK, 0xffffff00, 0x000000);
 
-	
+
 	if (pDM_Odm->CutVersion == ODM_CUT_A) {
 		RXPGA = ODM_GetRFReg(pDM_Odm, ODM_RF_PATH_B, 0x8f, bRFRegOffsetMask);
-		
+
 		if (pDM_Odm->ExtPA)
 			ODM_SetRFReg(pDM_Odm, ODM_RF_PATH_B, 0x8f, bRFRegOffsetMask, 0xa8000);
 		else
 			ODM_SetRFReg(pDM_Odm, ODM_RF_PATH_B, 0x8f, bRFRegOffsetMask, 0xae000);
-	}	
+	}
 
 	/*path A to SI mode to avoid RF go to shot-down mode*/
 	ODM_SetBBReg(pDM_Odm, 0x820, BIT8, 0x0);
-	
+
 	ODM_SetBBReg(pDM_Odm, rFPGA0_IQK, 0xffffff00, 0x808000);
 
 	/*path-B IQK setting*/
@@ -793,7 +793,7 @@ phy_PathB_RxIQK_97F(
 	ODM_SetBBReg(pDM_Odm, rFPGA0_IQK, 0xffffff00, 0x000000);
 	ODM_SetRFReg(pDM_Odm, ODM_RF_PATH_B, 0x8f, bRFRegOffsetMask, RXPGA);
 	}
-	
+
 	/*Path A back to PI mode*/
 	ODM_SetBBReg(pDM_Odm, 0x820, BIT8, 0x1);
 
@@ -805,7 +805,7 @@ phy_PathB_RxIQK_97F(
 	else {						/*if Tx not OK, ignore Rx*/
 		ODM_RT_TRACE(pDM_Odm, ODM_COMP_CALIBRATION, ODM_DBG_LOUD, ("[IQK] Path B RXIQK step1 is not success\n"));
 		return result;
-		
+
 	}
 
 	u4tmp = 0x80007C00 | (regEB4 & 0x3FF0000)  | ((regEBC & 0x3FF0000) >> 16);
@@ -821,11 +821,11 @@ phy_PathB_RxIQK_97F(
 	ODM_SetBBReg(pDM_Odm, rFPGA0_IQK, 0xffffff00, 0x000000);
 
 
-	/*PA/PAD control by 0x56, and set = 0x0*/	
+	/*PA/PAD control by 0x56, and set = 0x0*/
 	if (pDM_Odm->CutVersion == ODM_CUT_A) {
-		
+
 		RXPGA = ODM_GetRFReg(pDM_Odm, ODM_RF_PATH_B, 0x8f, bRFRegOffsetMask);
-		
+
 		if (pDM_Odm->ExtPA) {
 			ODM_SetRFReg(pDM_Odm, ODM_RF_PATH_B, 0xdf, 0x00800, 0x1);
 			ODM_SetRFReg(pDM_Odm, ODM_RF_PATH_B, 0x56, 0x003e0, 0x3);
@@ -888,7 +888,7 @@ phy_PathB_RxIQK_97F(
 	ODM_SetBBReg(pDM_Odm, rFPGA0_IQK, 0xffffff00, 0x000000);
 	ODM_SetRFReg(pDM_Odm, ODM_RF_PATH_B, 0xdf, 0x00800, 0x0);
 	if (pDM_Odm->CutVersion == ODM_CUT_A)
-		ODM_SetRFReg(pDM_Odm, ODM_RF_PATH_B, 0x8f, bRFRegOffsetMask, RXPGA);	
+		ODM_SetRFReg(pDM_Odm, ODM_RF_PATH_B, 0x8f, bRFRegOffsetMask, RXPGA);
 
 	/*Path A back to PI mode*/
 	ODM_SetBBReg(pDM_Odm, 0x820, BIT8, 0x1);
@@ -936,7 +936,7 @@ _PHY_PathAFillIQKMatrix_97F(
 		return;
 
 	else if (bIQKOK) {
-#if 0		
+#if 0
 		Oldval_0 = (ODM_GetBBReg(pDM_Odm, rOFDM0_XATxIQImbalance, bMaskDWord) >> 22) & 0x3FF;
 
 		X = result[final_candidate][0];
@@ -961,22 +961,22 @@ _PHY_PathAFillIQKMatrix_97F(
 		ODM_SetBBReg(pDM_Odm, rOFDM0_ECCAThreshold, BIT(29), ((Y * Oldval_0 >> 7) & 0x1));
 #endif
 				Oldval_0 = (ODM_GetBBReg(pDM_Odm, rOFDM0_XATxIQImbalance, bMaskDWord) >> 22) & 0x3FF;
-		
+
 				ODM_SetBBReg(pDM_Odm, rOFDM0_XATxIQImbalance, 0x3FF, Oldval_0);
-				
+
 				X = result[final_candidate][0];
 				if ((X & 0x00000200) != 0)
 					X = X | 0xFFFFFC00;
-				
+
 				TX0_A = (X * 0x100) >> 8;
 				ODM_RT_TRACE(pDM_Odm, ODM_COMP_CALIBRATION, ODM_DBG_LOUD, ("[IQK] X = 0x%x, TX0_A = 0x%x\n", X, TX0_A));
-		
+
 				ODM_SetBBReg(pDM_Odm, 0xe30, 0x3FF00000, TX0_A);
-		
+
 				Y = result[final_candidate][1];
 				if ((Y & 0x00000200) != 0)
 					Y = Y | 0xFFFFFC00;
-		
+
 				TX0_C = (Y * 0x100) >> 8;
 				ODM_RT_TRACE(pDM_Odm, ODM_COMP_CALIBRATION, ODM_DBG_LOUD, ("[IQK] Y = 0x%x, TX0_C = 0x%x\n", Y, TX0_C));
 				ODM_SetBBReg(pDM_Odm, 0xe20, 0x000003C0, ((TX0_C & 0x3C0) >> 6));
@@ -1035,7 +1035,7 @@ _PHY_PathBFillIQKMatrix_97F(
 
 	else if (bIQKOK) {
 
-#if 0		
+#if 0
 		Oldval_1 = (ODM_GetBBReg(pDM_Odm, rOFDM0_XBTxIQImbalance, bMaskDWord) >> 22) & 0x3FF;
 
 		X = result[final_candidate][4];
@@ -1060,22 +1060,22 @@ _PHY_PathBFillIQKMatrix_97F(
 
 #endif
 				Oldval_1 = (ODM_GetBBReg(pDM_Odm, rOFDM0_XBTxIQImbalance, bMaskDWord) >> 22) & 0x3FF;
-		
+
 				ODM_SetBBReg(pDM_Odm, rOFDM0_XBTxIQImbalance, 0x3FF, Oldval_1);
-		
+
 				X = result[final_candidate][4];
 				if ((X & 0x00000200) != 0)
 					X = X | 0xFFFFFC00;
-				
+
 				TX1_A = (X * 0x100) >> 8;
 				ODM_RT_TRACE(pDM_Odm, ODM_COMP_CALIBRATION, ODM_DBG_LOUD, ("[IQK] X = 0x%x, TX1_A = 0x%x\n", X, TX1_A));
-		
+
 				ODM_SetBBReg(pDM_Odm, 0xe50, 0x3FF00000, TX1_A);
-		
+
 				Y = result[final_candidate][5];
 				if ((Y & 0x00000200) != 0)
 					Y = Y | 0xFFFFFC00;
-			
+
 				TX1_C = (Y * 0x100) >> 8;
 				ODM_RT_TRACE(pDM_Odm, ODM_COMP_CALIBRATION, ODM_DBG_LOUD, ("[IQK] Y = 0x%x, TX1_C = 0x%x\n", Y, TX1_C));
 				ODM_SetBBReg(pDM_Odm, 0xe24, 0x000003C0, ((TX1_C & 0x3C0) >> 6));
@@ -1282,9 +1282,9 @@ _PHY_PathADDAOn_97F(
 	#endif
 	/*ODM_RT_TRACE(pDM_Odm,ODM_COMP_CALIBRATION, ODM_DBG_LOUD, ("[IQK] ADDA ON.\n"));*/
 
-	ODM_SetBBReg(pDM_Odm, 0xd94, 0x00ff0000, 0xff);	
+	ODM_SetBBReg(pDM_Odm, 0xd94, 0x00ff0000, 0xff);
 	ODM_SetBBReg(pDM_Odm, 0xe70, bMaskDWord, 0x00400040);
-	
+
 #if 0
 	pathOn = isPathAOn ? 0x0fc01616 : 0x0fc01616;
 	if (FALSE == is2T) {
@@ -1553,7 +1553,7 @@ _phy_iqk_check_97f(
 		PVOID		pDM_VOID
 #else
 		PADAPTER	pAdapter
-#endif	
+#endif
 )
 {
 	PDM_ODM_T		pDM_Odm	= (PDM_ODM_T)pDM_VOID;
@@ -1584,7 +1584,7 @@ _phy_iqk_check_97f(
 		panic_printk("[IQK] path B TXIQK load default value!!!\n");
 	if (rxb_fail == 1)
 		panic_printk("[IQK] path B RXIQK load default value!!!\n");
-		
+
 }
 
 
@@ -1617,7 +1617,7 @@ phy_IQCalibrate_8197F(
 	u1Byte			tmp0xc50 = (u1Byte)ODM_GetBBReg(pDM_Odm, 0xC50, bMaskByte0);
 	u1Byte			tmp0xc58 = (u1Byte)ODM_GetBBReg(pDM_Odm, 0xC58, bMaskByte0);
 	u4Byte			ADDA_REG[IQK_ADDA_REG_NUM] = {
-		0xd94, rRx_Wait_CCA		
+		0xd94, rRx_Wait_CCA
 	};
 	u4Byte			IQK_MAC_REG[IQK_MAC_REG_NUM] = {
 		REG_TXPAUSE,	REG_BCN_CTRL,
@@ -1666,7 +1666,7 @@ phy_IQCalibrate_8197F(
 		DAC_gain_B = ODM_GetRFReg(pDM_Odm, ODM_RF_PATH_B, 0x55, bRFRegOffsetMask);
 		ODM_RT_TRACE(pDM_Odm, ODM_COMP_CALIBRATION, ODM_DBG_LOUD, ("[IQK] Ori_0x55 at Path A = 0x%x\n", DAC_gain_A));
 		ODM_RT_TRACE(pDM_Odm, ODM_COMP_CALIBRATION, ODM_DBG_LOUD, ("[IQK] Ori_0x55 at Path B = 0x%x\n", DAC_gain_B));
-	
+
 		ODM_SetRFReg(pDM_Odm, ODM_RF_PATH_A, 0x55, 0x000e0, 0x0);
 		ODM_SetRFReg(pDM_Odm, ODM_RF_PATH_B, 0x55, 0x000e0, 0x0);
 		ODM_RT_TRACE(pDM_Odm, ODM_COMP_CALIBRATION, ODM_DBG_LOUD, ("[IQK] Set_0x55 at Path A = 0x%x\n",
@@ -1706,16 +1706,16 @@ phy_IQCalibrate_8197F(
 	ODM_SetBBReg(pDM_Odm, rCCK0_AFESetting, 0x0f000000, 0xf);
 	ODM_SetBBReg(pDM_Odm, rOFDM0_TRxPathEnable, bMaskDWord, 0x6f005403);
 	ODM_SetBBReg(pDM_Odm, rOFDM0_TRMuxPar, bMaskDWord, 0x000804e4);
-	ODM_SetBBReg(pDM_Odm, rFPGA0_XCD_RFInterfaceSW, bMaskDWord, 0x04203400);	
-	
-	
+	ODM_SetBBReg(pDM_Odm, rFPGA0_XCD_RFInterfaceSW, bMaskDWord, 0x04203400);
+
+
 #if 1
 	/*FEM off when ExtPA or ExtLNA= 1*/
 	if (pDM_Odm->ExtPA || pDM_Odm->ExtLNA) {
 		ODM_SetBBReg(pDM_Odm, 0x930, bMaskDWord, 0xFFFF77FF);
 		ODM_SetBBReg(pDM_Odm, 0x934, bMaskDWord, 0xFFFFFFF7);
 		ODM_SetBBReg(pDM_Odm, 0x93c, bMaskDWord, 0xFFFF777F);
-	} 	
+	}
 #endif
 
 
@@ -1736,7 +1736,7 @@ phy_IQCalibrate_8197F(
 	ODM_SetBBReg(pDM_Odm, rFPGA0_IQK, 0xffffff00, 0x808000);
 	ODM_SetBBReg(pDM_Odm, rTx_IQK, bMaskDWord, 0x01007c00);
 	ODM_SetBBReg(pDM_Odm, rRx_IQK, bMaskDWord, 0x01004800);
-	
+
 
 /*path A TXIQK*/
 	#if 1
@@ -1861,7 +1861,7 @@ phy_IQCalibrate_8197F(
 				ODM_RT_TRACE(pDM_Odm, ODM_COMP_CALIBRATION, ODM_DBG_LOUD, ("Path B Rx IQK Fail!!\n"));
 				result[t][6] = 0x100;
 				result[t][7] = 0x0;
-		} 
+		}
 	}
 
 		if (0x00 == PathBOK)
@@ -1904,7 +1904,7 @@ phy_IQCalibrate_8197F(
 			ODM_SetBBReg(pDM_Odm, 0xc58, bMaskByte0, 0x50);
 			ODM_SetBBReg(pDM_Odm, 0xc58, bMaskByte0, tmp0xc58);
 		}
-#if 0		
+#if 0
 		/*RF setting :RXBB enter power saving*/
 		if (pDM_Odm->CutVersion != ODM_CUT_A) {
 		ODM_SetRFReg(pDM_Odm, ODM_RF_PATH_A, 0xdf, 0x00002, 0x0);
@@ -1964,26 +1964,26 @@ phy_LCCalibrate_8197F(
 
 	/*backup RF0x18*/
 	LC_Cal = ODM_GetRFReg(pDM_Odm, ODM_RF_PATH_A, RF_CHNLBW, bRFRegOffsetMask);
-		
+
 	/*Start LCK*/
 	ODM_SetRFReg(pDM_Odm, ODM_RF_PATH_A, RF_CHNLBW, bRFRegOffsetMask, LC_Cal|0x08000);
-	
+
 	for (cnt = 0; cnt < 100; cnt++) {
 		if (ODM_GetRFReg(pDM_Odm, ODM_RF_PATH_A, RF_CHNLBW, 0x8000) != 0x1)
 			break;
-		
+
 		ODM_delay_ms(10);
 	}
-	
+
 	/*Recover channel number*/
-	ODM_SetRFReg(pDM_Odm, ODM_RF_PATH_A, RF_CHNLBW, bRFRegOffsetMask, LC_Cal);	
+	ODM_SetRFReg(pDM_Odm, ODM_RF_PATH_A, RF_CHNLBW, bRFRegOffsetMask, LC_Cal);
 
 
 	/*Restore original situation*/
 	if ((tmpReg&0x70) != 0) {
 		/*Deal with contisuous TX case*/
 		ODM_Write1Byte(pDM_Odm, 0xd03, tmpReg);
-	} else { 
+	} else {
 		/* Deal with Packet TX case*/
 		ODM_Write1Byte(pDM_Odm, REG_TXPAUSE, 0x00);
 	}
@@ -2075,12 +2075,12 @@ PHY_IQCalibrate_8197F(
 	#endif
 
 	if (pRFCalibrateInfo->bIQKInProgress)
-		return;	
+		return;
 
 	#if (DM_ODM_SUPPORT_TYPE & (ODM_CE|ODM_AP))
 	if (bReCovery)
 	#else /*for ODM_WIN*/
-	if (bReCovery && 
+	if (bReCovery &&
 	(!pAdapter->bInHctTest)) /*YJ,add for PowerTest,120405*/
 	#endif
 	{
@@ -2091,7 +2091,7 @@ PHY_IQCalibrate_8197F(
 		#else
 		_PHY_ReloadADDARegisters_97F(pDM_Odm, IQK_BB_REG_92C, pDM_Odm->RFCalibrateInfo.IQK_BB_backup_recover, 9);
 		#endif
-#endif		
+#endif
 		return;
 	}
 
@@ -2100,7 +2100,7 @@ PHY_IQCalibrate_8197F(
 
 	/*check IC cut and IQK version*/
 	if (pDM_Odm->CutVersion == ODM_CUT_A)
-	ODM_RT_TRACE(pDM_Odm, ODM_COMP_CALIBRATION, ODM_DBG_LOUD, ("[IQK] Cut Version is A\n"));	
+	ODM_RT_TRACE(pDM_Odm, ODM_COMP_CALIBRATION, ODM_DBG_LOUD, ("[IQK] Cut Version is A\n"));
 	else if (pDM_Odm->CutVersion == ODM_CUT_B)
 	ODM_RT_TRACE(pDM_Odm, ODM_COMP_CALIBRATION, ODM_DBG_LOUD, ("[IQK] Cut Version is B\n"));
 	else if (pDM_Odm->CutVersion == ODM_CUT_C)
@@ -2247,7 +2247,7 @@ PHY_IQCalibrate_8197F(
 		#else
 		_phy_iqk_check_97f(pDM_Odm);
 		#endif
-		
+
 		pDM_Odm->RFCalibrateInfo.RegE94 = pDM_Odm->RFCalibrateInfo.RegEB4 = 0x100;	/*X default value*/
 		pDM_Odm->RFCalibrateInfo.RegE9C = pDM_Odm->RFCalibrateInfo.RegEBC = 0x0;	/*Y default value*/
 		priv->pshare->IQK_fail_cnt++;
@@ -2416,14 +2416,14 @@ phy_path_a_dpk_init_8197f(
 	ODM_SetBBReg(pDM_Odm, 0xb04, bMaskDWord, 0xf76d9f84);
 	ODM_SetBBReg(pDM_Odm, 0xb28, bMaskDWord, 0x000844aa);
 	ODM_SetBBReg(pDM_Odm, 0xb68, bMaskDWord, 0x11160200);
-														 
+
 	ODM_SetBBReg(pDM_Odm, 0xb30, bMaskDWord, 0x0007bdef);
 	ODM_SetBBReg(pDM_Odm, 0xe28, bMaskDWord, 0x40000000);
-														 
+
 	ODM_SetBBReg(pDM_Odm, 0xbc0, bMaskDWord, 0x00021d5f);
-														 
+
 	ODM_SetBBReg(pDM_Odm, 0xe28, bMaskDWord, 0x00000000);
-														 													 
+
 	ODM_SetBBReg(pDM_Odm, 0xb08, bMaskDWord, 0x41382e21);
 	ODM_SetBBReg(pDM_Odm, 0xb0c, bMaskDWord, 0x5b554f48);
 	ODM_SetBBReg(pDM_Odm, 0xb10, bMaskDWord, 0x6f6b6661);
@@ -2432,9 +2432,9 @@ phy_path_a_dpk_init_8197f(
 	ODM_SetBBReg(pDM_Odm, 0xb1c, bMaskDWord, 0x9d9a9793);
 	ODM_SetBBReg(pDM_Odm, 0xb20, bMaskDWord, 0xaaa7a4a1);
 	ODM_SetBBReg(pDM_Odm, 0xb24, bMaskDWord, 0xb6b3b0ad);
-														 													 
-	ODM_SetBBReg(pDM_Odm, 0xe28, bMaskDWord, 0x40000000);														 
-														 
+
+	ODM_SetBBReg(pDM_Odm, 0xe28, bMaskDWord, 0x40000000);
+
 	ODM_SetBBReg(pDM_Odm, 0xb00, bMaskDWord, 0x02ce03e8);
 	ODM_SetBBReg(pDM_Odm, 0xb04, bMaskDWord, 0x01fd024c);
 	ODM_SetBBReg(pDM_Odm, 0xb08, bMaskDWord, 0x01a101c9);
@@ -2451,13 +2451,13 @@ phy_path_a_dpk_init_8197f(
 	ODM_SetBBReg(pDM_Odm, 0xb34, bMaskDWord, 0x00c200c5);
 	ODM_SetBBReg(pDM_Odm, 0xb38, bMaskDWord, 0x00bb00be);
 	ODM_SetBBReg(pDM_Odm, 0xb3c, bMaskDWord, 0x00b500b8);
-														 
+
 	ODM_SetBBReg(pDM_Odm, 0xe28, bMaskDWord, 0x00000000);
-														 														 
+
 	ODM_SetBBReg(pDM_Odm, 0xbac, bMaskDWord, 0x00000c00);
-														 
+
 	ODM_SetBBReg(pDM_Odm, 0xba8, bMaskDWord, 0x00000000);
-														 
+
 	ODM_SetBBReg(pDM_Odm, 0xb2c, bMaskDWord, 0x10000304);
 	ODM_SetBBReg(pDM_Odm, 0xb2c, bMaskDWord, 0x10010203);
 	ODM_SetBBReg(pDM_Odm, 0xb2c, bMaskDWord, 0x10020102);
@@ -2474,15 +2474,15 @@ phy_path_a_dpk_init_8197f(
 	ODM_SetBBReg(pDM_Odm, 0xb2c, bMaskDWord, 0x100d1419);
 	ODM_SetBBReg(pDM_Odm, 0xb2c, bMaskDWord, 0x100e0810);
 	ODM_SetBBReg(pDM_Odm, 0xb2c, bMaskDWord, 0x100f0506);
-														 
+
 	ODM_SetBBReg(pDM_Odm, 0xb2c, bMaskDWord, 0x00000000);
-														 														 
+
 	ODM_SetBBReg(pDM_Odm, 0xe28, bMaskDWord, 0x00000000);
-														 
+
 	ODM_SetBBReg(pDM_Odm, 0xbac, bMaskDWord, 0x00000c00);
-														 
+
 	ODM_SetBBReg(pDM_Odm, 0xba8, bMaskDWord, 0x0000000d);
-														 	
+
 	ODM_SetBBReg(pDM_Odm, 0xb2c, bMaskDWord, 0x01007800);
 	ODM_SetBBReg(pDM_Odm, 0xb2c, bMaskDWord, 0x01017800);
 	ODM_SetBBReg(pDM_Odm, 0xb2c, bMaskDWord, 0x01027800);
@@ -2547,9 +2547,9 @@ phy_path_a_dpk_init_8197f(
 	ODM_SetBBReg(pDM_Odm, 0xb2c, bMaskDWord, 0x013D7800);
 	ODM_SetBBReg(pDM_Odm, 0xb2c, bMaskDWord, 0x013E7800);
 	ODM_SetBBReg(pDM_Odm, 0xb2c, bMaskDWord, 0x013F7800);
-															 
+
 	ODM_SetBBReg(pDM_Odm, 0xba8, bMaskDWord, 0x0000000d);
-														 
+
 	ODM_SetBBReg(pDM_Odm, 0xb2c, bMaskDWord, 0x02007800);
 	ODM_SetBBReg(pDM_Odm, 0xb2c, bMaskDWord, 0x02017800);
 	ODM_SetBBReg(pDM_Odm, 0xb2c, bMaskDWord, 0x02027800);
@@ -2614,7 +2614,7 @@ phy_path_a_dpk_init_8197f(
 	ODM_SetBBReg(pDM_Odm, 0xb2c, bMaskDWord, 0x023D7800);
 	ODM_SetBBReg(pDM_Odm, 0xb2c, bMaskDWord, 0x023E7800);
 	ODM_SetBBReg(pDM_Odm, 0xb2c, bMaskDWord, 0x023F7800);
-															 
+
 	ODM_SetBBReg(pDM_Odm, 0xba8, bMaskDWord, 0x00000000);
 	ODM_SetBBReg(pDM_Odm, 0xb2c, bMaskDWord, 0x00000000);
 
@@ -2646,14 +2646,14 @@ phy_path_b_dpk_init_8197f(
 	ODM_SetBBReg(pDM_Odm, 0xb74, bMaskDWord, 0xf76d9f84);
 	ODM_SetBBReg(pDM_Odm, 0xb98, bMaskDWord, 0x000844aa);
 	ODM_SetBBReg(pDM_Odm, 0xb6c, bMaskDWord, 0x11160200);
-														 
+
 	ODM_SetBBReg(pDM_Odm, 0xba0, bMaskDWord, 0x0007bdef);
 	ODM_SetBBReg(pDM_Odm, 0xe28, bMaskDWord, 0x40000000);
-														 
+
 	ODM_SetBBReg(pDM_Odm, 0xbc4, bMaskDWord, 0x00021d5f);
-														 
+
 	ODM_SetBBReg(pDM_Odm, 0xe28, bMaskDWord, 0x00000000);
-														 													 
+
 	ODM_SetBBReg(pDM_Odm, 0xb78, bMaskDWord, 0x41382e21);
 	ODM_SetBBReg(pDM_Odm, 0xb7c, bMaskDWord, 0x5b554f48);
 	ODM_SetBBReg(pDM_Odm, 0xb80, bMaskDWord, 0x6f6b6661);
@@ -2662,9 +2662,9 @@ phy_path_b_dpk_init_8197f(
 	ODM_SetBBReg(pDM_Odm, 0xb8c, bMaskDWord, 0x9d9a9793);
 	ODM_SetBBReg(pDM_Odm, 0xb90, bMaskDWord, 0xaaa7a4a1);
 	ODM_SetBBReg(pDM_Odm, 0xb94, bMaskDWord, 0xb6b3b0ad);
-														 													 
-	ODM_SetBBReg(pDM_Odm, 0xe28, bMaskDWord, 0x40000000);														 
-														 
+
+	ODM_SetBBReg(pDM_Odm, 0xe28, bMaskDWord, 0x40000000);
+
 	ODM_SetBBReg(pDM_Odm, 0xb60, bMaskDWord, 0x02ce03e8);
 	ODM_SetBBReg(pDM_Odm, 0xb64, bMaskDWord, 0x01fd024c);
 	ODM_SetBBReg(pDM_Odm, 0xb68, bMaskDWord, 0x01a101c9);
@@ -2681,13 +2681,13 @@ phy_path_b_dpk_init_8197f(
 	ODM_SetBBReg(pDM_Odm, 0xb94, bMaskDWord, 0x00c200c5);
 	ODM_SetBBReg(pDM_Odm, 0xb98, bMaskDWord, 0x00bb00be);
 	ODM_SetBBReg(pDM_Odm, 0xb9c, bMaskDWord, 0x00b500b8);
-														 
+
 	ODM_SetBBReg(pDM_Odm, 0xe28, bMaskDWord, 0x00000000);
-														 														 
+
 	ODM_SetBBReg(pDM_Odm, 0xbac, bMaskDWord, 0x00000c00);
-														 
+
 	ODM_SetBBReg(pDM_Odm, 0xba8, bMaskDWord, 0x00000000);
-														 
+
 	ODM_SetBBReg(pDM_Odm, 0xb2c, bMaskDWord, 0x20000304);
 	ODM_SetBBReg(pDM_Odm, 0xb2c, bMaskDWord, 0x20010203);
 	ODM_SetBBReg(pDM_Odm, 0xb2c, bMaskDWord, 0x20020102);
@@ -2704,15 +2704,15 @@ phy_path_b_dpk_init_8197f(
 	ODM_SetBBReg(pDM_Odm, 0xb2c, bMaskDWord, 0x200d1419);
 	ODM_SetBBReg(pDM_Odm, 0xb2c, bMaskDWord, 0x200e0810);
 	ODM_SetBBReg(pDM_Odm, 0xb2c, bMaskDWord, 0x200f0506);
-														 
+
 	ODM_SetBBReg(pDM_Odm, 0xb2c, bMaskDWord, 0x00000000);
-														 														 
+
 	ODM_SetBBReg(pDM_Odm, 0xe28, bMaskDWord, 0x00000000);
-														 
+
 	ODM_SetBBReg(pDM_Odm, 0xbac, bMaskDWord, 0x00000c00);
-														 
+
 	ODM_SetBBReg(pDM_Odm, 0xba8, bMaskDWord, 0x0000000d);
-														 	
+
 	ODM_SetBBReg(pDM_Odm, 0xb2c, bMaskDWord, 0x04007800);
 	ODM_SetBBReg(pDM_Odm, 0xb2c, bMaskDWord, 0x04017800);
 	ODM_SetBBReg(pDM_Odm, 0xb2c, bMaskDWord, 0x04027800);
@@ -2777,9 +2777,9 @@ phy_path_b_dpk_init_8197f(
 	ODM_SetBBReg(pDM_Odm, 0xb2c, bMaskDWord, 0x043D7800);
 	ODM_SetBBReg(pDM_Odm, 0xb2c, bMaskDWord, 0x043E7800);
 	ODM_SetBBReg(pDM_Odm, 0xb2c, bMaskDWord, 0x043F7800);
-															 
+
 	ODM_SetBBReg(pDM_Odm, 0xba8, bMaskDWord, 0x0000000d);
-														 
+
 	ODM_SetBBReg(pDM_Odm, 0xb2c, bMaskDWord, 0x08007800);
 	ODM_SetBBReg(pDM_Odm, 0xb2c, bMaskDWord, 0x08017800);
 	ODM_SetBBReg(pDM_Odm, 0xb2c, bMaskDWord, 0x08027800);
@@ -2844,7 +2844,7 @@ phy_path_b_dpk_init_8197f(
 	ODM_SetBBReg(pDM_Odm, 0xb2c, bMaskDWord, 0x083D7800);
 	ODM_SetBBReg(pDM_Odm, 0xb2c, bMaskDWord, 0x083E7800);
 	ODM_SetBBReg(pDM_Odm, 0xb2c, bMaskDWord, 0x083F7800);
-															 
+
 	ODM_SetBBReg(pDM_Odm, 0xba8, bMaskDWord, 0x00000000);
 	ODM_SetBBReg(pDM_Odm, 0xb2c, bMaskDWord, 0x00000000);
 
@@ -2887,7 +2887,7 @@ phy_set_txrate_index_8197f(
 	ODM_SetBBReg(pDM_Odm, 0x834, bMaskDWord, 0x30303030);
 	ODM_SetBBReg(pDM_Odm, 0x83c, bMaskDWord, 0x30303030);
 	ODM_SetBBReg(pDM_Odm, 0x848, bMaskDWord, 0x30303030);
-	
+
 }
 
 u1Byte
@@ -2923,9 +2923,9 @@ phy_path_a_gainloss_8197f(
 	ODM_SetBBReg(pDM_Odm, 0xb08, bMaskDWord, 0x41382e21);
 	ODM_Write1Byte(pDM_Odm, 0xbad, 0x2c);
 	ODM_SetBBReg(pDM_Odm, 0xe34, bMaskDWord, 0x10000000);
-	
+
 	ODM_delay_ms(5);
-	
+
 	for (k = 0; k < 5; k++)
 	{
 		ODM_Write1Byte(pDM_Odm, 0xb2b, 0x80);
@@ -2939,7 +2939,7 @@ phy_path_a_gainloss_8197f(
 		if ((k != 0) && (result[k] == result[k-1]))
 			break;
 	}
-	
+
 	if (k == 4)
 		TX_AGC_search = ((result[0] + result[1] + result[2] + result[3] + result[4]) / 5);
 	else
@@ -2947,7 +2947,7 @@ phy_path_a_gainloss_8197f(
 
 	ODM_RT_TRACE(pDM_Odm, ODM_COMP_CALIBRATION, ODM_DBG_LOUD, ("[DPK] TXAGC_search_a = 0x%x\n", TX_AGC_search));
 	return TX_AGC_search;
-	
+
 }
 
 u1Byte
@@ -2983,7 +2983,7 @@ phy_path_b_gainloss_8197f(
 	ODM_SetBBReg(pDM_Odm, 0xb78, bMaskDWord, 0x41382e21);
 	ODM_Write1Byte(pDM_Odm, 0xbad, 0x0c);
 	ODM_SetBBReg(pDM_Odm, 0xe54, bMaskDWord, 0x10000000);
-	
+
 	ODM_delay_ms(5);
 
 	for (k = 0; k < 5; k++)
@@ -2999,7 +2999,7 @@ phy_path_b_gainloss_8197f(
 		if ((k != 0) && (result[k] == result[k-1]))
 			break;
 	}
-	
+
 	if (k == 4)
 		TX_AGC_search = ((result[0] + result[1] + result[2] + result[3] + result[4]) / 5);
 	else
@@ -3007,7 +3007,7 @@ phy_path_b_gainloss_8197f(
 
 	ODM_RT_TRACE(pDM_Odm, ODM_COMP_CALIBRATION, ODM_DBG_LOUD, ("[DPK] TXAGC_search_b = 0x%x\n", TX_AGC_search));
 	return TX_AGC_search;
-	
+
 }
 
 
@@ -3039,7 +3039,7 @@ phy_path_a_dodpk_8197f(
 
 
 	ODM_Write1Byte(pDM_Odm, 0xb2b, 0x40);
-	
+
 	switch (TX_AGC_search)
 	{
 		case 0x0:
@@ -3051,7 +3051,7 @@ phy_path_a_dodpk_8197f(
 			REG_B68 = 0x11160200 | (0x1a<<10);
 			TX_AGC = 0x13;
 			break;
-			
+
 		case 0x2:
 			REG_B68 = 0x11160200 | (0x1b<<10);
 			TX_AGC = 0x14;
@@ -3060,22 +3060,22 @@ phy_path_a_dodpk_8197f(
 		case 0x3:
 			REG_B68 = 0x11160200 | (0x1c<<10);
 			TX_AGC = 0x15;
-			break;	
+			break;
 
 		case 0x4:
 			REG_B68 = 0x11160200 | (0x1d<<10);
 			TX_AGC = 0x16;
 			break;
-			
+
 		case 0x5:
 			REG_B68 = 0x11160200 | (0x1e<<10);
 			TX_AGC = 0x17;
-			break;	
+			break;
 
 		case 0x6:
 			REG_B68 = 0x11160200 | (0x1f<<10);
 			TX_AGC = 0x18;
-			break;	
+			break;
 
 		case 0x7:
 			REG_B68 = 0x11160200 | (0x00<<10);
@@ -3095,8 +3095,8 @@ phy_path_a_dodpk_8197f(
 		case 0xa:
 			REG_B68 = 0x11160200 | (0x03<<10);
 			TX_AGC = 0x1c;
-			break;	
-	
+			break;
+
 	}
 
 	ODM_SetBBReg(pDM_Odm, 0xb68, bMaskDWord, REG_B68);
@@ -3104,12 +3104,12 @@ phy_path_a_dodpk_8197f(
 	ODM_SetRFReg(pDM_Odm, ODM_RF_PATH_A, 0x00, bRFRegOffsetMask, (0x58000 | TX_AGC));
 
 	ODM_RT_TRACE(pDM_Odm, ODM_COMP_CALIBRATION, ODM_DBG_LOUD, ("[DPK] RF_a 0x0 = 0x%x\n", ODM_GetRFReg(pDM_Odm, ODM_RF_PATH_A, 0x00, bRFRegOffsetMask)));
-	
+
 	pDM_Odm->RFCalibrateInfo.pwsf_2g_a[k] = (u1Byte)ODM_GetBBReg(pDM_Odm, 0xb68, 0x00007C00);
 
-	ODM_RT_TRACE(pDM_Odm, ODM_COMP_CALIBRATION, ODM_DBG_LOUD, ("[DPK] 0xb68[%d] = 0x%x, pwsf_2g_a[%d] = 0x%x\n", 
+	ODM_RT_TRACE(pDM_Odm, ODM_COMP_CALIBRATION, ODM_DBG_LOUD, ("[DPK] 0xb68[%d] = 0x%x, pwsf_2g_a[%d] = 0x%x\n",
 		k, ODM_GetBBReg(pDM_Odm, 0xb68, bMaskDWord), k, pDM_Odm->RFCalibrateInfo.pwsf_2g_a[k]));
-	//ODM_delay_ms(5);	
+	//ODM_delay_ms(5);
 	ODM_Write1Byte(pDM_Odm, 0xb2b, 0xc0);
 	ODM_Write1Byte(pDM_Odm, 0xb2b, 0x40);
 	ODM_delay_ms(10);
@@ -3117,7 +3117,7 @@ phy_path_a_dodpk_8197f(
 	result = ODM_GetBBReg(pDM_Odm, 0xbd8, (BIT18));
 	ODM_RT_TRACE(pDM_Odm, ODM_COMP_CALIBRATION, ODM_DBG_LOUD, ("[DPK] fail bit = %x\n", result));
 	return result;
-	
+
 }
 
 u4Byte
@@ -3148,7 +3148,7 @@ phy_path_b_dodpk_8197f(
 
 
 	ODM_Write1Byte(pDM_Odm, 0xb9b, 0x40);
-	
+
 	switch (TX_AGC_search)
 	{
 		case 0x0:
@@ -3160,7 +3160,7 @@ phy_path_b_dodpk_8197f(
 			REG_B6C = 0x11160200 | (0x1a<<10);
 			TX_AGC = 0x13;
 			break;
-			
+
 		case 0x2:
 			REG_B6C = 0x11160200 | (0x1b<<10);
 			TX_AGC = 0x14;
@@ -3169,22 +3169,22 @@ phy_path_b_dodpk_8197f(
 		case 0x3:
 			REG_B6C = 0x11160200 | (0x1c<<10);
 			TX_AGC = 0x15;
-			break;	
+			break;
 
 		case 0x4:
 			REG_B6C = 0x11160200 | (0x1d<<10);
 			TX_AGC = 0x16;
 			break;
-			
+
 		case 0x5:
 			REG_B6C = 0x11160200 | (0x1e<<10);
 			TX_AGC = 0x17;
-			break;	
+			break;
 
 		case 0x6:
 			REG_B6C = 0x11160200 | (0x1f<<10);
 			TX_AGC = 0x18;
-			break;	
+			break;
 
 		case 0x7:
 			REG_B6C = 0x11160200 | (0x00<<10);
@@ -3204,8 +3204,8 @@ phy_path_b_dodpk_8197f(
 		case 0xa:
 			REG_B6C = 0x11160200 | (0x03<<10);
 			TX_AGC = 0x1c;
-			break;	
-	
+			break;
+
 	}
 
 	ODM_SetBBReg(pDM_Odm, 0xb6c, bMaskDWord, REG_B6C);
@@ -3216,7 +3216,7 @@ phy_path_b_dodpk_8197f(
 
 	pDM_Odm->RFCalibrateInfo.pwsf_2g_b[k] = (u1Byte)ODM_GetBBReg(pDM_Odm, 0xb6c, 0x00007C00);
 
-	ODM_RT_TRACE(pDM_Odm, ODM_COMP_CALIBRATION, ODM_DBG_LOUD, ("[DPK] 0xb6c[%d] = 0x%x, pwsf_2g_b[%d] = 0x%x\n", 
+	ODM_RT_TRACE(pDM_Odm, ODM_COMP_CALIBRATION, ODM_DBG_LOUD, ("[DPK] 0xb6c[%d] = 0x%x, pwsf_2g_b[%d] = 0x%x\n",
 		k, ODM_GetBBReg(pDM_Odm, 0xb6c, bMaskDWord), k, pDM_Odm->RFCalibrateInfo.pwsf_2g_b[k]));
 	//ODM_delay_ms(5);
 	ODM_Write1Byte(pDM_Odm, 0xb9b, 0xc0);
@@ -3226,7 +3226,7 @@ phy_path_b_dodpk_8197f(
 	result = ODM_GetBBReg(pDM_Odm, 0xbd8, (BIT19));
 	ODM_RT_TRACE(pDM_Odm, ODM_COMP_CALIBRATION, ODM_DBG_LOUD, ("[DPK] fail bit = %x\n", result));
 	return result;
-	
+
 }
 
 BOOLEAN
@@ -3251,11 +3251,11 @@ phy_path_a_iq_check_8197f(
 	PDM_ODM_T		pDM_Odm = &pHalData->DM_OutSrc;
 	#endif
 	#endif
-														 
+
 	u4Byte		i_val, q_val;
 
 	if(addr == 0) {
-	
+
 		i_val = ODM_GetBBReg(pDM_Odm, 0xbc0, 0x003FF800);
 		q_val = ODM_GetBBReg(pDM_Odm, 0xbc0, 0x000007FF);
 
@@ -3267,7 +3267,7 @@ phy_path_a_iq_check_8197f(
 		if ((i_val*i_val + q_val*q_val) < 0x29526) {/* LMS (I^2 + Q^2) < -1.9dB happen*/
 			ODM_RT_TRACE(pDM_Odm, ODM_COMP_CALIBRATION, ODM_DBG_LOUD, ("[DPK] RF_a[%d] I^2 + Q^2 = 0x%x\n", group, (i_val*i_val + q_val*q_val)));
 			return 1;
-		} else {	
+		} else {
 			return 0;
 		}
 	} else {
@@ -3298,11 +3298,11 @@ phy_path_b_iq_check_8197f(
 	PDM_ODM_T		pDM_Odm = &pHalData->DM_OutSrc;
 	#endif
 	#endif
-														 
+
 	u4Byte		i_val, q_val;
 
 	if(addr == 0) {
-	
+
 		i_val = ODM_GetBBReg(pDM_Odm, 0xbc8, 0x003FF800);
 		q_val = ODM_GetBBReg(pDM_Odm, 0xbc8, 0x000007FF);
 
@@ -3314,7 +3314,7 @@ phy_path_b_iq_check_8197f(
 		if ((i_val*i_val + q_val*q_val) < 0x29526) {/* LMS (I^2 + Q^2) < -2dB happen*/
 			ODM_RT_TRACE(pDM_Odm, ODM_COMP_CALIBRATION, ODM_DBG_LOUD, ("[DPK] RF_b[%d] I^2 + Q^2 = 0x%x\n", group, (i_val*i_val + q_val*q_val)));
 			return 1;
-		} else {	
+		} else {
 			return 0;
 		}
 	} else {
@@ -3345,20 +3345,20 @@ phy_path_a_pas_read_8197f(
 	PDM_ODM_T		pDM_Odm = &pHalData->DM_OutSrc;
 	#endif
 	#endif
-														 
+
 	int			k;
 	u4Byte		reg_b00, reg_b68, reg_bdc, reg_be0, reg_be4, reg_be8;
-	
-	
+
+
 	reg_b00 = ODM_GetBBReg(pDM_Odm, 0xb00, bMaskDWord);
-	reg_b68 = ODM_GetBBReg(pDM_Odm, 0xb68, bMaskDWord);	
+	reg_b68 = ODM_GetBBReg(pDM_Odm, 0xb68, bMaskDWord);
 
 	if(is_gainloss) {
 		ODM_SetBBReg(pDM_Odm, 0xb68, BIT26, 0x0);
 		ODM_RT_TRACE(pDM_Odm, ODM_COMP_CALIBRATION, ODM_DBG_LOUD, ("[DPK] 0xb68 = 0x%x\n", ODM_GetBBReg(pDM_Odm, 0xb68, bMaskDWord)));
 	}
-	
-	for (k = 0; k < 8; k++) 
+
+	for (k = 0; k < 8; k++)
 	{
 	ODM_SetBBReg(pDM_Odm, 0xb00, bMaskDWord, (0x0101f038 | k));
 	//ODM_RT_TRACE(pDM_Odm, ODM_COMP_CALIBRATION, ODM_DBG_LOUD, ("[DPK] 0xb00[%d] = 0x%x\n", k, ODM_GetBBReg(pDM_Odm, 0xb00, bMaskDWord)));
@@ -3374,7 +3374,7 @@ phy_path_a_pas_read_8197f(
 
 	ODM_SetBBReg(pDM_Odm, 0xb00, bMaskDWord, reg_b00);
 	ODM_SetBBReg(pDM_Odm, 0xb68, bMaskDWord, reg_b68);
-			
+
 }
 
 VOID
@@ -3398,20 +3398,20 @@ phy_path_b_pas_read_8197f(
 	PDM_ODM_T		pDM_Odm = &pHalData->DM_OutSrc;
 	#endif
 	#endif
-														 
+
 	int			k;
 	u4Byte		reg_b70, reg_b6c, reg_bec, reg_bf0, reg_bf4, reg_bf8;
-	
+
 	reg_b70 = ODM_GetBBReg(pDM_Odm, 0xb70, bMaskDWord);
-	reg_b6c = ODM_GetBBReg(pDM_Odm, 0xb6c, bMaskDWord);	
+	reg_b6c = ODM_GetBBReg(pDM_Odm, 0xb6c, bMaskDWord);
 
 
 	if(is_gainloss) {
 		ODM_SetBBReg(pDM_Odm, 0xb6c, BIT26, 0x0);
 		ODM_RT_TRACE(pDM_Odm, ODM_COMP_CALIBRATION, ODM_DBG_LOUD, ("[DPK] 0xb6c = 0x%x\n", ODM_GetBBReg(pDM_Odm, 0xb6c, bMaskDWord)));
-	}	
-	
-	for (k = 0; k < 8; k++) 
+	}
+
+	for (k = 0; k < 8; k++)
 	{
 	ODM_SetBBReg(pDM_Odm, 0xb70, bMaskDWord, (0x0101f038 | k));
 	//ODM_RT_TRACE(pDM_Odm, ODM_COMP_CALIBRATION, ODM_DBG_LOUD, ("[DPK] 0xb70[%d] = 0x%x\n", k, ODM_GetBBReg(pDM_Odm, 0xb70, bMaskDWord)));
@@ -3427,7 +3427,7 @@ phy_path_b_pas_read_8197f(
 
 	ODM_SetBBReg(pDM_Odm, 0xb70, bMaskDWord, reg_b70);
 	ODM_SetBBReg(pDM_Odm, 0xb6c, bMaskDWord, reg_b6c);
-			
+
 }
 
 VOID
@@ -3464,7 +3464,7 @@ phy_path_a_dpk_enable_8197f(
 
 	/*ODM_SetBBReg(pDM_Odm, 0xe30, bMaskDWord, 0x10000000);*/
 	/*ODM_SetBBReg(pDM_Odm, 0xe20, bMaskDWord, 0x00000000);*/
-	
+
 }
 
 VOID
@@ -3501,7 +3501,7 @@ phy_path_b_dpk_enable_8197f(
 
 	/*ODM_SetBBReg(pDM_Odm, 0xe30, bMaskDWord, 0x10000000);*/
 	/*ODM_SetBBReg(pDM_Odm, 0xe20, bMaskDWord, 0x00000000);*/
-	
+
 }
 
 u1Byte
@@ -3538,9 +3538,9 @@ phy_dpk_channel_transfer_8197f(
 		i = 2;
 
 
-	ODM_RT_TRACE(pDM_Odm, ODM_COMP_CALIBRATION, ODM_DBG_LOUD, ("[DPK] channel = %d, bandwidth = %d, transfer idx = %d\n", 
+	ODM_RT_TRACE(pDM_Odm, ODM_COMP_CALIBRATION, ODM_DBG_LOUD, ("[DPK] channel = %d, bandwidth = %d, transfer idx = %d\n",
 		channel, bandwidth, i));
-	
+
 	return i;
 
 }
@@ -3567,7 +3567,7 @@ phy_lut_sram_read_8197f(
 	PDM_ODM_T		pDM_Odm = &pHalData->DM_OutSrc;
 	#endif
 	#endif
-														 
+
 	u1Byte		addr, i;
 	u4Byte		regb2c;
 
@@ -3632,7 +3632,7 @@ phy_lut_sram_read_8197f(
 	{
 		for (i = 0; i < 3; i++)
 		{
-			for(addr = 0; addr < 16; addr++)		
+			for(addr = 0; addr < 16; addr++)
 				ODM_RT_TRACE(pDM_Odm, ODM_COMP_CALIBRATION, ODM_DBG_LOUD, ("[DPK] LUT_SRAM_read_2G_A even 0xbc0[%d][%2d] = 0x%x\n", i, addr, pDM_Odm->RFCalibrateInfo.lut_2g_even_a[i][addr]));
 
 			for(addr = 0; addr < 16; addr++)
@@ -3652,14 +3652,14 @@ phy_lut_sram_read_8197f(
 	{
 		printk("bDPPathAOK=%d   bDPPathBOK=%d\n", pDM_Odm->RFCalibrateInfo.bDPPathAOK, pDM_Odm->RFCalibrateInfo.bDPPathBOK);
 		u4Byte j;
-		
+
 		//for (i = 0; i < 3; i++)
 		{
-			printk("sram_read pwsf_2g_a[%d]=0x%x   pwsf_2g_b[%d]=0x%x\n", k, pDM_Odm->RFCalibrateInfo.pwsf_2g_a[k], k, pDM_Odm->RFCalibrateInfo.pwsf_2g_b[k]);	
+			printk("sram_read pwsf_2g_a[%d]=0x%x   pwsf_2g_b[%d]=0x%x\n", k, pDM_Odm->RFCalibrateInfo.pwsf_2g_a[k], k, pDM_Odm->RFCalibrateInfo.pwsf_2g_b[k]);
 		}
 
 		//for (i = 0; i < 3; i++)
-		{	
+		{
 			for (j = 0; j < 64; j++)
 				printk("sram_read lut_2g_even_a[%2d][%2d]=0x%x\n", k, j, pDM_Odm->RFCalibrateInfo.lut_2g_even_a[k][j]);
 
@@ -3668,9 +3668,9 @@ phy_lut_sram_read_8197f(
 
 			for (j = 0; j < 64; j++)
 				printk("sram_read lut_2g_even_b[%2d][%2d]=0x%x\n", k, j, pDM_Odm->RFCalibrateInfo.lut_2g_even_b[k][j]);
-				
+
 			for (j = 0; j < 64; j++)
-				printk("sram_read  lut_2g_odd_b[%2d][%2d]=0x%x\n", k, j, pDM_Odm->RFCalibrateInfo.lut_2g_odd_b[k][j]);	
+				printk("sram_read  lut_2g_odd_b[%2d][%2d]=0x%x\n", k, j, pDM_Odm->RFCalibrateInfo.lut_2g_odd_b[k][j]);
 		}
 	}
 #endif
@@ -3699,7 +3699,7 @@ phy_lut_sram_write_8197f(
 	PDM_ODM_T		pDM_Odm = &pHalData->DM_OutSrc;
 	#endif
 	#endif
-														 
+
 	u1Byte		addr, k;
 	u4Byte		regba8_a_even[64] = {0}, regb2c_a_even[64] = {0};
 	u4Byte		regba8_a_odd[64] = {0}, regb2c_a_odd[64] = {0};
@@ -3713,14 +3713,14 @@ phy_lut_sram_write_8197f(
 {
 		printk("bDPPathAOK=%d   bDPPathBOK=%d\n", pDM_Odm->RFCalibrateInfo.bDPPathAOK, pDM_Odm->RFCalibrateInfo.bDPPathBOK);
 		u4Byte j;
-		
+
 		//for (i = 0; i < 3; i++)
 		{
-			printk("sram_write pwsf_2g_a[%d]=0x%x   pwsf_2g_b[%d]=0x%x\n", k, pDM_Odm->RFCalibrateInfo.pwsf_2g_a[k], k, pDM_Odm->RFCalibrateInfo.pwsf_2g_b[k]);	
+			printk("sram_write pwsf_2g_a[%d]=0x%x   pwsf_2g_b[%d]=0x%x\n", k, pDM_Odm->RFCalibrateInfo.pwsf_2g_a[k], k, pDM_Odm->RFCalibrateInfo.pwsf_2g_b[k]);
 		}
 
 		//for (i = 0; i < 3; i++)
-		{	
+		{
 			for (j = 0; j < 64; j++)
 				printk("sram_write lut_2g_even_a[%2d][%2d]=0x%x\n", k, j, pDM_Odm->RFCalibrateInfo.lut_2g_even_a[k][j]);
 
@@ -3729,9 +3729,9 @@ phy_lut_sram_write_8197f(
 
 			for (j = 0; j < 64; j++)
 				printk("sram_write lut_2g_even_b[%2d][%2d]=0x%x\n", k, j, pDM_Odm->RFCalibrateInfo.lut_2g_even_b[k][j]);
-				
+
 			for (j = 0; j < 64; j++)
-				printk("sram_write  lut_2g_odd_b[%2d][%2d]=0x%x\n", k, j, pDM_Odm->RFCalibrateInfo.lut_2g_odd_b[k][j]);	
+				printk("sram_write  lut_2g_odd_b[%2d][%2d]=0x%x\n", k, j, pDM_Odm->RFCalibrateInfo.lut_2g_odd_b[k][j]);
 		}
 }
 #endif
@@ -3749,7 +3749,7 @@ phy_lut_sram_write_8197f(
 
 		ODM_SetBBReg(pDM_Odm, 0xba8, 0x0000003F, regba8_a_even[addr]);
 		ODM_SetBBReg(pDM_Odm, 0xb2c, 0x003FFFFF, (regb2c_a_even[addr] | (addr<<16)));
-		
+
 #if (DPK_SRAM_write_DBG_8197F)
 		ODM_RT_TRACE(pDM_Odm, ODM_COMP_CALIBRATION, ODM_DBG_LOUD, ("[DPK] LUT_SRAM_write_2G_A even 0xba8[%2d] = 0x%x\n", addr, ODM_GetBBReg(pDM_Odm, 0xba8, bMaskDWord)));
 		ODM_RT_TRACE(pDM_Odm, ODM_COMP_CALIBRATION, ODM_DBG_LOUD, ("[DPK] LUT_SRAM_write_2G_A even 0xb2c[%2d] = 0x%x\n", addr, ODM_GetBBReg(pDM_Odm, 0xb2c, bMaskDWord)));
@@ -3808,11 +3808,11 @@ phy_lut_sram_write_8197f(
 
 	ODM_SetBBReg(pDM_Odm, 0xb68, bMaskDWord, (0x11260200 | (pDM_Odm->RFCalibrateInfo.pwsf_2g_a[k]<<10)));
 	ODM_RT_TRACE(pDM_Odm, ODM_COMP_CALIBRATION, ODM_DBG_LOUD, ("[DPK] init pwsf_a[%d] = 0x%x\n", k, ODM_GetBBReg(pDM_Odm, 0xb68, 0x00007c00)));
-	
+
 	ODM_SetBBReg(pDM_Odm, 0xb6c, bMaskDWord, (0x11260200 | (pDM_Odm->RFCalibrateInfo.pwsf_2g_b[k]<<10)));
 	ODM_RT_TRACE(pDM_Odm, ODM_COMP_CALIBRATION, ODM_DBG_LOUD, ("[DPK] init pwsf_b[%d] = 0x%x\n", k, ODM_GetBBReg(pDM_Odm, 0xb6c, 0x00007c00)));
 
-	
+
 }
 
 VOID
@@ -3859,7 +3859,7 @@ phy_dpcalibrate_8197f(
 #endif
 	BOOLEAN		is2T,
 	u1Byte		k
-	
+
 )
 {
 	PDM_ODM_T		pDM_Odm	= (PDM_ODM_T)pDM_VOID;
@@ -3875,7 +3875,7 @@ phy_dpcalibrate_8197f(
 	#endif
 
 	u4Byte			ADDA_REG[2] = {
-		0xd94, rRx_Wait_CCA		
+		0xd94, rRx_Wait_CCA
 	};
 	u4Byte			IQK_MAC_REG[IQK_MAC_REG_NUM] = {
 		REG_TXPAUSE,	REG_BCN_CTRL,
@@ -3891,14 +3891,14 @@ phy_dpcalibrate_8197f(
 	u4Byte			Txrate_REG[11] = {
 		0xe08, 0x86c, 0xe00, 0xe04, 0xe10, 0xe14,
 		0x838, 0x830, 0x834, 0x83c, 0x848
-	};	
+	};
 
 	u4Byte			result_a = 0x1, result_b = 0x1, tmp_rf_a_00, tmp_rf_a_8f, tmp_rf_b_00, tmp_rf_b_8f;
 	u1Byte			TXAGC_a_search = 0x0, TXAGC_b_search = 0x0;
 
 	if (!((pDM_Odm->RFEType == 0) || (pDM_Odm->RFEType == 2)))
 	{
-		printk("[DPK] Skip DPK due to RFE type != 0 or 2\n"); 
+		printk("[DPK] Skip DPK due to RFE type != 0 or 2\n");
 		return 3;
 	}
 	ODM_RT_TRACE(pDM_Odm, ODM_COMP_CALIBRATION, ODM_DBG_LOUD, ("[DPK] DPK Start!!!!\n"));
@@ -3912,7 +3912,7 @@ phy_dpcalibrate_8197f(
 	tmp_rf_a_8f = ODM_GetRFReg(pDM_Odm, ODM_RF_PATH_A, 0x8f, bRFRegOffsetMask);
 	tmp_rf_b_00 = ODM_GetRFReg(pDM_Odm, ODM_RF_PATH_B, 0x00, bRFRegOffsetMask);
 	tmp_rf_b_8f = ODM_GetRFReg(pDM_Odm, ODM_RF_PATH_B, 0x8f, bRFRegOffsetMask);
-	
+
 	ODM_SetBBReg(pDM_Odm, 0x520, bMaskByte2, 0xff); /*Tx Pause*/
 
 	phy_path_a_dpk_init_8197f(pDM_Odm);
@@ -3927,17 +3927,17 @@ phy_dpcalibrate_8197f(
 	ODM_SetBBReg(pDM_Odm, 0xe70, bMaskDWord, 0x00400040);
 	ODM_SetBBReg(pDM_Odm, 0x87c, bMaskDWord, 0x004f0201);
 	ODM_SetBBReg(pDM_Odm, 0x884, bMaskDWord, 0xc0000120);
-	ODM_SetBBReg(pDM_Odm, 0x880, bMaskDWord, 0xd8001402);	
+	ODM_SetBBReg(pDM_Odm, 0x880, bMaskDWord, 0xd8001402);
 	ODM_SetBBReg(pDM_Odm, 0xc04, bMaskDWord, 0x6f005433);
-	ODM_SetBBReg(pDM_Odm, 0xc08, bMaskDWord, 0x000804e4); 
-	ODM_SetBBReg(pDM_Odm, 0x874, bMaskDWord, 0x25204000);	 
+	ODM_SetBBReg(pDM_Odm, 0xc08, bMaskDWord, 0x000804e4);
+	ODM_SetBBReg(pDM_Odm, 0x874, bMaskDWord, 0x25204000);
 	ODM_SetBBReg(pDM_Odm, 0xc14, bMaskDWord, 0x00000000);
 	ODM_SetBBReg(pDM_Odm, 0xc1c, bMaskDWord, 0x00000000);
 
 #if 1
-	/*path A DPK*/	
+	/*path A DPK*/
 	ODM_RT_TRACE(pDM_Odm, ODM_COMP_CALIBRATION, ODM_DBG_LOUD, ("[DPK] ============ Path A[%d] DPK ============\n", k));
-	
+
 	TXAGC_a_search = phy_path_a_gainloss_8197f(pDM_Odm);
 
 	if (DPK_PAS_DBG_8197F)
@@ -3949,26 +3949,26 @@ phy_dpcalibrate_8197f(
 
 	if (DPK_PAS_DBG_8197F)
 		phy_path_a_pas_read_8197f(pDM_Odm, FALSE);
-	
+
 #endif
-	
+
 #if 1
-	/*path B DPK*/	
+	/*path B DPK*/
 	ODM_RT_TRACE(pDM_Odm, ODM_COMP_CALIBRATION, ODM_DBG_LOUD, ("[DPK] ============ Path B[%d] DPK ============\n", k));
-	
+
 	TXAGC_b_search = phy_path_b_gainloss_8197f(pDM_Odm);
 
 	if (DPK_PAS_DBG_8197F)
 		phy_path_b_pas_read_8197f(pDM_Odm, TRUE);
 
 	ODM_delay_ms(5);
-	
+
 	result_b = phy_path_b_dodpk_8197f(pDM_Odm, TXAGC_b_search, k);
 
 	if (DPK_PAS_DBG_8197F)
 		phy_path_b_pas_read_8197f(pDM_Odm, FALSE);
-	
-#endif	
+
+#endif
 
 	phy_path_a_dpk_enable_8197f(pDM_Odm);
 	phy_path_b_dpk_enable_8197f(pDM_Odm);
@@ -4021,7 +4021,7 @@ phy_dpcalibrate_8197f(
 	ODM_SetRFReg(pDM_Odm, ODM_RF_PATH_B, 0x8f, bRFRegOffsetMask, tmp_rf_b_8f);
 
 	ODM_RT_TRACE(pDM_Odm, ODM_COMP_CALIBRATION, ODM_DBG_LOUD, ("[DPK] DPK Finish!!!!\n"));
-	
+
 #if 1
 
 	if((result_a == 0) && (result_b == 0))

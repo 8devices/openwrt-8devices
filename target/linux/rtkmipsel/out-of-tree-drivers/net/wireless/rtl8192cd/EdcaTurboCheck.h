@@ -21,7 +21,7 @@ ChooseIotMainSTA(
 	PSTA_INFO_T		pstat
 	);
 
-VOID 
+VOID
 IotEngine(
 	struct rtl8192cd_priv *priv
 	);

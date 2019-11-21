@@ -416,43 +416,6 @@
 #define		WACTMSK_TX_RESP_ON_DUR_Mask	0x0FF
 
 
-#if defined(CONFIG_RTL_92D_SUPPORT) && defined(EN_EFUSE)
-
-#define EEPROM_MAC0_MACADDRESS			0x55 // MAC-0 MAC Address
-#define EEPROM_MAC1_MACADDRESS			0x5B // MAC-1 MAC Address
-
-#define EEPROM_2G_TxPowerCCK			0x61 // 2.4G CCK Tx Power base
-#define	EEPROM_2G_TxPowerHT40_1S		0x67 // 2.4G HT40 Tx Power base
-#define	EEPROM_2G_TxPowerHT40_2SDiff	0x6D // 2.4G HT40 Tx Power diff
-#define EEPROM_2G_TxPowerHT20Diff		0x70 // 2.4G HT20 Tx Power diff
-#define EEPROM_2G_TxPowerOFDMDiff		0x73 // 2.4G OFDM Tx Power diff
-
-#define	EEPROM_5GL_TxPowerHT40_1S		0x7C // 5G Ch.36-44 HT40 Tx Power base
-#define	EEPROM_5GL_TxPowerHT40_2SDiff	0x82 // 5G Ch.36-44 HT40 Tx Power diff
-#define EEPROM_5GL_TxPowerHT20Diff		0x85 // 5G Ch.36-44 HT20 Tx Power diff
-#define EEPROM_5GL_TxPowerOFDMDiff		0x88 // 5G Ch.36-44 OFDM Tx Power diff
-
-#define	EEPROM_5GM_TxPowerHT40_1S		0x91 // 5G Ch.100-112 HT40 Tx Power base
-#define	EEPROM_5GM_TxPowerHT40_2SDiff	0x97 // 5G Ch.100-112 HT40 Tx Power diff
-#define EEPROM_5GM_TxPowerHT20Diff		0x9A // 5G Ch.100-112 HT20 Tx Power diff
-#define EEPROM_5GM_TxPowerOFDMDiff		0x9D // 5G Ch.100-112 OFDM Tx Power diff
-
-#define	EEPROM_5GH_TxPowerHT40_1S		0xA6 // 5G Ch.149-153 HT40 Tx Power base
-#define	EEPROM_5GH_TxPowerHT40_2SDiff	0xAC // 5G Ch.149-153 HT40 Tx Power diff
-#define EEPROM_5GH_TxPowerHT20Diff		0xAF // 5G Ch.149-153 HT20 Tx Power diff
-#define EEPROM_5GH_TxPowerOFDMDiff		0xB2 // 5G Ch.149-153 OFDM Tx Power diff
-
-#define EEPROM_92D_IQK_DELTA			0xBC
-#define EEPROM_92D_LCK_DELTA			0xBC
-#define EEPROM_92D_XTAL_K				0xBD //[7:0]
-#define EEPROM_92D_TSSI_A_5G			0xBE
-#define EEPROM_92D_TSSI_B_5G			0xBF
-#define EEPROM_92D_TSSI_AB_5G			0xC0
-#define EEPROM_92D_THERMAL_METER		0xC3 //[4:0]
-#define EEPROM_92D_TRSW_CTRL			0xC9
-#define EEPROM_92D_PAPE_CTRL			0xCC
-
-#endif
 
 
 #endif

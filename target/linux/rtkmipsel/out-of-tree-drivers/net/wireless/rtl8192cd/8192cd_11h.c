@@ -12,28 +12,14 @@
 
 #define _8192CD_11H_C_
 
-#ifdef __KERNEL__
 #include <linux/module.h>
 #include <asm/byteorder.h>
-#elif defined(__ECOS)
-#include <cyg/io/eth/rltk/819x/wrapper/sys_support.h>
-#include <cyg/io/eth/rltk/819x/wrapper/skbuff.h>
-#include <cyg/io/eth/rltk/819x/wrapper/timer.h>
-#include <cyg/io/eth/rltk/819x/wrapper/wrapper.h>
-#endif
 
 #include "./8192cd_cfg.h"
 
-#if !defined(__KERNEL__) && !defined(__ECOS)
-#include "./sys-support.h"
-#endif
 
 #include "./8192cd.h"
-#ifdef __KERNEL__
 #include "./ieee802_mib.h"
-#elif defined(__ECOS)
-#include <cyg/io/eth/rltk/819x/wlan/ieee802_mib.h>
-#endif
 #include "./8192cd_util.h"
 #include "./8192cd_headers.h"
 #include "./8192cd_debug.h"
@@ -50,7 +36,7 @@ typedef struct _PER_CHANNEL_ENTRY_ {
 
 typedef struct _BAND_TABLE_ELEMENT_ {
     unsigned char  channel_set_number;
-    PER_CHANNEL_ENTRY	channel_set[MAX_CHANNEL_SET_NUMBER];	
+    PER_CHANNEL_ENTRY	channel_set[MAX_CHANNEL_SET_NUMBER];
 } BAND_TABLE_ELEMENT;
 
 
@@ -65,7 +51,7 @@ typedef struct _COUNTRY_IE_ELEMENT_ {
 static const COUNTRY_IE_ELEMENT countryIEArray[] =
 {
 	/*
-	 format: countryNumber | CountryCode(A2) 
+	 format: countryNumber | CountryCode(A2)
 	*/
 	{8,"AL ",   3, 3},   /*ALBANIA*/
 	{12,"DZ ",  3, 3},  /*ALGERIA*/
@@ -171,10 +157,10 @@ static const COUNTRY_IE_ELEMENT countryIEArray[] =
 
 
 static const BAND_TABLE_ELEMENT country_ie_channel_2_4g[] = {
-    /* number of channel set | array of channel sets{first channel, num of channel,  tx power} 
+    /* number of channel set | array of channel sets{first channel, num of channel,  tx power}
             transmit tx power is copy from CAMEO
        */
-    
+
     /* (1) FCC */           {1, {{1, 11, 30}}},
     /* (2) IC */		        {1, {{1, 11, 30}}},
     /* (3) ETSI */		    {1, {{1, 13, 30}}},
@@ -206,9 +192,9 @@ static const BAND_TABLE_ELEMENT country_ie_channel_5g[] = {
 	/* (2) IC */		  {12, {{36,1,30}, {40,1,30}, {44,1,30}, {48,1,30},
                             {52,1,30}, {56,1,30}, {60,1,30}, {64,1,30},
                             {149,1,30},{153,1,30},{157,1,30},{161,1,30}  }
-                      },                    
-	/* (3) ETSI */	  {19, {{36,1,30}, {40,1,30}, {44,1,30}, {48,1,30}, 
-	                        {52,1,30}, {56,1,30}, {60,1,30}, {64,1,30}, 
+                      },
+	/* (3) ETSI */	  {19, {{36,1,30}, {40,1,30}, {44,1,30}, {48,1,30},
+	                        {52,1,30}, {56,1,30}, {60,1,30}, {64,1,30},
 	                        {100,1,20},{104,1,20},{108,1,20},{112,1,20},{116,1,20},{120,1,20},{124,1,20},{128,1,20},{132,1,20},{136,1,20},{140,1,20}  }
                       },
 	/* (4) SPAIN */    {3,  {{36,4,30},  //36, 40, 44, 48
@@ -219,12 +205,12 @@ static const BAND_TABLE_ELEMENT country_ie_channel_5g[] = {
 	                        {52,4,30},  //52, 56, 60, 64
 	                        {100,11,20} } //100, 104, 108, 112, 116,120,124,128,132,136,140
                       },
-	/* (6) MKK */     {19,  {{36,1,30}, {40,1,30}, {44,1,30}, {48,1,30}, 
-	                         {52,1,30}, {56,1,30}, {60,1,30}, {64,1,30}, 
+	/* (6) MKK */     {19,  {{36,1,30}, {40,1,30}, {44,1,30}, {48,1,30},
+	                         {52,1,30}, {56,1,30}, {60,1,30}, {64,1,30},
 	                         {100,1,20},{104,1,20},{108,1,20},{112,1,20},{116,1,20},{120,1,20},{124,1,20},{128,1,20},{132,1,20},{136,1,20},{140,1,20}  }
                       },
-	/* (7) ISRAEL */	  {19, {{36,1,30}, {40,1,30}, {44,1,30}, {48,1,30}, 
-	                        {52,1,30}, {56,1,30}, {60,1,30}, {64,1,30}, 
+	/* (7) ISRAEL */	  {19, {{36,1,30}, {40,1,30}, {44,1,30}, {48,1,30},
+	                        {52,1,30}, {56,1,30}, {60,1,30}, {64,1,30},
 	                        {100,1,30},{104,1,30},{108,1,30},{112,1,30},{116,1,30},{120,1,30},{124,1,30},{128,1,30},{132,1,30},{136,1,30},{140,1,30}  }
                       },
 	/* (8) MKK1 */	  {1,  {{34,4,30}  } // 34, 38, 42, 46
@@ -234,12 +220,12 @@ static const BAND_TABLE_ELEMENT country_ie_channel_5g[] = {
 	/* (10) MKK3 */	  {2,  {{36,4,30}, //36, 40, 44, 48
 	                        {52,4,30}  } //52, 56, 60, 64
                       },
-	/* (11) NCC (Taiwan) */	
-                      {15, {{56,1,30}, {60,1,30}, {64,1,30}, 
+	/* (11) NCC (Taiwan) */
+                      {15, {{56,1,30}, {60,1,30}, {64,1,30},
                             {100,1,20},{104,1,20},{108,1,20},{112,1,20},{116,1,20},{136,1,20},{140,1,20},
                             {149,1,30},{153,1,30},{157,1,30},{161,1,30},{165,1,30}  }
                       },
-	/* (12) RUSSIAN */{16, {{36,1,20}, {40,1,20}, {44,1,20}, {48,1,20}, 
+	/* (12) RUSSIAN */{16, {{36,1,20}, {40,1,20}, {44,1,20}, {48,1,20},
 	                        {52,1,20}, {56,1,20}, {60,1,20}, {64,1,20},
 	                        {132,1,30},{136,1,30},{140,1,30},
 	                        {149,1,30},{153,1,30},{157,1,30},{161,1,30},{165,1,30}}
@@ -248,14 +234,14 @@ static const BAND_TABLE_ELEMENT country_ie_channel_5g[] = {
                             {52,1,30}, {56,1,30}, {60,1,30}, {64,1,30},
 							{149,1,30},{153,1,30},{157,1,30},{161,1,30},{165,1,30}  }
                       },
-	/* (14) Global */	  {20, {{36,1,30}, {40,1,30}, {44,1,30}, {48,1,30}, 
-	                        {52,1,30}, {56,1,30}, {60,1,30}, {64,1,30}, 
+	/* (14) Global */	  {20, {{36,1,30}, {40,1,30}, {44,1,30}, {48,1,30},
+	                        {52,1,30}, {56,1,30}, {60,1,30}, {64,1,30},
 	                        {100,1,30},{104,1,30},{108,1,30},{112,1,30},{116,1,30},{136,1,30},{140,1,30},
 	                        {149,1,30},{153,1,30},{157,1,30},{161,1,30},{165,1,30}  }
                       },
-	/* (15) World_wide */	
-                      {20, {{36,1,30}, {40,1,30}, {44,1,30}, {48,1,30}, 
-                            {52,1,30}, {56,1,30}, {60,1,30}, {64,1,30}, 
+	/* (15) World_wide */
+                      {20, {{36,1,30}, {40,1,30}, {44,1,30}, {48,1,30},
+                            {52,1,30}, {56,1,30}, {60,1,30}, {64,1,30},
                             {100,1,30},{104,1,30},{108,1,30},{112,1,30},{116,1,30},{136,1,30},{140,1,30},
                             {149,1,30},{153,1,30},{157,1,30},{161,1,30},{165,1,30}  }
                       },
@@ -299,7 +285,7 @@ unsigned char * construct_country_ie(struct rtl8192cd_priv *priv, unsigned char	
             band_table = &(country_ie_channel_2_4g[country_ie->G_Band_Region-1]);
         }
     }
-    else {                 
+    else {
         if(country_ie->A_Band_Region) {
             band_table = &(country_ie_channel_5g[country_ie->A_Band_Region-1]);
         }
@@ -311,13 +297,13 @@ unsigned char * construct_country_ie(struct rtl8192cd_priv *priv, unsigned char	
 
         memcpy(temp + len, (unsigned char *)band_table->channel_set, band_table->channel_set_number*3);
         len += band_table->channel_set_number*3;
-        
+
         /*add padding, the length of country ie must divided by two*/
-        if(len%2) { 
+        if(len%2) {
             temp[len] = 0;
             len++;
         }
-        
+
         pbuf = set_ie(pbuf, _COUNTRY_IE_, len, temp, frlen);
     }
     return pbuf;
@@ -367,11 +353,11 @@ unsigned char search_country_txpower(struct rtl8192cd_priv *priv, unsigned char 
 
 
 #if defined(DOT11H) || defined(DOT11K)
-#if defined(CLIENT_MODE) || defined(CONFIG_RTK_MESH) 
+#if defined(CLIENT_MODE) || defined(CONFIG_RTK_MESH)
 unsigned char * construct_power_capability_ie(struct rtl8192cd_priv *priv, unsigned char	*pbuf, unsigned int *frlen) {
     unsigned char temp[2];
     temp[0] = priv->pmib->dot11hTPCEntry.min_tx_power;
-    temp[1] = priv->pmib->dot11hTPCEntry.max_tx_power;       
+    temp[1] = priv->pmib->dot11hTPCEntry.max_tx_power;
     pbuf = set_ie(pbuf, _PWR_CAPABILITY_IE_, 2, temp, frlen);
     return pbuf;
 }
@@ -388,9 +374,9 @@ unsigned char * construct_TPC_report_ie(struct rtl8192cd_priv *priv, unsigned ch
 #endif
 
 #ifdef DOT11H
-#if defined(CLIENT_MODE) || defined(CONFIG_RTK_MESH) 
+#if defined(CLIENT_MODE) || defined(CONFIG_RTK_MESH)
 unsigned char * construct_supported_channel_ie(struct rtl8192cd_priv *priv, unsigned char	*pbuf, unsigned int *frlen) {
-    const COUNTRY_IE_ELEMENT * country_ie;    
+    const COUNTRY_IE_ELEMENT * country_ie;
     const BAND_TABLE_ELEMENT * band_table = NULL;
     unsigned char temp[MAX_CHANNEL_SET_NUMBER*2];/*channel sets*/
     unsigned int i,j = 0;
@@ -401,18 +387,18 @@ unsigned char * construct_supported_channel_ie(struct rtl8192cd_priv *priv, unsi
                 band_table = &(country_ie_channel_2_4g[country_ie->G_Band_Region-1]);
             }
         }
-        else {                 
+        else {
             if(country_ie->A_Band_Region) {
                 band_table = &(country_ie_channel_5g[country_ie->A_Band_Region-1]);
             }
-        }        
+        }
         if(band_table) {
-            for(i = 0; i < band_table->channel_set_number; i++) {            
+            for(i = 0; i < band_table->channel_set_number; i++) {
                 temp[j++] = band_table->channel_set[i].firstChannel;
-                temp[j++] = band_table->channel_set[i].numberOfChannel;            
-            }     
+                temp[j++] = band_table->channel_set[i].numberOfChannel;
+            }
             pbuf = set_ie(pbuf, _SUPPORTED_CHANNEL_IE_, j, temp, frlen);
-        }   
+        }
     }
     return pbuf;
 }
@@ -425,15 +411,10 @@ void issue_TPC_report(struct rtl8192cd_priv *priv, unsigned char *da, unsigned c
 
     txinsn.q_num = MANAGE_QUE_NUM;
     txinsn.fr_type = _PRE_ALLOCMEM_;
-#ifdef P2P_SUPPORT	// 2013
-    if(rtk_p2p_is_enabled(priv)){
-        txinsn.tx_rate = _6M_RATE_;
-    }else
-#endif    
         txinsn.tx_rate = find_rate(priv, NULL, 0, 1);
-    
+
     txinsn.fixed_rate = 1;
-    
+
     pbuf = txinsn.pframe = get_mgtbuf_from_poll(priv);
     if (pbuf == NULL)
         goto issue_TPC_report_fail;
@@ -441,27 +422,27 @@ void issue_TPC_report(struct rtl8192cd_priv *priv, unsigned char *da, unsigned c
     txinsn.phdr = get_wlanhdr_from_poll(priv);
     if (txinsn.phdr == NULL)
         goto issue_TPC_report_fail;
-    
+
     memset((void *)(txinsn.phdr), 0, sizeof(struct wlan_hdr));
 
     pbuf[0] = _SPECTRUM_MANAGEMENT_CATEGORY_ID_;
     pbuf[1] = _TPC_REPORT_ACTION_ID_;
     pbuf[2] = dialog_token;
     frlen = 3;
-        
+
     construct_TPC_report_ie(priv, pbuf + frlen, &frlen);
-    
+
     txinsn.fr_len += frlen;
-    
+
     SetFrameSubType((txinsn.phdr), WIFI_WMM_ACTION);
 
     memcpy((void *)GetAddr1Ptr((txinsn.phdr)), da, MACADDRLEN);
     memcpy((void *)GetAddr2Ptr((txinsn.phdr)), GET_MY_HWADDR, MACADDRLEN);
     memcpy((void *)GetAddr3Ptr((txinsn.phdr)), BSSID, MACADDRLEN);
-    
+
     if ((rtl8192cd_firetx(priv, &txinsn)) == SUCCESS)
         return;
-    
+
 issue_TPC_report_fail:
 
     if (txinsn.phdr)

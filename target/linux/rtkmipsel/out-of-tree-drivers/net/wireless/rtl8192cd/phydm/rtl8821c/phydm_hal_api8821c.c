@@ -1,7 +1,7 @@
 /******************************************************************************
  *
  * Copyright(c) 2007 - 2011 Realtek Corporation. All rights reserved.
- *                                        
+ *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of version 2 of the GNU General Public License as
  * published by the Free Software Foundation.
@@ -21,7 +21,7 @@
 #include "mp_precomp.h"
 #include "../phydm_precomp.h"
 
-#if (RTL8821C_SUPPORT == 1)  
+#if (RTL8821C_SUPPORT == 1)
 
 /* ======================================================================== */
 /* These following functions can be used for PHY DM only*/
@@ -56,7 +56,7 @@ phydm_rfe_8821c(
 			ODM_SetBBReg(pDM_Odm, 0xeb4, bMaskByte1, 0x45);
 		} else
 			return FALSE;
-	
+
 		/* chip top mux */
 		ODM_SetBBReg(pDM_Odm, 0x64, BIT29|BIT28, 0x3);
 		ODM_SetBBReg(pDM_Odm, 0x4c, BIT26|BIT25, 0x0);
@@ -98,7 +98,7 @@ phydm_ccapar_8821c(
 		{0x75D97010, 0x75D97010, 0x75D97010, 0x75D97010}, /*Reg82C*/
 		{0x00000000, 0x00000000, 0x00000000, 0x00000000}, /*Reg830*/
 		{0x00000000, 0x00000000, 0x00000000, 0x00000000}, /*Reg838*/
-		/*40M*/					
+		/*40M*/
 		{0x75D97010, 0x75D97010, 0x75D97010, 0x75D97010}, /*Reg82C*/
 		{0x00000000, 0x79a0ea28, 0x00000000, 0x79a0ea28}, /*Reg830*/
 		{0x87765541, 0x87766341, 0x87765541, 0x87766341}, /*Reg838*/
@@ -120,7 +120,7 @@ phydm_ccapar_8821c(
 		{0x75BA7010, 0x75BA7010, 0x75BA7010, 0x75BA7010}, /*Reg82C*/
 		{0x00000000, 0x00000000, 0x00000000, 0x00000000}, /*Reg830*/
 		{0x87766431, 0x87766431, 0x87766431, 0x87766431} }; /*Reg838*/
-		
+
 	u1Byte	row, col;
 	u4Byte	reg82c, reg830, reg838;
 
@@ -155,14 +155,14 @@ phydm_ccapar_8821c(
 		reg830 = (cca_efem[row + 1][col] != 0)?cca_efem[row + 1][col]:reg830_8821c;
 		reg838 = (cca_efem[row + 2][col] != 0)?cca_efem[row + 2][col]:reg838_8821c;
 	}
-	
+
 	ODM_SetBBReg(pDM_Odm, 0x82c, bMaskDWord, reg82c);
 	ODM_SetBBReg(pDM_Odm, 0x830, bMaskDWord, reg830);
 	ODM_SetBBReg(pDM_Odm, 0x838, bMaskDWord, reg838);
-	
-	ODM_RT_TRACE(pDM_Odm, ODM_PHY_CONFIG, ODM_DBG_TRACE, ("[%s]: Update CCA parameters for Bcut (Pkt%d, Intf%d, RFE%d), row = %d, col = %d\n", 
+
+	ODM_RT_TRACE(pDM_Odm, ODM_PHY_CONFIG, ODM_DBG_TRACE, ("[%s]: Update CCA parameters for Bcut (Pkt%d, Intf%d, RFE%d), row = %d, col = %d\n",
 		__func__, pDM_Odm->PackageType, pDM_Odm->SupportInterface, pDM_Odm->RFEType, row, col));
-#endif	
+#endif
 }
 
 VOID
@@ -184,14 +184,14 @@ phydm_ccapar_by_bw_8821c(
 	if (bandwidth == ODM_BW20M) {
 		/* 82c[15:12] = 4 */
 		/* 82c[27:24] = 6 */
-		
+
 		reg82c &= (~(0x0f00f000));
 		reg82c |= ((0x4) << 12);
 		reg82c |= ((0x6) << 24);
 	} else if (bandwidth == ODM_BW40M) {
 		/* 82c[19:16] = 9 */
 		/* 82c[27:24] = 6 */
-	
+
 		reg82c &= (~(0x0f0f0000));
 		reg82c |= ((0x9) << 16);
 		reg82c |= ((0x6) << 24);
@@ -200,7 +200,7 @@ phydm_ccapar_by_bw_8821c(
 		/* 82c[19:16] b */
 		/* 82c[23:20] d */
 		/* 82c[27:24] 3 */
-	
+
 		reg82c &= (~(0x0ffff000));
 		reg82c |= ((0xdb7) << 12);
 		reg82c |= ((0x3) << 24);
@@ -208,7 +208,7 @@ phydm_ccapar_by_bw_8821c(
 
 	ODM_SetBBReg(pDM_Odm, 0x82c, bMaskDWord, reg82c);
 	ODM_RT_TRACE(pDM_Odm, ODM_PHY_CONFIG, ODM_DBG_TRACE, ("[%s]: Update CCA parameters for Acut\n", __func__));
-#endif	
+#endif
 }
 
 VOID
@@ -272,7 +272,7 @@ BOOLEAN
 phydm_write_txagc_1byte_8821c(
 	IN	PDM_ODM_T				pDM_Odm,
 	IN	u4Byte					PowerIndex,
-	IN	ODM_RF_RADIO_PATH_E		Path,	
+	IN	ODM_RF_RADIO_PATH_E		Path,
 	IN	u1Byte					HwRate
 	)
 {
@@ -303,7 +303,7 @@ phydm_write_txagc_1byte_8821c(
 	ODM_Write1Byte(pDM_Odm, (offset_txagc[Path] + HwRate), (PowerIndex & 0x3f));
 #endif
 
-	ODM_RT_TRACE(pDM_Odm, ODM_PHY_CONFIG, ODM_DBG_TRACE, ("[%s]: Path-%d Rate index 0x%x (0x%x) = 0x%x\n", 
+	ODM_RT_TRACE(pDM_Odm, ODM_PHY_CONFIG, ODM_DBG_TRACE, ("[%s]: Path-%d Rate index 0x%x (0x%x) = 0x%x\n",
 		__func__, Path, HwRate, (offset_txagc[Path] + HwRate), PowerIndex));
 	return TRUE;
 }
@@ -347,7 +347,7 @@ config_phydm_read_rf_reg_8821c(
 
 	/* Read RF register directly */
 	Readback_Value = ODM_GetBBReg(pDM_Odm, Direct_Addr, BitMask);
-	ODM_RT_TRACE(pDM_Odm, ODM_PHY_CONFIG, ODM_DBG_TRACE, ("[%s]: RF-%d 0x%x = 0x%x, bit mask = 0x%x\n", 
+	ODM_RT_TRACE(pDM_Odm, ODM_PHY_CONFIG, ODM_DBG_TRACE, ("[%s]: RF-%d 0x%x = 0x%x, bit mask = 0x%x\n",
 		__func__, RFPath, RegAddr, Readback_Value, BitMask));
 	return Readback_Value;
 }
@@ -399,11 +399,11 @@ config_phydm_write_rf_reg_8821c(
 	}
 
 	/* Put write addr in [27:20]  and write data in [19:00] */
-	DataAndAddr = ((RegAddr<<20) | (Data&0x000fffff)) & 0x0fffffff;	
+	DataAndAddr = ((RegAddr<<20) | (Data&0x000fffff)) & 0x0fffffff;
 
 	/* Write Operation */
 	ODM_SetBBReg(pDM_Odm, offset_writeRF[RFPath], bMaskDWord, DataAndAddr);
-	ODM_RT_TRACE(pDM_Odm, ODM_PHY_CONFIG, ODM_DBG_TRACE, ("[%s]: RF-%d 0x%x = 0x%x (original: 0x%x), bit mask = 0x%x\n", 
+	ODM_RT_TRACE(pDM_Odm, ODM_PHY_CONFIG, ODM_DBG_TRACE, ("[%s]: RF-%d 0x%x = 0x%x (original: 0x%x), bit mask = 0x%x\n",
 		__func__, RFPath, RegAddr, Data, Data_original, BitMask));
 	return TRUE;
 }
@@ -412,7 +412,7 @@ BOOLEAN
 config_phydm_write_txagc_8821c(
 	IN	PDM_ODM_T				pDM_Odm,
 	IN	u4Byte					PowerIndex,
-	IN	ODM_RF_RADIO_PATH_E		Path,	
+	IN	ODM_RF_RADIO_PATH_E		Path,
 	IN	u1Byte					HwRate
 	)
 {
@@ -436,7 +436,7 @@ config_phydm_write_txagc_8821c(
 	/* driver need to construct a 4-byte power index */
 	ODM_SetBBReg(pDM_Odm, (offset_txagc[Path] + rate_idx), bMaskDWord, PowerIndex);
 
-	ODM_RT_TRACE(pDM_Odm, ODM_PHY_CONFIG, ODM_DBG_TRACE, ("[%s]: Path-%d Rate index 0x%x (0x%x) = 0x%x\n", 
+	ODM_RT_TRACE(pDM_Odm, ODM_PHY_CONFIG, ODM_DBG_TRACE, ("[%s]: Path-%d Rate index 0x%x (0x%x) = 0x%x\n",
 		__func__, Path, HwRate, (offset_txagc[Path] + HwRate), PowerIndex));
 	return TRUE;
 }
@@ -471,14 +471,14 @@ config_phydm_read_txagc_8821c(
 	readBack_data = (u1Byte)ODM_GetBBReg(pDM_Odm, 0xd30, 0x7f0000);
 
 	/* Driver have to disable TXAGC report after reading TXAGC (ref. user guide v11) */
-	ODM_SetBBReg(pDM_Odm, 0x1998, BIT16, 0x0);	
-	
+	ODM_SetBBReg(pDM_Odm, 0x1998, BIT16, 0x0);
+
 	ODM_RT_TRACE(pDM_Odm, ODM_PHY_CONFIG, ODM_DBG_TRACE, ("[%s]: Path-%d rate index 0x%x = 0x%x\n", __func__, Path, HwRate, readBack_data));
 	return readBack_data;
 }
 
 BOOLEAN
-config_phydm_switch_band_8821c(	
+config_phydm_switch_band_8821c(
 	IN	PDM_ODM_T				pDM_Odm,
 	IN	u1Byte					central_ch
 	)
@@ -486,7 +486,7 @@ config_phydm_switch_band_8821c(
 	u4Byte		rf_reg18;
 	BOOLEAN		rf_reg_status = TRUE;
 
-	ODM_RT_TRACE(pDM_Odm, ODM_PHY_CONFIG, ODM_DBG_TRACE, ("[%s]======================>\n", __func__));	
+	ODM_RT_TRACE(pDM_Odm, ODM_PHY_CONFIG, ODM_DBG_TRACE, ("[%s]======================>\n", __func__));
 
 	if (pDM_Odm->bDisablePhyApi) {
 		ODM_RT_TRACE(pDM_Odm, ODM_PHY_CONFIG, ODM_DBG_TRACE, ("[%s]: disable PHY API for debug!!\n", __func__));
@@ -518,7 +518,7 @@ config_phydm_switch_band_8821c(
 
 		/* Enable BB CCK check */
 		ODM_SetBBReg(pDM_Odm, 0xa80, BIT18, 0x1);
-		
+
 		/* Enable CCK check */
 		ODM_SetBBReg(pDM_Odm, 0x454, BIT7, 0x1);
 
@@ -542,16 +542,16 @@ config_phydm_switch_band_8821c(
 		return FALSE;
 
 	if (rf_reg_status == FALSE) {
-		ODM_RT_TRACE(pDM_Odm, ODM_PHY_CONFIG, ODM_DBG_TRACE, ("[%s]: Fail to switch band (ch: %d), because writing RF register is fail\n", __func__, central_ch));	
+		ODM_RT_TRACE(pDM_Odm, ODM_PHY_CONFIG, ODM_DBG_TRACE, ("[%s]: Fail to switch band (ch: %d), because writing RF register is fail\n", __func__, central_ch));
 		return FALSE;
 	}
 
-	ODM_RT_TRACE(pDM_Odm, ODM_PHY_CONFIG, ODM_DBG_TRACE, ("[%s]: Success to switch band (ch: %d)\n", __func__, central_ch));	
+	ODM_RT_TRACE(pDM_Odm, ODM_PHY_CONFIG, ODM_DBG_TRACE, ("[%s]: Success to switch band (ch: %d)\n", __func__, central_ch));
 	return TRUE;
 }
 
 BOOLEAN
-config_phydm_switch_channel_8821c(	
+config_phydm_switch_channel_8821c(
 	IN	PDM_ODM_T				pDM_Odm,
 	IN	u1Byte					central_ch
 	)
@@ -671,7 +671,7 @@ config_phydm_switch_channel_8821c(
 }
 
 BOOLEAN
-config_phydm_switch_bandwidth_8821c(	
+config_phydm_switch_bandwidth_8821c(
 	IN	PDM_ODM_T				pDM_Odm,
 	IN	u1Byte					primary_ch_idx,
 	IN	ODM_BW_E				bandwidth
@@ -744,7 +744,7 @@ config_phydm_switch_bandwidth_8821c(
 
 		/* RF bandwidth */
 		rf_reg18 = (rf_reg18 & (~(BIT11|BIT10)));
-		rf_reg18 = (rf_reg18|BIT11);		
+		rf_reg18 = (rf_reg18|BIT11);
 
 		break;
 	}
@@ -837,14 +837,14 @@ config_phydm_switch_bandwidth_8821c(
 	/*ODM_SetBBReg(pDM_Odm, 0x808, bMaskByte0, 0x0);*/
 	/*ODM_SetBBReg(pDM_Odm, 0x808, bMaskByte0, 0x11);*/
 
-	
+
 
 	ODM_RT_TRACE(pDM_Odm, ODM_PHY_CONFIG, ODM_DBG_TRACE, ("[%s]: Success to switch bandwidth (bw: %d, primary ch: %d)\n", __func__, bandwidth, primary_ch_idx));
 	return TRUE;
 }
 
 BOOLEAN
-config_phydm_switch_channel_bw_8821c(	
+config_phydm_switch_channel_bw_8821c(
 	IN	PDM_ODM_T				pDM_Odm,
 	IN	u1Byte					central_ch,
 	IN	u1Byte					primary_ch_idx,
@@ -894,7 +894,7 @@ config_phydm_parameter_init_8821c(
 		ODM_RT_TRACE(pDM_Odm, ODM_PHY_CONFIG, ODM_DBG_TRACE, ("[%s]: Post setting: enable OFDM and CCK block\n", __func__));
 		reg82c_8821c = ODM_GetBBReg(pDM_Odm, 0x82c, bMaskDWord);
 		reg838_8821c = ODM_GetBBReg(pDM_Odm, 0x838, bMaskDWord);
-		reg830_8821c = ODM_GetBBReg(pDM_Odm, 0x830, bMaskDWord);	
+		reg830_8821c = ODM_GetBBReg(pDM_Odm, 0x830, bMaskDWord);
 	} else {
 		ODM_RT_TRACE(pDM_Odm, ODM_PHY_CONFIG, ODM_DBG_TRACE, ("[%s]: Wrong type!!\n", __func__));
 		return FALSE;
@@ -908,7 +908,7 @@ query_phydm_trx_capability_8821c(
 	IN	PDM_ODM_T				pDM_Odm
 ){
 	u4Byte value32 = 0x00000000;
-	
+
 	ODM_RT_TRACE(pDM_Odm, ODM_PHY_CONFIG, ODM_DBG_TRACE, ("[%s]: trx_capability = 0x%x\n", __func__, value32));
 	return value32;
 }
@@ -918,7 +918,7 @@ query_phydm_stbc_capability_8821c(
 	IN	PDM_ODM_T				pDM_Odm
 ){
 	u4Byte value32 = 0x00010001;
-	
+
 	ODM_RT_TRACE(pDM_Odm, ODM_PHY_CONFIG, ODM_DBG_TRACE, ("[%s]: stbc_capability = 0x%x\n", __func__, value32));
 	return value32;
 }
@@ -928,7 +928,7 @@ query_phydm_ldpc_capability_8821c(
 	IN	PDM_ODM_T				pDM_Odm
 ){
 	u4Byte value32 = 0x01000100;
-	
+
 	ODM_RT_TRACE(pDM_Odm, ODM_PHY_CONFIG, ODM_DBG_TRACE, ("[%s]: ldpc_capability = 0x%x\n", __func__, value32));
 	return value32;
 }
@@ -938,7 +938,7 @@ query_phydm_txbf_parameters_8821c(
 	IN	PDM_ODM_T				pDM_Odm
 ){
 	u4Byte value32 = 0x00030003;
-	
+
 	ODM_RT_TRACE(pDM_Odm, ODM_PHY_CONFIG, ODM_DBG_TRACE, ("[%s]: txbf_parameters = 0x%x\n", __func__, value32));
 	return value32;
 }
@@ -948,7 +948,7 @@ query_phydm_txbf_capability_8821c(
 	IN	PDM_ODM_T				pDM_Odm
 ){
 	u4Byte value32 = 0x01010001;
-	
+
 	ODM_RT_TRACE(pDM_Odm, ODM_PHY_CONFIG, ODM_DBG_TRACE, ("[%s]: txbf_capability = 0x%x\n", __func__, value32));
 	return value32;
 }

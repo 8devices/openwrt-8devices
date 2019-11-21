@@ -6,19 +6,19 @@ Copyright (c) Realtek Semiconductor Corp. All rights reserved.
 
 Module Name:
 	Hal88XXDebug.h
-	
+
 Abstract:
 	Defined HAL 88XX debug reigster
-	    
+
 Major Change History:
 	When       Who               What
 	---------- ---------------   -------------------------------
-	2012-09-07 Eric              Create.	
+	2012-09-07 Eric              Create.
 --*/
 
 
 //
-//**Note**: 
+//**Note**:
 //      If one of these register is used, we should register MACRO at RTL88XXX_debug.h.
 //
 // Range List:
@@ -56,8 +56,8 @@ typedef enum _DRV_ERR0_STATUS_
     DRV_ER_RSVD_2               = BIT13,
     DRV_ER_RSVD_3               = BIT14,
     DRV_ER_RSVD_4               = BIT15,
-    DRV_ER_RSVD_5               = BIT16,    
-    
+    DRV_ER_RSVD_5               = BIT16,
+
 }DRV_ERR0_STATUS, *PDRV_ERR0_STATUS;
 
 

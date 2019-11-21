@@ -6,9 +6,7 @@
 #include "StatusCode.h"
 #include "HalDbgCmd.h"
 
-#ifdef CONFIG_WLAN_MACHAL_API
 #include "HalMacAPI.h"
-#endif
 
 //MAC function support
 #include "HalMacFunc.h"
@@ -39,7 +37,7 @@
 //Instance
 #include "HalCommon.h"
 
- 
+
 
 
 #if IS_RTL88XX_GENERATION
@@ -100,16 +98,14 @@
 
 #endif  //IS_RTL88XX_GENERATION
 
-#else  
+#else
 
 //HAL Shared with Driver
 #include "Include/StatusCode.h"
 #include "HalDbgCmd.h"
 
 
-#ifdef CONFIG_WLAN_MACHAL_API
 #include "HalMacAPI.h"
-#endif
 
 //MAC function support
 #include "HalMacFunc.h"

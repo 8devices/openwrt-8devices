@@ -12,37 +12,21 @@
 
 #define _8192CD_TKIP_C_
 
-#ifdef __KERNEL__
 #include <linux/module.h>
 #include <asm/byteorder.h>
-#elif defined(__ECOS)
-#include <cyg/io/eth/rltk/819x/wrapper/sys_support.h>
-#include <cyg/io/eth/rltk/819x/wrapper/skbuff.h>
-#include <cyg/io/eth/rltk/819x/wrapper/timer.h>
-#include <cyg/io/eth/rltk/819x/wrapper/wrapper.h>
-#endif
 
 #include "./8192cd_cfg.h"
 
-#if !defined(__KERNEL__) && !defined(__ECOS)
-#include "./sys-support.h"
-#endif
 
 #include "./8192cd.h"
-#if defined(__KERNEL__) || defined(__OSK__)
 #include "./ieee802_mib.h"
-#elif defined(__ECOS)
-#include <cyg/io/eth/rltk/819x/wlan/ieee802_mib.h>
-#endif
 #include "./8192cd_util.h"
 #include "./8192cd_headers.h"
 #include "./8192cd_debug.h"
 
-#ifdef __LINUX_2_6__
 /*avoid mutli defined*/
 #ifdef swap
 #undef swap
-#endif
 #endif
 
 #define MAX_MESSAGE_LENGTH 2048
@@ -238,13 +222,12 @@ void michael(
 		num_blocks -= 2;
 	}
 
-#ifndef NOT_RTK_BSP
 	if ((priv->pshare->have_hw_mic) &&
 		!(priv->pmib->dot11StationConfigEntry.swTkipMic))
 	{
 		if (tx)
 			rtl_cache_sync_wback(priv, (unsigned long)message, (num_blocks*4), PCI_DMA_TODEVICE);
-		
+
 		*(volatile unsigned int *)GDMACNR  = 0;
 		*(volatile unsigned int *)GDMACNR  = GDMA_ENABLE;
 		*(volatile unsigned int *)GDMAIMR  = 0;
@@ -258,7 +241,6 @@ void michael(
 		*(volatile unsigned int *)GDMACNR  = GDMA_ENABLE|GDMA_POLL|GDMA_MIC|internalUsedGDMACNR;
 	}
 	else
-#endif // NOT_RTK_BSP
 	{
 		for (block = 0; block < num_blocks; block++)
 		{
@@ -783,23 +765,12 @@ void tkip_encrypt(
 	struct stat_info	*pstat = NULL;
 	unsigned char *ta = GET_MY_HWADDR;
 	unsigned char *ra;
-#ifdef WDS
-	unsigned int to_fr_ds = (GetToDs(pwlhdr) << 1) | GetFrDs(pwlhdr);
-#endif
 
 	DEBUG_TRACE;
 
 	ra = GetAddr1Ptr(pwlhdr);
 	pstat = get_stainfo(priv, ra);
 
-#ifdef WDS
-	if ( (to_fr_ds == 3) && pstat && (pstat->state & WIFI_WDS)) {
-		ttkey = GET_UNICAST_ENCRYP_KEY;
-		ptsc48 = GET_UNICAST_ENCRYP_PN;
-		keyid = pstat->keyid;
-		goto do_tkip_encrypt;
-	}
-#endif
 
 	if (OPMODE & WIFI_AP_STATE)
 	{
@@ -854,9 +825,6 @@ void tkip_encrypt(
 		return;
 	}
 
-#ifdef WDS
-do_tkip_encrypt:
-#endif
 	pnl = get_pnl(ptsc48);
 	pnh = get_pnh(ptsc48);
 
@@ -906,13 +874,6 @@ unsigned int tkip_decrypt(struct rtl8192cd_priv *priv, struct rx_frinfo *pfrinfo
 	pstat = get_stainfo(priv, ta);
 
 	if (pstat) {
-#ifdef WDS
-		if ((pfrinfo->to_fr_ds == 3) && (pstat->state & WIFI_WDS)) {
-			keylen = GET_UNICAST_ENCRYP_KEYLEN;
-			ttkey  = GET_UNICAST_ENCRYP_KEY;
-			goto do_tkip_decrypt;
-		}
-#endif
 	}
 
 	if (OPMODE & WIFI_AP_STATE)
@@ -933,7 +894,7 @@ unsigned int tkip_decrypt(struct rtl8192cd_priv *priv, struct rx_frinfo *pfrinfo
 				keylen = GET_GROUP_IDX2_ENCRYP_KEYLEN;
 				ttkey = GET_GROUP_ENCRYP2_KEY;
 			}
-			else{				
+			else{
 				keylen = GET_GROUP_ENCRYP_KEYLEN;
 				ttkey = GET_GROUP_ENCRYP_KEY;
 			}
@@ -959,9 +920,6 @@ unsigned int tkip_decrypt(struct rtl8192cd_priv *priv, struct rx_frinfo *pfrinfo
 		DEBUG_ERR("no descrypt key for TKIP due to keylen=0\n");
 		return FALSE;
 	}
-#ifdef WDS
-do_tkip_decrypt:
-#endif
 	tsc48._byte_.TSC1 = *(pframe + hdr_len + 0);
 	tsc48._byte_.TSC0 = *(pframe + hdr_len + 2);
 	tsc48._byte_.TSC2 = *(pframe + hdr_len + 4);
@@ -1007,9 +965,6 @@ void wep_encrypt(struct rtl8192cd_priv *priv, unsigned char *pwlhdr, unsigned in
 	struct stat_info *pstat = NULL;
 	unsigned int *piv;
 	int keylen;
-#ifdef WDS
-	unsigned int to_fr_ds = (GetToDs(pwlhdr) << 1) | GetFrDs(pwlhdr);
-#endif
 
 	DEBUG_TRACE;
 
@@ -1017,13 +972,6 @@ void wep_encrypt(struct rtl8192cd_priv *priv, unsigned char *pwlhdr, unsigned in
 	pstat = get_stainfo(priv, ra);
 
 	if (pstat) {
-#ifdef WDS
-		if ((to_fr_ds == 3) && (pstat->state & WIFI_WDS)) {
-			ttkey = GET_UNICAST_ENCRYP_KEY;
-			keyid = pstat->keyid;
-			goto do_encrypt;
-		}
-#endif
 	}
 
 	if (priv->pmib->dot118021xAuthEntry.dot118021xAlgrthm)	// 1x enabled, get key from mapping table
@@ -1068,9 +1016,6 @@ void wep_encrypt(struct rtl8192cd_priv *priv, unsigned char *pwlhdr, unsigned in
 		ttkey = priv->pmib->dot11DefaultKeysTable.keytype[keyid&3].skey;
 	}
 
-#ifdef WDS
-do_encrypt:
-#endif
 
 	piv = (unsigned int *)GET_GROUP_ENCRYP_PN;
 	if (type == _WEP_40_PRIVACY_)
@@ -1078,20 +1023,7 @@ do_encrypt:
 	else
 		keylen = 16;
 
-#ifdef __OSK__
-	{
-		/* 20100612 iv pointer is not always 4byte alignment, when qos enabled on station and ap, and mb
-		ssid enabled, txcfg->hdrlen is 26 for QoS*/
-       unsigned long temp;
-       temp = cpu_to_le32(((*piv) & 0x00FFFFFF) |((keyid&0x03)<<30));
-       *((unsigned char*)iv) = (temp>>24)&0xFF;
-       *(((unsigned char*)iv)+1) = (temp>>16)&0xFF;
-       *(((unsigned char*)iv)+2) = (temp>>8)&0xFF;
-       *(((unsigned char*)iv)+3) = temp&0xFF;
-	}
-#else
 	*((unsigned int *)iv) = cpu_to_le32(((*piv) & 0x00FFFFFF) |((keyid&0x03)<<30));
-#endif
 	*piv = *piv + 1;
 
 	memcpy(rc4key, iv, 3);
@@ -1101,7 +1033,7 @@ do_encrypt:
 {
 	char tmpbuf[400], tmp1[100];
 	int i;
-	
+
 	sprintf(tmpbuf, "wep encrypt: iv=%d, keyid=%d, type=%s, key=",
 		(le32_to_cpup((u32 *)iv) & 0xFFFFFF), keyid,
 		(type==_WEP_40_PRIVACY_ ? "64b" : "128b"));
@@ -1153,12 +1085,6 @@ unsigned int wep_decrypt(struct rtl8192cd_priv *priv, struct rx_frinfo *pfrinfo,
 	pstat = get_stainfo(priv, ta);
 
 	if (pstat) {
-#ifdef WDS
-		if ((pfrinfo->to_fr_ds == 3) && (pstat->state & WIFI_WDS)) {
-			ttkey = GET_UNICAST_ENCRYP_KEY;
-			goto do_decrypt;
-		}
-#endif
 	}
 
 	if (priv->pmib->dot118021xAuthEntry.dot118021xAlgrthm)	// 1x enabled, get key from mapping table
@@ -1213,9 +1139,6 @@ unsigned int wep_decrypt(struct rtl8192cd_priv *priv, struct rx_frinfo *pfrinfo,
 	else // default key
 		ttkey = priv->pmib->dot11DefaultKeysTable.keytype[(iv[3]>>6) & 3].skey;
 
-#ifdef WDS
-do_decrypt:
-#endif
 
 	memcpy(rc4key, iv, 3);
 	memcpy(&rc4key[3], ttkey, keylen-3);
@@ -1224,7 +1147,7 @@ do_decrypt:
 {
 	char tmpbuf[400], tmp1[100];
 	int i;
-	
+
 	sprintf(tmpbuf, "wep decript: iv=%d, keyid=%d, type=%s, key=",
 		(le32_to_cpup((u32 *)iv) & 0xFFFFFF), (int)((iv[3]>>6)&3),
 		(type==_WEP_40_PRIVACY_ ? "64b" : "128b"));
@@ -1277,9 +1200,6 @@ int tkip_rx_mic(struct rtl8192cd_priv *priv, unsigned char *pframe, unsigned cha
 
 	if (OPMODE & WIFI_AP_STATE)
 	{
-#ifdef WDS
-		unsigned int to_fr_ds = (GetToDs(pframe) << 1) | GetFrDs(pframe);
-#endif
 
 		if (pstat == NULL) {
 			DEBUG_ERR("rx mic pstat == NULL\n");
@@ -1287,15 +1207,6 @@ int tkip_rx_mic(struct rtl8192cd_priv *priv, unsigned char *pframe, unsigned cha
 		}
 
 		keylen = GET_UNICAST_MIC_KEYLEN;
-#ifdef WDS
-		if ( to_fr_ds==3 && (pstat->state & WIFI_WDS))
-#ifdef __DRAYTEK_OS__
-		mickey = GET_UNICAST_TKIP_MIC2_KEY;
-#else
-		mickey = GET_UNICAST_TKIP_MIC1_KEY;
-#endif
-		else
-#endif
 		mickey = GET_UNICAST_TKIP_MIC2_KEY;
 	}
 #ifdef CLIENT_MODE
@@ -1308,7 +1219,7 @@ int tkip_rx_mic(struct rtl8192cd_priv *priv, unsigned char *pframe, unsigned cha
             mickey = GET_UNICAST_TKIP_MIC1_KEY;
         }
         else
-        #endif     
+        #endif
 		if (IS_MCAST(da))
 		{
 	 		if((pframe[WLAN_HDR_A3_LEN + 3]&BIT(7))){
@@ -1317,7 +1228,7 @@ int tkip_rx_mic(struct rtl8192cd_priv *priv, unsigned char *pframe, unsigned cha
 			}
 			else{
 				keylen = GET_GROUP_MIC_KEYLEN;
-				mickey = GET_GROUP_TKIP_MIC1_KEY;		
+				mickey = GET_GROUP_TKIP_MIC1_KEY;
 			}
 		}
 		else
@@ -1361,7 +1272,6 @@ int tkip_rx_mic(struct rtl8192cd_priv *priv, unsigned char *pframe, unsigned cha
 	if ((16 + len + 5) & (4-1))
 		num_blocks++;
 
-#ifndef NOT_RTK_BSP
 	if ((priv->pshare->have_hw_mic) &&
 		!(priv->pmib->dot11StationConfigEntry.swTkipMic))
 	{
@@ -1389,7 +1299,6 @@ int tkip_rx_mic(struct rtl8192cd_priv *priv, unsigned char *pframe, unsigned cha
 		tkipmic[7] = (unsigned char)((r >> 24) & 0xff);
 	}
 	else
-#endif // NOT_RTK_BSP
 		michael(priv, mickey, hdr, pbuf, pbuf+8, (num_blocks << 2), tkipmic, 0);
 
 	return TRUE;

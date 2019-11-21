@@ -3,14 +3,14 @@ Copyright (c) Realtek Semiconductor Corp. All rights reserved.
 
 Module Name:
 	Hal88XXGen.c
-	
+
 Abstract:
 	Defined RTL8192EE HAL Function
-	    
+
 Major Change History:
 	When       Who               What
 	---------- ---------------   -------------------------------
-	2012-03-23 Filen            Create.	
+	2012-03-23 Filen            Create.
 --*/
 
 
@@ -44,7 +44,7 @@ typedef enum _RTL8192E_EXTEND_C2H_EVT
 RT_STATUS
 InitPON_8192ES(
     IN  HAL_PADAPTER Adapter,
-    IN  u4Byte     	ClkSel        
+    IN  u4Byte     	ClkSel
 )
 {
 	u32     bytetmp;
@@ -65,13 +65,13 @@ InitPON_8192ES(
 		HAL_RTL_W16(REG_AFE_CTRL4, 0x002a);
 		HAL_RTL_W8(REG_AFE_CTRL2, 1);
 	}
-	
+
 	//pattern Patching EQC fail IC(AFE issue)
 	//Setting is suggested by SD1-Pisa
 	//Set 0x78[21] = 0, 0x28[6] = 0
 	//0x28[6] = 0 is done by XTAL seletion 0x28[6] = 0
 	HAL_RTL_W32(REG_AFE_CTRL4, HAL_RTL_R32(REG_AFE_CTRL4) & ~BIT21);
-	
+
 	if (!HalPwrSeqCmdParsing88XX(Adapter, PWR_CUT_ALL_MSK, PWR_FAB_ALL_MSK,
 			PWR_INTF_SDIO_MSK, rtl8192E_card_enable_flow))
 	{
@@ -128,13 +128,13 @@ InitPON_8192ES(
 
 	if (bytetmp & BIT(0)) {
 		RT_TRACE(COMP_INIT, DBG_SERIOUS, ("%s ERROR: auto enable WLAN failed!!(0x%02X)\n", __FUNCTION__, bytetmp) );
-	}	
+	}
 
 	HAL_RTL_W16(REG_SYS_FUNC_EN, HAL_RTL_R16(REG_SYS_FUNC_EN) & ~BIT_FEN_CPUEN);
 
 	HAL_delay_us(2);
 
-	// check LDO mode 
+	// check LDO mode
 	if (HAL_RTL_R32(REG_SYS_CFG1) & BIT24) {
 		// LDO mode set 0x7C
 		HAL_RTL_W8(REG_LDO_SWR_CTRL, 0xc3);
@@ -143,7 +143,7 @@ InitPON_8192ES(
 		HAL_RTL_W8(REG_LDO_SWR_CTRL, 0x83);
 	}
 
-	return  RT_STATUS_SUCCESS;    
+	return  RT_STATUS_SUCCESS;
 }
 
 
@@ -178,21 +178,21 @@ RT_STATUS
 StopHW_8192ES(
     IN  HAL_PADAPTER Adapter
 )
-{   
+{
 	HAL_RTL_W8(REG_RSV_CTRL, HAL_RTL_R8(REG_RSV_CTRL)& ~BIT(1));//unlock reg0x00~0x03 for 8881a, 92e
 
 	//MCU reset
 	HAL_RTL_W16(REG_SYS_FUNC_EN, HAL_RTL_R16(REG_SYS_FUNC_EN) & ~BIT10);
 
 	// Run LPS WL RFOFF flow
-	if (_FALSE == HalPwrSeqCmdParsing88XX(Adapter, PWR_CUT_ALL_MSK, PWR_FAB_ALL_MSK, 
+	if (_FALSE == HalPwrSeqCmdParsing88XX(Adapter, PWR_CUT_ALL_MSK, PWR_FAB_ALL_MSK,
 			PWR_INTF_SDIO_MSK, rtl8192E_enter_lps_flow)) {
 		RT_TRACE(COMP_INIT, DBG_SERIOUS, ("rtl8192E_enter_lps_flow\n"));
 	}
-	
+
 	// Disable CMD53 R/W Operation
 	GET_HAL_INTF_DATA(Adapter)->bMacPwrCtrlOn = FALSE;
-	
+
 	// Card disable power action flow
 	if (_FALSE == HalPwrSeqCmdParsing88XX(Adapter, PWR_CUT_ALL_MSK, PWR_FAB_ALL_MSK,
 			PWR_INTF_SDIO_MSK, rtl8192E_card_disable_flow)) {
@@ -231,12 +231,12 @@ StopMBSSID_8192ES(
 RT_STATUS
 SetMACIDSleep_8192ES(
     IN  HAL_PADAPTER Adapter,
-    IN  BOOLEAN      bSleep,   
+    IN  BOOLEAN      bSleep,
     IN  u4Byte       aid
 )
 {
 	notify_macid_pause_change(Adapter, aid, bSleep);
-	
+
         return RT_STATUS_SUCCESS;
 }
 
@@ -251,7 +251,7 @@ UpdateHalMSRRPT_8192ES(
 }
 
 
-RT_STATUS	
+RT_STATUS
 hal_Associate_8192ES(
     HAL_PADAPTER        Adapter,
     BOOLEAN                 IsDefaultAdapter
@@ -272,10 +272,6 @@ hal_Associate_8192ES(
     pHalFunc->InitMBIDCAMHandler    = InitMBIDCAM88XX;
 #endif  //CFG_HAL_SUPPORT_MBSSID
     pHalFunc->InitLLT_TableHandler  = InitLLT_Table88XX;
-#ifdef MULTI_MAC_CLONE
-	pHalFunc->McloneSetMBSSIDHandler 	= McloneSetMBSSID88XX;
-	pHalFunc->McloneStopMBSSIDHandler   = McloneStopMBSSID88XX;
-#endif
     pHalFunc->SetMBIDCAMHandler     = SetMBIDCAM88XX;
     pHalFunc->InitVAPIMRHandler     = InitVAPIMR88XX;
 
@@ -325,7 +321,7 @@ hal_Associate_8192ES(
     pHalFunc->Timer1SecDMHandler            =   Timer1SecDM88XX;
 #endif //CFG_HAL_MACDM
     //
-    // Security Related     
+    // Security Related
     //
     pHalFunc->CAMReadMACConfigHandler       =   CAMReadMACConfig88XX;
     pHalFunc->CAMEmptyEntryHandler          =   CAMEmptyEntry88XX;
@@ -339,7 +335,7 @@ hal_Associate_8192ES(
     pHalFunc->PHYSetCCKTxPowerHandler       = PHYSetCCKTxPower88XX_N;
     pHalFunc->PHYSetOFDMTxPowerHandler      = PHYSetOFDMTxPower88XX_N;
     pHalFunc->PHYSwBWModeHandler            = SwBWMode88XX_N;
-    //pHalFunc->TXPowerTrackingHandler        = TXPowerTracking_ThermalMeter_88XX;    
+    //pHalFunc->TXPowerTrackingHandler        = TXPowerTracking_ThermalMeter_88XX;
     pHalFunc->PHYSSetRFRegHandler           = PHY_SetRFReg_88XX_N;
     pHalFunc->PHYQueryRFRegHandler          = PHY_QueryRFReg_88XX_N;
     pHalFunc->IsBBRegRangeHandler           = IsBBRegRange88XX;
@@ -362,22 +358,22 @@ hal_Associate_8192ES(
     pHalFunc->SetRsvdPageHandler	          = SetRsvdPage88XX;
     pHalFunc->GetRsvdPageLocHandler	        = GetRsvdPageLoc88XX;
 #endif // SDIO_AP_OFFLOAD
-    
+
 //    pHalFunc->DownloadRsvdPageHandler	    = DownloadRsvdPage88XX;
     pHalFunc->C2HHandler                    = C2HHandler88XX;
-    pHalFunc->C2HPacketHandler              = C2HPacketHandler_92E;    
-    
-    return  RT_STATUS_SUCCESS;    
+    pHalFunc->C2HPacketHandler              = C2HPacketHandler_92E;
+
+    return  RT_STATUS_SUCCESS;
 }
 
 
-void 
+void
 InitMAC8192EE(
     IN  HAL_PADAPTER Adapter
 )
 {
 
-    
+
 }
 
 VOID
@@ -403,7 +399,7 @@ C2HTxTxReportHandler_92E(
 VOID
 _C2HContentParsing92E(
 	struct rtl8192cd_priv *priv,
-		u1Byte			c2hCmdId, 
+		u1Byte			c2hCmdId,
 		u1Byte			c2hCmdLen,
 		pu1Byte 			tmpBuf
 )
@@ -411,16 +407,16 @@ _C2HContentParsing92E(
 	switch(c2hCmdId)
 	{
 		case C2H_8192E_TXBF:
-#if (BEAMFORMING_SUPPORT == 1) 	
+#if (BEAMFORMING_SUPPORT == 1)
 			C2HTxBeamformingHandler_92E(priv, tmpBuf, c2hCmdLen);
-#endif	
+#endif
 			break;
 		case C2H_8192E_TX_RATE:
-#ifdef TXREPORT	
+#ifdef TXREPORT
 			C2HTxTxReportHandler_92E(priv, tmpBuf, c2hCmdLen);
 			//requestTxReport88XX(priv);
 			notify_request_tx_report(priv);
-#endif			
+#endif
 			break;
 
 		default:
@@ -454,8 +450,8 @@ C2HPacketHandler_92E(
 	{
 		c2hCmdLen = Length -2;
 		tmpBuf = Buffer+2;
-		
-		_C2HContentParsing92E(priv, c2hCmdId, c2hCmdLen, tmpBuf);		
+
+		_C2HContentParsing92E(priv, c2hCmdId, c2hCmdLen, tmpBuf);
 	}
 }
 
@@ -475,12 +471,12 @@ SetBeamformRfMode92E(
 	BEAMFORMING_CAP 	BeamformCap = BEAMFORMING_CAP_NONE;
 
 	BeamformCap = Beamforming_GetBeamCap(priv, pBeamformingInfo);
-	
+
 	if(BeamformCap == pBeamformingInfo->BeamformCap)
 		return;
-	else 
+	else
 		pBeamformingInfo->BeamformCap = BeamformCap;
-	
+
 	if(get_rf_mimo_mode(priv) == MIMO_1T1R)
 		return;
 
@@ -491,7 +487,7 @@ SetBeamformRfMode92E(
 	bSelfBeamformee = BeamformCap & BEAMFORMEE_CAP;
 
 	if(bSelfBeamformer)
-	{ 
+	{
 		// Path_A
 		PHY_SetRFReg(priv, ODM_RF_PATH_A, RF_RCK_OS, 0xfffff,0x18000); // Select RX mode	0x30=0x18000
 		PHY_SetRFReg(priv, ODM_RF_PATH_A, RF_TXPA_G1, 0xfffff,0x0000f); // Set Table data
@@ -523,7 +519,7 @@ SetBeamformRfMode92E(
 		priv->pshare->rf_phy_bb_backup[19] = 0x83321333;
 		priv->pshare->rf_phy_bb_backup[22] |=  BIT31|BIT30;
 #endif
-			
+
 	}
 	else {
 		PHY_SetBBReg(priv, 0x90c, 0xffffffff, 0x81121313);
@@ -545,7 +541,7 @@ SetBeamformEnter92E(
 	u1Byte					i = 0;
 	u1Byte					BFerIdx = (BFerBFeeIdx & 0xF0)>>4;
 	u1Byte					BFeeIdx = (BFerBFeeIdx & 0xF);
-	u4Byte					CSI_Param;	
+	u4Byte					CSI_Param;
 	PRT_BEAMFORMING_INFO 	pBeamformingInfo = &(priv->pshare->BeamformingInfo);
 	RT_BEAMFORMING_ENTRY	BeamformeeEntry;
 	RT_BEAMFORMER_ENTRY	BeamformerEntry;
@@ -563,14 +559,14 @@ SetBeamformEnter92E(
 		if (IS_TEST_CHIP(priv))
 			RTL_W8( REG_SND_PTCL_CTRL, 0x1B); 		// Disable SIG-B CRC8 check
 		else
-			RTL_W8( REG_SND_PTCL_CTRL, 0xCB);	
+			RTL_W8( REG_SND_PTCL_CTRL, 0xCB);
 
 		// MAC addresss/Partial AID of Beamformer
 		if(BFerIdx == 0)
 		{
 			for(i = 0; i < 6 ; i++)
 				RTL_W8( (REG_ASSOCIATED_BFMER0_INFO+i), BeamformerEntry.MacAddr[i]);
-			
+
 			RTL_W16( REG_ASSOCIATED_BFMER0_INFO+6, BeamformerEntry.P_AID);
 		}
 		else
@@ -594,45 +590,45 @@ SetBeamformEnter92E(
 	if((pBeamformingInfo->BeamformCap & BEAMFORMER_CAP) && (BFeeIdx < BEAMFORMEE_ENTRY_NUM))
 	{
 		BeamformeeEntry = pBeamformingInfo->BeamformeeEntry[BFeeIdx];
-		
+
 		if(OPMODE & WIFI_ADHOC_STATE)
 			STAid = BeamformeeEntry.AID;
-		else 
+		else
 			STAid = BeamformeeEntry.P_AID;
 
 		// P_AID of Beamformee & enable NDPA transmission
 		if(BFeeIdx == 0)
-		{	
-			RTL_W16( REG_TXBF_CTRL, STAid);	
+		{
+			RTL_W16( REG_TXBF_CTRL, STAid);
 			RTL_W8( REG_TXBF_CTRL+3, RTL_R8( REG_TXBF_CTRL+3)|BIT6|BIT7|BIT4);
-		}	
+		}
 		else
 		{
 			RTL_W16( REG_TXBF_CTRL+2, STAid |BIT14| BIT15|BIT12);
-		}	
+		}
 
 		// CSI report parameters of Beamformee
-		if(BFeeIdx == 0)	
+		if(BFeeIdx == 0)
 		{
 			// Get BIT24 & BIT25
-			u1Byte	tmp = RTL_R8( REG_ASSOCIATED_BFMEE_SEL+3) & 0x3;	
+			u1Byte	tmp = RTL_R8( REG_ASSOCIATED_BFMEE_SEL+3) & 0x3;
 			RTL_W8( REG_ASSOCIATED_BFMEE_SEL+3, tmp | 0x60);
 			RTL_W16( REG_ASSOCIATED_BFMEE_SEL, STAid | BIT9);
-		}	
+		}
 		else
 		{
 			// Set BIT25
 			RTL_W16( REG_ASSOCIATED_BFMEE_SEL+2, STAid | 0xE200);
 		}
 
-	//	if(pHalData->bIsMPChip == FALSE) 
-		if (IS_TEST_CHIP(priv))		
+	//	if(pHalData->bIsMPChip == FALSE)
+		if (IS_TEST_CHIP(priv))
 		{
-			// VHT category value 
+			// VHT category value
 			RTL_W8( REG_SND_PTCL_CTRL+1, ACT_CAT_VHT);
 			// NDPA subtype
 			RTL_W8( REG_SND_PTCL_CTRL+2, Type_NDPA >> 4);
-		}	
+		}
 
 		Beamforming_Notify(priv);
 	}
@@ -653,15 +649,15 @@ SetBeamformLeave92E(
 	/*	Clear P_AID of Beamformee
 	* 	Clear MAC addresss of Beamformer
 	*	Clear Associated Bfmee Sel
-	*/	
+	*/
 
     if (BeamformeeEntry.BeamformEntryCap == BEAMFORMING_CAP_NONE)
     {
 	if(Idx == 0)
-	{	
-		RTL_W16( REG_TXBF_CTRL, 0);	
+	{
+		RTL_W16( REG_TXBF_CTRL, 0);
 		RTL_W16( REG_ASSOCIATED_BFMEE_SEL, 0);
-	}	
+	}
 	else
 	{
 		RTL_W16( REG_TXBF_CTRL+2, RTL_R16( REG_TXBF_CTRL+2) & 0xF000);
@@ -680,7 +676,7 @@ SetBeamformLeave92E(
         {
 		RTL_W32( REG_ASSOCIATED_BFMER1_INFO, 0);
 		RTL_W16( REG_ASSOCIATED_BFMER1_INFO+4, 0);
-	}	
+	}
 }
 
     if(((pBeamformingInfo->BeamformerEntry[0]).BeamformEntryCap == BEAMFORMING_CAP_NONE)
@@ -709,7 +705,7 @@ SetBeamformStatus92E(
 //	if(ACTING_AS_IBSS(Adapter))
 	if(OPMODE & WIFI_ADHOC_STATE)
 		BeamCtrlVal = BeamformEntry.MacId;
-	else 
+	else
 		BeamCtrlVal = BeamformEntry.P_AID;
 
 	if(Idx == 0)
@@ -723,7 +719,7 @@ SetBeamformStatus92E(
 #if 1
 	if((BeamformEntry.BeamformEntryState == BEAMFORMING_ENTRY_STATE_PROGRESSED) && (priv->pshare->rf_ft_var.applyVmatrix))
 	{
-	
+
 //	panic_printk("%d%s BW = %d\n",__LINE__,__FUNCTION__,BeamformEntry.BW);
 		if(BeamformEntry.BW == HT_CHANNEL_WIDTH_20)
 			BeamCtrlVal |= BIT9;
@@ -738,7 +734,7 @@ SetBeamformStatus92E(
 	{
 		BeamCtrlVal &= ~(BIT9|BIT10|BIT11);
 	}
-	
+
 
 //	PlatformEFIOWrite2Byte(Adapter, BeamCtrlReg, BeamCtrlVal);
 	RTL_W16(BeamCtrlReg, BeamCtrlVal);
@@ -765,7 +761,7 @@ VOID Beamforming_NDPARate_92E(
 
 	if(NDPARate == 0)
 	{
-// ???	
+// ???
 #if 0
 		if(Mode == 1 || Mode == 4)
 			NDPARate = 0x0c;		//MGN_MCS0;
@@ -781,7 +777,7 @@ VOID Beamforming_NDPARate_92E(
 	}
 
 	if(NDPARate < 0x0c)
-		BW = HT_CHANNEL_WIDTH_20;	
+		BW = HT_CHANNEL_WIDTH_20;
 
 	RTL_W8(REG_NDPA_OPT_CTRL, (NDPARate<<2) |  (BW & 0x03));
 
@@ -795,15 +791,15 @@ VOID Beamforming_NDPARate_92E(
 			rate = 0x0c;		//_MCS0_RATE_;
 			if(BW ==3)
 				BW= 2;
-#endif				
+#endif
 		}
 		else {
 			rate = 0x2c;		//_NSS1_MCS0_RATE_;
-			
+
 		}
 	}
 	RTL_W8(0x45f, (rate<<2) |  (BW & 0x03));
-#endif	
+#endif
 }
 
 // V1
@@ -825,8 +821,8 @@ void TXBF_timer_callback(unsigned long task_priv)
 
 //	panic_printk(".");
 
-// VAP ?	
-	
+// VAP ?
+
 	while(plist != phead)
 	{
 		pstat = list_entry(plist, struct stat_info, asoc_list);
@@ -865,7 +861,7 @@ C2HTxBeamformingHandler_92E(
 )
 {
 	u1Byte 	status = (CmdBuf[0] & BIT0);
-	
+
 //	panic_printk("%d%s status = %d \n",__LINE__,__FUNCTION__,status);
 	Beamforming_End(priv, status);
 }

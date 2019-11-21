@@ -59,7 +59,7 @@ phydm_8822b_sutxbfer_workaroud(
 	);
 
 #else
-#define HalTxbf8822B_Init(pDM_VOID)		
+#define HalTxbf8822B_Init(pDM_VOID)
 #define HalTxbf8822B_Enter(pDM_VOID, Idx)
 #define HalTxbf8822B_Leave(pDM_VOID, Idx)
 #define HalTxbf8822B_Status(pDM_VOID, Idx)

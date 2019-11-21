@@ -1,7 +1,7 @@
 /******************************************************************************
  *
  * Copyright(c) 2007 - 2011 Realtek Corporation. All rights reserved.
- *                                        
+ *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of version 2 of the GNU General Public License as
  * published by the Free Software Foundation.
@@ -56,7 +56,7 @@ BOOLEAN
 config_phydm_write_txagc_8822b(
 	IN	PDM_ODM_T				pDM_Odm,
 	IN	u4Byte					PowerIndex,
-	IN	ODM_RF_RADIO_PATH_E		Path,	
+	IN	ODM_RF_RADIO_PATH_E		Path,
 	IN	u1Byte					HwRate
 	);
 
@@ -73,26 +73,26 @@ phydm_dynamic_spur_det_elimitor(
 	);
 
 BOOLEAN
-config_phydm_switch_band_8822b(	
+config_phydm_switch_band_8822b(
 	IN	PDM_ODM_T				pDM_Odm,
 	IN	u1Byte					central_ch
 	);
 
 BOOLEAN
-config_phydm_switch_channel_8822b(	
+config_phydm_switch_channel_8822b(
 	IN	PDM_ODM_T				pDM_Odm,
 	IN	u1Byte					central_ch
 	);
 
 BOOLEAN
-config_phydm_switch_bandwidth_8822b(	
+config_phydm_switch_bandwidth_8822b(
 	IN	PDM_ODM_T				pDM_Odm,
 	IN	u1Byte					primary_ch_idx,
 	IN	ODM_BW_E				bandwidth
 	);
 
 BOOLEAN
-config_phydm_switch_channel_bw_8822b(	
+config_phydm_switch_channel_bw_8822b(
 	IN	PDM_ODM_T				pDM_Odm,
 	IN	u1Byte					central_ch,
 	IN	u1Byte					primary_ch_idx,
@@ -121,7 +121,7 @@ BOOLEAN
 phydm_write_txagc_1byte_8822b(
 	IN	PDM_ODM_T				pDM_Odm,
 	IN	u4Byte					PowerIndex,
-	IN	ODM_RF_RADIO_PATH_E		Path,	
+	IN	ODM_RF_RADIO_PATH_E		Path,
 	IN	u1Byte					HwRate
 	);
 

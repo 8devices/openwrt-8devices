@@ -1505,7 +1505,7 @@ phy_IQCalibrate_8192E(
 	*/
 	//BB setting
 	/*ODM_SetBBReg(pDM_Odm, rFPGA0_RFMOD, BIT24, 0x00);*/
-	ODM_SetBBReg(pDM_Odm, rCCK0_AFESetting, 0x0f000000, 0xf);	
+	ODM_SetBBReg(pDM_Odm, rCCK0_AFESetting, 0x0f000000, 0xf);
 	ODM_SetBBReg(pDM_Odm, rOFDM0_TRxPathEnable, bMaskDWord, 0x03a05600);
 	ODM_SetBBReg(pDM_Odm, rOFDM0_TRMuxPar, bMaskDWord, 0x000800e4);
 	ODM_SetBBReg(pDM_Odm, rFPGA0_XCD_RFInterfaceSW, bMaskDWord, 0x55204200);
@@ -2375,7 +2375,7 @@ PHY_IQCalibrate_8192E(
 	#if (DM_ODM_SUPPORT_TYPE & (ODM_CE|ODM_AP))
 	if (bReCovery)
 	#else /*for ODM_WIN*/
-	if (bReCovery && 
+	if (bReCovery &&
 	(!pAdapter->bInHctTest)) /*YJ,add for PowerTest,120405*/
 	#endif
 	{

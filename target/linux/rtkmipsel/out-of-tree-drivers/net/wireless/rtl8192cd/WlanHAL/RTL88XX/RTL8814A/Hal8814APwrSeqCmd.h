@@ -2,7 +2,7 @@
 #define REALTEK_POWER_SEQUENCE_8814A
 
 
-/* 
+/*
 	Check document WB-110628-DZ-RTL8195 (Jaguar) Power Architecture-R04.pdf
 	There are 6 HW Power States:
 	0: POFF--Power Off
@@ -19,7 +19,7 @@
 	TRANS_SUS_TO_CARDEMU
 	TRANS_CARDEMU_TO_PDN
 	TRANS_ACT_TO_LPS
-	TRANS_LPS_TO_ACT	
+	TRANS_LPS_TO_ACT
 
 	TRANS_END
 */
@@ -30,7 +30,7 @@
 #define	RTL8814A_TRANS_CARDEMU_TO_PDN_STEPS	17
 #define	RTL8814A_TRANS_PDN_TO_CARDEMU_STEPS	15
 #define	RTL8814A_TRANS_ACT_TO_LPS_STEPS	20
-#define	RTL8814A_TRANS_LPS_TO_ACT_STEPS	15	
+#define	RTL8814A_TRANS_LPS_TO_ACT_STEPS	15
 #define	RTL8814A_TRANS_END_STEPS	1
 
 
@@ -65,7 +65,7 @@
 	/*{0x0002, PWR_CUT_ALL_MSK, PWR_FAB_ALL_MSK, PWR_INTF_ALL_MSK,PWR_BASEADDR_MAC,PWR_CMD_WRITE, BIT0|BIT1, 0},*/   /*  0x02[1:0] = 0	reset BB */	\
 	{0x0007, PWR_CUT_ALL_MSK, PWR_FAB_ALL_MSK, PWR_INTF_ALL_MSK,PWR_BASEADDR_MAC,PWR_CMD_WRITE, BIT0, 1}, /*Don't turn off XTAL if wlan down or reboot*/	\
 	{0x0005, PWR_CUT_ALL_MSK, PWR_FAB_ALL_MSK, PWR_INTF_ALL_MSK,PWR_BASEADDR_MAC,PWR_CMD_WRITE, BIT1, BIT1}, /*0x04[9] = 1 turn off MAC by HW state machine*/	\
-	{0x0005, PWR_CUT_ALL_MSK, PWR_FAB_ALL_MSK, PWR_INTF_ALL_MSK,PWR_BASEADDR_MAC,PWR_CMD_POLLING, BIT1, 0}, /*wait till 0x04[9] = 0 polling until return 0 to disable*/	
+	{0x0005, PWR_CUT_ALL_MSK, PWR_FAB_ALL_MSK, PWR_INTF_ALL_MSK,PWR_BASEADDR_MAC,PWR_CMD_POLLING, BIT1, 0}, /*wait till 0x04[9] = 0 polling until return 0 to disable*/
 
 #define RTL8814A_TRANS_CARDEMU_TO_SUS													\
 	/* format */								\
@@ -78,7 +78,7 @@
 	{0x0091, PWR_CUT_ALL_MSK, PWR_FAB_ALL_MSK, PWR_INTF_USB_MSK,PWR_BASEADDR_MAC,PWR_CMD_WRITE, 0xA0, 0xA0}, /* 0x91[7]=1 0x91[5]=1 , disable sps,ldo sleep mode */	\
 	{0x0070, PWR_CUT_ALL_MSK, PWR_FAB_ALL_MSK, PWR_INTF_USB_MSK,PWR_BASEADDR_MAC,PWR_CMD_WRITE, BIT3, BIT3}, /* 0x70[3]=1 enable mainbias polling */	\
 	{0x0005, PWR_CUT_ALL_MSK, PWR_FAB_ALL_MSK, PWR_INTF_ALL_MSK,PWR_BASEADDR_MAC,PWR_CMD_WRITE, BIT3, BIT3}, /*0x04[11] = 1 enable WL suspend */
-	
+
 #define RTL8814A_TRANS_SUS_TO_CARDEMU													\
 	/* format */								\
 	/* { offset, cut_msk, fab_msk|interface_msk, base|cmd, msk, value }, // comments here*/								\
@@ -92,7 +92,7 @@
 	/**{0x0194, PWR_CUT_ALL_MSK, PWR_FAB_ALL_MSK, PWR_INTF_PCI_MSK,PWR_BASEADDR_MAC,PWR_CMD_WRITE, BIT0, 0}, //0x194[0]=0 , disable 32K clock*/	\
 	/**{0x0093, PWR_CUT_ALL_MSK, PWR_FAB_ALL_MSK, PWR_INTF_PCI_MSK,PWR_BASEADDR_MAC,PWR_CMD_WRITE, 0xFF, 0x94}, //0x93=0x94 , 90[30] =0 enable 500k ANA clock .switch clock from 12M to 500K , 90 [26] =0 disable EEprom loader clock*/	\
 	{0x0080, PWR_CUT_ALL_MSK, PWR_FAB_ALL_MSK, PWR_INTF_ALL_MSK,PWR_BASEADDR_MAC,PWR_CMD_WRITE, 0xFF, 0x05}, /*0x80=05h if reload fw, fill the default value of host_CPU handshake field*/
-	
+
 
 #define RTL8814A_TRANS_CARDDIS_TO_CARDEMU													\
 	/* format */																\
@@ -137,7 +137,7 @@
 	{0x1002, ~PWR_CUT_TESTCHIP_MSK, PWR_FAB_ALL_MSK, PWR_INTF_USB_MSK,PWR_BASEADDR_MAC,PWR_CMD_WRITE, BIT1, 0},  /* Whole BB is reset*/			\
 	{0x0100, PWR_CUT_ALL_MSK, PWR_FAB_ALL_MSK, PWR_INTF_ALL_MSK,PWR_BASEADDR_MAC,PWR_CMD_WRITE, 0xFF, 0x03},/*Reset MAC TRX*/			\
 	{0x0101, PWR_CUT_ALL_MSK, PWR_FAB_ALL_MSK, PWR_INTF_ALL_MSK,PWR_BASEADDR_MAC,PWR_CMD_WRITE, BIT1, 0},/*check if removed later*/		\
-	{0x05F1, PWR_CUT_ALL_MSK, PWR_FAB_ALL_MSK, PWR_INTF_ALL_MSK,PWR_BASEADDR_MAC,PWR_CMD_WRITE, BIT0, BIT0},/*Respond TxOK to scheduler*/	
+	{0x05F1, PWR_CUT_ALL_MSK, PWR_FAB_ALL_MSK, PWR_INTF_ALL_MSK,PWR_BASEADDR_MAC,PWR_CMD_WRITE, BIT0, BIT0},/*Respond TxOK to scheduler*/
 
 
 #define RTL8814A_TRANS_LPS_TO_ACT															\
@@ -155,7 +155,7 @@
 	{0x0002, PWR_CUT_TESTCHIP_MSK, PWR_FAB_ALL_MSK, PWR_INTF_ALL_MSK,PWR_BASEADDR_MAC,PWR_CMD_WRITE, BIT1|BIT0, BIT1|BIT0}, /*.	0x02[1:0] = 2b'11	 enable BB macro*/	\
 	{0x1002, ~PWR_CUT_TESTCHIP_MSK, PWR_FAB_ALL_MSK, PWR_INTF_ALL_MSK,PWR_BASEADDR_MAC,PWR_CMD_WRITE, BIT1|BIT0, BIT1|BIT0}, /*.	0x1002[1:0] = 2b'11	 enable BB macro*/	\
 	{0x0522, PWR_CUT_ALL_MSK, PWR_FAB_ALL_MSK, PWR_INTF_ALL_MSK,PWR_BASEADDR_MAC,PWR_CMD_WRITE, 0xFF, 0}, /*.	0x522 = 0*/
- 
+
 #define RTL8814A_TRANS_END																\
 	/* format */																\
 	/* { offset, cut_msk, fab_msk|interface_msk, base|cmd, msk, value }, // comments here*/		\

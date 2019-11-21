@@ -6,21 +6,21 @@ Copyright (c) Realtek Semiconductor Corp. All rights reserved.
 
 Module Name:
 	Hal8814AEDef.h
-	
+
 Abstract:
 	Defined HAL 8814AE data structure & Define
-	    
+
 Major Change History:
 	When       Who               What
 	---------- ---------------   -------------------------------
-	2013-05-28 Filen            Create.	
+	2013-05-28 Filen            Create.
 --*/
 
 
 /*RT_STATUS
 InitPON8814AE(
     IN  HAL_PADAPTER    Adapter,
-    IN  u4Byte          ClkSel        
+    IN  u4Byte          ClkSel
 );
 
 RT_STATUS
@@ -35,7 +35,7 @@ ResetHWForSurprise8814AE(
 );
 */
 
-RT_STATUS	
+RT_STATUS
 hal_Associate_8814AE(
 	struct rtl8192cd_priv *priv,
 	BOOLEAN             IsDefaultAdapter
@@ -106,7 +106,7 @@ Beamforming_NDPARate_8814A(
 VOID
 _C2HContentParsing8814A(
 	struct rtl8192cd_priv *priv,
-		u1Byte			c2hCmdId, 
+		u1Byte			c2hCmdId,
 		u1Byte			c2hCmdLen,
 		pu1Byte 			tmpBuf
 );
@@ -118,7 +118,7 @@ VOID HW_VAR_HW_REG_TIMER_INIT_8814A(struct rtl8192cd_priv *priv, int t);
 
 VOID HW_VAR_HW_REG_TIMER_STOP_8814A(struct rtl8192cd_priv *priv);
 
-#endif 
+#endif
 
 
 #endif  //__HAL8814AE_DEF_H__

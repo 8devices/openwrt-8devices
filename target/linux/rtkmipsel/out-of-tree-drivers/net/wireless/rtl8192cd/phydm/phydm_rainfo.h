@@ -110,7 +110,7 @@ typedef enum _Phydm_ra_dbg_para {
 } PHYDM_RA_DBG_PARA_E;
 
 typedef enum PHYDM_WIRELESS_MODE {
-	
+
 	PHYDM_WIRELESS_MODE_UNKNOWN = 0x00,
 	PHYDM_WIRELESS_MODE_A		= 0x01,
 	PHYDM_WIRELESS_MODE_B		= 0x02,
@@ -126,7 +126,7 @@ typedef enum PHYDM_WIRELESS_MODE {
 } PHYDM_WIRELESS_MODE_E;
 
 typedef enum PHYDM_RATEID_IDX_ {
-	
+
 	PHYDM_BGN_40M_2SS	= 0,
 	PHYDM_BGN_40M_1SS	= 1,
 	PHYDM_BGN_20M_2SS	= 2,
@@ -146,7 +146,7 @@ typedef enum PHYDM_RATEID_IDX_ {
 
 typedef	enum _PHYDM_RF_TYPE_DEFINITION {
 	PHYDM_RF_1T1R = 0,
-	PHYDM_RF_1T2R,			
+	PHYDM_RF_1T2R,
 	PHYDM_RF_2T2R,
 	PHYDM_RF_2T2R_GREEN,
 	PHYDM_RF_2T3R,
@@ -161,7 +161,7 @@ typedef	enum _PHYDM_BW {
 	PHYDM_BW_20	= 0,
 	PHYDM_BW_40,
 	PHYDM_BW_80,
-	PHYDM_BW_80_80,	
+	PHYDM_BW_80_80,
 	PHYDM_BW_160,
 	PHYDM_BW_10,
 	PHYDM_BW_5
@@ -254,7 +254,7 @@ typedef struct _Rate_Adaptive_Table_ {
 
 	#if (defined(CONFIG_RA_DYNAMIC_RTY_LIMIT))
 	u1Byte per_rate_retrylimit_20M[ODM_NUM_RATE_IDX];
-	u1Byte per_rate_retrylimit_40M[ODM_NUM_RATE_IDX];	
+	u1Byte per_rate_retrylimit_40M[ODM_NUM_RATE_IDX];
 	u1Byte			retry_descend_num;
 	u1Byte			retrylimit_low;
 	u1Byte			retrylimit_high;
@@ -453,7 +453,7 @@ odm_RefreshRateAdaptiveMaskAPADSL(
 	IN		PVOID		pDM_VOID
 );
 
-u1Byte 
+u1Byte
 phydm_RA_level_decision(
 	IN		PVOID			pDM_VOID,
 	IN		u4Byte			rssi,

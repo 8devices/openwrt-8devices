@@ -3,14 +3,14 @@ Copyright (c) Realtek Semiconductor Corp. All rights reserved.
 
 Module Name:
 	Hal8881AGen.c
-	
+
 Abstract:
 	Defined RTL8881A HAL Function
-	    
+
 Major Change History:
 	When       Who               What
 	---------- ---------------   -------------------------------
-	2012-03-23 Filen            Create.	
+	2012-03-23 Filen            Create.
 --*/
 
 #if !defined(__ECOS) && !defined(CPTCFG_CFG80211_MODULE)
@@ -196,15 +196,15 @@ StopHW8881A(
 )
 {
 
-    // TODO: 
+    // TODO:
     return  RT_STATUS_SUCCESS;
 }
 
 
 RT_STATUS
 InitPON8881A(
-    IN  HAL_PADAPTER Adapter,     
-    IN  u4Byte     	ClkSel    
+    IN  HAL_PADAPTER Adapter,
+    IN  u4Byte     	ClkSel
 )
 {
     RT_TRACE_F( COMP_INIT, DBG_LOUD, ("\n") );
@@ -215,7 +215,7 @@ InitPON8881A(
 		HAL_RTL_W8(REG_AFE_CTRL2, 5);
 	} else if (ClkSel == XTAL_CLK_SEL_40M){
 		HAL_RTL_W8(REG_AFE_CTRL2, 1);
-	}	
+	}
 
 	if (!HalPwrSeqCmdParsing88XX(Adapter, PWR_CUT_ALL_MSK, PWR_FAB_ALL_MSK,
 			PWR_INTF_PCI_MSK, rtl8881A_card_enable_flow))
@@ -224,11 +224,11 @@ InitPON8881A(
         return RT_STATUS_FAILURE;
     }
 
-    return RT_STATUS_SUCCESS;    
+    return RT_STATUS_SUCCESS;
 }
 
 
-RT_STATUS	
+RT_STATUS
 hal_Associate_8881A(
     HAL_PADAPTER            Adapter,
     BOOLEAN			        IsDefaultAdapter
@@ -236,35 +236,31 @@ hal_Associate_8881A(
 {
     PHAL_INTERFACE              pHalFunc = GET_HAL_INTERFACE(Adapter);
     PHAL_DATA_TYPE              pHalData = _GET_HAL_DATA(Adapter);
-    
+
 
     //
     //Initialization Related
     //
     pHalData->AccessSwapCtrl        = HAL_ACCESS_SWAP_MEM;
-    
+
     pHalFunc->InitPONHandler        = InitPON8881A;
     pHalFunc->InitMACHandler        = InitMAC88XX;
     pHalFunc->InitFirmwareHandler   = InitFirmware88XX;
     pHalFunc->InitHCIDMAMemHandler  = InitHCIDMAMem88XX;
-    pHalFunc->InitHCIDMARegHandler  = InitHCIDMAReg88XX;    
-#if CFG_HAL_SUPPORT_MBSSID        
+    pHalFunc->InitHCIDMARegHandler  = InitHCIDMAReg88XX;
+#if CFG_HAL_SUPPORT_MBSSID
     pHalFunc->InitMBSSIDHandler     = InitMBSSID88XX;
     pHalFunc->InitMBIDCAMHandler    = InitMBIDCAM88XX;
 #endif  //CFG_HAL_SUPPORT_MBSSID
     pHalFunc->InitVAPIMRHandler     = InitVAPIMR88XX;
     pHalFunc->InitLLT_TableHandler  = InitLLT_Table88XX;
-#ifdef MULTI_MAC_CLONE
-	pHalFunc->McloneSetMBSSIDHandler 	= McloneSetMBSSID88XX;
-	pHalFunc->McloneStopMBSSIDHandler   = McloneStopMBSSID88XX;
-#endif
     pHalFunc->SetMBIDCAMHandler     = SetMBIDCAM88XX;
 
 
     //
     //Stop Related
     //
-#if CFG_HAL_SUPPORT_MBSSID            
+#if CFG_HAL_SUPPORT_MBSSID
     pHalFunc->StopMBSSIDHandler     = StopMBSSID88XX;
 #endif  //CFG_HAL_SUPPORT_MBSSID
     pHalFunc->StopHWHandler         = StopHW88XX;
@@ -283,19 +279,19 @@ hal_Associate_8881A(
     pHalFunc->AddInterruptMaskHandler           = AddInterruptMask88XX;
     pHalFunc->RemoveInterruptMaskHandler        = RemoveInterruptMask88XX;
     pHalFunc->DisableRxRelatedInterruptHandler  = DisableRxRelatedInterrupt88XX;
-    pHalFunc->EnableRxRelatedInterruptHandler   = EnableRxRelatedInterrupt88XX;    
+    pHalFunc->EnableRxRelatedInterruptHandler   = EnableRxRelatedInterrupt88XX;
 
 
     //
     //Tx Related
     //
-    pHalFunc->PrepareTXBDHandler            = PrepareTXBD88XX;    
+    pHalFunc->PrepareTXBDHandler            = PrepareTXBD88XX;
     pHalFunc->FillTxHwCtrlHandler           = FillTxHwCtrl88XX;
     pHalFunc->SyncSWTXBDHostIdxToHWHandler  = SyncSWTXBDHostIdxToHW88XX;
     pHalFunc->TxPollingHandler              = TxPolling88XX;
     pHalFunc->SigninBeaconTXBDHandler       = SigninBeaconTXBD88XX;
     pHalFunc->SetBeaconDownloadHandler      = SetBeaconDownload88XX;
-    pHalFunc->FillBeaconDescHandler         = FillBeaconDesc88XX;    
+    pHalFunc->FillBeaconDescHandler         = FillBeaconDesc88XX;
     pHalFunc->GetTxQueueHWIdxHandler        = GetTxQueueHWIdx88XX;
     pHalFunc->MappingTxQueueHandler         = MappingTxQueue88XX;
     pHalFunc->QueryTxConditionMatchHandler  = QueryTxConditionMatch88XX;
@@ -306,10 +302,10 @@ hal_Associate_8881A(
 //    pHalFunc->GetShortCutTxDescHandler      = GetShortCutTxDesc88XX;
 //    pHalFunc->ReleaseShortCutTxDescHandler  = ReleaseShortCutTxDesc88XX;
     pHalFunc->GetShortCutTxBuffSizeHandler  = GetShortCutTxBuffSize88XX;
-    pHalFunc->SetShortCutTxBuffSizeHandler  = SetShortCutTxBuffSize88XX;    
+    pHalFunc->SetShortCutTxBuffSizeHandler  = SetShortCutTxBuffSize88XX;
     pHalFunc->CopyShortCutTxDescHandler     = CopyShortCutTxDesc88XX;
-    pHalFunc->FillShortCutTxHwCtrlHandler   = FillShortCutTxHwCtrl88XX;    
-    pHalFunc->FillShortCutTxDescHandler     = FillShortCutTxDesc88XX;	
+    pHalFunc->FillShortCutTxHwCtrlHandler   = FillShortCutTxHwCtrl88XX;
+    pHalFunc->FillShortCutTxDescHandler     = FillShortCutTxDesc88XX;
 #endif // CFG_HAL_TX_SHORTCUT
 
 
@@ -320,7 +316,7 @@ hal_Associate_8881A(
     pHalFunc->QueryRxDescHandler            = QueryRxDesc88XX;
     pHalFunc->UpdateRXBDInfoHandler         = UpdateRXBDInfo88XX;
     pHalFunc->UpdateRXBDHWIdxHandler        = UpdateRXBDHWIdx88XX;
-    pHalFunc->UpdateRXBDHostIdxHandler      = UpdateRXBDHostIdx88XX;      
+    pHalFunc->UpdateRXBDHostIdxHandler      = UpdateRXBDHostIdx88XX;
 
     //
     // General operation
@@ -344,7 +340,7 @@ hal_Associate_8881A(
 
 
     //
-    // Security Related		
+    // Security Related
     //
     pHalFunc->CAMReadMACConfigHandler       =   CAMReadMACConfig88XX;
     pHalFunc->CAMEmptyEntryHandler          =   CAMEmptyEntry88XX;
@@ -361,10 +357,10 @@ hal_Associate_8881A(
     pHalFunc->PHYSwBWModeHandler            = SwBWMode88XX_AC;
     // TODO: 8881A Power Tracking should be done
     pHalFunc->TXPowerTrackingHandler        = TXPowerTracking_ThermalMeter_Tmp8881A;
-    pHalFunc->PHYSSetRFRegHandler           = PHY_SetRFReg_88XX_AC;    
+    pHalFunc->PHYSSetRFRegHandler           = PHY_SetRFReg_88XX_AC;
     pHalFunc->PHYQueryRFRegHandler          = PHY_QueryRFReg_88XX_AC;
     pHalFunc->IsBBRegRangeHandler           = IsBBRegRange88XX;
-    
+
 
     //
     // Firmware CMD IO related
@@ -373,20 +369,20 @@ hal_Associate_8881A(
     pHalData->bFWReady          = _FALSE;
     pHalFunc->FillH2CCmdHandler             = FillH2CCmd88XX;
     pHalFunc->UpdateHalRAMaskHandler        = UpdateHalRAMask88XX;
-    pHalFunc->UpdateHalMSRRPTHandler        = UpdateHalMSRRPT88XX;    
+    pHalFunc->UpdateHalMSRRPTHandler        = UpdateHalMSRRPT88XX;
     pHalFunc->SetAPOffloadHandler           = SetAPOffload88XX;
     pHalFunc->SetRsvdPageHandler	        = SetRsvdPage88XX;
     pHalFunc->GetRsvdPageLocHandler	        = GetRsvdPageLoc88XX;
     pHalFunc->DownloadRsvdPageHandler	    = DownloadRsvdPage88XX;
     pHalFunc->C2HHandler                    = C2HHandler88XX;
-    pHalFunc->C2HPacketHandler              = C2HPacket88XX;        
+    pHalFunc->C2HPacketHandler              = C2HPacket88XX;
     pHalFunc->GetTxRPTHandler               = GetTxRPTBuf88XX;
-    pHalFunc->SetTxRPTHandler               = SetTxRPTBuf88XX;    
+    pHalFunc->SetTxRPTHandler               = SetTxRPTBuf88XX;
 
     pHalFunc->DumpRxBDescTestHandler = DumpRxBDesc88XX;
     pHalFunc->DumpTxBDescTestHandler = DumpTxBDesc88XX;
-    
-    return  RT_STATUS_SUCCESS;    
+
+    return  RT_STATUS_SUCCESS;
 }
 
 

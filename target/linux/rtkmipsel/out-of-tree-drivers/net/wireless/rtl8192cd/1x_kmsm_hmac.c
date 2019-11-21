@@ -10,23 +10,12 @@
  *  published by the Free Software Foundation.
  */
 
-#ifdef __KERNEL__
 #include <linux/types.h>
 #include <linux/string.h>
 #include <linux/ctype.h>
-#elif defined(__ECOS)
-#include <cyg/hal/plf_intr.h>
-#include <cyg/io/eth/rltk/819x/wrapper/sys_support.h>
-#include <cyg/io/eth/rltk/819x/wrapper/skbuff.h>
-#include <cyg/io/eth/rltk/819x/wrapper/timer.h>
-#include <cyg/io/eth/rltk/819x/wrapper/wrapper.h>
-#else
-#include <string.h>
-#endif
 
 #include "./8192cd_cfg.h"
 
-#if defined(INCLUDE_WPA_PSK) || defined(WIFI_HAPD) || defined(RTK_NL80211)
 
 //#define MODULE_TEST
 
@@ -646,10 +635,6 @@ enum
 #endif
 #define SHA1HashSize 20
 
-#if !defined( __KERNEL__) && !defined(__ECOS) && !defined(__OSK__)
-	typedef unsigned int uint32_t;
-	typedef unsigned char uint8_t;
-#endif
 typedef unsigned short	int_least16_t;
 /*
  *  This structure will hold context information for the SHA-1
@@ -1124,12 +1109,6 @@ hmac_sha1(unsigned char *text, int text_len, unsigned char *key,
  */
 
 //#include <stdint.h>
-#ifndef __KERNEL__
-#ifndef __ECOS
-#include <stdio.h>
-#endif
-#include <string.h>
-#endif
 //#include "sha1.h"
 
 /*
@@ -1565,4 +1544,3 @@ int _tmain_hmac()
 	return 0;
 }
 #endif
-#endif // INCLUDE_WPA_PSK

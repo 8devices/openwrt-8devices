@@ -6,14 +6,14 @@ Copyright (c) Realtek Semiconductor Corp. All rights reserved.
 
 Module Name:
 	Hal88XXDM.h
-	
+
 Abstract:
 	Defined HAL 88XX Dynamic Mechanism Related Define & Marco
-	    
+
 Major Change History:
 	When       Who               What
 	---------- ---------------   -------------------------------
-	2013-08-19 Filen            Create.	
+	2013-08-19 Filen            Create.
 --*/
 
 typedef enum _RSSI_LVL_DM_88XX_ {

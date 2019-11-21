@@ -1,7 +1,7 @@
 /******************************************************************************
  *
  * Copyright(c) 2007 - 2011 Realtek Corporation. All rights reserved.
- *                                        
+ *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of version 2 of the GNU General Public License as
  * published by the Free Software Foundation.
@@ -67,7 +67,7 @@ VOID
 ODM_PrimaryCCA_Init(
 	IN		PDM_ODM_T		pDM_Odm)
 {
-	pPri_CCA_T		PrimaryCCA = &(pDM_Odm->DM_PriCCA);  
+	pPri_CCA_T		PrimaryCCA = &(pDM_Odm->DM_PriCCA);
 	PrimaryCCA->DupRTS_flag = 0;
 	PrimaryCCA->intf_flag = 0;
 	PrimaryCCA->intf_type = 0;
@@ -80,8 +80,8 @@ ODM_DynamicPrimaryCCA_DupRTS(
 	IN		PDM_ODM_T		pDM_Odm
 	)
 {
-	pPri_CCA_T		PrimaryCCA = &(pDM_Odm->DM_PriCCA);  
-	
+	pPri_CCA_T		PrimaryCCA = &(pDM_Odm->DM_PriCCA);
+
 	return	PrimaryCCA->DupRTS_flag;
 }
 
@@ -92,18 +92,18 @@ ODM_DynamicPrimaryCCA(
 {
 
 #if(DM_ODM_SUPPORT_TYPE !=ODM_CE)
-	
+
 	PADAPTER	Adapter =  pDM_Odm->Adapter;	// for NIC
 
-#if (DM_ODM_SUPPORT_TYPE & (ODM_WIN))	
+#if (DM_ODM_SUPPORT_TYPE & (ODM_WIN))
 	PRT_WLAN_STA	pEntry;
-#endif	
+#endif
 
 	PFALSE_ALARM_STATISTICS		FalseAlmCnt = (PFALSE_ALARM_STATISTICS)PhyDM_Get_Structure( pDM_Odm , PHYDM_FALSEALMCNT);
-	pPri_CCA_T		PrimaryCCA = &(pDM_Odm->DM_PriCCA);  
-	
+	pPri_CCA_T		PrimaryCCA = &(pDM_Odm->DM_PriCCA);
+
 	BOOLEAN		Is40MHz;
-	BOOLEAN		Client_40MHz = FALSE, Client_tmp = FALSE;      // connected client BW  
+	BOOLEAN		Client_40MHz = FALSE, Client_tmp = FALSE;      // connected client BW
 	BOOLEAN		bConnected = FALSE;		// connected or not
 	static u1Byte	Client_40MHz_pre = 0;
 	static u8Byte	lastTxOkCnt = 0;
@@ -114,17 +114,17 @@ ODM_DynamicPrimaryCCA(
 	u8Byte		curRxOkCnt;
 	u1Byte		SecCHOffset;
 	u1Byte		i;
-	
+
 	if(!(pDM_Odm->SupportAbility & ODM_BB_PRIMARY_CCA))
 		return;
 
-	if(pDM_Odm->SupportICType != ODM_RTL8188E) 
+	if(pDM_Odm->SupportICType != ODM_RTL8188E)
 		return;
 
 	Is40MHz = *(pDM_Odm->pBandWidth);
 	SecCHOffset = *(pDM_Odm->pSecChOffset);
 	ODM_RT_TRACE(pDM_Odm,ODM_COMP_DYNAMIC_PRICCA, ODM_DBG_LOUD, ("Second CH Offset = %d\n", SecCHOffset));
-	
+
 #if (DM_ODM_SUPPORT_TYPE == ODM_WIN)
 	if(Is40MHz==1)
 		SecCHOffset = SecCHOffset%2+1;     // NIC's definition is reverse to AP   1:secondary below,  2: secondary above
@@ -133,7 +133,7 @@ ODM_DynamicPrimaryCCA(
 	curTxOkCnt = Adapter->TxStats.NumTxBytesUnicast - lastTxOkCnt;
 	curRxOkCnt = Adapter->RxStats.NumRxBytesUnicast - lastRxOkCnt;
 	lastTxOkCnt = Adapter->TxStats.NumTxBytesUnicast;
-	lastRxOkCnt = Adapter->RxStats.NumRxBytesUnicast;	
+	lastRxOkCnt = Adapter->RxStats.NumRxBytesUnicast;
 #elif (DM_ODM_SUPPORT_TYPE == ODM_AP)
 	//3 Check Current WLAN Traffic
 	curTxOkCnt = *(pDM_Odm->pNumTxBytesUnicast)-lastTxOkCnt;
@@ -152,15 +152,15 @@ ODM_DynamicPrimaryCCA(
 	ODM_RT_TRACE(pDM_Odm,ODM_COMP_DYNAMIC_PRICCA, ODM_DBG_LOUD, ("OFDM FA = %d\n", FalseAlmCnt->Cnt_Ofdm_fail));
 	ODM_RT_TRACE(pDM_Odm,ODM_COMP_DYNAMIC_PRICCA, ODM_DBG_LOUD, ("CCK FA = %d\n", FalseAlmCnt->Cnt_Cck_fail));
 	//================================================
-	
+
 #if (DM_ODM_SUPPORT_TYPE == ODM_WIN)
 	if (ACTING_AS_AP(Adapter))   // primary cca process only do at AP mode
 #endif
 	{
-		
+
 	#if (DM_ODM_SUPPORT_TYPE == ODM_WIN)
 		ODM_RT_TRACE(pDM_Odm,ODM_COMP_DYNAMIC_PRICCA, ODM_DBG_LOUD, ("ACTING as AP mode=%d\n", ACTING_AS_AP(Adapter)));
-		//3 To get entry's connection and BW infomation status. 
+		//3 To get entry's connection and BW infomation status.
 		for(i=0;i<ASSOCIATE_ENTRY_NUM;i++)
 		{
 			if(IsAPModeExist(Adapter)&&GetFirstExtAdapter(Adapter)!=NULL)
@@ -173,7 +173,7 @@ ODM_DynamicPrimaryCCA(
 				ODM_RT_TRACE(pDM_Odm,ODM_COMP_DYNAMIC_PRICCA, ODM_DBG_LOUD, ("Client_BW=%d\n", Client_tmp));
 				if(Client_tmp>Client_40MHz)
 					Client_40MHz = Client_tmp;     // 40M/20M coexist => 40M priority is High
-				
+
 				if(pEntry->bAssociated)
 				{
 					bConnected=TRUE;    // client is connected or not
@@ -186,7 +186,7 @@ ODM_DynamicPrimaryCCA(
 			}
 		}
 #elif (DM_ODM_SUPPORT_TYPE == ODM_AP)
-		//3 To get entry's connection and BW infomation status. 
+		//3 To get entry's connection and BW infomation status.
 
 		PSTA_INFO_T pstat;
 
@@ -194,18 +194,18 @@ ODM_DynamicPrimaryCCA(
 		{
 			pstat = pDM_Odm->pODM_StaInfo[i];
 			if(IS_STA_VALID(pstat) )
-			{			
-				Client_tmp = pstat->tx_bw;  
+			{
+				Client_tmp = pstat->tx_bw;
 				if(Client_tmp>Client_40MHz)
 					Client_40MHz = Client_tmp;     // 40M/20M coexist => 40M priority is High
-				
+
 				bConnected = TRUE;
 			}
 		}
 #endif
 		ODM_RT_TRACE(pDM_Odm,ODM_COMP_DYNAMIC_PRICCA, ODM_DBG_LOUD, ("bConnected=%d\n", bConnected));
 		ODM_RT_TRACE(pDM_Odm,ODM_COMP_DYNAMIC_PRICCA, ODM_DBG_LOUD, ("Is Client 40MHz=%d\n", Client_40MHz));
-		//1 Monitor whether the interference exists or not 
+		//1 Monitor whether the interference exists or not
 		if(PrimaryCCA->Monitor_flag == 1)
 		{
 			if(SecCHOffset == 1)       // secondary channel is below the primary channel
@@ -226,7 +226,7 @@ ODM_DynamicPrimaryCCA(
 						if(PrimaryCCA->DupRTS_flag == 0)
 							PrimaryCCA->DupRTS_flag = 1;
 					}
-				
+
 				}
 				else   // interferecne disappear
 				{
@@ -253,7 +253,7 @@ ODM_DynamicPrimaryCCA(
 						if(PrimaryCCA->DupRTS_flag == 0)
 							PrimaryCCA->DupRTS_flag = 1;
 					}
-				
+
 				}
 				else   // interferecne disappear
 				{
@@ -276,7 +276,7 @@ ODM_DynamicPrimaryCCA(
 				if(!bConnected)
 				{
 					ODM_RT_TRACE(pDM_Odm,ODM_COMP_DYNAMIC_PRICCA, ODM_DBG_LOUD, ("STA NOT Connected!!!!\n"));
-			
+
 					if(PrimaryCCA->PriCCA_flag == 1)		// reset primary cca when STA is disconnected
 					{
 						PrimaryCCA->PriCCA_flag = 0;
@@ -295,10 +295,10 @@ ODM_DynamicPrimaryCCA(
 							else
 								PrimaryCCA->intf_type = 2;    	// interference is in-band
 						}
-						else    
+						else
 						{
 							PrimaryCCA->intf_flag = 0;
-							PrimaryCCA->intf_type = 0;  
+							PrimaryCCA->intf_type = 0;
 						}
 					}
 					else if(SecCHOffset == 2)    // secondary channel is above the primary channel
@@ -311,10 +311,10 @@ ODM_DynamicPrimaryCCA(
 							else
 								PrimaryCCA->intf_type = 2;    	// interference is in-band
 						}
-						else    
+						else
 						{
 							PrimaryCCA->intf_flag = 0;
-							PrimaryCCA->intf_type = 0;  
+							PrimaryCCA->intf_type = 0;
 						}
 					}
 					ODM_RT_TRACE(pDM_Odm,ODM_COMP_DYNAMIC_PRICCA, ODM_DBG_LOUD, ("PrimaryCCA=%d\n",PrimaryCCA->PriCCA_flag));
@@ -365,7 +365,7 @@ ODM_DynamicPrimaryCCA(
 									if((FalseAlmCnt->Cnt_OFDM_CCA > 800)&&(FalseAlmCnt->Cnt_BW_LSC*5 > FalseAlmCnt->Cnt_BW_USC*9))
 									{
 										PrimaryCCA->intf_flag = 1;
-										if(FalseAlmCnt->Cnt_Ofdm_fail > FalseAlmCnt->Cnt_OFDM_CCA>>1)		
+										if(FalseAlmCnt->Cnt_Ofdm_fail > FalseAlmCnt->Cnt_OFDM_CCA>>1)
 											PrimaryCCA->intf_type = 1;    	// interference is shift
 										else
 											PrimaryCCA->intf_type = 2;    	// interference is in-band
@@ -376,7 +376,7 @@ ODM_DynamicPrimaryCCA(
 									if((FalseAlmCnt->Cnt_OFDM_CCA > 800)&&(FalseAlmCnt->Cnt_BW_USC*5 > FalseAlmCnt->Cnt_BW_LSC*9))
 									{
 										PrimaryCCA->intf_flag = 1;
-										if(FalseAlmCnt->Cnt_Ofdm_fail > FalseAlmCnt->Cnt_OFDM_CCA>>1)		
+										if(FalseAlmCnt->Cnt_Ofdm_fail > FalseAlmCnt->Cnt_OFDM_CCA>>1)
 											PrimaryCCA->intf_type = 1;    	// interference is shift
 										else
 											PrimaryCCA->intf_type = 2;    	// interference is in-band
@@ -389,7 +389,7 @@ ODM_DynamicPrimaryCCA(
 								if(SecCHOffset == 1)
 								{
 									if(FalseAlmCnt->Cnt_BW_LSC > (FalseAlmCnt->Cnt_BW_USC+500))
-									{	
+									{
 										if(Delay == 0)    // add delay to avoid interference occurring abruptly, jump one time
 										{
 											PrimaryCCA->intf_flag = 1;
@@ -401,12 +401,12 @@ ODM_DynamicPrimaryCCA(
 										}
 										else
 											Delay = 0;
-									}	
-								}	
+									}
+								}
 								else if(SecCHOffset == 2)
 								{
 									if(FalseAlmCnt->Cnt_BW_USC > (FalseAlmCnt->Cnt_BW_LSC+500))
-									{	
+									{
 										if(Delay == 0)    // add delay to avoid interference occurring abruptly
 										{
 											PrimaryCCA->intf_flag = 1;
@@ -418,7 +418,7 @@ ODM_DynamicPrimaryCCA(
 										}
 										else
 											Delay = 0;
-									}	
+									}
 								}
 							}
 						}
@@ -432,7 +432,7 @@ ODM_DynamicPrimaryCCA(
 		//1 Dynamic Primary CCA Monitor Counter
 		if((PrimaryCCA->PriCCA_flag == 1)||(PrimaryCCA->DupRTS_flag == 1))
 		{
-			if(Client_40MHz == 0)     // client=20M no need to monitor primary cca flag  
+			if(Client_40MHz == 0)     // client=20M no need to monitor primary cca flag
 			{
 				Client_40MHz_pre = Client_40MHz;
 				return;

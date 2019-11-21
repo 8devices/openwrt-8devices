@@ -1,7 +1,7 @@
 /******************************************************************************
  *
  * Copyright(c) 2007 - 2011 Realtek Corporation. All rights reserved.
- *                                        
+ *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of version 2 of the GNU General Public License as
  * published by the Free Software Foundation.
@@ -41,7 +41,7 @@ phydm_dynamic_switch_htstf_mumimo_8822b(
 			ODM_SetBBReg(pDM_Odm, 0x8d8, BIT17, 0x0);
 
 		ODM_RT_TRACE(pDM_Odm, ODM_COMP_COMMON, ODM_DBG_LOUD, ("%s, RSSI_Min = %d\n", __func__, pDM_Odm->RSSI_Min));
-}		
+}
 
 VOID
 phydm_somlrxhp_setting(
@@ -59,13 +59,13 @@ phydm_somlrxhp_setting(
 		ODM_SetBBReg(pDM_Odm, 0xc04, (BIT21|BIT18), 0x0);
 		ODM_SetBBReg(pDM_Odm, 0xe04, (BIT21|BIT18), 0x0);
 	}
-		
+
 	/* Dynamic RxHP setting with SoML on/off apply on all RFE type */
 	if ((switch_soml == FALSE) && ((pDM_Odm->RFEType == 1) || (pDM_Odm->RFEType == 6) || (pDM_Odm->RFEType == 7) || (pDM_Odm->RFEType == 9))) {
 		ODM_SetBBReg(pDM_Odm, 0x8cc, bMaskDWord, 0x08108000);
 		ODM_SetBBReg(pDM_Odm, 0x8d8, BIT27, 0x0);
 	}
-		
+
 	if (*pDM_Odm->pChannel <= 14) {
 		if ((switch_soml == TRUE) && (!((pDM_Odm->RFEType == 3) || (pDM_Odm->RFEType == 5) || (pDM_Odm->RFEType == 8)))) {
 			ODM_SetBBReg(pDM_Odm, 0x8cc, bMaskDWord, 0x08108000);

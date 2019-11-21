@@ -1,7 +1,7 @@
 /******************************************************************************
  *
  * Copyright(c) 2007 - 2011 Realtek Corporation. All rights reserved.
- *                                        
+ *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of version 2 of the GNU General Public License as
  * published by the Free Software Foundation.
@@ -21,7 +21,7 @@
 #include "mp_precomp.h"
 #include "../phydm_precomp.h"
 
-#if (RTL8821C_SUPPORT == 1)  
+#if (RTL8821C_SUPPORT == 1)
 
 void
 odm_ConfigRFReg_8821C(
@@ -35,7 +35,7 @@ odm_ConfigRFReg_8821C(
 	if (Addr == 0xffe) {
 		#ifdef CONFIG_LONG_DELAY_ISSUE
 		ODM_sleep_ms(50);
-		#else		
+		#else
 		ODM_delay_ms(50);
 		#endif
 	} else {
@@ -43,10 +43,10 @@ odm_ConfigRFReg_8821C(
 
 		/* Add 1us delay between BB/RF register setting. */
 		ODM_delay_us(1);
-	}	
+	}
 }
 
-void 
+void
 odm_ConfigRF_RadioA_8821C(
 	IN	PDM_ODM_T				pDM_Odm,
 	IN	u4Byte					Addr,
@@ -61,7 +61,7 @@ odm_ConfigRF_RadioA_8821C(
 	ODM_RT_TRACE(pDM_Odm, ODM_COMP_INIT, ODM_DBG_TRACE, ("===> ODM_ConfigRFWithHeaderFile: [RadioA] %08X %08X\n", Addr, Data));
 }
 
-void 
+void
 odm_ConfigMAC_8821C(
 	IN	PDM_ODM_T				pDM_Odm,
 	IN	u4Byte					Addr,
@@ -96,15 +96,15 @@ odm_UpdateAgcBigJumpLmt_8821C(
 			isLimit = TRUE;
 			pDM_DigTable->bigJumpLmt[agcTableIdx] = bbGainIdx - 2;
 			ODM_RT_TRACE(pDM_Odm, ODM_COMP_DIG, ODM_DBG_TRACE, ("===> [AGC_TAB] bigJumpLmt [%d] = 0x%x\n", agcTableIdx, pDM_DigTable->bigJumpLmt[agcTableIdx]));
-		} 
+		}
 	} else
 		isLimit = FALSE;
-	
+
 	pDM_DigTable->rfGainIdx = rfGainIdx;
-	
+
 }
 
-void 
+void
 odm_ConfigBB_AGC_8821C(
 	IN	PDM_ODM_T				pDM_Odm,
 	IN	u4Byte					Addr,
@@ -114,7 +114,7 @@ odm_ConfigBB_AGC_8821C(
 {
 	odm_UpdateAgcBigJumpLmt_8821C(pDM_Odm, Addr, Data);
 
-	ODM_SetBBReg(pDM_Odm, Addr, Bitmask, Data);		
+	ODM_SetBBReg(pDM_Odm, Addr, Bitmask, Data);
 
 	/* Add 1us delay between BB/RF register setting. */
 	ODM_delay_us(1);
@@ -132,7 +132,7 @@ odm_ConfigBB_PHY_REG_PG_8821C(
 	IN	u4Byte					Bitmask,
 	IN	u4Byte					Data
 	)
-{    
+{
 
 #if (!(DM_ODM_SUPPORT_TYPE&ODM_AP))
 	    PHY_StoreTxPowerByRate(pDM_Odm->Adapter, Band, RfPath, TxNum, Addr, Bitmask, Data);
@@ -141,23 +141,23 @@ odm_ConfigBB_PHY_REG_PG_8821C(
 	ODM_RT_TRACE(pDM_Odm, ODM_COMP_INIT, ODM_DBG_LOUD, ("===> ODM_ConfigBBWithHeaderFile: [PHY_REG] %08X %08X %08X\n", Addr, Bitmask, Data));
 }
 
-void 
+void
 odm_ConfigBB_PHY_8821C(
 	IN	PDM_ODM_T				pDM_Odm,
 	IN	u4Byte					Addr,
 	IN	u4Byte					Bitmask,
 	IN	u4Byte					Data
 	)
-{    
+{
 	if (Addr == 0xffe)
 		#ifdef CONFIG_LONG_DELAY_ISSUE
 		ODM_sleep_ms(50);
-		#else		
+		#else
 		ODM_delay_ms(50);
 		#endif
 	else
 		ODM_SetBBReg(pDM_Odm, Addr, Bitmask, Data);
-	
+
 	/* Add 1us delay between BB/RF register setting. */
 	ODM_delay_us(1);
 	ODM_RT_TRACE(pDM_Odm, ODM_COMP_INIT, ODM_DBG_TRACE, ("===> ODM_ConfigBBWithHeaderFile: [PHY_REG] %08X %08X\n", Addr, Data));

@@ -6,14 +6,14 @@ Copyright (c) Realtek Semiconductor Corp. All rights reserved.
 
 Module Name:
 	Hal8197FDef.h
-	
+
 Abstract:
 	Defined HAL 8197F data structure & Define
-	    
+
 Major Change History:
 	When       Who               What
 	---------- ---------------   -------------------------------
-	2012-03-23 Filen            Create.	
+	2012-03-23 Filen            Create.
 --*/
 
 
@@ -133,7 +133,7 @@ hal_Associate_8197F(
 RT_STATUS
 InitPON8197F(
     IN  HAL_PADAPTER Adapter,
-    IN  u4Byte     	ClkSel        
+    IN  u4Byte     	ClkSel
 );
 
 

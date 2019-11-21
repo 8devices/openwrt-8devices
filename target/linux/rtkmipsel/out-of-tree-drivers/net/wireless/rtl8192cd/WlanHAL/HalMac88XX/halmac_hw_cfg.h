@@ -17,37 +17,16 @@
 
 /* Interface define*/
 
-#ifdef CONFIG_WLAN_HAL_8881A
-#define HALMAC_8881A_SUPPORT    1
-#else
 #define HALMAC_8881A_SUPPORT    0
-#endif 
 
-#ifdef CONFIG_WLAN_HAL_8192EE
-#define HALMAC_8192E_SUPPORT    1
-#else
 #define HALMAC_8192E_SUPPORT    0
-#endif 
 
-#ifdef CONFIG_WLAN_HAL_8814AE
-#define HALMAC_8814AMP_SUPPORT  1
-#define HALMAC_8814A_SUPPORT    1
-#else
 #define HALMAC_8814AMP_SUPPORT  0
 #define HALMAC_8814A_SUPPORT    0
-#endif 
 
-#ifdef CONFIG_WLAN_HAL_8197F
 #define HALMAC_8197F_SUPPORT    1
-#else
-#define HALMAC_8197F_SUPPORT    0
-#endif 
 
-#ifdef CONFIG_WLAN_HAL_8822BE
 #define HALMAC_8822B_SUPPORT    1
-#else
-#define HALMAC_8822B_SUPPORT    0
-#endif 
 
 
 #define HALMAC_8723A_SUPPORT    0

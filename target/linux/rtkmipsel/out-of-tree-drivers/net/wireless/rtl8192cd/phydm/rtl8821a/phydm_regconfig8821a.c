@@ -1,7 +1,7 @@
 /******************************************************************************
  *
  * Copyright(c) 2007 - 2011 Realtek Corporation. All rights reserved.
- *                                        
+ *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of version 2 of the GNU General Public License as
  * published by the Free Software Foundation.
@@ -21,7 +21,7 @@
 #include "mp_precomp.h"
 #include "../phydm_precomp.h"
 
-#if (RTL8821A_SUPPORT == 1)  
+#if (RTL8821A_SUPPORT == 1)
 
 void
 odm_ConfigRFReg_8821A(
@@ -33,10 +33,10 @@ odm_ConfigRFReg_8821A(
 	)
 {
     if(Addr == 0xfe || Addr == 0xffe)
-	{ 					  
+	{
 		#ifdef CONFIG_LONG_DELAY_ISSUE
 		ODM_sleep_ms(50);
-		#else		
+		#else
 		ODM_delay_ms(50);
 		#endif
 	}
@@ -65,11 +65,11 @@ odm_ConfigRFReg_8821A(
 		ODM_SetRFReg(pDM_Odm, RF_PATH, RegAddr, bRFRegOffsetMask, Data);
 		// Add 1us delay between BB/RF register setting.
 		ODM_delay_us(1);
-	}	
+	}
 }
 
 
-void 
+void
 odm_ConfigRF_RadioA_8821A(
 	IN 	PDM_ODM_T 				pDM_Odm,
 	IN 	u4Byte 					Addr,
@@ -86,7 +86,7 @@ odm_ConfigRF_RadioA_8821A(
 
 // 8821 no RF B
 /*
-void 
+void
 odm_ConfigRF_RadioB_8821A(
 	IN 	PDM_ODM_T 				pDM_Odm,
 	IN 	u4Byte 					Addr,
@@ -97,13 +97,13 @@ odm_ConfigRF_RadioB_8821A(
 	u4Byte	maskforPhySet= (u4Byte)(content&0xE000);
 
     odm_ConfigRFReg_8812A(pDM_Odm, Addr, Data, ODM_RF_PATH_B, Addr|maskforPhySet);
-	
+
 	ODM_RT_TRACE(pDM_Odm,ODM_COMP_INIT, ODM_DBG_TRACE, ("===> ODM_ConfigRFWithHeaderFile: [RadioB] %08X %08X\n", Addr, Data));
-    
+
 }
 */
 
-void 
+void
 odm_ConfigMAC_8821A(
  	IN 	PDM_ODM_T 	pDM_Odm,
  	IN 	u4Byte 		Addr,
@@ -114,7 +114,7 @@ odm_ConfigMAC_8821A(
     ODM_RT_TRACE(pDM_Odm,ODM_COMP_INIT, ODM_DBG_TRACE, ("===> ODM_ConfigMACWithHeaderFile: [MAC_REG] %08X %08X\n", Addr, Data));
 }
 
-void 
+void
 odm_ConfigBB_AGC_8821A(
     IN 	PDM_ODM_T 	pDM_Odm,
     IN 	u4Byte 		Addr,
@@ -122,7 +122,7 @@ odm_ConfigBB_AGC_8821A(
     IN 	u4Byte 		Data
     )
 {
-	ODM_SetBBReg(pDM_Odm, Addr, Bitmask, Data);		
+	ODM_SetBBReg(pDM_Odm, Addr, Bitmask, Data);
 	// Add 1us delay between BB/RF register setting.
 	ODM_delay_us(1);
 
@@ -139,11 +139,11 @@ odm_ConfigBB_PHY_REG_PG_8821A(
     IN 	u4Byte 		Bitmask,
     IN 	u4Byte 		Data
     )
-{    
+{
 	if (Addr == 0xfe)
 		#ifdef CONFIG_LONG_DELAY_ISSUE
 		ODM_sleep_ms(50);
-		#else		
+		#else
 		ODM_delay_ms(50);
 		#endif
 	else if (Addr == 0xfd)
@@ -165,18 +165,18 @@ odm_ConfigBB_PHY_REG_PG_8821A(
 
 }
 
-void 
+void
 odm_ConfigBB_PHY_8821A(
 	IN 	PDM_ODM_T 	pDM_Odm,
     IN 	u4Byte 		Addr,
     IN 	u4Byte 		Bitmask,
     IN 	u4Byte 		Data
     )
-{    
+{
 	if (Addr == 0xfe)
 		#ifdef CONFIG_LONG_DELAY_ISSUE
 		ODM_sleep_ms(50);
-		#else		
+		#else
 		ODM_delay_ms(50);
 		#endif
 	else if (Addr == 0xfd)
@@ -190,9 +190,9 @@ odm_ConfigBB_PHY_8821A(
 	else if (Addr == 0xf9)
 		ODM_delay_us(1);
 	else if (Addr == 0xa24)
-		pDM_Odm->RFCalibrateInfo.RegA24 = Data;			
-	ODM_SetBBReg(pDM_Odm, Addr, Bitmask, Data);		
-	
+		pDM_Odm->RFCalibrateInfo.RegA24 = Data;
+	ODM_SetBBReg(pDM_Odm, Addr, Bitmask, Data);
+
 	// Add 1us delay between BB/RF register setting.
 	ODM_delay_us(1);
     ODM_RT_TRACE(pDM_Odm,ODM_COMP_INIT, ODM_DBG_TRACE, ("===> ODM_ConfigBBWithHeaderFile: [PHY_REG] %08X %08X\n", Addr, Data));

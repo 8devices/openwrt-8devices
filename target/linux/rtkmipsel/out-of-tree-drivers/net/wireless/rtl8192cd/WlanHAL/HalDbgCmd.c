@@ -3,14 +3,14 @@ Copyright (c) Realtek Semiconductor Corp. All rights reserved.
 
 Module Name:
 	HalDbgCmd.h
-	
+
 Abstract:
 	Defined HAL Debug Command
-	    
+
 Major Change History:
 	When       Who               What
 	---------- ---------------   -------------------------------
-	2012-03-29 Filen            Create.	
+	2012-03-29 Filen            Create.
 --*/
 
 #include "HalPrecomp.h"
@@ -70,7 +70,7 @@ u8Byte GlobalDebugComponents	= 	\
 //									COMP_CMD				|
 //									COMP_EFUSE				|
 //									COMP_MESH_INTERWORKING |
-//									COMP_CCX				|	
+//									COMP_CCX				|
 //									COMP_IOCTL				|
 //									COMP_GP 				|
 //									COMP_TXAGG				|

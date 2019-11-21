@@ -41,7 +41,7 @@ GetDeltaSwingTable_8723D(
 	OUT pu1Byte 			*TemperatureUP_A,
 	OUT pu1Byte 			*TemperatureDOWN_A,
 	OUT pu1Byte 			*TemperatureUP_B,
-	OUT pu1Byte 			*TemperatureDOWN_B	
+	OUT pu1Byte 			*TemperatureDOWN_B
 	);
 
 VOID
@@ -53,7 +53,7 @@ setCCKFilterCoefficient_8723D(
 void DoIQK_8723D(
 	PVOID		pDM_VOID,
 	u1Byte 		DeltaThermalIndex,
-	u1Byte		ThermalValue,	
+	u1Byte		ThermalValue,
 	u1Byte 		Threshold
 	);
 
@@ -76,8 +76,8 @@ ODM_TxXtalTrackSetXtal_8723D(
 
 //1 7.	IQK
 
-void	
-PHY_IQCalibrate_8723D(	
+void
+PHY_IQCalibrate_8723D(
 #if (DM_ODM_SUPPORT_TYPE & ODM_AP)
 	IN PDM_ODM_T		pDM_Odm,
 #else
@@ -89,7 +89,7 @@ PHY_IQCalibrate_8723D(
 //
 // LC calibrate
 //
-void	
+void
 PHY_LCCalibrate_8723D(
 #if (DM_ODM_SUPPORT_TYPE & ODM_CE)
 	PVOID		pDM_VOID
@@ -101,15 +101,15 @@ PHY_LCCalibrate_8723D(
 //
 // AP calibrate
 //
-void	
-PHY_APCalibrate_8723D(		
+void
+PHY_APCalibrate_8723D(
 #if (DM_ODM_SUPPORT_TYPE & ODM_AP)
 	IN PDM_ODM_T		pDM_Odm,
 #else
 	IN	PADAPTER	pAdapter,
 #endif
 							IN 	s1Byte		delta);
-void	
+void
 PHY_DigitalPredistortion_8723D(		IN	PADAPTER	pAdapter);
 
 
@@ -145,9 +145,9 @@ _PHY_MACSettingCalibration_8723D(
 	IN	PADAPTER	pAdapter,
 #endif
 	IN	pu4Byte		MACReg,
-	IN	pu4Byte		MACBackup	
+	IN	pu4Byte		MACBackup
 	);
 
-								
-#endif	// #ifndef __HAL_PHY_RF_8723D_H__								
+
+#endif	// #ifndef __HAL_PHY_RF_8723D_H__
 

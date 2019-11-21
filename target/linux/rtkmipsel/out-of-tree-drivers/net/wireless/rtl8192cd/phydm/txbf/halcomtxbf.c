@@ -167,7 +167,7 @@ phydm_beamformSetGetTxRate(
 #endif
 }
 
-VOID 
+VOID
 halComTxbf_EnterWorkItemCallback(
 #if (DM_ODM_SUPPORT_TYPE == ODM_WIN)
 	IN	PADAPTER		Adapter
@@ -184,9 +184,9 @@ halComTxbf_EnterWorkItemCallback(
 #endif
 	PHAL_TXBF_INFO	pTxbfInfo = &pDM_Odm->BeamformingInfo.TxbfInfo;
 	u1Byte			Idx = pTxbfInfo->TXBFIdx;
-	
+
 	ODM_RT_TRACE(pDM_Odm, PHYDM_COMP_TXBF, ODM_DBG_LOUD, ("[%s] Start!\n", __func__));
-	
+
 	if (pDM_Odm->SupportICType & (ODM_RTL8812|ODM_RTL8821))
 		HalTxbfJaguar_Enter(pDM_Odm, Idx);
 	else if (pDM_Odm->SupportICType & ODM_RTL8192E)
@@ -197,7 +197,7 @@ halComTxbf_EnterWorkItemCallback(
 		HalTxbf8822B_Enter(pDM_Odm, Idx);
 }
 
-VOID 
+VOID
 halComTxbf_LeaveWorkItemCallback(
 #if (DM_ODM_SUPPORT_TYPE == ODM_WIN)
 	IN	PADAPTER		Adapter
@@ -229,7 +229,7 @@ halComTxbf_LeaveWorkItemCallback(
 }
 
 
-VOID 
+VOID
 halComTxbf_FwNdpaWorkItemCallback(
 #if (DM_ODM_SUPPORT_TYPE == ODM_WIN)
 	IN	PADAPTER		Adapter
@@ -284,7 +284,7 @@ halComTxbf_ClkWorkItemCallback(
 
 
 VOID
-halComTxbf_RateWorkItemCallback(	
+halComTxbf_RateWorkItemCallback(
 #if (DM_ODM_SUPPORT_TYPE == ODM_WIN)
 	IN	PADAPTER		Adapter
 #else
@@ -300,8 +300,8 @@ halComTxbf_RateWorkItemCallback(
 #endif
 	PHAL_TXBF_INFO	pTxbfInfo = &pDM_Odm->BeamformingInfo.TxbfInfo;
 	u1Byte			BW = pTxbfInfo->BW;
-	u1Byte			Rate = pTxbfInfo->Rate;	
-	
+	u1Byte			Rate = pTxbfInfo->Rate;
+
 	ODM_RT_TRACE(pDM_Odm, PHYDM_COMP_TXBF, ODM_DBG_LOUD, ("[%s] Start!\n", __func__));
 
 	if (pDM_Odm->SupportICType & ODM_RTL8812)
@@ -310,12 +310,12 @@ halComTxbf_RateWorkItemCallback(
 		HalTxbf8192E_setNDPArate(pDM_Odm, BW, Rate);
 	else if (pDM_Odm->SupportICType & ODM_RTL8814A)
 		HalTxbf8814A_setNDPArate(pDM_Odm, BW, Rate);
-	
+
 }
 
 
 #if (DM_ODM_SUPPORT_TYPE == ODM_WIN)
-VOID 
+VOID
 halComTxbf_FwNdpaTimerCallback(
 	IN	PRT_TIMER		pTimer
 	)
@@ -327,7 +327,7 @@ halComTxbf_FwNdpaTimerCallback(
 
 	PHAL_TXBF_INFO	pTxbfInfo = &pDM_Odm->BeamformingInfo.TxbfInfo;
 
-	
+
 	ODM_RT_TRACE(pDM_Odm, PHYDM_COMP_TXBF, ODM_DBG_LOUD, ("[%s] Start!\n", __func__));
 
 	if (*pDM_Odm->pbFwDwRsvdPageInProgress)
@@ -390,7 +390,7 @@ halComTxbf_ResetTxPathWorkItemCallback(
 
 	if (pDM_Odm->SupportICType & ODM_RTL8814A)
 		HalTxbf8814A_ResetTxPath(pDM_Odm, Idx);
-	
+
 }
 
 VOID
@@ -408,7 +408,7 @@ halComTxbf_GetTxRateWorkItemCallback(
 #else
 	PDM_ODM_T	pDM_Odm = (PDM_ODM_T)pDM_VOID;
 #endif
-	
+
 	if (pDM_Odm->SupportICType & ODM_RTL8814A)
 		HalTxbf8814A_GetTxRate(pDM_Odm);
 }
@@ -426,7 +426,7 @@ HalComTxbf_Set(
 	PHAL_TXBF_INFO	pTxbfInfo = &pDM_Odm->BeamformingInfo.TxbfInfo;
 
 	ODM_RT_TRACE(pDM_Odm, PHYDM_COMP_TXBF, ODM_DBG_LOUD, ("[%s] setType = 0x%X\n", __func__, setType));
-	
+
 	switch(setType){
 	case TXBF_SET_SOUNDING_ENTER:
 	pTxbfInfo->TXBFIdx = *pU1Tmp;
@@ -457,7 +457,7 @@ HalComTxbf_Set(
 	case TXBF_SET_SOUNDING_CLK:
 	phydm_beamformSetSoundingClk(pDM_Odm);
 	break;
-		
+
 	case TXBF_SET_TX_PATH_RESET:
 	pTxbfInfo->TXBFIdx = *pU1Tmp;
 	phydm_beamformSetResetTxPath(pDM_Odm);
@@ -466,7 +466,7 @@ HalComTxbf_Set(
 	case TXBF_SET_GET_TX_RATE:
 	phydm_beamformSetGetTxRate(pDM_Odm);
 	break;
-	
+
 	}
 
 	return TRUE;
@@ -498,7 +498,7 @@ HalComTxbf_Get(
 			*pBoolean = FALSE;
 	} else if (getType == TXBF_GET_EXPLICIT_BEAMFORMER) {
 		if (IS_HARDWARE_TYPE_OLDER_THAN_8812A(Adapter))
-			*pBoolean = FALSE;		
+			*pBoolean = FALSE;
 		else	if (/*IS_HARDWARE_TYPE_8822B(Adapter)	||*/
 				IS_HARDWARE_TYPE_8821B(Adapter) 	||
 				IS_HARDWARE_TYPE_8192E(Adapter) 	||
@@ -520,7 +520,7 @@ HalComTxbf_Get(
 
 
 	} else if (getType == TXBF_GET_MU_MIMO_AP) {
-#if (RTL8822B_SUPPORT == 1)	
+#if (RTL8822B_SUPPORT == 1)
 		if (/*pDM_Odm->SupportICType & (ODM_RTL8822B)*/
 			IS_HARDWARE_TYPE_8822B(Adapter))
 			*pBoolean = TRUE;
@@ -528,11 +528,11 @@ HalComTxbf_Get(
 #endif
 			*pBoolean = FALSE;
 	}
-	
+
 	return TRUE;
-}	
+}
 #endif
 
 
-#endif 
+#endif
 

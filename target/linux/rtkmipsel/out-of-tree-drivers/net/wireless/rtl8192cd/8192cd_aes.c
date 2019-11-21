@@ -12,27 +12,13 @@
 
 #define _8192CD_AES_C_
 
-#ifdef __KERNEL__
 #include <asm/byteorder.h>
-#elif defined(__ECOS)
-#include <cyg/io/eth/rltk/819x/wrapper/sys_support.h>
-#include <cyg/io/eth/rltk/819x/wrapper/skbuff.h>
-#include <cyg/io/eth/rltk/819x/wrapper/timer.h>
-#include <cyg/io/eth/rltk/819x/wrapper/wrapper.h>
-#endif
 
 #include "./8192cd_cfg.h"
 
-#if !defined(__KERNEL__) && !defined(__ECOS)
-#include "./sys-support.h"
-#endif
 
 #include "./8192cd.h"
-#if defined(__KERNEL__) || defined(__OSK__)
 #include "./ieee802_mib.h"
-#elif defined(__ECOS)
-#include <cyg/io/eth/rltk/819x/wlan/ieee802_mib.h>
-#endif
 #include "./8192cd_util.h"
 #include "./8192cd_headers.h"
 #include "./8192cd_debug.h"
@@ -104,7 +90,7 @@ void construct_mic_header1(
                         unsigned char *mpdu
 #ifdef CONFIG_IEEE80211W
 						,unsigned char isMgmt
-#endif						
+#endif
 						);
 void construct_mic_header2(
                     unsigned char *mic_header2,
@@ -120,7 +106,7 @@ void construct_ctr_preload(
                         int c
 #ifdef CONFIG_IEEE80211W
 						,unsigned char isMgmt
-#endif						
+#endif
 					);
 void xor_128(unsigned char *a, unsigned char *b, unsigned char *out);
 void xor_32(unsigned char *a, unsigned char *b, unsigned char *out);
@@ -359,9 +345,9 @@ int omac1_aes_128_vector(const unsigned char *key, int num_elem,
 {
 	void *ctx;
 	unsigned char cbc[AES_BLOCK_SIZE], pad[AES_BLOCK_SIZE];
-	const unsigned char *pos, *end;	
+	const unsigned char *pos, *end;
 	int i, e, left, total_len;
-	
+
 	ctx = AES_SetKey(key, 128);
 	if (ctx == NULL)
 		return -1;
@@ -371,7 +357,7 @@ int omac1_aes_128_vector(const unsigned char *key, int num_elem,
 	for (e = 0; e < num_elem; e++)
 		total_len += len[e];
 	left = total_len;
-		
+
 
 	e = 0;
 	pos = addr[0];
@@ -392,7 +378,7 @@ int omac1_aes_128_vector(const unsigned char *key, int num_elem,
 	}
 
 	memset(pad, 0, AES_BLOCK_SIZE);
-	
+
 	AES_Encrypt(pad, pad);
 	gf_mulx(pad);
 
@@ -412,7 +398,7 @@ int omac1_aes_128_vector(const unsigned char *key, int num_elem,
 	for (i = 0; i < AES_BLOCK_SIZE; i++)
 		pad[i] ^= cbc[i];
 	AES_Encrypt(pad, mac);
-	
+
 	return 0;
 }
 
@@ -446,9 +432,9 @@ void construct_mic_iv(
                         unsigned char *mpdu,
                         unsigned int payload_length,
                         unsigned char *pn_vector
-#ifdef CONFIG_IEEE80211W						
+#ifdef CONFIG_IEEE80211W
 						,unsigned char isMgmt
-#endif						
+#endif
                         )
 {
     int i;
@@ -461,7 +447,7 @@ void construct_mic_iv(
 #ifdef CONFIG_IEEE80211W
 	if(isMgmt) mic_iv[1] |= BIT(4);  // Management fields of Nonce. Figure 11-20 in IEEE 802.11-2012
 #endif
-	
+
     for (i = 2; i < 8; i++)
         mic_iv[i] = mpdu[i + 8];                    /* mic_iv[2:7] = A2[0:5] = mpdu[10:15] */
 #ifdef CONSISTENT_PN_ORDER
@@ -487,17 +473,17 @@ void construct_mic_header1(
                         unsigned char *mpdu
 #ifdef CONFIG_IEEE80211W
 						, unsigned char isMgmt
-#endif						
+#endif
                         )
 {
     mic_header1[0] = (unsigned char)((header_length - 2) / 256);
     mic_header1[1] = (unsigned char)((header_length - 2) % 256);
-	
+
 #ifdef CONFIG_IEEE80211W
 	if(isMgmt)
 		mic_header1[2] = mpdu[0];
 	else
-#endif		
+#endif
     mic_header1[2] = mpdu[0] & 0xcf;    /* Mute CF poll & CF ack bits */
     mic_header1[3] = mpdu[1] & 0xc7;    /* Mute retry, more data and pwr mgt bits */
     mic_header1[4] = mpdu[4];       /* A1 */
@@ -579,9 +565,9 @@ void construct_ctr_preload(
                         unsigned char *mpdu,
                         unsigned char *pn_vector,
                         int c
-#ifdef CONFIG_IEEE80211W						
+#ifdef CONFIG_IEEE80211W
 						,unsigned char isMgmt
-#endif						
+#endif
                         )
 {
     int i = 0;
@@ -634,10 +620,10 @@ mic: mic of AES
 static void aes_tx(struct rtl8192cd_priv *priv, UINT8 *key, UINT8 keyid,
 			union PN48 *pn48, UINT8 *hdr, UINT8 *llc,
 			UINT8 *pframe, UINT32 plen, UINT8* txmic
-#ifdef CONFIG_IEEE80211W			
+#ifdef CONFIG_IEEE80211W
 			, unsigned char isMgmt
 			, unsigned char checkmic
-#endif			
+#endif
 			)
 {
 	static UINT8	message[MAX_MSG_SIZE];
@@ -658,9 +644,6 @@ static void aes_tx(struct rtl8192cd_priv *priv, UINT8 *key, UINT8 keyid,
 
 	UINT32	offset = 0;
 	UINT32	hdrlen  = get_hdrlen(priv, hdr);
-#ifdef RTK_129X_PLATFORM
-	dma_addr_t tmpaddr;
-#endif
 
 	memset((void *)mic_iv, 0, 16);
 	memset((void *)mic_header1, 0, 16);
@@ -696,10 +679,10 @@ static void aes_tx(struct rtl8192cd_priv *priv, UINT8 *key, UINT8 keyid,
 
 	memcpy((void *)message, hdr, (hdrlen + 8)); //8 is for ext iv len
 	offset = (hdrlen + 8);
-#ifdef CONFIG_IEEE80211W	
+#ifdef CONFIG_IEEE80211W
 	if(isMgmt)
 		llc = 0;
-#endif	
+#endif
 
 	if (llc)
 	{
@@ -722,19 +705,19 @@ static void aes_tx(struct rtl8192cd_priv *priv, UINT8 *key, UINT8 keyid,
                         a4_exists,
                         message,
                         (payload_length),
-                        pn_vector   
-#ifdef CONFIG_IEEE80211W						
+                        pn_vector
+#ifdef CONFIG_IEEE80211W
 						,isMgmt
-#endif						
+#endif
                         );
 
     construct_mic_header1(
                             mic_header1,
                             hdrlen,
                             message
-#ifdef CONFIG_IEEE80211W					
+#ifdef CONFIG_IEEE80211W
 									,isMgmt
-#endif							
+#endif
 
                             );
     construct_mic_header2(
@@ -795,9 +778,9 @@ static void aes_tx(struct rtl8192cd_priv *priv, UINT8 *key, UINT8 keyid,
                                 message,
                                 pn_vector,
                                 i+1
-#ifdef CONFIG_IEEE80211W								
+#ifdef CONFIG_IEEE80211W
 								,isMgmt
-#endif								
+#endif
 							);
         aes128k128d(key, ctr_preload, aes_out);
         bitwise_xor(aes_out, &message[payload_index], chain_buffer);
@@ -813,9 +796,9 @@ static void aes_tx(struct rtl8192cd_priv *priv, UINT8 *key, UINT8 keyid,
                                 message,
                                 pn_vector,
                                 num_blocks+1
-#ifdef CONFIG_IEEE80211W								
+#ifdef CONFIG_IEEE80211W
 								,isMgmt
-#endif						
+#endif
 		);
 
         for (j = 0; j < 16; j++) padded_buffer[j] = 0x00;
@@ -835,10 +818,10 @@ static void aes_tx(struct rtl8192cd_priv *priv, UINT8 *key, UINT8 keyid,
                         qc_exists,
                         message,
                         pn_vector,
-                        0	
-#ifdef CONFIG_IEEE80211W								
+                        0
+#ifdef CONFIG_IEEE80211W
 						,isMgmt
-#endif						
+#endif
 	);
 
     for (j = 0; j < 16; j++) padded_buffer[j] = 0x00;
@@ -867,9 +850,9 @@ static void aes_tx(struct rtl8192cd_priv *priv, UINT8 *key, UINT8 keyid,
     }
 
 		// Don't copy data to pframe
-#ifdef CONFIG_IEEE80211W	
+#ifdef CONFIG_IEEE80211W
 	if(!checkmic)
-#endif	
+#endif
     	memcpy((void *)pframe, (void *)(&message[offset]), (plen)); //now is for plen
     offset += (plen);
 
@@ -877,30 +860,11 @@ static void aes_tx(struct rtl8192cd_priv *priv, UINT8 *key, UINT8 keyid,
     memcpy((void *)txmic, (void *)(&message[offset]), 8); //now is for mic
     offset += 8;
 
-#ifdef RTK_129X_PLATFORM
-	tmpaddr = get_physical_addr(priv, hdr, hdrlen + 8, PCI_DMA_TODEVICE);
-	rtl_cache_sync_wback(priv, tmpaddr, hdrlen + 8, PCI_DMA_TODEVICE);
-	pci_unmap_single(priv->pshare->pdev, tmpaddr, hdrlen + 8, PCI_DMA_TODEVICE);
-	if (llc) {
-		tmpaddr = get_physical_addr(priv, llc, 8, PCI_DMA_TODEVICE);
-		rtl_cache_sync_wback(priv, tmpaddr, 8, PCI_DMA_TODEVICE);
-		pci_unmap_single(priv->pshare->pdev, tmpaddr, 8, PCI_DMA_TODEVICE);
-	}
-
-	tmpaddr = get_physical_addr(priv, pframe, plen, PCI_DMA_TODEVICE);
-	rtl_cache_sync_wback(priv, tmpaddr, plen, PCI_DMA_TODEVICE);
-	pci_unmap_single(priv->pshare->pdev, tmpaddr, plen, PCI_DMA_TODEVICE);
-
-	tmpaddr = get_physical_addr(priv, txmic, 8, PCI_DMA_TODEVICE);
-	rtl_cache_sync_wback(priv, tmpaddr, 8, PCI_DMA_TODEVICE);
-	pci_unmap_single(priv->pshare->pdev, tmpaddr, 8, PCI_DMA_TODEVICE);
-#elif defined(CONFIG_PCI_HCI)
 	rtl_cache_sync_wback(priv, (unsigned long)hdr, hdrlen + 8, PCI_DMA_TODEVICE);
 	if (llc)
 		rtl_cache_sync_wback(priv, (unsigned long)llc, 8, PCI_DMA_TODEVICE);
 	rtl_cache_sync_wback(priv, (unsigned long)pframe, plen, PCI_DMA_TODEVICE);
 	rtl_cache_sync_wback(priv, (unsigned long)txmic, 8, PCI_DMA_TODEVICE);
-#endif
 
     _DEBUG_INFO("--txmic=%X %X %X %X %X %X %X %X\n",
     txmic[0], txmic[1], txmic[2], txmic[3],
@@ -916,7 +880,7 @@ static void aes_tx(struct rtl8192cd_priv *priv, UINT8 *key, UINT8 keyid,
 void BIP_encrypt(struct rtl8192cd_priv *priv, unsigned char *pwlhdr,
 				unsigned char *frag1,
 				unsigned char *frag2, unsigned int frag2_len,
-				unsigned char *frag3, 
+				unsigned char *frag3,
 				unsigned char isMgmt)
 {
 #ifdef CONFIG_IEEE80211W_BIPTEST
@@ -931,47 +895,47 @@ void BIP_encrypt(struct rtl8192cd_priv *priv, unsigned char *pwlhdr,
 	unsigned char IGTK[16]={0x4e,0xa9,0x54,0x3e,0x09,0xcf,0x2b,0x1e,0xca,0x66,0xff,0xc5,0x8b,0xde,0xcb,0xcf};
 	unsigned char Addr[6]={0x02,0x00,0x00,0x00,0x00,0x00};
 #else
-unsigned char *BIP_data;	
-#endif		
+unsigned char *BIP_data;
+#endif
 	unsigned char IMIC[16];
 
 	int i;
 	union PN48 *pn48;
 	union PN48 BIPPN;
-	
+
 	unsigned char *da;
 	unsigned char *ttkey = NULL;
 	unsigned int	keyid = 0;
 	struct stat_info	*pstat = NULL;
 	UINT32	hdrlen  = get_hdrlen(priv, pwlhdr);
-	
+
 	unsigned char *pn;
 	unsigned int offset;
 	unsigned char pn_vector[6];
-	
+
 	printk("frag2_len=%d\n",frag2_len);
 	frag2_len -= 10; // payload length = frag2_len - 10, MMIE Length = 10
-	ttkey = GET_IGROUP_ENCRYP_KEY;	
+	ttkey = GET_IGROUP_ENCRYP_KEY;
 	PMFDEBUG("IGTK=");
 	for(i=0;i<16;i++)
 		PMFDEBUG("%x",priv->pmib->dot11IGTKTable.dot11EncryptKey.dot11TTKey.skey[i]);
 	PMFDEBUG("\n");
 	pn48 = GET_IGROUP_ENCRYP_PN;
-#ifdef CONFIG_IEEE80211W_BIPTEST	
+#ifdef CONFIG_IEEE80211W_BIPTEST
 	// test data
 	memcpy(pwlhdr+10,Addr,6);
 	memcpy(pwlhdr+16,Addr,6);
 	ttkey = IGTK;
 	BIPPN.val48 = 4;
 	pn48 = &BIPPN;
-#endif	
+#endif
 	pn_vector[0] = pn48->_byte_.TSC0;
 	pn_vector[1] = pn48->_byte_.TSC1;
 	pn_vector[2] = pn48->_byte_.TSC2;
 	pn_vector[3] = pn48->_byte_.TSC3;
 	pn_vector[4] = pn48->_byte_.TSC4;
 	pn_vector[5] = pn48->_byte_.TSC5;
-	
+
 	keyid = 4;
 #ifndef CONFIG_IEEE80211W_BIPTEST
 	BIP_data = (unsigned char *)kmalloc(20+ frag2_len + 18, GFP_ATOMIC);
@@ -985,7 +949,7 @@ unsigned char *BIP_data;
 	// Generate Management Frame Body
 	memcpy(BIP_data+20,frag2,frag2_len);
 
-	// Generate MMIE	
+	// Generate MMIE
 	offset = 20 + frag2_len;
 	BIP_data[offset++] = 0x4c; // element ID (Management MIC frame)
 	BIP_data[offset++] = 0x10; // MMIC length
@@ -994,32 +958,30 @@ unsigned char *BIP_data;
 	memcpy(BIP_data+offset,pn_vector,6); // IPN
 	offset += 6;
 	memset(BIP_data+offset,0,8);
-#ifdef CONFIG_IEEE80211W_BIPTEST	
+#ifdef CONFIG_IEEE80211W_BIPTEST
 	printk("BIP_data len=%d data=",frag2_len);
 	for(i=0;i<20+ frag2_len + 18;i++)
 		printk("%02x ",BIP_data[i]);
 	printk("\n");
-#endif	
+#endif
 	memcpy(frag2+frag2_len,BIP_data+20+frag2_len,10);
 	// Use AES-128-CMAC to generate IMIC
 #ifdef CONFIG_IEEE80211W
 	omac1_aes_128(ttkey,BIP_data,20+ frag2_len + 18,IMIC);
 #endif
-#ifdef CONFIG_IEEE80211W_BIPTEST	
+#ifdef CONFIG_IEEE80211W_BIPTEST
 	printk("IMIC=");
 	for(i=0;i<16;i++)
 		printk("%02x",IMIC[i]);
 	printk("\n");
-#endif	
+#endif
 	memcpy(frag3,IMIC,8);
-#ifdef CONFIG_PCI_HCI
 	rtl_cache_sync_wback(priv, (unsigned long)pwlhdr, hdrlen, PCI_DMA_TODEVICE);
 	rtl_cache_sync_wback(priv, (unsigned long)frag2, frag2_len+10, PCI_DMA_TODEVICE);
 	rtl_cache_sync_wback(priv, (unsigned long)frag3, 8, PCI_DMA_TODEVICE);
-#endif
-	
-	kfree(BIP_data);	
-		
+
+	kfree(BIP_data);
+
 	if (pn48->val48 == 0xffffffffffffULL)
 		pn48->val48 = 0;
 	else
@@ -1048,47 +1010,47 @@ int MMIE_check(struct rtl8192cd_priv *priv, struct rx_frinfo *pfrinfo)
 	unsigned char *ttkey = NULL;
     unsigned char BIP_data[40];
     unsigned char MIC_be_chk[16];    // 16 ? why not 8?
-    #ifdef CONFIG_IEEE80211W_CLI_DEBUG 
+    #ifdef CONFIG_IEEE80211W_CLI_DEBUG
     int i=0;
-    #endif 
+    #endif
 
     memset(BIP_data,0,40);
-    memset(MIC_be_chk,0,16);    
-    
-	ttkey = GET_IGROUP_ENCRYP_KEY;	 
+    memset(MIC_be_chk,0,16);
 
-    #ifdef CONFIG_IEEE80211W_CLI_DEBUG 
+	ttkey = GET_IGROUP_ENCRYP_KEY;
+
+    #ifdef CONFIG_IEEE80211W_CLI_DEBUG
 	PMFDEBUG("IGTK=");
 	for(i=0;i<16;i++)
 		PMFDEBUG("%x ",priv->pmib->dot11IGTKTable.dot11EncryptKey.dot11TTKey.skey[i]);
 	PMFDEBUG("\n");
     #endif
-    
-	/*cp BIP AAD (FC | A1 | A2 | A3)*/ 
+
+	/*cp BIP AAD (FC | A1 | A2 | A3)*/
     memcpy(&BIP_data[0],pframe,FC_LEN);  // cp FC
     memcpy(&BIP_data[FC_LEN],pframe+FC_LEN+DUR_LEN ,A1A2A3_LEN );  // cp A1 , A2 ,A3
 
-	/*cp Management Frame Body*/ 
-    memcpy(&BIP_data[FC_LEN + A1A2A3_LEN],pframe+FC_LEN+DUR_LEN+A1A2A3_LEN+SEQ_LEN ,REASON_LEN );  
+	/*cp Management Frame Body*/
+    memcpy(&BIP_data[FC_LEN + A1A2A3_LEN],pframe+FC_LEN+DUR_LEN+A1A2A3_LEN+SEQ_LEN ,REASON_LEN );
 
-	/*cp MMIE	*/ 
-    memcpy(&BIP_data[FC_LEN + A1A2A3_LEN + REASON_LEN],pframe+FC_LEN+DUR_LEN+A1A2A3_LEN+SEQ_LEN+REASON_LEN ,MMIE_LEN );   
-   
+	/*cp MMIE	*/
+    memcpy(&BIP_data[FC_LEN + A1A2A3_LEN + REASON_LEN],pframe+FC_LEN+DUR_LEN+A1A2A3_LEN+SEQ_LEN+REASON_LEN ,MMIE_LEN );
 
-	/*Use AES-128-CMAC to generate IMIC*/ 
+
+	/*Use AES-128-CMAC to generate IMIC*/
 	omac1_aes_128(ttkey,BIP_data,FC_LEN + A1A2A3_LEN + REASON_LEN + MMIE_LEN + MIC_LEN , MIC_be_chk );
 
-    #ifdef CONFIG_IEEE80211W_CLI_DEBUG	
+    #ifdef CONFIG_IEEE80211W_CLI_DEBUG
         PMFDEBUG("IMIC=");
         for(i=0;i<16;i++)
             PMFDEBUG("%02x",MIC_be_chk[i]);
         PMFDEBUG("\n");
-    #endif	
-    
-    
+    #endif
+
+
     if(!memcmp(MIC_be_chk, pframe + BIP_HEADER_LEN + 10, MIC_LEN))
         return 1; //_SUCCESS ; //match!
-    else    
+    else
         return 0; //_FAIL ;
 
 }
@@ -1105,22 +1067,22 @@ int aesccmp_checkmic(struct rtl8192cd_priv *priv, struct rx_frinfo *pfrinfo, uns
 	unsigned char calmic[8];
 	unsigned char data[1460];
 	sa = get_sa(pframe);
-	
-	if (OPMODE & WIFI_AP_STATE 
+
+	if (OPMODE & WIFI_AP_STATE
 #ifdef CONFIG_IEEE80211W_CLI
-	   || (OPMODE & WIFI_STATION_STATE)		
-#endif 
+	   || (OPMODE & WIFI_STATION_STATE)
+#endif
 	)
 	{
 		if (!IS_MCAST(sa))
 		{
 			pstat = get_stainfo(priv, sa);
-			
+
 			if (pstat == NULL) {
 				DEBUG_ERR("tx aes pstat == NULL\n");
 				return 0;
 			}
-			
+
 			ttkey = GET_UNICAST_ENCRYP_KEY;
 
 			pn48._byte_.TSC0 = pframe[pfrinfo->hdr_len];
@@ -1130,7 +1092,7 @@ int aesccmp_checkmic(struct rtl8192cd_priv *priv, struct rx_frinfo *pfrinfo, uns
 			pn48._byte_.TSC4 = pframe[pfrinfo->hdr_len+6];
 			pn48._byte_.TSC5 = pframe[pfrinfo->hdr_len+7];
 			keyid = 0;
-			
+
 		}
 	}
 
@@ -1140,9 +1102,9 @@ int aesccmp_checkmic(struct rtl8192cd_priv *priv, struct rx_frinfo *pfrinfo, uns
 	}
 
 	memcpy(data, pframe + pfrinfo->hdr_len + 8, pfrinfo->pktlen - pfrinfo->hdr_len - 8 - 8);
-	
-	aes_tx(priv, ttkey, keyid, 
-	       &pn48, pframe, 0, 
+
+	aes_tx(priv, ttkey, keyid,
+	       &pn48, pframe, 0,
 		   pframe + pfrinfo->hdr_len + 8, pfrinfo->pktlen - pfrinfo->hdr_len - 8 - 8,
 		   calmic, 1, 1);
 
@@ -1158,12 +1120,12 @@ void aesccmp_encrypt(struct rtl8192cd_priv *priv, unsigned char *pwlhdr,
 				unsigned char *frag1,
 				unsigned char *frag2, unsigned int frag2_len,
 				unsigned char *frag3
-#ifdef CONFIG_IEEE80211W				
+#ifdef CONFIG_IEEE80211W
 				, unsigned char isMgmt
-#endif				
+#endif
 			)
 {
-#ifdef CONFIG_IEEE80211W_TEST	
+#ifdef CONFIG_IEEE80211W_TEST
 	unsigned char CCMPTK[16]={0x66,0xed,0x21,0x04,0x2f,0x9f,0x26,0xd7,0x11,0x57,0x06,0xe4,0x04,0x14,0xcf,0x2e}; // test for PMF
 	unsigned char testDa[6]={0x02,0x00,0x00,0x00,0x01,0x00};// test for PMF (unicast Deauth frame)
 	//unsigned char testDa[6]={0xff,0xff,0xff,0xff,0xff,0xff};// test for PMF (broadcast Deauth frame)
@@ -1177,7 +1139,7 @@ void aesccmp_encrypt(struct rtl8192cd_priv *priv, unsigned char *pwlhdr,
 	unsigned int	keyid = 0;
 	struct stat_info	*pstat = NULL;
 
-#ifdef CONFIG_IEEE80211W_TEST		
+#ifdef CONFIG_IEEE80211W_TEST
 	if(isMgmt) {
 		printk("isMgmt\n");
 		memcpy(pwlhdr+4,testDa,6);// test for PMF
@@ -1186,7 +1148,7 @@ void aesccmp_encrypt(struct rtl8192cd_priv *priv, unsigned char *pwlhdr,
 		memcpy(pwlhdr+16,testSa,6);// test for PMF
 		CCMPPN.val48 = 1;// test for PMF (unicast)
 	}
-#endif	
+#endif
 
 	da = get_da(pwlhdr);
 
@@ -1210,14 +1172,14 @@ void aesccmp_encrypt(struct rtl8192cd_priv *priv, unsigned char *pwlhdr,
 		}
 		else
 		{
-#ifdef CONFIG_IEEE80211W_TEST		
+#ifdef CONFIG_IEEE80211W_TEST
 			// marked test for PMF
 			if(isMgmt) { // when test and Mgmt frame
 				ttkey = CCMPTK;
-				pn48 = &CCMPPN; 			
+				pn48 = &CCMPPN;
 			}
-			else 
-#endif			
+			else
+#endif
 			{
 				pstat = get_stainfo(priv, da);
 				if (pstat == NULL) {
@@ -1227,7 +1189,7 @@ void aesccmp_encrypt(struct rtl8192cd_priv *priv, unsigned char *pwlhdr,
 				ttkey = GET_UNICAST_ENCRYP_KEY;
 				pn48 = GET_UNICAST_ENCRYP_PN;
 			}
-#ifdef CONFIG_IEEE80211W_TEST	
+#ifdef CONFIG_IEEE80211W_TEST
 			if(isMgmt) {
 				printk("isUnicast\n");
 				printk("ttkey=");
@@ -1236,7 +1198,7 @@ void aesccmp_encrypt(struct rtl8192cd_priv *priv, unsigned char *pwlhdr,
 				printk("\n");
 				printk("pn48=%02x%02x%02x%02x%02x%02x\n",pn48->_byte_.TSC0,pn48->_byte_.TSC1,pn48->_byte_.TSC2,pn48->_byte_.TSC3,pn48->_byte_.TSC4,pn48->_byte_.TSC5);
 			}
-			ttkey = GET_UNICAST_ENCRYP_KEY;		
+			ttkey = GET_UNICAST_ENCRYP_KEY;
 			pn48 = GET_UNICAST_ENCRYP_PN;
 #endif
 			keyid = 0;
@@ -1264,7 +1226,7 @@ void aesccmp_encrypt(struct rtl8192cd_priv *priv, unsigned char *pwlhdr,
 		}
 		ttkey = GET_UNICAST_ENCRYP_KEY;
 		pn48 = GET_UNICAST_ENCRYP_PN;
-			
+
 		keyid = 0;
 
 		}
@@ -1284,20 +1246,20 @@ void aesccmp_encrypt(struct rtl8192cd_priv *priv, unsigned char *pwlhdr,
 #ifdef CONFIG_IEEE80211W
 	if (isMgmt)
 		frag1 = 0;
-#endif		
+#endif
 
 	aes_tx(priv, ttkey, keyid, pn48, pwlhdr, frag1, frag2, frag2_len, frag3
-#ifdef CONFIG_IEEE80211W	
+#ifdef CONFIG_IEEE80211W
 		 	,isMgmt
 			, 0
-#endif		
+#endif
 		   );
 }
 
 
 static void aes_rx(UINT8 *ttkey, UINT8 qc_exists, UINT8 a4_exists,
 				UINT8 *pframe, UINT32 hdrlen, UINT32 plen
-#ifdef CONFIG_IEEE80211W				
+#ifdef CONFIG_IEEE80211W
 				, unsigned char isMgmt
 #endif
 			)
@@ -1346,10 +1308,10 @@ static void aes_rx(UINT8 *ttkey, UINT8 qc_exists, UINT8 a4_exists,
                                 qc_exists,
                                 pframe,
                                 pn_vector,
-                                i+1       
-#ifdef CONFIG_IEEE80211W								
+                                i+1
+#ifdef CONFIG_IEEE80211W
 								,isMgmt
-#endif								
+#endif
                             );
 
         aes128k128d(ttkey, ctr_preload, aes_out);
@@ -1367,9 +1329,9 @@ static void aes_rx(UINT8 *ttkey, UINT8 qc_exists, UINT8 a4_exists,
                                 pframe,
                                 pn_vector,
                                 num_blocks+1
-#ifdef CONFIG_IEEE80211W								
+#ifdef CONFIG_IEEE80211W
 								,isMgmt
-#endif								
+#endif
                             );
 
         for (j = 0; j < 16; j++) padded_buffer[j] = 0x00;
@@ -1385,7 +1347,7 @@ static void aes_rx(UINT8 *ttkey, UINT8 qc_exists, UINT8 a4_exists,
 
 
 unsigned int aesccmp_decrypt(struct rtl8192cd_priv *priv, struct rx_frinfo *pfrinfo
-#ifdef CONFIG_IEEE80211W				
+#ifdef CONFIG_IEEE80211W
 								, unsigned char isMgmt
 #endif
 								)
@@ -1398,15 +1360,15 @@ unsigned int aesccmp_decrypt(struct rtl8192cd_priv *priv, struct rx_frinfo *pfri
 	UINT8	*pframe = get_pframe(pfrinfo);
 	UINT8	to_fr_ds = pfrinfo->to_fr_ds;
 	struct stat_info	*pstat = NULL;
-#ifdef CONFIG_IEEE80211W_TEST	
-		
+#ifdef CONFIG_IEEE80211W_TEST
+
 		unsigned char CCMPTK[16]={0x66,0xed,0x21,0x04,0x2f,0x9f,0x26,0xd7,0x11,0x57,0x06,0xe4,0x04,0x14,0xcf,0x2e}; // test for PMF
 		unsigned char testDa[6]={0x02,0x00,0x00,0x00,0x01,0x00};// test for PMF (unicast Deauth frame)
 		//unsigned char testDa[6]={0xff,0xff,0xff,0xff,0xff,0xff};// test for PMF (broadcast Deauth frame)
 		unsigned char testSa[6]={0x02,0x00,0x00,0x00,0x00,0x00};// test for PMF
 		unsigned char testIV[8]={0x01,0x00,0x00,0x20,0x00,0x00,0x00,0x00};
 		unsigned char testdata[10]={0x1d,0x07,0xca,0xfd,0x04,0x09,0xbb,0x8b,0xaf,0xef};
-			
+
 		if(isMgmt) {
 			printk("isMgmt\n");
 			pframe[0]=0xc0;
@@ -1442,18 +1404,18 @@ unsigned int aesccmp_decrypt(struct rtl8192cd_priv *priv, struct rx_frinfo *pfri
 #if defined(WDS) || defined(CONFIG_RTK_MESH) || defined(A4_STA)
 		if (to_fr_ds == 3)
 			pstat = get_stainfo (priv, GetAddr2Ptr(pframe));
-		else			
+		else
 #endif
 		pstat = get_stainfo (priv, sa);
 
-#ifdef CONFIG_IEEE80211W_TEST		
+#ifdef CONFIG_IEEE80211W_TEST
 		// marked test for PMF
 		if(isMgmt) { // when test and Mgmt frame
 			ttkey = CCMPTK;
 			keylen = 16;
 		}
-		else 
-#endif	
+		else
+#endif
 		{
 		if (pstat == NULL)
 		{
@@ -1475,7 +1437,7 @@ unsigned int aesccmp_decrypt(struct rtl8192cd_priv *priv, struct rx_frinfo *pfri
 				keylen = GET_GROUP_IDX2_ENCRYP_KEYLEN;
 				ttkey  = GET_GROUP_ENCRYP2_KEY;
 			}
-			else{				
+			else{
 				keylen = GET_GROUP_ENCRYP_KEYLEN;
 				ttkey  = GET_GROUP_ENCRYP_KEY;
 			}
@@ -1502,7 +1464,7 @@ unsigned int aesccmp_decrypt(struct rtl8192cd_priv *priv, struct rx_frinfo *pfri
 		DEBUG_ERR("no descrypt key for AES due to keylen=0\n");
 		return FALSE;
 	}
-#ifdef CONFIG_IEEE80211W_TEST	
+#ifdef CONFIG_IEEE80211W_TEST
 	if(isMgmt) {
 		int i;
 		printk("pframe=");
@@ -1515,12 +1477,12 @@ unsigned int aesccmp_decrypt(struct rtl8192cd_priv *priv, struct rx_frinfo *pfri
 		printk("\n");
 		printk("hdrlen=%d\n",hdrlen);
 	}
-#endif		
+#endif
 
 	aes_rx(ttkey, qc_exists, a4_exists, pframe, hdrlen, pfrinfo->pktlen-hdrlen-8
-#ifdef CONFIG_IEEE80211W				
+#ifdef CONFIG_IEEE80211W
 			, isMgmt
-#endif		
+#endif
 			);
 	return TRUE;
 }
