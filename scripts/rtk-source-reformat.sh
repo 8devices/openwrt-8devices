@@ -1,7 +1,7 @@
 #!/bin/sh
 
-DIR="target/linux/rtkmipsel/out-of-tree-drivers/net/wireless/rtl8192cd/"
-U_FILE="target/linux/rtkmipsel/out-of-tree-drivers/unifdef-file"
+DIR="package/kernel/rtl8192cd"
+U_FILE="package/kernel/rtl8192cd/unifdef-file"
 
 _dos2unix(){
 	find $DIR -type f -exec dos2unix '{}' ';'
