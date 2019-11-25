@@ -691,7 +691,11 @@ int event_indicate_cfg80211(struct rtl8192cd_priv *priv, unsigned char *mac, int
 	}
 
     /*cfg p2p 2014-0330 , report CFG80211_NEW_STA , ASAP*/
-	if( (event != CFG80211_SCAN_DONE)  && (event != CFG80211_NEW_STA) && (event != CFG80211_DEL_STA) && (event != CFG80211_RADAR_CAC_FINISHED) ){ //eric-bb
+	if( (event != CFG80211_SCAN_DONE)  &&
+	    (event != CFG80211_SCAN_ABORDED) &&
+	    (event != CFG80211_NEW_STA) &&
+	    (event != CFG80211_DEL_STA) &&
+	    (event != CFG80211_RADAR_CAC_FINISHED) ){ //eric-bb
     	if( (OPMODE & WIFI_AP_STATE) && (priv->up_time <= HAPD_READY_RX_EVENT) )
     	{
     		NLMSG("ignore cfg event,up_time[%d],event[%d]\n", priv->up_time,event);

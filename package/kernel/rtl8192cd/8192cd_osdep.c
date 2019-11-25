@@ -5572,15 +5572,17 @@ int rtl8192cd_close(struct net_device *dev)
 {
 	struct rtl8192cd_priv *priv = GET_DEV_PRIV(dev);
 	struct rtl8192cd_priv *priv_vxd;
-    unsigned int errorFlag=0;
+	unsigned int errorFlag=0;
 	unsigned long flags=0;
 
 	int i;
 
-	#if 0	//prevent drop vxd, vap connection
+#if 0	//prevent drop vxd, vap connection
 	if(IS_ROOT_INTERFACE(priv))
 		close_vxd_vap(priv);
-	#endif
+#endif
+	if(IS_ROOT_INTERFACE(priv) && priv->scan_req)
+		event_indicate_cfg80211(priv, NULL, CFG80211_SCAN_ABORDED, NULL);
 
 	if(is_WRT_scan_iface(dev->name))
 	{
@@ -5588,18 +5590,18 @@ int rtl8192cd_close(struct net_device *dev)
 		return 0;
 	}
 
-    STADEBUG("===>\n");
+	STADEBUG("===>\n");
 	SMP_LOCK(flags);
 	DBFENTER;
 
-    {
-    	if (!(priv->drv_state & DRV_STATE_OPEN))
-        {
-		DBFEXIT;
-		SMP_UNLOCK(flags);
-		return 0;
+	{
+		if (!(priv->drv_state & DRV_STATE_OPEN))
+		{
+			DBFEXIT;
+			SMP_UNLOCK(flags);
+			return 0;
+		}
 	}
-    }
 
 	SAVE_INT_AND_CLI(flags);
 
@@ -5608,7 +5610,7 @@ int rtl8192cd_close(struct net_device *dev)
 	}
 
 
-		priv->drv_state &= ~DRV_STATE_OPEN;     // set driver as has been closed, david
+	priv->drv_state &= ~DRV_STATE_OPEN;     // set driver as has been closed, david
 
 #if defined(PCIE_POWER_SAVING) || defined(RF_MIMO_SWITCH)
 	if (timer_pending(&priv->ps_timer)) {
