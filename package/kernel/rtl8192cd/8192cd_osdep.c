@@ -5957,7 +5957,7 @@ static void MDL_DEVINIT set_mib_default(struct rtl8192cd_priv *priv)
 	unsigned int vap_idx=-1;
 
 	name = priv->dev->name;
-	if (!is_WRT_scan_iface(name)) {
+	if (!is_WRT_scan_iface(name) && !IS_VXD_INTERFACE(priv)) {
 		if (IS_ROOT_INTERFACE(priv)) {
 			vap_idx = 0;
 			mac=priv->rtk->root_mac;
@@ -5966,7 +5966,7 @@ static void MDL_DEVINIT set_mib_default(struct rtl8192cd_priv *priv)
 			mac=priv->rtk->vap_mac[vap_idx];
 		}
 
-		if((vap_idx<0)||(read_flash_hw_mac_vap(mac, vap_idx)))
+		if(read_flash_hw_mac_vap(mac, vap_idx))
 			memcpy(p, "\x00\xe0\x4c\x81\x86\x86", MACADDRLEN);
 		else
 		        memcpy(p, mac, MACADDRLEN);
