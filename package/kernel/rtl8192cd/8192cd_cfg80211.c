@@ -484,7 +484,7 @@ void realtek_cfg80211_inform_bss_ies(unsigned char *ie_buf, unsigned int *total_
 int translate_ss_result_rssi(int rssi)
 {
 	//reference libiwinfo/iwinfo_nl80211.c - scan_cb
-	return ((rssi-100+0x100)*100);
+	return ((rssi-100)*100);
 }
 #endif
 
