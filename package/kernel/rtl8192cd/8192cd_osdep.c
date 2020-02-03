@@ -5577,6 +5577,12 @@ int rtl8192cd_close(struct net_device *dev)
 
 	int i;
 
+	if (timer_pending(&priv->ch_avail_chk_timer)) {
+		del_timer(&priv->ch_avail_chk_timer);
+		RTL_W8(TXPAUSE, 0xff);
+		event_indicate_cfg80211(priv, NULL, CFG80211_RADAR_CAC_ABORTED, NULL);
+	}
+
 #if 0	//prevent drop vxd, vap connection
 	if(IS_ROOT_INTERFACE(priv))
 		close_vxd_vap(priv);

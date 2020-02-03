@@ -664,6 +664,9 @@ void event_to_name(int event, char *event_name)
 	case CFG80211_RADAR_DETECTED:
 		strcpy(event_name, "CFG80211_RADAR_DETECTED");
 		break;
+	case CFG80211_RADAR_CAC_ABORTED:
+		strcpy(event_name, "CFG80211_RADAR_CAC_ABORTED");
+		break;
 	default:
 		strcpy(event_name, "UNKNOWN EVENT");
 		break;
@@ -695,6 +698,7 @@ int event_indicate_cfg80211(struct rtl8192cd_priv *priv, unsigned char *mac, int
 	    (event != CFG80211_SCAN_ABORDED) &&
 	    (event != CFG80211_NEW_STA) &&
 	    (event != CFG80211_DEL_STA) &&
+	    (event != CFG80211_RADAR_CAC_ABORTED) &&
 	    (event != CFG80211_RADAR_CAC_FINISHED) ){ //eric-bb
     	if( (OPMODE & WIFI_AP_STATE) && (priv->up_time <= HAPD_READY_RX_EVENT) )
     	{
@@ -854,6 +858,10 @@ int event_indicate_cfg80211(struct rtl8192cd_priv *priv, unsigned char *mac, int
 		case CFG80211_RADAR_CAC_FINISHED:
 			NDEBUG("cfg80211_event [CFG80211_RADAR_CAC_FINISHED][%d]\n", event);
 			cfg80211_cac_event(priv->dev, priv->pshare->dfs_chan_def, NL80211_RADAR_CAC_FINISHED, GFP_KERNEL);
+			break;
+		case CFG80211_RADAR_CAC_ABORTED:
+			NDEBUG("cfg80211_event [CFG80211_RADAR_CAC_ABORTED][%d]\n", event);
+			cfg80211_cac_event(priv->dev, priv->pshare->dfs_chan_def, NL80211_RADAR_CAC_ABORTED, GFP_KERNEL);
 			break;
 		case CFG80211_RADAR_DETECTED:
 			NDEBUG("cfg80211_event [CFG80211_RADAR_DETECTED][%d]\n", event);
