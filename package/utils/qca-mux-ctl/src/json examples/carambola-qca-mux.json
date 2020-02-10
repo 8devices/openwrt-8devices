@@ -1,0 +1,14 @@
+{
+	"mux_list": [
+		{"gpio" : 1, "gpio_direction" : "IN"}
+		],
+
+	"functions": [
+		{"gpio_function" : "SPI_EN", "state" : true},
+		{"gpio_function" : "EJTAG_DISABLE", "state" : true},
+		{"gpio_function" : "SPI_CS_EN2", "state" : false},
+		{"gpio_function" : "UART_EN", "state" : true},
+		{"gpio_function" : "SPI_CS_EN1", "state" : false}
+		]
+}
+

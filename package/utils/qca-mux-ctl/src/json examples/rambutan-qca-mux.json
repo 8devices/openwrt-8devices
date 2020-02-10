@@ -1,0 +1,12 @@
+{
+	"mux_list": [
+		{"gpio" : 21, "signal_direction": "IN", "gpio_direction" : "OUT","signal": "I2C_DATA"},
+		{"gpio" : 21, "signal_direction": "OUT", "gpio_direction" : "OUT","signal": "I2C_DATA"},
+		{"gpio" : 22, "signal_direction": "OUT", "gpio_direction" : "OUT","signal": "I2C_CLK"}
+		],
+
+	"functions": [
+		{"gpio_function" : "DISABLE_JTAG", "state" : true}
+		]
+}
+
