@@ -30,7 +30,7 @@ config RTL_IGMP_PROXY
 
 config RTL_IGMP_SNOOPING
 	bool "RTL_IGMP_SNOOPING"
-	default y
+	default n
 	depends on BRIDGE
 	depends on !BRIDGE_IGMP_SNOOPING
 

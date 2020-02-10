@@ -4192,7 +4192,7 @@ int  rtl_MulticastRxCheck(struct sk_buff *skb,rtl_nicRx_info *info,int mCastFlag
 		#endif
 
 
-//#if defined (CONFIG_RTL_HARDWARE_MULTICAST)
+#if defined (CONFIG_RTL_HARDWARE_MULTICAST)
 		#ifdef CONFIG_RTL_VLAN_PASSTHROUGH_SUPPORT 
         if (*(uint16*)skb->vlan_passthrough_saved_tag == __constant_htons(ETH_P_8021Q))
         {
@@ -4213,7 +4213,7 @@ int  rtl_MulticastRxCheck(struct sk_buff *skb,rtl_nicRx_info *info,int mCastFlag
 		if(net_ratelimit())
 			printk("[%s:%d]skb->srcVlanId is %d\n",__FUNCTION__,__LINE__,skb->srcVlanId);
 		#endif
-//#endif
+#endif
 
 		#if defined (CONFIG_RTL_MULTI_LAN_DEV)
 		#ifdef CONFIG_RTL_VLAN_8021Q
@@ -4808,10 +4808,10 @@ int  rtl_MulticastRxCheck(struct sk_buff *skb,rtl_nicRx_info *info,int mCastFlag
 #endif
 	else
 	{
-		//#if defined (CONFIG_RTL_HARDWARE_MULTICAST)
+		#if defined (CONFIG_RTL_HARDWARE_MULTICAST)
 		skb->srcVlanId=0;
 		skb->srcPort=0xFFFF;
-		//#endif
+		#endif
 	}
 
 	#if 0
