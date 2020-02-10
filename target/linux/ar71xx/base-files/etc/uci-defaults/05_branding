@@ -1,0 +1,50 @@
+#!/bin/sh
+#
+# Copyright (C) 2011 OpenWrt.org
+#
+
+[ -e /etc/config/branding ] && exit 0
+
+touch /etc/config/branding
+
+. /lib/functions.sh
+
+board=$(board_name)
+
+case "$board" in
+carambola2)
+	uci set system.@system[0].hostname=Carambola2
+	uci set wireless.@wifi-iface[0].ssid=Carambola2
+	echo "i2c-dev" > /etc/modules.d/50-i2c-gpio-custom
+	echo "i2c-gpio-custom bus0=0,18,19" >> /etc/modules.d/50-i2c-gpio-custom
+	;;
+
+centipede)
+	uci set system.@system[0].hostname=Centipede
+	uci set wireless.@wifi-iface[0].ssid=Centipede
+
+	# Centipede is not internet gateway device
+	# WAN zone is used for eth0 (DHCP client)
+	# Change firwall rule to allow access from eth0
+	uci set firewall.@zone[1].input='ACCEPT'
+	;;
+
+lima)
+	uci set system.@system[0].hostname=Lima
+	uci set wireless.@wifi-iface[0].ssid=Lima
+	;;
+
+rambutan)
+	uci set system.@system[0].hostname=Rambutan
+	uci set wireless.@wifi-iface[0].ssid=Rambutan
+	;;
+
+*)
+	;;
+esac
+
+uci commit system
+uci commit wireless
+uci commit firewall
+
+exit 0

@@ -159,6 +159,7 @@ TARGET_DEVICES += bsb
 
 define Device/carambola2
   DEVICE_TITLE := 8devices Carambola2
+  DEVICE_PROFILE := 8DEV
   DEVICE_PACKAGES := kmod-usb-core kmod-usb2
   BOARDNAME := CARAMBOLA2
   IMAGE_SIZE := 16000k
@@ -166,6 +167,17 @@ define Device/carambola2
   MTDPARTS := spi0.0:256k(u-boot)ro,64k(u-boot-env)ro,16000k(firmware),64k(art)ro
 endef
 TARGET_DEVICES += carambola2
+
+define Device/centipede
+  DEVICE_TITLE := 8devices Centipede
+  DEVICE_PROFILE := 8DEV
+  DEVICE_PACKAGES := kmod-usb-core kmod-usb2
+  BOARDNAME := CENTIPEDE
+  IMAGE_SIZE := 16000k
+  CONSOLE := ttyATH0,115200
+  MTDPARTS := spi0.0:256k(u-boot)ro,64k(u-boot-env)ro,16000k(firmware),64k(art)ro
+endef
+TARGET_DEVICES += centipede
 
 define Device/cf-e316n-v2
   DEVICE_TITLE := COMFAST CF-E316N v2
@@ -559,6 +571,7 @@ TARGET_DEVICES += lan-turtle
 define Device/lima
   DEVICE_TITLE := 8devices Lima
   DEVICE_PACKAGES := kmod-usb-core kmod-usb2
+  DEVICE_PROFILE := 8DEV
   BOARDNAME := LIMA
   IMAGE_SIZE := 15616k
   MTDPARTS := spi0.0:256k(u-boot)ro,256k(u-boot-env)ro,256k(art)ro,-(firmware)
