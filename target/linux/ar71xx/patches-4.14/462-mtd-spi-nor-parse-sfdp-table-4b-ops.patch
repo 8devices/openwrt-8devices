@@ -1,0 +1,52 @@
+--- a/drivers/mtd/spi-nor/spi-nor.c
++++ b/drivers/mtd/spi-nor/spi-nor.c
+@@ -1978,6 +1978,9 @@ struct sfdp_header {
+ #define BFPT_DWORD15_QER_SR2_BIT1_NO_RD		(0x4UL << 20)
+ #define BFPT_DWORD15_QER_SR2_BIT1		(0x5UL << 20) /* Spansion */
+ 
++/* 16th DWORD */
++#define BFPT_DWORD16_4B_INSTR_SET		BIT(29)
++
+ struct sfdp_bfpt {
+ 	u32	dwords[BFPT_DWORD_MAX];
+ };
+@@ -2266,6 +2269,10 @@ static int spi_nor_parse_bfpt(struct spi
+ 		return -EINVAL;
+ 	}
+ 
++	if (bfpt.dwords[BFPT_DWORD(16)] & BFPT_DWORD16_4B_INSTR_SET) {
++		nor->flags |= SNOR_F_HAS_4B_OPCODES;
++	}
++
+ 	return 0;
+ }
+ 
+@@ -2800,6 +2807,9 @@ int spi_nor_scan(struct spi_nor *nor, co
+ 	if (info->flags & SPI_NOR_NO_FR)
+ 		params.hwcaps.mask &= ~SNOR_HWCAPS_READ_FAST;
+ 
++	if (info->flags & SPI_NOR_4B_OPCODES)
++		nor->flags |= SNOR_F_HAS_4B_OPCODES;
++
+ 	/*
+ 	 * Configure the SPI memory:
+ 	 * - select op codes for (Fast) Read, Page Program and Sector Erase.
+@@ -2819,7 +2829,7 @@ int spi_nor_scan(struct spi_nor *nor, co
+ 		/* enable 4-byte addressing if the device exceeds 16MiB */
+ 		nor->addr_width = 4;
+ 		if (JEDEC_MFR(info) == SNOR_MFR_SPANSION ||
+-		    info->flags & SPI_NOR_4B_OPCODES)
++		    nor->flags & SNOR_F_HAS_4B_OPCODES)
+ 			spi_nor_set_4byte_opcodes(nor, info);
+ 		else
+ 			set_4byte(nor, info, 1);
+--- a/include/linux/mtd/spi-nor.h
++++ b/include/linux/mtd/spi-nor.h
+@@ -229,6 +229,7 @@ enum spi_nor_option_flags {
+ 	SNOR_F_S3AN_ADDR_DEFAULT = BIT(3),
+ 	SNOR_F_READY_XSR_RDY	= BIT(4),
+ 	SNOR_F_USE_CLSR		= BIT(5),
++	SNOR_F_HAS_4B_OPCODES	= BIT(6),
+ };
+ 
+ /**
