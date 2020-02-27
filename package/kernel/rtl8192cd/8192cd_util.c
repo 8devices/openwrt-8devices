@@ -3420,7 +3420,7 @@ int get_available_channel(struct rtl8192cd_priv *priv)
 	struct channel_list *ch_5g_lst=NULL;
 
 	priv->available_chnl_num = 0;
-	reg = priv->pmib->dot11StationConfigEntry.dot11RegDomain;
+	reg = DOMAIN_TEST;
 
 	if ((reg < DOMAIN_FCC) || (reg >= DOMAIN_MAX))
 		return FAIL;
