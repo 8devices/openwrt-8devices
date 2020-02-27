@@ -455,10 +455,9 @@ mac80211_prepare_vif() {
 
 			mac80211_hostapd_setup_bss "$phy" "$ifname" "$macaddr" "$type" || return
 
-			[ -n "$hostapd_ctrl" ] || {
-				iw phy "$phy" interface add "$ifname" type __ap
-				hostapd_ctrl="${hostapd_ctrl:-/var/run/hostapd/$ifname}"
-			}
+			hostapd_ctrl="${hostapd_ctrl:-/var/run/hostapd/$ifname}"
+			[ -n "$hostapd_ctrl" ] && rm $hostapd_ctrl
+			iw phy "$phy" interface add "$ifname" type __ap
 		;;
 		mesh)
 			iw phy "$phy" interface add "$ifname" type mp
