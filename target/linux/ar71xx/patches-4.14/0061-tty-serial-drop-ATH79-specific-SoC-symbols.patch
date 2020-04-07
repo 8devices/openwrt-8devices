@@ -1,0 +1,36 @@
+From fffd7173ac3210279896f8726ec31699b28c93b4 Mon Sep 17 00:00:00 2001
+From: John Crispin <john@phrozen.org>
+Date: Mon, 7 May 2018 15:14:07 +0200
+Subject: tty: serial: drop ATH79 specific SoC symbols
+
+QCA MIPS support is being converted to pure OF. As part of this we are
+dropping the SOC_AR* symbols. Additionally the SERIAL_AR933X style tty
+is also found on a few SoCs newer that the AR933x.
+
+This patch changes the dependency to ATH79, thus fixing the 2 issues
+described above.
+
+Signed-off-by: John Crispin <john@phrozen.org>
+Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+---
+ drivers/tty/serial/Kconfig | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+(limited to 'drivers/tty/serial/Kconfig')
+
+diff --git a/drivers/tty/serial/Kconfig b/drivers/tty/serial/Kconfig
+index eca55187539a..df8bd0c7b97d 100644
+--- a/drivers/tty/serial/Kconfig
++++ b/drivers/tty/serial/Kconfig
+@@ -1294,7 +1294,7 @@ config SERIAL_XILINX_PS_UART_CONSOLE
+ 
+ config SERIAL_AR933X
+ 	tristate "AR933X serial port support"
+-	depends on HAVE_CLK && SOC_AR933X
++	depends on HAVE_CLK && ATH79
+ 	select SERIAL_CORE
+ 	help
+ 	  If you have an Atheros AR933X SOC based board and want to use the
+-- 
+cgit 1.2-0.3.lf.el7
+

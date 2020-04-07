@@ -58,6 +58,52 @@ static struct mdio_board_info rambutan_mdio1_info[] = {
 	},
 };
 
+static struct spi_board_info rambutan_spi_info[] = {
+	{
+		.bus_num	= 0,
+		.chip_select	= 0,
+		.max_speed_hz	= 25000000,
+		.modalias	= "spidev",
+	},
+	{
+		.bus_num	= 0,
+		.chip_select	= 1,
+		.max_speed_hz   = 25000000,
+		.modalias	= "spidev",
+	},
+	{
+		.bus_num	= 0,
+		.chip_select	= 2,
+		.max_speed_hz   = 25000000,
+		.modalias	= "spidev",
+	}
+};
+
+static struct ath79_spi_platform_data rambutan_spi_data = {
+		.bus_num	= 0,
+		.num_chipselect	= 3,
+};
+
+static struct resource rambutan_uart1_resources[] = {
+	{
+		.start	= QCA955X_UART1_BASE,
+		.end	= QCA955X_UART1_BASE + QCA955X_UART1_SIZE - 1,
+		.flags	= IORESOURCE_MEM,
+	},
+	{
+		.start	= ATH79_MISC_IRQ(6),
+		.end	= ATH79_MISC_IRQ(6),
+		.flags	= IORESOURCE_IRQ,
+	},
+};
+
+static struct platform_device rambutan_uart1_device = {
+	.name		= "ar933x-uart",
+	.id		= -1,
+	.resource	= rambutan_uart1_resources,
+	.num_resources	= ARRAY_SIZE(rambutan_uart1_resources),
+};
+
 static void __init rambutan_setup(void)
 {
 	ath79_nfc_set_ecc_mode(AR934X_NFC_ECC_HW);
@@ -65,6 +111,8 @@ static void __init rambutan_setup(void)
 	ath79_register_usb();
 	ath79_register_pci();
 	ath79_register_wmac_simple();
+	platform_device_register(&rambutan_uart1_device);
+	ath79_register_spi(&rambutan_spi_data, rambutan_spi_info, 3);
 
 	mdiobus_register_board_info(rambutan_mdio0_info,
 				    ARRAY_SIZE(rambutan_mdio0_info));
