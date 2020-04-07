@@ -1,0 +1,76 @@
+--- a/drivers/mtd/devices/m25p80.c
++++ b/drivers/mtd/devices/m25p80.c
+@@ -216,6 +216,13 @@
+ 	t[data_idx].rx_nbits = data_nbits;
+ 	t[data_idx].len = min3(len, spi_max_transfer_size(spi),
+ 			       spi_max_message_size(spi) - cmd_sz);
++	t[data_idx].bits_per_word = 32;
++	if (t[data_idx].len % 4) {
++		t[data_idx].bits_per_word = 16;
++		if (t[data_idx].len % 2)
++			t[data_idx].bits_per_word = 8;
++	}
++	
+ 	spi_message_add_tail(&t[data_idx], &m);
+ 
+ 	ret = spi_sync(spi, &m);
+--- a/drivers/spi/spi-ath79.c
++++ b/drivers/spi/spi-ath79.c
+@@ -25,6 +25,7 @@
+ #include <linux/clk.h>
+ #include <linux/err.h>
+ 
++#include <asm/mach-ath79/ath79.h>
+ #include <asm/mach-ath79/ar71xx_regs.h>
+ #include <asm/mach-ath79/ath79_spi_platform.h>
+ 
+@@ -231,6 +232,19 @@ static u32 ath79_spi_txrx_mode0(struct s
+ 	return ath79_spi_rr(sp, AR71XX_SPI_REG_RDS);
+ }
+ 
++static u32 ath79_spi_txrx_shiftreg_mode0(struct spi_device *spi, unsigned nsecs,
++					u32 word, u8 bits)
++{
++	struct ath79_spi *sp = ath79_spidev_to_sp(spi);
++	u32 ret;
++
++	ath79_spi_wr(sp, AR71XX_SPI_REG_WDS, word);
++	ath79_spi_wr(sp, AR71XX_SPI_REG_CDS, AR71XX_SPI_CDS_EN |
++					     AR71XX_SPI_CDS_CS(spi->chip_select) | bits);
++	ret = ath79_spi_rr(sp, AR71XX_SPI_REG_RDS);
++	return ret;
++}
++
+ static bool ath79_spi_flash_read_supported(struct spi_device *spi)
+ {
+         if (spi->chip_select || gpio_is_valid(spi->cs_gpio))
+@@ -371,7 +398,7 @@ static int ath79_spi_probe(struct platfo
+ 
+ 	sp->bitbang.master = master;
+ 	sp->bitbang.chipselect = ath79_spi_chipselect;
+-	sp->bitbang.txrx_word[SPI_MODE_0] = ath79_spi_txrx_mode0;
++	sp->bitbang.txrx_word[SPI_MODE_0] = ath79_spi_txrx_shiftreg_mode0;
+ 	sp->bitbang.setup_transfer = spi_bitbang_setup_transfer;
+ 	sp->bitbang.flags = SPI_CS_HIGH;
+ 
+--- a/arch/mips/include/asm/mach-ath79/ar71xx_regs.h
++++ b/arch/mips/include/asm/mach-ath79/ar71xx_regs.h
+@@ -811,6 +811,8 @@
+ #define AR71XX_SPI_REG_CTRL	0x04	/* SPI Control */
+ #define AR71XX_SPI_REG_IOC	0x08	/* SPI I/O Control */
+ #define AR71XX_SPI_REG_RDS	0x0c	/* Read Data Shift */
++#define AR71XX_SPI_REG_WDS	0x10	/* Write Data Shift */
++#define AR71XX_SPI_REG_CDS	0x14	/* Control Data Shift */
+ 
+ #define AR71XX_SPI_FS_GPIO	BIT(0)	/* Enable GPIO mode */
+ 
+@@ -826,6 +828,9 @@
+ #define AR71XX_SPI_IOC_CS_ALL	(AR71XX_SPI_IOC_CS0 | AR71XX_SPI_IOC_CS1 | \
+ 				 AR71XX_SPI_IOC_CS2)
+ 
++#define AR71XX_SPI_CDS_EN	BIT(31)	/* Enable Shifting */
++#define AR71XX_SPI_CDS_CS(n)	BIT(28 + n)
++
+ /*
+  * GPIO block
+  */
