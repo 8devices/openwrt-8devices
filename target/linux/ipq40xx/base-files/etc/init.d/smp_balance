@@ -1,0 +1,28 @@
+#!/bin/sh /etc/rc.common
+
+START=21
+STOP=99
+
+
+edma_smp_affinity() {
+	grep -q edma_eth_ /proc/interrupts || return 0
+	local nr=`cat /proc/cpuinfo | grep processor | wc -l`
+	local cpu=0
+	local tx_irq_num
+
+	for tx_num in `seq 0 1 15` ; do
+		cpu=`printf "%x" $((1<<((tx_num/4+0)%nr)))`
+		tx_irq_num=`grep -m1 edma_eth_tx$tx_num /proc/interrupts | cut -d ':' -f 1 | tail -n1 | tr -d ' '`
+		[ -n "$tx_irq_num" ] && echo $cpu > /proc/irq/$tx_irq_num/smp_affinity
+	done
+
+	for rx_num in `seq 0 1 7` ; do
+		cpu=`printf "%x" $((1<<((rx_num/2)%nr)))`
+		rx_irq_num=`grep -m1 edma_eth_rx$rx_num /proc/interrupts | cut -d ':' -f 1 | tail -n1 | tr -d ' '`
+		[ -n "$rx_irq_num" ] && echo $cpu > /proc/irq/$rx_irq_num/smp_affinity
+	done
+}
+
+boot() {
+	edma_smp_affinity
+}
