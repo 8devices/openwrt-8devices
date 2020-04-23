@@ -12,8 +12,7 @@ ipq40xx_setup_interfaces()
 	local board="$1"
 
 	case "$board" in
-	8dev,habanero-dvk-c1|\
-	8dev,habanero-dvk-c2|\
+	8dev,habanero-dvk|\
 	avm,fritzbox-4040|\
 	linksys,ea6350v3|\
 	linksys,ea8300)
