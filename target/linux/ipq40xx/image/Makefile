@@ -78,7 +78,6 @@ define Device/8dev_jalapeno
 	DEVICE_DTS := qcom-ipq4018-jalapeno
 	BLOCKSIZE := 128k
 	PAGESIZE := 2048
-	SUPPORTED_DEVICES += 8dev,habanero-dvk 8dev,habanero-dvk-c1 8dev,habanero-dvk-c2 8dev,habanero
 	DEVICE_TITLE := 8devices Jalapeno
 endef
 TARGET_DEVICES += 8dev_jalapeno
