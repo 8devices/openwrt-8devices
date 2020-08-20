@@ -1,6 +1,20 @@
 # WRT Baker
 
-## Build WRT Baker docker image
+## Quick start
+
+Build docker image (only run the first time - all firmware builds then use the same docker image):
+
+    ./build.sh
+
+Build firmware:
+
+    ./run.sh
+
+In menu select platform type and config.
+
+## Advanced usage
+
+### Build WRT Baker docker image
 Simple way to build:
 
     ./build.sh
@@ -13,18 +27,18 @@ if want to have same uid/gid (same as in build.sh)
 
     docker build --build-arg UID=$(id -u) --build-arg GID=$(id -g) -t wrt_baker:latest ./
 
-## Compile code example
+### Compile code example
 For compiling go to source dir and user usual commands
 
     cd $SRC
     docker run -h wrt_builder -v $PWD:/home/baker/${PWD##*/} --rm -it wrt_baker:latest /bin/bash -c "cd /home/baker/${PWD##*/}; exec make -j4"
 
-## Interactive mode:
+### Interactive mode:
 For running in interactive mode
 
     docker run -h wrt_builder -v $PWD:/home/baker/${PWD##*/} --rm -it wrt_baker:latest
 
-## Running
+### Running
 For running you can source this script:
 
     wb () {
