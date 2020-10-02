@@ -1,0 +1,12 @@
+Index: linux-4.14.171/arch/mips/Kconfig
+===================================================================
+--- linux-4.14.171.orig/arch/mips/Kconfig
++++ linux-4.14.171/arch/mips/Kconfig
+@@ -191,6 +191,7 @@ config ATH79
+ 	select CEVT_R4K
+ 	select CSRC_R4K
+ 	select DMA_NONCOHERENT
++	select HW_HAS_PCI
+ 	select GPIOLIB
+ 	select HAVE_CLK
+ 	select COMMON_CLK
