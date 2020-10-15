@@ -190,6 +190,14 @@
 			bias-pull-down;
 		};
 	};
+
+	sfp_sense_pins: sfp_sense_pins {
+		mux {
+			pins = "gpio49";
+			function = "gpio";
+			bias-pull-up;
+		};
+	};
 };
 
 &soc {
@@ -247,6 +255,8 @@
 		reg = <0x3a001800 0x200>;
 		qcom,mactype = <0>;
 		local-mac-address = [000000000000];
+		pinctrl-0 = <&sfp_sense_pins>;
+		sfp_sense_gpio = <&tlmm 49 GPIO_ACTIVE_HIGH>; /* TODO: next rev. should be active low*/
 		qcom,link-poll = <1>;
 		qcom,phy-mdio-addr = <24>;
 		phy-mode = "sgmii";
@@ -266,7 +276,10 @@
 		switch_inner_bmp = <0xc0>; /*inner port bitmap*/
 		switch_mac_mode = <0x0>; /* mac mode for uniphy instance0*/
 		switch_mac_mode1 = <0xf>; /* mac mode for uniphy instance1*/
+		switch_mac_mode1_sfp = <0x14>; /* mac mode for uniphy instance1 in SFP case - only used if sfp_sense_gpio is defined*/
 		switch_mac_mode2 = <0xff>; /* mac mode for uniphy instance2*/
+		pinctrl-0 = <&sfp_sense_pins>;
+		sfp_sense_gpio = <&tlmm 49 GPIO_ACTIVE_HIGH>; /* TODO: next rev. should be active low*/
 		qcom,port_phyinfo {
 			port@3 {
 				port_id = <4>;
