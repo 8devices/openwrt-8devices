@@ -17,6 +17,8 @@
 # Initializing global variables
 DTB="";
 FDT="";
+INFO="";
+INFB="";
 CONFIG="";
 CONFIG_ID="1";
 DTB_COMPRESS="none";
@@ -35,6 +37,7 @@ usage() {
 	echo -e "\t-D ==> human friendly Device Tree Blob 'name'"
 	echo -e "\t-d ==> include Device Tree Blob 'dtb'"
 	echo -e "\t-o ==> create output file 'its_file'"
+	echo -e "\t-i ==> include firmware meta-info image 'info'"
 	exit 1
 }
 
@@ -86,7 +89,24 @@ Generate_Config () {
 "
 }
 
-while getopts ":A:a:C:c:D:d:e:k:l:o:v:" OPTION
+Generate_INFO () {
+	INFO="$INFO
+		info@1 {
+			description = \"Firmware meta-information data\";
+			data = /incbin/(\"${1}\");
+			type = \"multi\";
+			compression = \"none\";
+			hash@1 {
+				algo = \"crc32\";
+			};
+			hash@2 {
+				algo = \"sha1\";
+			};
+		};
+"
+}
+
+while getopts ":A:a:C:c:D:d:e:k:l:o:v:i:" OPTION
 do
 	case $OPTION in
 		A ) ARCH=$OPTARG;;
@@ -100,6 +120,7 @@ do
 		l ) DTB_LOAD_ADDR=$OPTARG;;
 		o ) OUTPUT=$OPTARG;;
 		v ) VERSION=$OPTARG;;
+		i ) INFB=$OPTARG;;
 		* ) echo "Invalid option passed to '$0' (options:$@)"
 		usage;;
 	esac
@@ -112,6 +133,8 @@ if [ -z "${ARCH}" ] || [ -z "${COMPRESS}" ] || [ -z "${LOAD_ADDR}" ] || \
 	usage
 fi
 
+[ -n "$INFB" ] && cp $INFB /tmp/fit/
+
 ARCH_UPPER=`echo $ARCH | tr '[:lower:]' '[:upper:]'`
 
 # Conditionally create fdt information
@@ -119,7 +142,7 @@ if [ -n "${DTB}" ]; then
 	CONFIG_ID=($DTB)
 	for dtb in $DTB
 	do
-		CONFIG_ID=$([ ${#CONFIG_ID[@]} == 1 ] && echo ${#CONFIG_ID[@]} || basename ${dtb%%.gz} .dtb | sed -e 's/^[^-]*-[^-]*-//g');
+		CONFIG_ID=$([ ${#CONFIG_ID[@]} == 1 ] && echo ${#CONFIG_ID[@]} || basename ${dtb%%.gz} .dtb | sed -e 's/\([^-]*-\)\{2\}//g');
 		[ "${DTB_COMPRESS}" != "none" ] && Generate_Comp_FDT $dtb || Generate_FDT $dtb
 		Generate_Config
 
@@ -132,6 +155,10 @@ else
 			fdt = \"fdt@1\";
 		};
 "
+fi
+
+if [ -n "${INFB}" ]; then
+	Generate_INFO $INFB
 fi
 
 # Create a default, fully populated DTS file
@@ -160,6 +187,7 @@ DATA="/dts-v1/;
 		};
 
 ${FDT}
+${INFO}
 
 	};
 

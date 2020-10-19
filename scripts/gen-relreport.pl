@@ -110,7 +110,6 @@ sub xref_packages() {
                 version     => $package{$pkg}->{version},
                 description => $package{$pkg}->{description},
                 source      => $package{$pkg}->{source},
-                isIntTarball      => $package{$pkg}->{isIntTarball},
             }
             unless exists( $QSDKPKGS{$pkg} );
 
@@ -166,10 +165,10 @@ sub write_output_xlsx($) {
         $SOC =~ s/\.xlsx//g;
 	$SOC = "ipq_$SOC";
     }
+
     &WriteDataToExcel($workbook, $SOC, 0);
     &WriteDataToExcel($workbook, 'LoadConfigs', 1);
-    WriteDownloadedFilesToExcel($workbook);
-    $workbook->close();
+
 }
 
 sub WriteDataToExcel
@@ -268,11 +267,7 @@ sub WriteDataToExcel
         } else {
             $worksheet->write_blank($row, $col++, $f_data);
         }
-	if( $curpkg->{isIntTarball} eq "False") {
-            $worksheet->write( $row, $col++, $curpkg->{source},  $f_data );
-	} else {
-            $worksheet->write_blank($row, $col++, $f_data);
-	}
+        $worksheet->write( $row, $col++, $curpkg->{source},  $f_data );
         $worksheet->write_string( $row, $col++, $curpkg->{version}, $f_data )
           unless !exists( $curpkg->{version} );
 
@@ -403,10 +398,8 @@ DDRSIZE:
                 $prevFeed, $f_data );
             $worksheet->merge_range( $start_merge, 4, $row - 1, 4,
                  $prevSubsystem, $f_data );
-	    if( $prevpkg->{isIntTarball} eq "False") {
             $worksheet->merge_range( $start_merge, 5, $row - 1, 5,
                 $prevpkg->{source}, $f_data );
-	    }
             $worksheet->merge_range( $start_merge, 6, $row - 1, 6,
                 $prevpkg->{version}, $f_data );
             $start_merge = 0;
@@ -502,55 +495,6 @@ sub parse_command() {
     }
 }
 
-sub WriteDownloadedFilesToExcel {
-    my $workbook = shift;
-    my $worksheet = $workbook->add_worksheet("downloadedFiles");
-    $worksheet->set_column( 0, 0, 28 );
-    my $c_orange = $workbook->set_custom_color( 40, 247, 150, 70 );
-    my $f_title  = $workbook->add_format(
-        align    => 'center',
-        valign   => 'vcenter',
-        bold     => 1,
-        border   => 2,                     # Continuous, Weight=2
-        bg_color => $c_orange,
-    );
-    my $f_data = $workbook->add_format(
-        align  => 'center',
-        valign => 'vcenter',
-        border => 1,
-    );
-
-    my $row_id = 0;
-    $worksheet->write( $row_id, 0, "Downloaded FileName", $f_title );
-    $row_id++;
-    my $dl_folder_files = "dlFiles.txt";
-    system "ls dl/ -p | grep -v / > dlFiles.txt";
-    open(my $fh,"<", "dlFiles.txt") or die "cant open the download list files";
-    while(my $dlFile = <$fh>) {
-        my $addFlag = "True";
-        if( index($dlFile,"qca-wifi-fw") != -1) {
-            next;
-        }
-        chomp($dlFile);
-        foreach my $pkg (keys %QSDKPKGS) {
-            if( ($QSDKPKGS{$pkg}->{source} eq $dlFile) and ($QSDKPKGS{$pkg}->{isIntTarball} eq "True")) {
-                 #this is not an opensource tarball, do not add
-                 $addFlag = "False";
-                 last;
-            }
-            if(($QSDKPKGS{$pkg}->{source} eq $dlFile) and ($QSDKPKGS{$pkg}->{isIntTarball} eq "False")) {
-                 #opensource, exit the loop to save iterations
-                 last;
-            }
-        }
-	if( $addFlag ne "False") {
-            $worksheet->write( $row_id, 0, $dlFile, $f_data );
-            $row_id++;
-        }
-    }
-    close($fh);
-    unlink $dl_folder_files;
-}
 parse_command();
 parse_package_metadata("tmp/.packageinfo");
 xref_packages();

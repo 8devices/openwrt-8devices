@@ -6,9 +6,6 @@ kernel=""
 rootfs=""
 outfile=""
 err=""
-ubinize_dir=""
-vol_name_rootfs=""
-vol_name_rootfs_data=""
 
 get_magic_word() {
 	dd if=$1 bs=2 count=1 2>/dev/null | hexdump -v -n 2 -e '1/1 "%02x"'
@@ -53,9 +50,9 @@ ubilayout() {
 		ubivol $vol_id kernel "$3"
 		vol_id=$(( $vol_id + 1 ))
 	fi
-	ubivol $vol_id "$vol_name_rootfs" "$2" $root_is_ubifs
+	ubivol $vol_id rootfs "$2" $root_is_ubifs
 	vol_id=$(( $vol_id + 1 ))
-	[ "$root_is_ubifs" ] || ubivol $vol_id "$vol_name_rootfs_data" "" 1
+	[ "$root_is_ubifs" ] || ubivol $vol_id rootfs_data "" 1
 }
 
 while [ "$1" ]; do
@@ -86,24 +83,10 @@ while [ "$1" ]; do
 			shift
 			continue
 		fi
-		if [ ! "$ubinize_dir" ]; then
-			ubinize_dir=$1
-			shift
-			continue
-		fi
-		if [ ! "$vol_name_rootfs" ]; then
-			vol_name_rootfs=$1
-			shift
-			continue
-		fi
-		if [ ! "$vol_name_rootfs_data" ]; then
-			vol_name_rootfs_data=$1
-			shift
-			continue
-		fi
 		;;
 	esac
 done
+
 if [ ! -r "$rootfs" -o ! -r "$kernel" -a ! "$outfile" ]; then
 	echo "syntax: $0 [--uboot-env] [--kernel kernelimage] rootfs out [ubinize opts]"
 	exit 1
