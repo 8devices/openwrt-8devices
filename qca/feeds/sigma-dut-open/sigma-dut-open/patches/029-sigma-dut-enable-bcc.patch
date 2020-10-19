@@ -1,0 +1,43 @@
+--- a/ap.c
++++ b/ap.c
+@@ -940,7 +940,11 @@ static enum sigma_cmd_result cmd_ap_set_
+ 	val = get_param(cmd, "MCS_FIXEDRATE");
+ 	if (val) {
+ 		dut->ap_fixed_rate = 1;
+-		dut->ap_mcs = atoi(val);
++		if (dut->program == PROGRAM_HE) {
++			dut->he_mcs = atoi(val);
++		} else {
++			dut->ap_mcs = atoi(val);
++		}
+ 	}
+ 
+ 	val = get_param(cmd, "SPATIAL_RX_STREAM");
+@@ -9046,6 +9050,16 @@ skip_key_mgmt:
+ 			/* Trigger interval */
+ 			run_system_wrapper(dut, "ath11k-fwtest -t 2 -i %s -m 0x00 -p %d 0xA2 0xC8", ifname, pdev_id);
+ 		}
++
++		if (dut->ap_bcc == VALUE_ENABLED && dut->ap_fixed_rate) {
++			if (dut->ap_channel <= 11)
++				run_system_wrapper(dut, "iw %s set bitrates he-mcs-2.4 1:%d\n",
++						   ifname, dut->he_mcs);
++			else
++				run_system_wrapper(dut, "iw %s set bitrates he-mcs-5 1:%d\n",
++						   ifname, dut->he_mcs);
++		}
++
+ 	}
+ 
+ 	if (dut->program == PROGRAM_60GHZ) {
+--- a/sigma_dut.h
++++ b/sigma_dut.h
+@@ -939,7 +939,7 @@ struct sigma_dut {
+ 	wifi_handle wifi_hal_handle;
+ 	bool wifi_hal_initialized;
+ #endif /*ANDROID_WIFI_HAL*/
+-
++	int he_mcs;
+ 	int sae_h2e_default;
+ 	enum {
+ 		SAE_PWE_DEFAULT,

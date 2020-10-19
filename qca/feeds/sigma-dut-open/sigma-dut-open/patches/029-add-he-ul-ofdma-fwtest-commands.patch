@@ -1,0 +1,79 @@
+--- a/ap.c
++++ b/ap.c
+@@ -8340,6 +8340,15 @@ skip_key_mgmt:
+ 	}
+ 
+ 	if(drv == DRIVER_MAC80211 && dut->program == PROGRAM_HE) {
++		int pdev_id;
++
++		if (strcmp(ifname, "wlan0") == 0) {
++			pdev_id = 1;
++		} else if (strcmp(ifname, "wlan1") == 0) {
++			pdev_id = 2;
++		} else {
++			pdev_id = 3;
++		}
+ 
+ 		/* disable MU BAR */
+ 		run_system_wrapper(dut, "ath11k-fwtest -i %s -m 0x47 -v 0 64 1",
+@@ -8388,6 +8397,18 @@ skip_key_mgmt:
+ 			/* disable enable_ul_ofdma_efficiency_check */
+ 			run_system_wrapper(dut, "ath11k-fwtest -i %s -m 0x47 -v 0 131 0",
+ 					   ifname);
++
++			/* he_dynamic_muedca 0 */
++			run_system_wrapper(dut, "ath11k-fwtest -t 2 -i %s -m 0x00 -p %d 0xBF 0x00", ifname, pdev_id);
++
++			/* Trigger Interval */
++			run_system_wrapper(dut, "ath11k-fwtest -t 2 -i %s -m 0x00 -p %d 0xA2 0x02", ifname, pdev_id);
++			/* he_mu_edca 1 */
++			run_system_wrapper(dut, "ath11k-fwtest -t 1 -i %s -m 0x00 -v 0 0x8F 0x01", ifname);
++			/* he ul ltf */
++			run_system_wrapper(dut, "ath11k-fwtest -t 1 -i %s -m 0x00 -v 0 0x8D 0x03", ifname);
++			/*he ul gi */
++			run_system_wrapper(dut, "ath11k-fwtest -t 1 -i %s -m 0x00 -v 0 0x89 0x03", ifname);
+ 		}
+ 
+ 		if (dut->ap_he_ppdu == PPDU_MU &&
+@@ -8413,6 +8434,41 @@ skip_key_mgmt:
+ 			run_system_wrapper(dut, "ath11k-fwtest -i %s -m 0x4b -v 0 2 1",
+ 					   ifname);
+ 		}
++		if (strcmp(dut->ap_ssid, "HE-4.40.1") == 0) {
++			/* Fixed UL MCS */
++			run_system_wrapper(dut, "ath11k-fwtest -t 1 -i %s -m 0x00 -v 0 0x88 0x10000407", ifname);
++			/* Max UL NSS */
++			run_system_wrapper(dut, "ath11k-fwtest -t 1 -i %s -m 0x00 -v 0 0x8B 0x01",ifname);
++		}
++		if (strcmp(dut->ap_ssid, "HE-4.40.2") == 0) {
++			/* Fixed UL MCS */
++			run_system_wrapper(dut, "ath11k-fwtest -t 1 -i %s -m 0x00 -v 0 0x88 0x10000427", ifname);
++			/* Max UL NSS */
++			run_system_wrapper(dut, "ath11k-fwtest -t 1 -i %s -m 0x00 -v 0 0x8B 0x02", ifname);
++			/* Target RSSI */
++			run_system_wrapper(dut, "ath11k-fwtest -i %s -m 0x4b -v 0 7 -48", ifname);
++		}
++		if (strcmp(dut->ap_ssid, "HE-4.40.4") == 0) {
++			/* Fixed UL MCS */
++			run_system_wrapper(dut, "ath11k-fwtest -t 1 -i %s -m 0x00 -v 0 0x88 0x10000407", ifname);
++			/* Max UL NSS */
++			run_system_wrapper(dut, "ath11k-fwtest -t 1 -i %s -m 0x00 -v 0 0x8B 0x01",ifname);
++			/* UL LDPC enable */
++			run_system_wrapper(dut, "ath11k-fwtest -t 1 -i %s -m 0x00 -v 0 0x8A 0x01", ifname);
++		}
++		if ((strcmp(dut->ap_ssid, "HE-4.40.3") == 0) ||
++		   (strcmp(dut->ap_ssid, "HE-4.40.5") == 0)) {
++			/* Fixed UL MCS */
++			run_system_wrapper(dut, "ath11k-fwtest -t 1 -i %s -m 0x00 -v 0 0x88 0x10000427", ifname);
++			/* Max UL NSS */
++			run_system_wrapper(dut, "ath11k-fwtest -t 1 -i %s -m 0x00 -v 0 0x8B 0x02", ifname);
++			/* UL LDPC enable */
++			run_system_wrapper(dut, "ath11k-fwtest -t 1 -i %s -m 0x00 -v 0 0x8A 0x01", ifname);
++		}
++		if (strcmp(dut->ap_ssid, "HE-4.49.1") == 0) {
++			/* Trigger interval */
++			run_system_wrapper(dut, "ath11k-fwtest -t 2 -i %s -m 0x00 -p %d 0xA2 0xC8", ifname, pdev_id);
++		}
+ 	}
+ 
+ 	if (dut->program == PROGRAM_60GHZ && dut->ap_num_ese_allocs > 0) {

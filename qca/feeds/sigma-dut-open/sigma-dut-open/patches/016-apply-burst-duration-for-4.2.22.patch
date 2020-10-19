@@ -1,0 +1,67 @@
+Index: sigma-dut-20200429/ap.c
+===================================================================
+--- sigma-dut-20200429.orig/ap.c
++++ sigma-dut-20200429/ap.c
+@@ -7441,9 +7441,12 @@ enum sigma_cmd_result cmd_ap_config_comm
+ 	const char *ifname;
+ 	char buf[500];
+ 	char buf_dual[500];
+-	char path[100];
++	char path[100], if_path[100];
+ 	char ap_conf_path[100];
+ 	enum driver_type drv;
++	DIR *dir;
++	struct dirent *entry;
++	struct stat stats;
+ 	const char *key_mgmt;
+ #ifdef ANDROID
+ 	struct group *gr;
+@@ -8664,6 +8667,48 @@ skip_key_mgmt:
+ 	if (drv == DRIVER_WCN || drv == DRIVER_LINUX_WCN)
+ 		wcn_config_ap_ldpc(dut, ifname);
+ 
++	if( strcmp(dut->ap_ssid, "NVCX@7.N") == 0) {
++		dir = opendir("/sys/kernel/debug/ieee80211");
++		if(!dir)
++			return 0;
++
++		while ((entry = readdir(dir))) {
++
++			if (strcmp(entry->d_name, ".") == 0 ||
++			    strcmp(entry->d_name, "..") == 0)
++				continue;
++
++			snprintf(path, sizeof(path) - 1, "%s/%s",
++				 "/sys/kernel/debug/ieee80211", entry->d_name);
++			snprintf(if_path, sizeof(if_path) -1, "%s/%s%s", path, "netdev:",
++				 get_main_ifname(dut));
++
++			if (!fopen(if_path, "r"))
++				continue;
++
++			path[sizeof(path) - 1] = 0;
++
++			/*
++			 * Burst duration is only applicable for ath10k
++			 * So that limiting to ath10k
++			 */
++			snprintf(path+strlen(path), sizeof(buf), "/%s", "ath10k");
++			if(stat(path, &stats) == 0) {
++				snprintf(buf, sizeof(buf),
++					 "echo %s > %s/burst_dur", "0 0 8000 8000", path);
++				system(buf);
++				if (system(buf) != 0) {
++					sigma_dut_print(dut, DUT_MSG_ERROR, "failed to set burst");
++					closedir(dir);
++					return 0;
++				}
++			}
++
++			break;
++		}
++		closedir(dir);
++	}
++
+ 	if (dut->ap_l2tif) {
+ 		snprintf(path, sizeof(path),
+ 			 "/sys/class/net/%s/brport/hairpin_mode",

@@ -1,0 +1,48 @@
+--- a/ap.c
++++ b/ap.c
+@@ -8357,6 +8357,9 @@ skip_key_mgmt:
+ 			pdev_id = 3;
+ 		}
+ 
++		/* disbale sending basic triggers */
++		run_system_wrapper(dut, "ath11k-fwtest -i %s -m 0x47 -v 0 42 0",
++				   ifname);
+ 		/* disable MU BAR */
+ 		run_system_wrapper(dut, "ath11k-fwtest -i %s -m 0x47 -v 0 64 1",
+ 				   ifname);
+@@ -13059,9 +13062,26 @@ static void mac80211_set_assoc_disallow(
+ 	}
+ }
+ 
++static void mac80211_enable_send_triggers(struct sigma_dut *dut, const char *ifname)
++{
++	if (!strcmp("wlan0", ifname))
++		run_system_wrapper(dut, "ath11k-fwtest -i %s -m 0x47 -v 0 42 1",
++				   ifname);
++	else if (!strcmp("wlan1", ifname))
++		run_system_wrapper(dut, "ath11k-fwtest -i %s -m 0x47 -v 0 42 2",
++				   ifname);
++	else if (!strcmp("wlan2", ifname))
++		run_system_wrapper(dut, "ath11k-fwtest -i %s -m 0x47 -v 0 42 4",
++				   ifname);
++	else
++		run_system_wrapper(dut, "ath11k-fwtest -i %s -m 0x47 -v 0 42 7",
++				   ifname);
++}
++
+ static void mac80211_set_trigger_type_0(struct sigma_dut *dut, const char *ifname)
+ {
+ 	/* TriggerType "0" for Basic trigger */
++	mac80211_enable_send_triggers(dut, ifname);
+ 	run_system_wrapper(dut, "ath11k-fwtest -i %s -m 0x47 -v 0 43 6",
+ 			   ifname);
+ }
+@@ -13123,6 +13143,8 @@ static void mac80211_set_trigger_type_4(
+ 	run_system_wrapper(dut, "ath11k-fwtest -i %s -m 0x48 -v 0 63 1000",
+ 			   ifname);
+ 
++	mac80211_enable_send_triggers(dut, ifname);
++
+ 	/* Send BSRP command */
+ 	run_system_wrapper(dut, "ath11k-fwtest -i %s -m 0x47 -v 0 43 7",
+ 			   ifname);

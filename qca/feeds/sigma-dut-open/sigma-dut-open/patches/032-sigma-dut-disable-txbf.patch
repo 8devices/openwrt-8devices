@@ -1,0 +1,19 @@
+--- a/ap.c
++++ b/ap.c
+@@ -8357,6 +8357,16 @@ skip_key_mgmt:
+ 			pdev_id = 3;
+ 		}
+ 
++		/* A WAR done for MU_BAR test case. We are disabling anything
++		   related to MU MIMO when dl_ofdma test case is running
++		   we  noticed in dl_ofdma mu-bar TC AP is not sending MU traffic
++		   if MIMO is enabled.
++		 */
++		if (dut->ap_he_dlofdma == VALUE_ENABLED && dut->ap_he_ppdu == PPDU_MU) {
++			dut->ap_txBF = 0;
++			dut->ap_mu_txBF = 0;
++		}
++
+ 		/* disbale sending basic triggers */
+ 		run_system_wrapper(dut, "ath11k-fwtest -i %s -m 0x47 -v 0 42 0",
+ 				   ifname);

@@ -1,0 +1,203 @@
+--- a/ap.c
++++ b/ap.c
+@@ -8916,6 +8916,82 @@ skip_key_mgmt:
+ 		return 0;
+ 	}
+ 
++	if(drv == DRIVER_MAC80211 && dut->program == PROGRAM_HE) {
++
++		/* disable MU BAR */
++		run_system_wrapper(dut, "ath11k-fwtest -i %s -m 0x47 -v 0 64 1",
++			           ifname);
++		/* disable PSD Boost*/
++		run_system_wrapper(dut, "ath11k-fwtest -i %s -m 0x48 -v 0 142 1",
++				   ifname);
++		/* Enable mix bw */
++		run_system_wrapper(dut, "ath11k-fwtest -i %s -m 0x47 -v 0 141 1",
++				   ifname);
++		/* Disable preferred AC */
++		run_system_wrapper(dut, "ath11k-fwtest -i %s -m 0x48 -v 0 186 0",
++				   ifname);
++		/* enable full_band_probing */
++		run_system_wrapper(dut, "ath11k-fwtest -i %s -m 0x47 -v 0 194 0",
++				   ifname);
++		/* enable the equal RU allocation*/
++		run_system_wrapper(dut, "ath11k-fwtest -i %s -m 0x4b -v 0 0 1",
++				   ifname);
++
++		if (dut->ap_txBF) {
++			/* Ignore TBTT for NDP */
++			run_system_wrapper(dut,
++					   "ath11k-fwtest -i %s -m 0x48 -v 0 2 1",
++					   ifname);
++		        /* cv query enable */
++			run_system_wrapper(dut,
++					   "ath11k-fwtest -i %s -m 0x47 -v 0 7 1",
++					   ifname);
++			/* override TPC calculations & set TxBF flag to true */
++			run_system_wrapper(dut,
++					   "ath11k-fwtest -i %s -m 0x47 -v 0 47 1",
++					   ifname);
++		}
++
++		if (dut->ap_he_ulofdma == VALUE_ENABLED) {
++			/* Disable sounding for UL OFDMA */
++			run_system_wrapper(dut, "ath11k-fwtest -i %s -m 0x47 -v 0 7 0",
++					   ifname);
++			/* Set random RU allocation */
++			run_system_wrapper(dut, "ath11k-fwtest -i %s -m 0x47 -v 0 9 1",
++					   ifname);
++			/* To set TBTT PPDU duration (us) */
++			run_system_wrapper(dut, "ath11k-fwtest -i %s -m 0x48 -v 0 63 1908",
++					   ifname);
++			/* disable enable_ul_ofdma_efficiency_check */
++			run_system_wrapper(dut, "ath11k-fwtest -i %s -m 0x47 -v 0 131 0",
++					   ifname);
++		}
++
++		if (dut->ap_he_ppdu == PPDU_MU &&
++		    dut->ap_he_dlofdma == VALUE_ENABLED) {
++			/* Increase the min TX time limit for MU MIMO to disable MU MIMO
++			 * scheduling */
++			run_system_wrapper(dut,
++					   "ath11k-fwtest -i %s -m 0x47 -v 0 11 1000000",
++					   ifname);
++			/* Increase the max TX time limit for DL OFDMA to enable OFDMA
++			 * scheduling */
++			run_system_wrapper(dut,
++					   "ath11k-fwtest -i %s -m 0x47 -v 0 17 1000000",
++					   ifname);
++			/* Disable 'force SU schedule' to enable MU sch */
++			run_system_wrapper(dut,"ath11k-fwtest -i %s -m 0x47 -v 0 8 0",
++				           ifname);
++			/* Enable MU 11ax support in sch algo */
++			run_system_wrapper(dut,
++					   "ath11k-fwtest -i %s -m 0x47 -v 0 29 0",
++					   ifname);
++			/* Enable to sort RU allocation */
++			run_system_wrapper(dut, "ath11k-fwtest -i %s -m 0x4b -v 0 2 1",
++					   ifname);
++		}
++	}
++
+ 	if (dut->program == PROGRAM_60GHZ) {
+ 		if (dut->ap_num_ese_allocs > 0) {
+ 			/* wait extra time for AP to start */
+@@ -13648,6 +13724,103 @@ static void mac80211_set_assoc_disallow(
+ 	}
+ }
+ 
++static void mac80211_set_trigger_type_0(struct sigma_dut *dut, const char *ifname)
++{
++	/* TriggerType "0" for Basic trigger */
++	run_system_wrapper(dut, "ath11k-fwtest -i %s -m 0x47 -v 0 43 6",
++			   ifname);
++}
++
++static void mac80211_set_trigger_type_1(struct sigma_dut *dut, const char *ifname)
++{
++	/* TriggerType "1" for MU BRP */
++	run_system_wrapper(dut, "ath11k-fwtest -i %s -m 0x47 -v 0 7 1",
++			   ifname);
++	/* sets force_1x1_peer to 1 which should be reset to zero for
++	 * non MU test cases
++	 */
++	run_system_wrapper(dut, "ath11k-fwtest -i %s -m 0x48 -v 0 118 1",
++			   ifname);
++	/* Disable DL OFDMA */
++	run_system_wrapper(dut, "ath11k-fwtest -i %s -m 0x47 -v 0 11 0",
++			   ifname);
++}
++
++static void mac80211_set_trigger_type_2(struct sigma_dut *dut, const char *ifname)
++{
++	/* TriggerType "2" for MU BAR */
++	if (dut->ap_channel >= 36) {
++		/* RU allocation RU 242 - DL OFDMA data */
++		run_system_wrapper(dut,
++				   "ath11k-fwtest -i %s -m 0x4b -v 0 1 0 3 1 3 2 3 3 3",
++				   ifname);
++		/* RU allocation RU 52 - UL BA */
++		run_system_wrapper(dut,
++				   "ath11k-fwtest -i %s -m 0x4b -v 0 4 0 2 1 2 2 2 3 2",
++				   ifname);
++	} else {
++		/* RU allocation RU 52 - DL OFDMA data */
++		run_system_wrapper(dut,
++				   "ath11k-fwtest -i %s -m 0x4b -v 0 1 0 1 1 1 2 1 3 1",
++				   ifname);
++	}
++	/* Force TBPPDU duration to 400 us */
++	run_system_wrapper(dut, "ath11k-fwtest -i %s -m 0x48 -v 0 63 400",
++			   ifname);
++	run_system_wrapper(dut, "ath11k-fwtest -i %s -m 0x47 -v 0 49 0",
++			   ifname);
++	/* enable MU BAR */
++	run_system_wrapper(dut, "ath11k-fwtest -i %s -m 0x47 -v 0 64 0",
++			   ifname);
++}
++
++static void mac80211_set_trigger_type_3(struct sigma_dut *dut, const char *ifname)
++{
++	/* TriggerType "3" for MU RTS */
++	/* Send MU RTS Trigger - '1' is to enable MU RTS */
++	run_system_wrapper(dut, "ath11k-fwtest -i %s -m 0x47 -v 0 101 1",
++			   ifname);
++}
++
++static void mac80211_set_trigger_type_4(struct sigma_dut *dut, const char *ifname)
++{
++	/* TriggerType "4" for BSRP */
++	run_system_wrapper(dut, "ath11k-fwtest -i %s -m 0x48 -v 0 63 1000",
++			   ifname);
++
++	/* Send BSRP command */
++	run_system_wrapper(dut, "ath11k-fwtest -i %s -m 0x47 -v 0 43 7",
++			   ifname);
++}
++
++static int mac80211_set_trigger_type(struct sigma_dut *dut, const char *ifname,
++				      const char *val)
++{
++	int trigtype = atoi(val);
++
++	switch (trigtype) {
++	case 0:
++		mac80211_set_trigger_type_0(dut, ifname);
++		break;
++	case 1:
++		mac80211_set_trigger_type_1(dut, ifname);
++		break;
++	case 2:
++		mac80211_set_trigger_type_2(dut, ifname);
++		break;
++	case 3:
++		mac80211_set_trigger_type_3(dut, ifname);
++		break;
++	case 4:
++		mac80211_set_trigger_type_4(dut, ifname);
++		break;
++	default:
++		return STATUS_SENT_ERROR;
++	}
++
++	return SUCCESS_SEND_STATUS;
++}
++
+ static int mac80211_ap_set_rfeature(struct sigma_dut *dut,
+ 				    struct sigma_conn *conn,
+ 				    struct sigma_cmd *cmd)
+@@ -13711,6 +13884,13 @@ static int mac80211_ap_set_rfeature(stru
+ 	if (val)
+ 		dut->ap_btmreq_bss_term_tsf = atoi(val);
+ 
++	val = get_param(cmd, "TriggerType");
++	if (val && mac80211_set_trigger_type(dut, ifname, val) < 0) {
++		send_resp(dut, conn, SIGMA_ERROR,
++			  "errorCode,TriggerType not supported");
++		return STATUS_SENT_ERROR;
++	}
++
+ 	return 1;
+ }
+ 

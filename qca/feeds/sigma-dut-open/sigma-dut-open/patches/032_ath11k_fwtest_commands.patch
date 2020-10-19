@@ -1,0 +1,196 @@
+--- a/ap.c
++++ b/ap.c
+@@ -109,6 +109,7 @@ static int ath_ap_start_hostapd(struct s
+ static void ath_ap_set_params(struct sigma_dut *dut);
+ static int kill_process(struct sigma_dut *dut, char *proc_name,
+ 			unsigned char is_proc_instance_one, int sig);
++static void mac80211_enable_send_triggers(struct sigma_dut *dut, const char *ifname);
+ 
+ 
+ static int ap_ft_enabled(struct sigma_dut *dut)
+@@ -7481,18 +7482,25 @@ static int ap_set_force_mcs(struct sigma
+ 	}
+ }
+ 
+-static int default_muedca_values(FILE *f)
++static int default_muedca_values(struct sigma_dut *dut, FILE *f)
+ {
++	enum driver_type drv = get_driver_type(dut);
++	uint8_t aifsn[4] = { 8, 15, 5, 5 };
++
+ 	if(!f)
+ 		return -1;
+ 
++	if(drv == DRIVER_MAC80211 && (strncmp(dut->ap_ssid, "HE-4.56.1",9) == 0)) {
++		memset(aifsn, 0, 4);
++	}
++
+ 	fprintf(f,"he_mu_edca_qos_info_param_count=1\n"
+ 		"he_mu_edca_qos_info_q_ack=0\n"
+ 		"he_mu_edca_qos_info_queue_request=0\n"
+ 		"he_mu_edca_qos_info_txop_request=0\n"
+ 
+ 		/* Best Effort */
+-		"he_mu_edca_ac_be_aifsn=8\n"
++		"he_mu_edca_ac_be_aifsn=%u\n"
+ 		"he_mu_edca_ac_be_acm=0\n"
+ 		"he_mu_edca_ac_be_aci=0\n"
+ 		"he_mu_edca_ac_be_ecwmin=9\n"
+@@ -7500,7 +7508,7 @@ static int default_muedca_values(FILE *f
+ 		"he_mu_edca_ac_be_timer=255\n"
+ 
+ 		/* Background */
+-		"he_mu_edca_ac_bk_aifsn=15\n"
++		"he_mu_edca_ac_bk_aifsn=%u\n"
+ 		"he_mu_edca_ac_bk_acm=0\n"
+ 		"he_mu_edca_ac_bk_aci=1\n"
+ 		"he_mu_edca_ac_bk_ecwmin=9\n"
+@@ -7508,7 +7516,7 @@ static int default_muedca_values(FILE *f
+ 		"he_mu_edca_ac_bk_timer=255\n"
+ 
+ 		/* Video */
+-		"he_mu_edca_ac_vi_aifsn=5\n"
++		"he_mu_edca_ac_vi_aifsn=%u\n"
+ 		"he_mu_edca_ac_vi_acm=0\n"
+ 		"he_mu_edca_ac_vi_aci=2\n"
+ 		"he_mu_edca_ac_vi_ecwmin=5\n"
+@@ -7516,12 +7524,13 @@ static int default_muedca_values(FILE *f
+ 		"he_mu_edca_ac_vi_timer=255\n"
+ 
+ 		/* Voice */
+-		"he_mu_edca_ac_vo_aifsn=5\n"
++		"he_mu_edca_ac_vo_aifsn=%u\n"
+ 		"he_mu_edca_ac_vo_acm=0\n"
+ 		"he_mu_edca_ac_vo_aci=3\n"
+ 		"he_mu_edca_ac_vo_ecwmin=5\n"
+ 		"he_mu_edca_ac_vo_ecwmax=7\n"
+-		"he_mu_edca_ac_vo_timer=255\n");
++		"he_mu_edca_ac_vo_timer=255\n",
++		aifsn[0], aifsn[1], aifsn[2], aifsn[3]);
+ 
+ 	return 0;
+ }
+@@ -8589,7 +8598,7 @@ skip_key_mgmt:
+ 		fprintf(f, "he_mu_beamformer=%d\n", dut->ap_mu_txBF);
+ 		/* Disable BSS Color config by default */
+ 		fprintf(f, "he_bss_color=1\n");
+-		if (default_muedca_values(f) < 0) {
++		if (default_muedca_values(dut, f) < 0) {
+ 			sigma_dut_print(dut, DUT_MSG_ERROR,
+ 					"%s: File pointer is invalid",
+ 					__func__);
+@@ -9039,12 +9048,25 @@ skip_key_mgmt:
+ 		/* Disable preferred AC */
+ 		run_system_wrapper(dut, "ath11k-fwtest -i %s -m 0x48 -v 0 186 0",
+ 				   ifname);
++		if (dut->ap_he_ulofdma == VALUE_ENABLED) {
++			/* he_dynamic_muedca 0 */
++			run_system_wrapper(dut,
++					   "ath11k-fwtest -t 2 -i %s -m 0x00 -p %d 0xBF 0x00",
++					   ifname, pdev_id);
++		}
++
+ 		/* enable full_band_probing */
+ 		run_system_wrapper(dut, "ath11k-fwtest -i %s -m 0x47 -v 0 194 0",
+ 				   ifname);
+-		/* enable the equal RU allocation*/
+-		run_system_wrapper(dut, "ath11k-fwtest -i %s -m 0x4b -v 0 0 1",
+-				   ifname);
++
++		if (dut->ap_he_ulofdma == VALUE_ENABLED) {
++			/* Disable DL OFDMA */
++			if (dut->ap_he_dlofdma != VALUE_ENABLED) {
++				run_system_wrapper(dut,
++						   "ath11k-fwtest -t 1 -i %s -m 0x00 -v 0 32770 111",
++						   ifname);
++			}
++		}
+ 
+ 		if (dut->ap_txBF) {
+ 			/* Ignore TBTT for NDP */
+@@ -9062,30 +9084,63 @@ skip_key_mgmt:
+ 		}
+ 
+ 		if (dut->ap_he_ulofdma == VALUE_ENABLED) {
++			/* he_mu_edca 1 */
++			run_system_wrapper(dut,
++					   "ath11k-fwtest -t 1 -i %s -m 0x00 -v 0 0x8F 0x01",
++					   ifname);
+ 			/* Disable sounding for UL OFDMA */
+ 			run_system_wrapper(dut, "ath11k-fwtest -i %s -m 0x47 -v 0 7 0",
+ 					   ifname);
++			/* enable the equal RU allocation */
++			run_system_wrapper(dut,
++					   "ath11k-fwtest -i %s -m 0x4b -v 0 0 1",
++					   ifname);
++			/* he ul ltf */
++			run_system_wrapper(dut,
++					   "ath11k-fwtest -t 1 -i %s -m 0x00 -v 0 0x8D 0x03",
++					   ifname);
++			/*he ul gi */
++			run_system_wrapper(dut,
++					   "ath11k-fwtest -t 1 -i %s -m 0x00 -v 0 0x89 0x03",
++					   ifname);
++			/* Trigger Interval */
++			run_system_wrapper(dut,
++					   "ath11k-fwtest -t 2 -i %s -m 0x00 -p %d 0xA2 0x02",
++					   ifname, pdev_id);
++			/* disable enable_ul_ofdma_efficiency_check */
++			run_system_wrapper(dut,
++					   "ath11k-fwtest -i %s -m 0x47 -v 0 131 0",
++					   ifname);
+ 			/* Set random RU allocation */
+ 			run_system_wrapper(dut, "ath11k-fwtest -i %s -m 0x47 -v 0 9 1",
+ 					   ifname);
+ 			/* To set TBTT PPDU duration (us) */
+ 			run_system_wrapper(dut, "ath11k-fwtest -i %s -m 0x48 -v 0 63 1908",
+ 					   ifname);
+-			/* disable enable_ul_ofdma_efficiency_check */
+-			run_system_wrapper(dut, "ath11k-fwtest -i %s -m 0x47 -v 0 131 0",
+-					   ifname);
++			if (strncmp(dut->ap_ssid, "HE-4.40",7) == 0) {
++				/* Target RSSI */
++				run_system_wrapper(dut, "ath11k-fwtest -i %s -m 0x4b -v 0 7 -48", ifname);
++			}
+ 
+-			/* he_dynamic_muedca 0 */
+-			run_system_wrapper(dut, "ath11k-fwtest -t 2 -i %s -m 0x00 -p %d 0xBF 0x00", ifname, pdev_id);
++			if (strncmp(dut->ap_ssid, "HE-4.56.1",9) == 0) {
++				/* BSR Trigger disable/enable UL trigger frame scheduling */
++				mac80211_enable_send_triggers(dut, ifname);
+ 
+-			/* Trigger Interval */
+-			run_system_wrapper(dut, "ath11k-fwtest -t 2 -i %s -m 0x00 -p %d 0xA2 0x02", ifname, pdev_id);
+-			/* he_mu_edca 1 */
+-			run_system_wrapper(dut, "ath11k-fwtest -t 1 -i %s -m 0x00 -v 0 0x8F 0x01", ifname);
+-			/* he ul ltf */
+-			run_system_wrapper(dut, "ath11k-fwtest -t 1 -i %s -m 0x00 -v 0 0x8D 0x03", ifname);
+-			/*he ul gi */
+-			run_system_wrapper(dut, "ath11k-fwtest -t 1 -i %s -m 0x00 -v 0 0x89 0x03", ifname);
++				/* Set twt trigger type to basic trigger */
++				run_system_wrapper(dut,
++						   "ath11k-fwtest -i %s -m 0x47 -v 0 95 6",
++						   ifname);
++
++				/* Configure hw stuck ssr threshold */
++				run_system_wrapper(dut,
++						   "ath11k-fwtest -i %s -m 0x47 -v 0 43 8",
++						   ifname);
++
++				/* UL trigger duration */
++				run_system_wrapper(dut,
++						   "ath11k-fwtest -i %s -m 0x48 -v 0 63 1000",
++						   ifname);
++			}
+ 		}
+ 
+ 		if (dut->ap_he_ppdu == PPDU_MU &&
+@@ -9122,8 +9177,6 @@ skip_key_mgmt:
+ 			run_system_wrapper(dut, "ath11k-fwtest -t 1 -i %s -m 0x00 -v 0 0x88 0x10000427", ifname);
+ 			/* Max UL NSS */
+ 			run_system_wrapper(dut, "ath11k-fwtest -t 1 -i %s -m 0x00 -v 0 0x8B 0x02", ifname);
+-			/* Target RSSI */
+-			run_system_wrapper(dut, "ath11k-fwtest -i %s -m 0x4b -v 0 7 -48", ifname);
+ 		}
+ 		if (strcmp(dut->ap_ssid, "HE-4.40.4") == 0) {
+ 			/* Fixed UL MCS */

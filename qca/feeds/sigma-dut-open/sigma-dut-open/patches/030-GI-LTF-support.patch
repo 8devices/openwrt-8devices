@@ -1,0 +1,106 @@
+--- a/ap.c
++++ b/ap.c
+@@ -13150,6 +13150,82 @@ static int mac80211_set_trigger_type(str
+ 	return SUCCESS_SEND_STATUS;
+ }
+ 
++
++static int16_t mac80211_he_ltf_mapping(struct sigma_dut *dut,
++				       struct sigma_conn *conn,
++				       const char *val)
++{
++	int16_t ret = STATUS_SENT_ERROR;
++
++	if (strcmp(val, "3.2") == 0)
++		ret = 0x01;
++	else if (strcmp(val, "6.4") == 0)
++		ret = 0x02;
++	else if (strcmp(val, "12.8") == 0)
++		ret = 0x04;
++	else
++		send_resp(dut, conn, SIGMA_ERROR, "errorCode,Unsupported LTF");
++
++	return ret;
++}
++
++
++static enum sigma_cmd_result mac80211_he_ltf(struct sigma_dut *dut,
++					     struct sigma_conn *conn,
++					     const char *ifname,
++					     const char *val)
++{
++	int ret = SUCCESS_SEND_STATUS;
++
++	if (dut->ar_ltf)
++		free(dut->ar_ltf);
++
++	dut->ar_ltf = strdup(val);
++	if (!dut->ar_ltf) {
++		send_resp(dut, conn, SIGMA_ERROR,
++			  "errorCode, Failed to store new LTF");
++		ret = STATUS_SENT_ERROR;
++	}
++	return ret;
++}
++
++
++static enum sigma_cmd_result mac80211_he_gi(struct sigma_dut *dut,
++					    struct sigma_conn *conn,
++					    const char *ifname,
++					    const char *val)
++{
++	int16_t he_ltf = 0xFF;
++	char *mode = dut->use_5g ? "5" : "2.4";
++	int ret = SUCCESS_SEND_STATUS;
++
++	if (dut->ar_ltf) {
++		he_ltf = mac80211_he_ltf_mapping(dut, conn, dut->ar_ltf);
++		free(dut->ar_ltf);
++		dut->ar_ltf = NULL;
++
++		if (he_ltf < 0)
++			return STATUS_SENT_ERROR;
++
++		if (val) {
++			ret = run_system_wrapper(dut,
++						 "iw %s set bitrates he-gi-%s %s he-ltf-%s %u",
++						 ifname, mode, val, mode,
++						 he_ltf);
++		} else {
++			ret = run_system_wrapper(dut,
++						 "iw %s set bitrates he-ltf-%s %u",
++						 ifname, mode, he_ltf);
++		}
++	} else if (val) {
++		ret = run_system_wrapper(dut,
++					 "iw %s set bitrates he-gi-%s %s",
++					 ifname, mode, val);
++	}
++	return ret;
++}
++
++
+ static int mac80211_ap_set_rfeature(struct sigma_dut *dut,
+ 				    struct sigma_conn *conn,
+ 				    struct sigma_cmd *cmd)
+@@ -13219,7 +13295,19 @@ static int mac80211_ap_set_rfeature(stru
+ 		return STATUS_SENT_ERROR;
+ 	}
+ 
+-	return 1;
++	/* Extract LTF value before GI because in case of auto-rate,
++	 * dut->ar_ltf should be set before calling
++	 * mac80211_he_ar_gi_ltf_mask()
++	 */
++	val = get_param(cmd, "LTF");
++	if (val && (mac80211_he_ltf(dut, conn, ifname, val) < 0))
++		return STATUS_SENT_ERROR;
++
++	val = get_param(cmd, "GI");
++	if (mac80211_he_gi(dut, conn, ifname, val) < 0)
++		return STATUS_SENT_ERROR;
++
++	return SUCCESS_SEND_STATUS;
+ }
+ 
+ 
