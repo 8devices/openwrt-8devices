@@ -1,4 +1,5 @@
 *.o
+.config_backup
 .DS_Store
 .*.swp
 /env
