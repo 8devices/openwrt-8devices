@@ -1,0 +1,451 @@
+/dts-v1/;
+/*
+ * Copyright (c) 2019, The Linux Foundation. All rights reserved.
+ *
+ * Permission to use, copy, modify, and/or distribute this software for any
+ * purpose with or without fee is hereby granted, provided that the above
+ * copyright notice and this permission notice appear in all copies.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
+ * WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF
+ * MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR
+ * ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES
+ * WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN
+ * ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
+ * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
+ */
+
+#include "qcom-ipq6018.dtsi"
+#include <dt-bindings/input/input.h>
+#include "qcom-ipq6018-rpm-regulator.dtsi"
+#include "qcom-ipq6018-cpr-regulator.dtsi"
+#include "qcom-ipq6018-cp-cpu.dtsi"
+
+/ {
+	#address-cells = <0x2>;
+	#size-cells = <0x2>;
+	model = "8devices Mango DVK";
+	compatible = "8dev,mango", "qcom,ipq6018";
+	interrupt-parent = <&intc>;
+	qcom,msm-id = <0x192 0x0>, <0x193 0x0>;
+
+	aliases {
+		serial0 = &blsp1_uart3;
+		sdhc2 = &sdhc_2;
+		/*
+		 * Aliases as required by u-boot
+		 * to patch MAC addresses
+		 */
+		ethernet0 = "/soc/dp1";
+		ethernet1 = "/soc/dp2";
+		ethernet2 = "/soc/dp3";
+	};
+
+	chosen {
+		bootargs = "console=ttyMSM0,115200,n8 rw init=/init";
+		bootargs-append = " swiotlb=1 coherent_pool=2M";
+	};
+};
+
+&tlmm {
+	uart_pins: uart_pins {
+		mux {
+			pins = "gpio44", "gpio45";
+			function = "blsp2_uart";
+			drive-strength = <8>;
+			bias-pull-down;
+		};
+	};
+
+	spi_0_pins: spi_0_pins {
+		mux {
+			pins = "gpio38", "gpio39", "gpio40", "gpio41";
+			function = "blsp0_spi";
+			drive-strength = <8>;
+			bias-pull-down;
+		};
+	};
+
+	qpic_pins: qpic_pins {
+		data_0 {
+			pins = "gpio15";
+			function = "qpic_pad0";
+			drive-strength = <8>;
+			bias-pull-down;
+		};
+		data_1 {
+			pins = "gpio12";
+			function = "qpic_pad1";
+			drive-strength = <8>;
+			bias-pull-down;
+		};
+		data_2 {
+			pins = "gpio13";
+			function = "qpic_pad2";
+			drive-strength = <8>;
+			bias-pull-down;
+		};
+		data_3 {
+			pins = "gpio14";
+			function = "qpic_pad3";
+			drive-strength = <8>;
+			bias-pull-down;
+		};
+		data_4 {
+			pins = "gpio5";
+			function = "qpic_pad4";
+			drive-strength = <8>;
+			bias-pull-down;
+		};
+		data_5 {
+			pins = "gpio6";
+			function = "qpic_pad5";
+			drive-strength = <8>;
+			bias-pull-down;
+		};
+		data_6 {
+			pins = "gpio7";
+			function = "qpic_pad6";
+			drive-strength = <8>;
+			bias-pull-down;
+		};
+		data_7 {
+			pins = "gpio8";
+			function = "qpic_pad7";
+			drive-strength = <8>;
+			bias-pull-down;
+		};
+		qpic_pad {
+			pins = "gpio1", "gpio3", "gpio4",
+			       "gpio10", "gpio11", "gpio17";
+			function = "qpic_pad";
+			drive-strength = <8>;
+			bias-pull-down;
+		};
+	};
+
+	sd_pins: sd_pins {
+		mux {
+			pins = "gpio62";
+			function = "sd_card";
+			drive-strength = <8>;
+			bias-pull-up;
+		};
+	};
+
+	extcon_usb_pins: extcon_usb_pins {
+		mux {
+			pins = "gpio26";
+			function = "gpio";
+			drive-strength = <2>;
+			bias-pull-down;
+		};
+	};
+
+	button_pins: button_pins {
+		wps_button {
+			pins = "gpio79";
+			function = "gpio";
+			drive-strength = <8>;
+			bias-pull-up;
+		};
+	};
+
+	mdio_pins: mdio_pinmux {
+		mux_0 {
+			pins = "gpio64";
+			function = "mdc";
+			drive-strength = <8>;
+			bias-pull-up;
+		};
+		mux_1 {
+			pins = "gpio65";
+			function = "mdio";
+			drive-strength = <8>;
+			bias-pull-up;
+		};
+		mux_2 {
+			pins = "gpio75";
+			function = "gpio";
+			bias-pull-up;
+		};
+		mux_3 {
+			pins = "gpio77";
+			function = "gpio";
+			bias-pull-up;
+		};
+	};
+
+	leds_pins: leds_pins {
+		led_5g {
+			pins = "gpio66";
+			function = "gpio";
+			drive-strength = <8>;
+			bias-pull-down;
+		};
+		led_2g {
+			pins = "gpio67";
+			function = "gpio";
+			drive-strength = <8>;
+			bias-pull-down;
+		};
+	};
+};
+
+&soc {
+	extcon_usb: extcon_usb {
+		pinctrl-0 = <&extcon_usb_pins>;
+		pinctrl-names = "default";
+		id-gpio = <&tlmm 26 GPIO_ACTIVE_LOW>;
+		status = "ok";
+	};
+
+	mdio: mdio@90000 {
+		pinctrl-0 = <&mdio_pins>;
+		pinctrl-names = "default";
+		phy-reset-gpio = <&tlmm 75 0 &tlmm 77 1>;
+		status = "ok";
+		phy0: ethernet-phy@0 {
+			reg = <3>;
+		};
+		phy1: ethernet-phy@1 {
+			reg = <4>;
+		};
+		phy2: ethernet-phy@2 {
+			reg = <0x18>;
+		};
+	};
+
+	dp1 {
+		device_type = "network";
+		compatible = "qcom,nss-dp";
+		qcom,id = <4>;
+		reg = <0x3a001400 0x200>;
+		qcom,mactype = <0>;
+		local-mac-address = [000000000000];
+		qcom,link-poll = <1>;
+		qcom,phy-mdio-addr = <3>;
+		phy-mode = "sgmii";
+	};
+
+	dp2 {
+		device_type = "network";
+		compatible = "qcom,nss-dp";
+		qcom,id = <3>;
+		reg = <0x3a001600 0x200>;
+		qcom,mactype = <0>;
+		local-mac-address = [000000000000];
+		qcom,link-poll = <1>;
+		qcom,phy-mdio-addr = <4>;
+		phy-mode = "sgmii";
+	};
+
+	dp3 {
+		device_type = "network";
+		compatible = "qcom,nss-dp";
+		qcom,id = <5>;
+		reg = <0x3a001800 0x200>;
+		qcom,mactype = <0>;
+		local-mac-address = [000000000000];
+		qcom,link-poll = <1>;
+		qcom,phy-mdio-addr = <24>;
+		phy-mode = "sgmii";
+	};
+
+	nss-macsec0 {
+		compatible = "qcom,nss-macsec";
+		phy_addr = <0x18>;
+		phy_access_mode = <0>;
+		mdiobus = <&mdio>;
+	};
+
+	ess-switch@3a000000 {
+		switch_cpu_bmp = <0x1>;  /* cpu port bitmap */
+		switch_lan_bmp = <0x18>; /* lan port bitmap */
+		switch_wan_bmp = <0x20>; /* wan port bitmap */
+		switch_inner_bmp = <0xc0>; /*inner port bitmap*/
+		switch_mac_mode = <0x0>; /* mac mode for uniphy instance0*/
+		switch_mac_mode1 = <0xf>; /* mac mode for uniphy instance1*/
+		switch_mac_mode2 = <0xff>; /* mac mode for uniphy instance2*/
+		qcom,port_phyinfo {
+			port@3 {
+				port_id = <4>;
+				phy_address = <3>;
+			};
+			port@4 {
+				port_id = <3>;
+				phy_address = <4>;
+			};
+			port@5 {
+				port_id = <5>;
+				phy_address = <0x18>;
+				port_mac_sel = "QGMAC_PORT";
+			};
+		};
+	};
+
+	gpio_keys {
+		compatible = "gpio-keys";
+		pinctrl-0 = <&button_pins>;
+		pinctrl-names = "default";
+
+/*
+	* TODO: enable in next rev
+	* in r1 GPIO79 crosses with eth0 and triggers on cable disconnect
+		wps {
+			label = "wps";
+			linux,code = <KEY_WPS_BUTTON>;
+			gpios = <&tlmm 79 GPIO_ACTIVE_LOW>;
+			linux,input-type = <1>;
+			debounce-interval = <60>;
+		};
+*/
+	};
+
+	leds {
+		compatible = "gpio-leds";
+		pinctrl-0 = <&leds_pins>;
+		pinctrl-names = "default";
+
+		led@66 {
+			label = "led_5g";
+			gpios = <&tlmm 66 GPIO_ACTIVE_HIGH>;
+			linux,default-trigger = "led_5g";
+			default-state = "off";
+		};
+		led@67 {
+			label = "led_2g";
+			gpios = <&tlmm 67 GPIO_ACTIVE_HIGH>;
+			linux,default-trigger = "led_2g";
+			default-state = "off";
+		};
+	};
+};
+
+&blsp1_uart3 {
+	pinctrl-0 = <&uart_pins>;
+	pinctrl-names = "default";
+	status = "ok";
+};
+
+&spi_0 {
+	pinctrl-0 = <&spi_0_pins>;
+	pinctrl-names = "default";
+	cs-select = <0>;
+	status = "ok";
+
+	m25p80@0 {
+		#address-cells = <1>;
+		#size-cells = <1>;
+		reg = <0>;
+		compatible = "n25q128a11";
+		linux,modalias = "m25p80", "n25q128a11";
+		spi-max-frequency = <50000000>;
+		use-default-sizes;
+
+		partition0 {
+			label = "0:SBL1";
+			reg = <0x00000000 0x000c0000>;
+		};
+		partition1 {
+			label = "0:MIBIB";
+			reg = <0x000c0000 0x00010000>;
+		};
+		partition2 {
+			label = "0:QSEE";
+			reg = <0x000d0000 0x001a0000>;
+		};
+		partition3 {
+			label = "0:DEVCFG";
+			reg = <0x00270000 0x00010000>;
+		};
+		partition4 {
+			label = "0:RPM";
+			reg = <0x00280000 0x00020000>;
+		};
+		partition5 {
+			label = "0:CDT";
+			reg = <0x002a0000 0x00010000>;
+		};
+		partition6 {
+			label = "0:APPSBLENV";
+			reg = <0x002b0000 0x00010000>;
+		};
+		partition7 {
+			label = "0:APPSBL";
+			reg = <0x002c0000 0x000a0000>;
+		};
+		partition8 {
+			label = "0:ART";
+			reg = <0x00360000 0x00040000>;
+		};
+		partition9 {
+			label = "config";
+			reg = <0x003a0000 0x00040000>;
+		};
+		partition10 {
+			label = "data";
+			reg = <0x003e0000 0x00100000>;
+		};
+		partition11 {
+			label = "firmware";
+			reg = <0x004e0000 0x1b20000>;
+		};
+	};
+};
+
+&sdhc_2 {
+	pinctrl-0 = <&sd_pins>;
+	pinctrl-names = "default";
+	cd-gpios = <&tlmm 62 1>;
+	vqmmc-supply = <&ipq6018_l2_corner>;
+	status = "ok";
+};
+
+&qpic_bam {
+	status = "ok";
+};
+
+&nand {
+	pinctrl-0 = <&qpic_pins>;
+	pinctrl-names = "default";
+	status = "ok";
+};
+
+&ssphy_0 {
+	status = "ok";
+};
+
+&qusb_phy_0 {
+	status = "ok";
+};
+
+&qusb_phy_1 {
+	status = "ok";
+};
+
+&usb2 {
+	status = "ok";
+};
+
+&usb3 {
+	status = "ok";
+};
+
+&nss_crypto {
+	status = "ok";
+};
+
+&pcie_phy {
+	status = "ok";
+};
+
+&pcie0 {
+	status = "ok";
+};
+
+&wifi0 {
+	compatible = "qcom,ipq6018-wifi";
+	qcom,board_id = <0x31>;
+	status = "ok";
+};
