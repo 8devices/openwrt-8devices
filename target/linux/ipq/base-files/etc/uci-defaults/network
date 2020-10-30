@@ -16,6 +16,10 @@ ucidef_set_interface_loopback
 board=$(ipq806x_board_name)
 
 case "$board" in
+8devices,mango)
+	ucidef_add_switch "switch0"
+	ucidef_set_interfaces_lan_wan "eth0 eth1" "eth2"
+	;;
 db149|\
 db149_1xx|\
 db149_2xx)

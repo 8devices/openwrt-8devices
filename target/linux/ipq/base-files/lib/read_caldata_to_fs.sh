@@ -193,7 +193,7 @@ do_load_ipq4019_board_bin()
                     [ -L /lib/firmware/IPQ5018/caldata.bin ] || \
                     ln -s ${apdk}/IPQ5018/caldata.bin /lib/firmware/IPQ5018/caldata.bin
             ;;
-            ap-cp*)
+            ap-cp* | 8devices,mango)
                     CP_BD_FILENAME=/lib/firmware/IPQ6018/bdwlan.bin
                     mkdir -p ${apdk}/IPQ6018
                     if [ -f "$CP_BD_FILENAME" ]; then

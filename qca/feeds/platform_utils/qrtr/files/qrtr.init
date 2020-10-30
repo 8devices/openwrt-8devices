@@ -30,7 +30,8 @@ boot() {
 		ap-hk* | db-hk* |\
 		ap-ac* | ap-oak* |\
 		ap-cp* | db-cp* |\
-		ap-mp*)
+		ap-mp* | \
+		8devices,mango)
 		/usr/sbin/qrtr-cfg 1
 		service_start /usr/sbin/qrtr-ns
 		;;

@@ -227,6 +227,9 @@ ipq806x_board_detect() {
 	*"DB-MP03.3-C2")
 		name="db-mp03.3-c2"
 		;;
+	*"Mango"*)
+		name="8devices,mango"
+		;;
 	esac
 
 	[ -z "$name" ] && name="unknown"
