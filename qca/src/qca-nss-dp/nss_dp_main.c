@@ -25,6 +25,7 @@
 #include <linux/of_platform.h>
 #include <linux/of_address.h>
 #include <linux/of_mdio.h>
+#include <linux/of_gpio.h>
 #include <linux/phy.h>
 #if defined(NSS_DP_PPE_SUPPORT)
 #include <ref/ref_vsi.h>
@@ -437,6 +438,9 @@ static int32_t nss_dp_of_get_pdata(struct device_node *np,
 	uint8_t *maddr;
 	struct nss_dp_dev *dp_priv;
 	struct resource memres_devtree = {0};
+	int sfp_gpio, active_low;
+	int sfp_state = -1;
+	enum of_gpio_flags sfp_gpio_flags;
 
 	dp_priv = netdev_priv(netdev);
 
@@ -465,6 +469,20 @@ static int32_t nss_dp_of_get_pdata(struct device_node *np,
 
 	dp_priv->phy_mii_type = of_get_phy_mode(np);
 	dp_priv->link_poll = of_property_read_bool(np, "qcom,link-poll");
+
+	sfp_gpio = of_get_named_gpio_flags(np, "sfp_sense_gpio", 0, &sfp_gpio_flags);
+	if (sfp_gpio >= 0) {
+		if(!gpio_request_one(sfp_gpio, GPIOF_IN, "sfp_sense_gpio")) {
+			active_low = sfp_gpio_flags & OF_GPIO_ACTIVE_LOW;
+			sfp_state = (gpio_get_value_cansleep(sfp_gpio) ? 1 : 0) ^ active_low;
+			pr_info("Selecting %s mode using GPIO(%d)\n", sfp_state ? "SFP" : "PHY", sfp_gpio);
+			gpio_free(sfp_gpio);
+		}
+	}
+	if (sfp_state == 1) {
+		dp_priv->link_poll = 0;
+	}
+
 	if (of_property_read_u32(np, "qcom,phy-mdio-addr",
 		&dp_priv->phy_mdio_addr) && dp_priv->link_poll) {
 		pr_err("%s: mdio addr required if link polling is enabled\n",
