@@ -286,6 +286,9 @@ static void ssdk_dt_parse_mac_mode(a_uint32_t dev_id,
 {
 	const __be32 *mac_mode;
 	a_uint32_t len = 0;
+	int sfp_gpio, active_low;
+	int sfp_state = -1;
+	enum of_gpio_flags sfp_gpio_flags;
 
 	mac_mode = of_get_property(switch_node, "switch_mac_mode", &len);
 	if (!mac_mode)
@@ -295,8 +298,21 @@ static void ssdk_dt_parse_mac_mode(a_uint32_t dev_id,
 		SSDK_INFO("mac mode = 0x%x\n", be32_to_cpup(mac_mode));
 		ssdk_dt_global.ssdk_dt_switch_nodes[dev_id]->mac_mode = cfg->mac_mode;
 	}
+	sfp_gpio = of_get_named_gpio_flags(switch_node, "sfp_sense_gpio", 0, &sfp_gpio_flags);
+	if (sfp_gpio >= 0) {
+		if(!gpio_request_one(sfp_gpio, GPIOF_IN, "sfp_sense_gpio")) {
+			active_low = sfp_gpio_flags & OF_GPIO_ACTIVE_LOW;
+			sfp_state = (gpio_get_value_cansleep(sfp_gpio) ? 1 : 0) ^ active_low;
+			SSDK_INFO("Selecting %s mode using GPIO(%d)\n", sfp_state ? "SFP" : "PHY", sfp_gpio);
+			gpio_free(sfp_gpio);
+		}
+	}
 
-	mac_mode = of_get_property(switch_node, "switch_mac_mode1", &len);
+	if (sfp_state == 1)
+		mac_mode = of_get_property(switch_node, "switch_mac_mode1_sfp", &len);
+	else
+		mac_mode = of_get_property(switch_node, "switch_mac_mode1", &len);
+
 	if(!mac_mode)
 		SSDK_INFO("mac mode1 doesn't exit!\n");
 	else {
