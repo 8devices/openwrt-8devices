@@ -47,8 +47,8 @@ define Package/ath11k-firmware-ipq60xx/install
 	$(INSTALL_DIR) $(1)/lib/firmware/ath11k/IPQ6018/hw1.0
 #	$(INSTALL_DATA) $(PKG_BUILD_DIR)/IPQ6018/hw1.0/caldata.bin \
 #		$(1)/lib/firmware/ath11k/IPQ6018/hw1.0
-	$(INSTALL_DATA) $(PKG_BUILD_DIR)/IPQ6018/hw1.0/board-2.bin \
-		$(1)/lib/firmware/ath11k/IPQ6018/hw1.0
+	$(INSTALL_DATA) ./files/board-2-mango.bin \
+		$(1)/lib/firmware/ath11k/IPQ6018/hw1.0/board-2.bin
 endef
 
 define Package/ath11k-firmware-ipq807x/install
