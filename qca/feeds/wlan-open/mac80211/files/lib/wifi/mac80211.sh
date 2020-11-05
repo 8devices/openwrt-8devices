@@ -1,4 +1,6 @@
 #!/bin/sh
+. /lib/netifd/mac80211.sh
+
 append DRIVERS "mac80211"
 
 lookup_phy() {
@@ -6,35 +8,12 @@ lookup_phy() {
 		[ -d /sys/class/ieee80211/$phy ] && return
 	}
 
-	# Incase of multiple radios belonging to the same soc, the device path
-	# of these radio's would be same. To find the correct phy, we can
-	# get the phy index of the device in soc and use it during searching
-	# the global phy list
-	local radio_idx=${device:5:1}
-	local first_phy_idx=0
-	local delta=0
 	local devpath
 	config_get devpath "$device" path
-	while :; do
-	config_get devicepath "radio$first_phy_idx" path
-	[ -n "$devicepath" -a -n "$devpath" ] || break
-	[ "$devpath" == "$devicepath" ] && break
-	first_phy_idx=$(($first_phy_idx + 1))
-	done
-
-	delta=$(($radio_idx - $first_phy_idx))
 
 	[ -n "$devpath" ] && {
-		for phy in $(ls /sys/class/ieee80211 2>/dev/null); do
-			case "$(readlink -f /sys/class/ieee80211/$phy/device)" in
-			*$devpath)
-				if [ $delta -gt 0 ]; then
-					delta=$(($delta - 1))
-					continue;
-				fi
-				return;;
-			esac
-		done
+		phy="$(mac80211_path_to_phy "$devpath")"
+		[ -n "$phy" ] && return
 	}
 
 	local macaddr="$(config_get "$device" macaddr | tr 'A-Z' 'a-z')"
@@ -145,16 +124,8 @@ EOF
 
 		[ -n $htmode ] && append ht_capab "	option htmode	$htmode" "$N"
 
-		if [ -x /usr/bin/readlink -a -h /sys/class/ieee80211/${dev} ]; then
-			path="$(readlink -f /sys/class/ieee80211/${dev}/device)"
-		else
-			path=""
-		fi
+		path="$(mac80211_phy_to_path "$dev")"
 		if [ -n "$path" ]; then
-			path="${path##/sys/devices/}"
-			case "$path" in
-				platform*/pci*) path="${path##platform/}";;
-			esac
 			dev_id="	option path	'$path'"
 		else
 			dev_id="	option macaddr	$(cat /sys/class/ieee80211/${dev}/macaddress)"

@@ -4,6 +4,7 @@
 [ -e /lib/netifd/hostapd.sh ] && . /lib/netifd/hostapd.sh
 [ -e /lib/wifi/hostapd.sh ] && . /lib/wifi/hostapd.sh
 [ -e /lib/wifi/wpa_supplicant.sh ] && . /lib/wifi/wpa_supplicant.sh
+. /lib/netifd/mac80211.sh
 
 init_wireless_driver "$@"
 
@@ -717,34 +718,9 @@ mac80211_generate_mac() {
 
 find_phy() {
 	[ -n "$phy" -a -d /sys/class/ieee80211/$phy ] && return 0
-
-	# Incase multiple radio's are in the same soc, device path
-	# for these radio's will be the same. In such case we can
-	# get the phy based on the phy index of the soc
-	local radio_idx=${1:5:1}
-	local first_phy_idx=0
-	local delta=0
-	config_load wireless
-	while :; do
-	config_get devicepath "radio$first_phy_idx" path
-	[ -n "$devicepath" -a -n "$path" ] || break
-	[ "$path" == "$devicepath" ] && break
-	first_phy_idx=$(($first_phy_idx + 1))
-	done
-
-	delta=$(($radio_idx - $first_phy_idx))
-
 	[ -n "$path" ] && {
-		for phy in $(ls /sys/class/ieee80211 2>/dev/null); do
-			case "$(readlink -f /sys/class/ieee80211/$phy/device)" in
-				*$path)
-					if [ $delta -gt 0 ]; then
-						delta=$(($delta - 1))
-						continue;
-					fi
-					return 0;;
-			esac
-		done
+		phy="$(mac80211_path_to_phy "$path")"
+		[ -n "$phy" ] && return 0
 	}
 	[ -n "$macaddr" ] && {
 		for phy in $(ls /sys/class/ieee80211 2>/dev/null); do
@@ -1130,11 +1106,10 @@ mac80211_interface_cleanup() {
 	local phy="$1"
 
 	for wdev in $(list_phy_interfaces "$phy"); do
-		#Ensure the interface belongs to the phy being passed
-		phy_name="$(cat /sys/class/ieee80211/${phy}/device/net/${wdev}/phy80211/name)"
-		if [ "$phy_name" != "$phy" ]; then
-			continue
-		fi
+		local wdev_phy="$(readlink /sys/class/net/${wdev}/phy80211)"
+		wdev_phy="$(basename "$wdev_phy")"
+		[ -n "$wdev_phy" -a "$wdev_phy" != "$phy" ] && continue
+
 		# 11ad uses single hostapd and single wpa_supplicant instance
 		[ -f "/var/run/hostapd-${wdev}.lock" ] && [ $hwmode = "ad" ] && { \
 			hostapd_cli -p /var/run/hostapd raw REMOVE ${wdev}
