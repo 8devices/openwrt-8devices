@@ -29,7 +29,8 @@
 	var modes = [
 		'', 'Legacy', true,
 		'n', 'N', hwmodes.n,
-		'ac', 'AC', hwmodes.ac
+		'ac', 'AC', hwmodes.ac,
+		'ax', 'AX', hwmodes.ax
 	];
 
 	var htmodes = {
@@ -45,6 +46,12 @@
 			'VHT40', '40 MHz', htmodes.VHT40,
 			'VHT80', '80 MHz', htmodes.VHT80,
 			'VHT160', '160 MHz', htmodes.VHT160
+		],
+		'ax': [
+			'HE20', '20 MHz', htmodes.HE20,
+			'HE40', '40 MHz', htmodes.HE40,
+			'HE80', '80 MHz', htmodes.HE80,
+			'HE160', '160 MHz', htmodes.HE160
 		]
 	};
 
@@ -59,6 +66,10 @@
 		],
 		'ac': [
 			'11a', '5 GHz', true
+		],
+		'ax':  [
+			'11g', '2.4 GHz', (channels['11g'].length > 3),
+			'11a', '5 GHz', (channels['11a'].length > 3)
 		]
 	};
 
@@ -131,6 +142,8 @@
 
 		if (/VHT20|VHT40|VHT80|VHT160/.test(<%= luci.http.write_json(self.map:get(section, "htmode")) %>))
 			mode.value = 'ac';
+		else if (/HE20|HE40|HE80|HE80_80|HE160/.test(<%= luci.http.write_json(self.map:get(section, "htmode")) %>))
+			mode.value = 'ax';
 		else if (/HT20|HT40/.test(<%= luci.http.write_json(self.map:get(section, "htmode")) %>))
 			mode.value = 'n';
 		else
