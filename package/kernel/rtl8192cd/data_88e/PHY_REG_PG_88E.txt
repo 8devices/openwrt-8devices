@@ -1,0 +1,144 @@
+//=========================
+// PHY_related MAC register by channel, Wilson 091016
+// Related from willis 090406 PHY_REG_PG.txt for 92S
+//=========================
+//Offset talbe_0 for for EEPROM_0x79[bit0~2]= 0 , Table_0 (20/40MHz, all channel)
+// For Ant A
+0xe00 0xffffffff 0x0e0e1010 // base on 0x30  // for 18M,12M,09M,06M  
+0xe04 0xffffffff 0x0204080a 	 // base on 0x30  // for 54M,48M,36M,24M  
+0xe08 0x0000ff00 0x06       // base on 0x30  // for CCK 1M           
+0x86c 0xffffff00 0x000204   // base on 0x30  // for CCK 11M, 5.5M, 2M use 17 dB
+0xe10 0xffffffff 0x0e101414 // base on 0x30  // for MCS=03,02,01,00  
+0xe14 0xffffffff 0x0204060a // base on 0x30  // for MCS=07,06,05,04  
+0xe18 0xffffffff 0x00000000 // base on 0x30  // for MCS=11,10,09,08  
+0xe1c 0xffffffff 0x00000000 // base on 0x30  // for MCS=15,14,13,12  
+// For Ant B                                                         
+0x830 0xffffffff 0x00000000 // base on 0x32  // for 18M,12M,09M,06M  
+0x834 0xffffffff 0x00000000 // base on 0x32  // for 54M,48M,36M,24M  
+0x838 0xffffff00 0x00000000   // base on 0x34  // for CCK 5.5M, 2M, 1M  use 17dB
+0x86c 0x000000ff 0x00	      // base on 0x34  // for CCK 11M          
+0x83c 0xffffffff 0x00000000 // base on 0x32  // for MCS=03,02,01,00  
+0x848 0xffffffff 0x00000000 // base on 0x32  // for MCS=07,06,05,04  
+0x84c 0xffffffff 0x00000000 // base on 0x32  // for MCS=11,10,09,08  
+0x868 0xffffffff 0x00000000 // base on 0x32  // for MCS=15,14,13,12  
+//=========================
+//Offset talbe_1 for EEPROM_0x79[bit0~2]= 1 Ch01-Ch03, Table _1 (20MHz, ch1~ch03)
+// For Ant A
+0xe00 0xffffffff 0x00000000 // base on 0x30  // for 18M,12M,09M,06M  
+0xe04 0xffffffff 0x00000000 // base on 0x30  // for 54M,48M,36M,24M  
+0xe08 0x0000ff00 0x00       // base on 0x30  // for CCK 1M           
+0x86c 0xffffff00 0x000000   // base on 0x30  // for CCK 11M, 5.5M, 2M use 17 dB
+0xe10 0xffffffff 0x00000000 // base on 0x30  // for MCS=03,02,01,00  
+0xe14 0xffffffff 0x00000000 // base on 0x30  // for MCS=07,06,05,04  
+0xe18 0xffffffff 0x00000000 // base on 0x30  // for MCS=11,10,09,08  
+0xe1c 0xffffffff 0x00000000 // base on 0x30  // for MCS=15,14,13,12  
+// For Ant B                                                         
+0x830 0xffffffff 0x00000000 // base on 0x32  // for 18M,12M,09M,06M  
+0x834 0xffffffff 0x00000000 // base on 0x32  // for 54M,48M,36M,24M  
+0x838 0xffffff00 0x000000   // base on 0x34  // for CCK 5.5M, 2M, 1M  use 17dB
+0x86c 0x000000ff 0x00	      // base on 0x34  // for CCK 11M          
+0x83c 0xffffffff 0x00000000 // base on 0x32  // for MCS=03,02,01,00  
+0x848 0xffffffff 0x00000000 // base on 0x32  // for MCS=07,06,05,04  
+0x84c 0xffffffff 0x00000000 // base on 0x32  // for MCS=11,10,09,08  
+0x868 0xffffffff 0x00000000 // base on 0x32  // for MCS=15,14,13,12  
+//=========================
+//Offset talbe_2 for Mode  EEPROM_0x79[bit0~2]= 1 Ch04-Ch09, Table _2 (20MHz, ch4~ch09)
+// For Ant A
+0xe00 0xffffffff 0x04040404 // base on 0x30  // for 18M,12M,09M,06M  
+0xe04 0xffffffff 0x00020204 // base on 0x30  // for 54M,48M,36M,24M  
+0xe08 0x0000ff00 0x00       // base on 0x30  // for CCK 1M           
+0x86c 0xffffff00 0x000000   // base on 0x30  // for CCK 11M, 5.5M, 2M use 17 dB
+0xe10 0xffffffff 0x06060606 // base on 0x30  // for MCS=03,02,01,00  
+0xe14 0xffffffff 0x00020406 // base on 0x30  // for MCS=07,06,05,04  
+0xe18 0xffffffff 0x00000000 // base on 0x30  // for MCS=11,10,09,08  
+0xe1c 0xffffffff 0x00000000 // base on 0x30  // for MCS=15,14,13,12  
+// For Ant B                                                         
+0x830 0xffffffff 0x04040404 // base on 0x32  // for 18M,12M,09M,06M  
+0x834 0xffffffff 0x00020204 // base on 0x32  // for 54M,48M,36M,24M  
+0x838 0xffffff00 0x000000   // base on 0x34  // for CCK 5.5M, 2M, 1M  use 17dB
+0x86c 0x000000ff 0x00	      // base on 0x34  // for CCK 11M          
+0x83c 0xffffffff 0x06060606 // base on 0x32  // for MCS=03,02,01,00  
+0x848 0xffffffff 0x00020406 // base on 0x32  // for MCS=07,06,05,04  
+0x84c 0xffffffff 0x00000000 // base on 0x32  // for MCS=11,10,09,08  
+0x868 0xffffffff 0x00000000 // base on 0x32  // for MCS=15,14,13,12  //for MCS=15,14,13,12
+//=========================
+//Offset talbe_3 for Mode EEPROM_0x79[bit0~2]= 1 Ch10-Ch14, Table _3 (20MHz,  ch10~ch14)
+// For Ant A
+0xe00 0xffffffff 0x00000000 // base on 0x30  // for 18M,12M,09M,06M  
+0xe04 0xffffffff 0x00000000 // base on 0x30  // for 54M,48M,36M,24M  
+0xe08 0x0000ff00 0x00       // base on 0x30  // for CCK 1M           
+0x86c 0xffffff00 0x000000   // base on 0x30  // for CCK 11M, 5.5M, 2M use 17 dB
+0xe10 0xffffffff 0x00000000 // base on 0x30  // for MCS=03,02,01,00  
+0xe14 0xffffffff 0x00000000 // base on 0x30  // for MCS=07,06,05,04  
+0xe18 0xffffffff 0x00000000 // base on 0x30  // for MCS=11,10,09,08  
+0xe1c 0xffffffff 0x00000000 // base on 0x30  // for MCS=15,14,13,12  
+// For Ant B                                                         
+0x830 0xffffffff 0x00000000 // base on 0x32  // for 18M,12M,09M,06M  
+0x834 0xffffffff 0x00000000 // base on 0x32  // for 54M,48M,36M,24M  
+0x838 0xffffff00 0x000000   // base on 0x34  // for CCK 5.5M, 2M, 1M  use 17dB
+0x86c 0x000000ff 0x00	      // base on 0x34  // for CCK 11M          
+0x83c 0xffffffff 0x00000000 // base on 0x32  // for MCS=03,02,01,00  
+0x848 0xffffffff 0x00000000 // base on 0x32  // for MCS=07,06,05,04  
+0x84c 0xffffffff 0x00000000 // base on 0x32  // for MCS=11,10,09,08  
+0x868 0xffffffff 0x00000000 // base on 0x32  // for MCS=15,14,13,12  
+//=========================
+// Offset table _4 for EERPOM_0x79[bit0~2]= 1 Ch01-Ch03, Table _4 (40MHz, ch1~ch03)
+// For Ant_A
+0xe00 0xffffffff 0x00000000 // base on 0x2a  // for 18M,12M,09M,06M  
+0xe04 0xffffffff 0x00000000 // base on 0x2a  // for 54M,48M,36M,24M  
+0xe08 0x0000ff00 0x00       // base on 0x2a  // for CCK 1M           
+0x86c 0xffffff00 0x000000   // base on 0x2a  // for CCK 11M, 5.5M, 2M
+0xe10 0xffffffff 0x00000000 // base on 0x2a  // for MCS=03,02,01,00  
+0xe14 0xffffffff 0x00000000 // base on 0x2a  // for MCS=07,06,05,04  
+0xe18 0xffffffff 0x00000000 // base on 0x2a  // for MCS=11,10,09,08  
+0xe1c 0xffffffff 0x00000000 // base on 0x2a  // for MCS=15,14,13,12  
+// For Ant_B                                                         
+0x830 0xffffffff 0x00000000 // base on 0x2a  // for 18M,12M,09M,06M  
+0x834 0xffffffff 0x00000000 // base on 0x2a  // for 54M,48M,36M,24M  
+0x838 0xffffff00 0x000000   // base on 0x2a  // for CCK 5.5M, 2M, 1M 
+0x86c 0x000000ff 0x00       // base on 0x2a  // for CCK 11M          
+0x83c 0xffffffff 0x00000000 // base on 0x2a  // for MCS=03,02,01,00  
+0x848 0xffffffff 0x00000000 // base on 0x2a  // for MCS=07,06,05,04  
+0x84c 0xffffffff 0x00000000 // base on 0x2a  // for MCS=11,10,09,08  
+0x868 0xffffffff 0x00000000 // base on 0x2a  // for MCS=15,14,13,12  
+//=========================
+// Offset table _5 for EEPROM_0x79[bit0~2]= 1 Ch04-Ch09, Table _5 (40MHz, ch4~ch09)
+// For Ant_A
+0xe00 0xffffffff 0x04040404 // base on 0x2a  // for 18M,12M,09M,06M  
+0xe04 0xffffffff 0x00020204 // base on 0x2a  // for 54M,48M,36M,24M  
+0xe08 0x0000ff00 0x00       // base on 0x2a  // for CCK 1M           
+0x86c 0xffffff00 0x000000   // base on 0x2a  // for CCK 11M, 5.5M, 2M
+0xe10 0xffffffff 0x00000000 // base on 0x2a  // for MCS=03,02,01,00  
+0xe14 0xffffffff 0x00000000 // base on 0x2a  // for MCS=07,06,05,04  
+0xe18 0xffffffff 0x00000000 // base on 0x2a  // for MCS=11,10,09,08  
+0xe1c 0xffffffff 0x00000000 // base on 0x2a  // for MCS=15,14,13,12  
+// For Ant_B                                                         
+0x830 0xffffffff 0x04040404 // base on 0x2a  // for 18M,12M,09M,06M  
+0x834 0xffffffff 0x00020204 // base on 0x2a  // for 54M,48M,36M,24M  
+0x838 0xffffff00 0x000000   // base on 0x2a  // for CCK 5.5M, 2M, 1M 
+0x86c 0x000000ff 0x00       // base on 0x2a  // for CCK 11M          
+0x83c 0xffffffff 0x00000000 // base on 0x2a  // for MCS=03,02,01,00  
+0x848 0xffffffff 0x00000000 // base on 0x2a  // for MCS=07,06,05,04  
+0x84c 0xffffffff 0x00000000 // base on 0x2a  // for MCS=11,10,09,08  
+0x868 0xffffffff 0x00000000 // base on 0x2a  // for MCS=15,14,13,12  
+//=========================
+// Offset table _6 for EEPROM_0x79[bit0~2]= 1 Ch10-Ch14, Table _6 (40MHz,  ch10~ch14)
+// For Ant_A
+0xe00 0xffffffff 0x00000000 // base on 0x2a  // for 18M,12M,09M,06M
+0xe04 0xffffffff 0x00000000 // base on 0x2a  // for 54M,48M,36M,24M
+0xe08 0x0000ff00 0x00       // base on 0x2a  // for CCK 1M
+0x86c 0xffffff00 0x000000   // base on 0x2a  // for CCK 11M, 5.5M, 2M
+0xe10 0xffffffff 0x00000000 // base on 0x2a  // for MCS=03,02,01,00
+0xe14 0xffffffff 0x00000000 // base on 0x2a  // for MCS=07,06,05,04
+0xe18 0xffffffff 0x00000000 // base on 0x2a  // for MCS=11,10,09,08
+0xe1c 0xffffffff 0x00000000 // base on 0x2a  // for MCS=15,14,13,12
+// For Ant_B
+0x830 0xffffffff 0x00000000 // base on 0x2a  // for 18M,12M,09M,06M
+0x834 0xffffffff 0x00000000 // base on 0x2a  // for 54M,48M,36M,24M
+0x838 0xffffff00 0x000000   // base on 0x2a  // for CCK 5.5M, 2M, 1M
+0x86c 0x000000ff 0x00       // base on 0x2a  // for CCK 11M
+0x83c 0xffffffff 0x00000000 // base on 0x2a  // for MCS=03,02,01,00
+0x848 0xffffffff 0x00000000 // base on 0x2a  // for MCS=07,06,05,04
+0x84c 0xffffffff 0x00000000 // base on 0x2a  // for MCS=11,10,09,08
+0x868 0xffffffff 0x00000000 // base on 0x2a  // for MCS=15,14,13,12
+0xff //end of file

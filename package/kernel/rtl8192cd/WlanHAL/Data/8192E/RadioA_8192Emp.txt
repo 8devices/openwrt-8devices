@@ -1,0 +1,127 @@
+//RTL8192E_MAC_PHY_Parameter_v043_MP_20141229
+0x7F	0x00082  // for C cut POW_SYN	
+0x81	0x3FC00 // for C cut POW_BB_filter	
+0x00	0x30000                                                                                               	
+0x08	0x08400  //DC leakage                                                                                 	
+0x18	0x00407                                                                                               	
+0x19	0x00012 //(120918): RC calibration : 1b[4] 1b[1]                                                   	
+0x1B   	0x0394C //(121226): default 00  for CCK ACPR  	
+0x1E	0x80009                                                                                               	
+0x1F	0x00880                                                                                               	
+0x2F	0x1A060                                                                                               	
+0x3F	0x00000                                                                                               	
+0x42	0x060C0                                                                                               	
+0x57	0xd0000  //for 80M OFDM(right) spur                                                                   	
+0x58	0xBE180                                                                                               	
+0x67	0x01552                                                                                               	
+0x83	0x00000                                                                                               	
+0xB0	0xFF9F1                                                                                          	
+0xB1	0x55418                                                                                               	
+0xB2	0x8CC00  //VCO current                                                                                	
+0xB4	0x43083  //KVCO                                                                                       	
+0xB5	0x08166  //5G LO buffier increase current                                                             	
+0xB6	0x0803E  // SDM neg edge                                                                              	
+0xB7	0x1C69f  //LPF                                                                                        	
+0xB8	0x0407F  //LPF Defalt:080FF reduce R3 (121005) RDC Lily                                                                                         	
+0xB9	0x90001  //Defalt:80001  CV curve offset +1 for 25C (121005) RDC Lily                                                                                              	
+0xBA	0x40001 //0x40000 : SDM 3 change 2 order for in-band noise floor  check 40M spur for CH7?            	
+0xBB	0x00400                                                                                               	
+0xBC	0x00078	
+0xBD	0xB3333	
+0xBE	0x33340	
+0xBF	0x00000                                                                                               	
+0xC0	0x05999	
+0xC1	0x09999	
+0xC2	0x02400                                                                                               	
+0xC3	0x00009                                                                                               	
+0xC4	0x40C91                                                                                               	
+0xC5	0x99999                                                                                               	
+0xC6	0x000A3                                                                                               	
+0xC7	0x88820                                                                                               	
+0xC8	0x76C06                                                                                               	
+0xC9	0x00000                                                                                               	
+0xCA	0x80000                                                                                               	
+0x1C	0x00000                                                                                               	
+//0xB6	0x0803E	
+//0xB2	0x8CC00  //VCO current                                                                                	
+
+//phking  		
+0xDF	0x00180                     	
+0xEF	0x001a0                     	
+0x51	0x69545  //0x6b25d :spur    	
+0x52	0x7E45E	
+0x53	0x00071  // [1:0] for Tx EVM shrink                          	
+0x56	0x51FF3                          	
+0x35	0x000a8   // a8=ba                         	
+0x35	0x001e2  //CCK DY swing TX EVM    	
+0x35	0x002a8 //OFDM                   	
+0x36	0x01C24                          	
+0x36	0x09C24                          	
+0x36	0x11C24                          	
+0x36	0x19C24                          	
+0x18	0x00C07                          	
+0X5A	0x48000 //TX IMR 4Be00 // 8bd00           	
+0X19	0x739d0                          	
+
+
+//For MP Chip power saving (92EE) 		
+0x34	0xadd7                      	
+0x34	0x9dd4                     	
+0x34	0x8dd1                    	
+0x34	0x7dce                      	
+0x34	0x6dcb                      	
+0x34	0x5dc8   //0x5cea           	
+0x34	0x4dc5   //0x4ce7           	
+0x34	0x34cc   //0x34e7           	
+0x34	0x244f   //0x246a           	
+0x34	0x144c   //0x1467           	
+0x34	0x0014  //0x0068           	
+
+
+
+//phking  		
+0x00	0x30159 //RX mode     	
+// RX setting 20111118  		
+0x84	0x68180 // update by Hillo for better IMR                                   	
+0x86	0x0014e  // LNA switch by BB control modified by Hillo	
+0x87	0x49f80  // modified by Hillo                                  	
+0x8e	0x65540                                   	
+0x8f	0x88000                                   	
+// RX gain table 20111118    		
+0xef 	0x020A0 //Rx gaintable WE                	
+0x3b 	0xf02b0                                  	
+0x3b 	0xef7b0                                  	
+0x3b 	0xd4fb0                                  	
+0x3b 	0xcf060                                  	
+0x3b 	0xb0090                                  	
+0x3b 	0xa0080                                  	
+0x3b 	0x90080                                  	
+0x3b 	0x8f780                                  	
+0x3b 	0x78730    // update for CS     0x7c2b0                                  	
+0x3b 	0x60fb0    // CS gain table              	
+0x3b 	0x5ffa0   //54fb0                        	
+0x3b 	0x40620   // update for CS    0x407a0    //  CS gain table             	
+0x3b 	0x37090   // C-cut                                  	
+0x3b 	0x20080                                  	
+0x3b 	0x1f060 // HG for CCK  	
+0x3b 	0x0ffb0 // ULG for CCK	
+0xef 	0x000A0 //Rx gaintable WEb               	
+
+
+0xfe
+//LC calibration start		
+//0xb1	0x55400	
+0x18	0x0fc07  //LC calibration	
+0xfe
+0xfe
+0xfe
+0xfe
+
+//0xb1	0x55418	
+//LC calibration end		
+
+0x1e	0x00001	
+0x1f	0x80000	
+0x00	0x33e70 //RX mode //pc_wang only	
+
+0xffff 0xffff

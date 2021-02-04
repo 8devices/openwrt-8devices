@@ -1,0 +1,26 @@
+//=========================
+// PHY_related MAC register by channel, Wilson 091016
+// Related from willis 090406 PHY_REG_PG.txt for 92S
+//=========================
+
+
+//Offset talbe_0 for BG_EN=0 
+// For Ant A
+0xe00 0xffffffff 0x0609090a // base on 0x30  //for 18M,12M,09M,06M
+0xe04 0xffffffff 0x00030406 // base on 0x30  //for 54M,48M,36M,24M
+0xe08 0x0000ff00 0x00       // base on 0x30  //for CCK 1M , use 17 dB  
+0x86c 0xffffff00 0x000000   // base on 0x30  //for CCK 2M, 5.5M, 11M, use 17 dB
+0xe10 0xffffffff 0x090a0a0b // base on 0x30  //for MCS=03,02,01,00
+0xe14 0xffffffff 0x01040508 // base on 0x30  //for MCS=07,06,05,04
+0xe18 0xffffffff 0x090a0a0b // base on 0x30  //for MCS=11,10,09,08
+0xe1c 0xffffffff 0x01040508 // base on 0x30  //for MCS=15,14,13,12 
+// For Ant B
+0x830 0xffffffff 0x0609090a // base on 0x32  //for 18M,12M,09M,06M
+0x834 0xffffffff 0x00030406 // base on 0x32  //for 54M,48M,36M,24M
+0x838 0xffffff00 0x000000   // base on 0x34  //for CCK 1M, 2M, 5.5M, use 17dB
+0x86c 0x000000ff 0x00				// base on 0x34  //for CCK 11M, use 17dB
+0x83c 0xffffffff 0x090a0a0b // base on 0x32  //for MCS=03,02,01,00
+0x848 0xffffffff 0x01040508 // base on 0x32  //for MCS=07,06,05,04
+0x84c 0xffffffff 0x090a0a0b // base on 0x32  //for MCS=11,10,09,08
+0x868 0xffffffff 0x01040508 // base on 0x32  //for MCS=15,14,13,12
+0xff

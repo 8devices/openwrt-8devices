@@ -1,0 +1,326 @@
+//RL6310_MAC_PHY_RF_Parameter_8881A_Merge_V005_20140717
+// Format:							
+//							
+// 		Note: The order of the tables MUST match the definition in WLAN driver.
+//							
+//		Power Limit Table Parameter Definition					
+//		Band:			2.4G/5G		
+//		Bandwidth:		20/40/80/160 MHZ			
+//		RF Path:		1/2/3/4 Transmit RF			
+//		Rate Section:	CCK/OFDM/HT/VHT				
+//		Regulation: 	FCC/ETSI/MKK				
+//							
+//		Description:					
+//		1. IF in 1T test
+//		2. power is real dBm.					
+//		3. // is for comment.					
+//							
+// 		NA is non-release channle.					
+//							
+//							
+//Table 1: ===========================================							
+//							
+##	2.4G, 20M, 1T, CCK, //(1M;2M;5.5M;11M)						
+##	START
+##	#3#	FCC	ETSI	MKK	
+CH01	18	18	18	
+CH02	18	18	18	
+CH03	18	18	18	
+CH04	18	18	18	
+CH05	18	18	18	
+CH06	18	18	18	
+CH07	18	18	18	
+CH08	18	18	18	
+CH09	18	18	18	
+CH10	18	18	18	
+CH11	18	18	18	
+CH12	NA	18	18	
+CH13	NA	18	18	
+CH14	NA	NA	18	
+##	END						
+//							
+//Table 2: ===========================================							
+//							
+##	2.4G, 20M, 1T, OFDM, //(6M;9M;12M;18M;24M;36M;48M;54M)						
+##	START
+##	#3#	FCC	ETSI	MKK	
+CH01	16	16	17	
+CH02	17	17	17	
+CH03	17	17	17	
+CH04	17	17	17	
+CH05	17	17	17	
+CH06	17	17	17	
+CH07	17	17	17	
+CH08	17	17	17	
+CH09	17	17	17	
+CH10	17	17	17	
+CH11	16	17	17	
+CH12	NA	17	17	
+CH13	NA	16	17	
+CH14	NA	NA	NA	
+##	END						
+//							
+//Table 3: ===========================================							
+//							
+##	2.4G, 20M, 1T, HT, //(MCS0~MCS7)						
+##	START
+##	#3#	FCC	ETSI	MKK	
+CH01	15	17	17	
+CH02	17	17	17	
+CH03	17	17	17	
+CH04	17	17	17	
+CH05	17	17	17	
+CH06	17	17	17	
+CH07	17	17	17	
+CH08	17	17	17	
+CH09	17	17	17	
+CH10	17	17	17	
+CH11	15	17	17	
+CH12	NA	17	17	
+CH13	NA	17	17	
+CH14	NA	NA	NA	
+##	END						
+//							
+//Table 4: ===========================================							
+//							
+##	2.4G, 20M, 2T, HT, //(MCS8~MCS15)						
+##	START
+##	#3#	FCC	ETSI	MKK	
+CH01	15	17	17	
+CH02	17	17	17	
+CH03	17	17	17	
+CH04	17	17	17	
+CH05	17	17	17	
+CH06	17	17	17	
+CH07	17	17	17	
+CH08	17	17	17	
+CH09	17	17	17	
+CH10	17	17	17	
+CH11	15	17	17	
+CH12	NA	17	17	
+CH13	NA	17	17	
+CH14	NA	NA	NA	
+##	END       						
+//                							
+//Table 5: ===========================================							
+//                							
+##	2.4G, 40M, 1T, HT, //(MCS0~MCS7)						
+##	START
+##	#3#	FCC	ETSI	MKK	
+CH01	NA	NA	NA	
+CH02	NA	NA	NA	
+CH03	15	17	17	
+CH04	17	17	17	
+CH05	17	17	17	
+CH06	17	17	17	
+CH07	17	17	17	
+CH08	17	17	17	
+CH09	17	17	17	
+CH10	17	17	17	
+CH11	15	17	17	
+CH12	NA	17	17	
+CH13	NA	17	17	
+CH14	NA	NA	NA	
+##	END						
+//							
+//Table 6: ===========================================							
+//							
+##	2.4G, 40M, 2T, HT, //(MCS8~MCS15)						
+##	START
+##	#3#	FCC	ETSI	MKK	
+CH01	NA	NA	NA	
+CH02	NA	NA	NA	
+CH03	15	17	17	
+CH04	17	17	17	
+CH05	17	17	17	
+CH06	17	17	17	
+CH07	17	17	17	
+CH08	17	17	17	
+CH09	17	17	17	
+CH10	17	17	17	
+CH11	15	17	17	
+CH12	NA	17	17	
+CH13	NA	17	17	
+CH14	NA	NA	NA	
+##	END						
+//							
+//Table 7: ===========================================							
+//							
+##	5G, 20M, 1T, OFDM, //(6M;9M;12M;18M;24M;36M;48M;54M)						
+##	START
+##	#3#	FCC	ETSI	MKK	
+//5G Band 1							
+CH36	17	17	17	
+CH40	17	17	17	
+CH44	17	17	17	
+CH48	17	17	17	
+//5G Band 2       	  						
+CH52	17	17	17	
+CH56	17	17	17	
+CH60	17	17	17	
+CH64	17	17	17	
+//5G Band 3           							
+CH100	17	17	17	
+CH114	17	17	17	
+CH108	17	17	17	
+CH112	17	17	17	
+CH116	17	17	17	
+CH120	17	17	17	
+CH124	17	17	17	
+CH128	17	17	17	
+CH132	17	17	17	
+CH136	17	17	17	
+CH140	17	17	17	
+//5G Band 4       	  						
+CH149	17	17	NA	
+CH153	17	17	NA	
+CH157	17	17	NA	
+CH161	17	17	NA	
+CH165	17	17	NA	
+##	END						
+//							
+//Table 8: ======================================							
+//							
+##	5G, 20M, 1T, HT, //(MCS0~MCS7)						
+##	START
+##	#3#	FCC	ETSI	MKK	
+//5G Band 1							
+CH36	17	17	17	
+CH40	17	17	17	
+CH44	17	17	17	
+CH48	17	17	17	
+//5G Band 2 				  			 
+CH52	17	17	17	
+CH56	17	17	17	
+CH60	17	17	17	
+CH64	17	17	17	
+//5G Band 3 				  			 
+CH100	17	17	17	
+CH114	17	17	17	
+CH108	17	17	17	
+CH112	17	17	17	
+CH116	17	17	17	
+CH120	17	17	17	
+CH124	17	17	17	
+CH128	17	17	17	
+CH132	17	17	17	
+CH136	17	17	17	
+CH140	17	17	17	
+//5G Band 4 				  			 
+CH149	17	17	NA	
+CH153	17	17	NA	
+CH157	17	17	NA	
+CH161	17	17	NA	
+CH165	17	17	NA	
+##	END						
+//							
+//Table 9: ===========================================							
+//							
+##	5G, 20M, 2T, HT, //(MCS8~MCS15)						
+##	START
+##	#3#	FCC	ETSI	MKK	
+//5G Band 1							
+CH36	17	17	17	
+CH40	17	17	17	
+CH44	17	17	17	
+CH48	17	17	17	
+//5G Band 2 				  			
+CH52	17	17	17	
+CH56	17	17	17	
+CH60	17	17	17	
+CH64	17	17	17	
+//5G Band 3 				  			
+CH100	17	17	17	
+CH114	17	17	17	
+CH108	17	17	17	
+CH112	17	17	17	
+CH116	17	17	17	
+CH120	17	17	17	
+CH124	17	17	17	
+CH128	17	17	17	
+CH132	17	17	17	
+CH136	17	17	17	
+CH140	17	17	17	
+//5G Band 4 				  			
+CH149	17	17	NA	
+CH153	17	17	NA	
+CH157	17	17	NA	
+CH161	17	17	NA	
+CH165	17	17	NA	
+##	END                       						
+//                							
+//Table 10: ===========================================							
+//                							
+##	5G, 40M, 1T, HT, //(MCS0~MCS7)						
+##	START
+##	#3#	FCC	ETSI	MKK	
+//5G Band 1							
+CH38	15	16	16	
+CH46	15	16	16	
+//5G Band 2       	  						
+CH54	15	16	16	
+CH62	15	16	16	
+//5G Band 3       							
+CH102	16	16	16	
+CH110	16	16	16	
+CH118	16	16	16	
+CH126	16	16	16	
+CH134	16	16	16	
+//5G Band 4         							
+CH151	16	16	NA	
+CH159	16	16	NA	
+##	END       						
+//                							
+//Table 11: ===========================================							
+//							
+##	5G, 40M, 2T, HT, //(MCS8~MCS15)						
+##	START
+##	#3#	FCC	ETSI	MKK	
+//5G Band 1							
+CH38	15	16	16	
+CH46	15	16	16	
+//5G Band 2       	  						
+CH54	15	16	16	
+CH62	15	16	16	
+//5G Band 3       	  						
+CH102	16	16	16	
+CH110	16	16	16	
+CH118	16	16	16	
+CH126	16	16	16	
+CH134	16	16	16	
+//5G Band 4       	  						
+CH151	16	16	NA	
+CH159	16	16	NA	
+##	END						
+//                							
+//Table 12: ===========================================							
+//							
+##	5G, 80M, 1T, VHT, //(MCS0~MCS9)						
+##	START
+##	#3#	FCC	ETSI	MKK	
+//5G Band 1							
+CH42	14	16	16	
+//5G Band 2       	  						
+CH58	13	16	16	
+//5G Band 3       	  						
+CH106	13	16	16	
+CH122	16	16	16	
+//5G Band 4       	  						
+CH155	16	16	NA	
+##	END						
+//                							
+//Table 13: ===========================================							
+//							
+##	5G, 80M, 2T, VHT, //(MCS0~MCS9)						
+##	START
+##	#3#	FCC	ETSI	MKK	
+//5G Band 1       							
+CH42	14	16	16	
+//5G Band 2       	  						
+CH58	13	16	16	
+//5G Band 3       	  						
+CH106	13	16	16	
+CH122	16	16	16	
+//5G Band 4       	  						
+CH155	16	16	NA	
+##	END						

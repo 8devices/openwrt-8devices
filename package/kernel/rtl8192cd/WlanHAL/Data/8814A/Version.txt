@@ -1,0 +1,1 @@
+CurrentVersion = RLE0572B_MAC_PHY_Parameter_v033_20140418

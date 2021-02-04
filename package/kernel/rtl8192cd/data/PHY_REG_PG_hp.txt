@@ -1,0 +1,27 @@
+//=========================
+// PHY_related MAC register by channel, Wilson 091016
+// Related from willis 090406 PHY_REG_PG.txt for 92S
+// High-power application, jerry 20100928
+//=========================
+
+
+//Offset talbe_0 for BG_EN=0 
+// For Ant A
+0xe00 0xffffffff 0x06080808 // base on 0x30  //for 18M,12M,09M,06M  //27,28,28,28dBm
+0xe04 0xffffffff 0x00040406 // base on 0x30  //for 54M,48M,36M,24M  //24,26,26,27dBm
+0xe08 0x0000ff00 0x00       // base on 0x30  //for CCK 1M , use 28 dB  
+0x86c 0xffffff00 0x000000   // base on 0x30  //for CCK 2M, 5.5M, 11M, use 28 dB
+0xe10 0xffffffff 0x04060608 // base on 0x30  //for MCS=03,02,01,00  //26,27,27,28dBm
+0xe14 0xffffffff 0x00020204 // base on 0x30  //for MCS=07,06,05,04  //24,25,25,26dBm
+0xe18 0xffffffff 0x04060608 // base on 0x30  //for MCS=11,10,09,08  //26,27,27,28dBm
+0xe1c 0xffffffff 0x00020204 // base on 0x30  //for MCS=15,14,13,12  //24,25,25,26dBm
+// For Ant B
+0x830 0xffffffff 0x06080808 // base on 0x32  //for 18M,12M,09M,06M  //same as Ant A
+0x834 0xffffffff 0x00040406 // base on 0x32  //for 54M,48M,36M,24M
+0x838 0xffffff00 0x000000   // base on 0x34  //for CCK 1M, 2M, 5.5M, use 28dB
+0x86c 0x000000ff 0x00	    // base on 0x34  //for CCK 11M, use 28dB
+0x83c 0xffffffff 0x04060608 // base on 0x32  //for MCS=03,02,01,00
+0x848 0xffffffff 0x00020204 // base on 0x32  //for MCS=07,06,05,04
+0x84c 0xffffffff 0x04060608 // base on 0x32  //for MCS=11,10,09,08
+0x868 0xffffffff 0x00020204 // base on 0x32  //for MCS=15,14,13,12
+0xff

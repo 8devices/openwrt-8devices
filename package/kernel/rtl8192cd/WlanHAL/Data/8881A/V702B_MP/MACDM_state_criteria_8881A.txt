@@ -1,0 +1,15 @@
+////Release version: 8881A.0820.2013
+// State: 
+//	1.) MACDM_TP_STATE_DEFAULT
+//	2.) MACDM_TP_STATE_GENERAL
+//	3.) MACDM_TP_STATE_TXOP
+// So, we need four criteria
+//	1.) MACDM_TP_THRS_DEF_TO_GEN
+//	2.) MACDM_TP_THRS_GEN_TO_DEF
+//	3.) MACDM_TP_THRS_GEN_TO_TXOP
+//	4.) MACDM_TP_THRS_TXOP_TO_GEN
+0x1
+0x2
+0x3
+0x4
+0xffff

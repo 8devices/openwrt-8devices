@@ -1,0 +1,35 @@
+////Release version: 8881A.0820.2013
+// State: 
+//	1.) MACDM_TP_STATE_DEFAULT
+//	2.) MACDM_TP_STATE_GENERAL
+//	3.) MACDM_TP_STATE_TXOP
+// So, we need four criteria
+//	1.) MACDM_TP_THRS_DEF_TO_GEN
+//            a.) RSSI low
+//            b.) RSSI normal
+//            c.) RSSI high
+//	2.) MACDM_TP_THRS_GEN_TO_DEF
+//            a.) RSSI low
+//            b.) RSSI normal
+//            c.) RSSI high
+//	3.) MACDM_TP_THRS_GEN_TO_TXOP
+//            a.) RSSI low
+//            b.) RSSI normal
+//            c.) RSSI high
+//	4.) MACDM_TP_THRS_TXOP_TO_GEN
+//            a.) RSSI low
+//            b.) RSSI normal
+//            c.) RSSI high
+0x1a
+0x1b
+0x1c
+0x2a
+0x2b
+0x2c
+0x3a
+0x3b
+0x3c
+0x4a
+0x4b
+0x4c
+0xffff
