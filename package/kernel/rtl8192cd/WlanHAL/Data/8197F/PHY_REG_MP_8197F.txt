@@ -1,2 +1,0 @@
-0x8fc  0x00000000 // dummy setting for driver from header
-0xffff 0xffff
