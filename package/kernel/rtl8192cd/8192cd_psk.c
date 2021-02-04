@@ -2099,7 +2099,7 @@ static void ToDrv_SetPort(struct rtl8192cd_priv *priv, struct stat_info *pstat, 
 	rtl8192cd_ioctl_priv_daemonreq(priv->dev, &wrq);
 }
 
-void ToDrv_SetIE(struct rtl8192cd_priv *priv) 
+static void ToDrv_SetIE(struct rtl8192cd_priv *priv) 
 {
 	struct iw_point wrq;
 	DOT11_SET_RSNIE Set_Rsnie;

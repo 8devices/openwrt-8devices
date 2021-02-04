@@ -89,35 +89,18 @@ config SOC_ENABLE_EFUSE
 
 config	BT_COEXIST
 	bool "Bluetooth Coexist support"
-	depends on (WLAN_HAL_8197F)
+	depends on WLAN_HAL_8197F
 	default n
-	
-choice 
-	prompt "Choose WiFi-BT configuration"
-	depends on (BT_COEXIST) 
-	default BT_COEXIST_8197F_8761
-config 	BT_COEXIST_8197F_8761
-	bool "8197F+8761"
-#config 	BT_COEXIST_8197F_8822B
-#	bool "8197F+8822B"
-endchoice
-choice 
-	prompt "RTK mode / 3-wire mode"
-	depends on (BT_COEXIST) 
-	default RTK_MODE
-config 	RTK_MODE
-	bool "RTK mode"
-config 	THREE_WIRE_MODE
-	bool "3-wire mode"
-endchoice
 
-	
-	
+config BT_COEXIST_SOCKET
+	bool
+	depends on BT_COEXIST && WLAN_HAL_8197F
+	default y
+
 config BT_REPEATER_CONFIG
 	bool "Realtek Blueooth repeater config"
 	depends on WLAN_HAL_8822BE
 	default n
-	
 #config USE_Lextra_BUS
 #	bool "USE Lextra BUS WiFi device"
 #	depends on CONFIG_RTL_8881A && RTL8192CD
@@ -750,7 +733,7 @@ config RTL_8812_1T1R_SUPPORT
 
 config RTL_DUAL_BAND_SELECTIVE
 	bool "Realtek Dual Band 2G/5G selective support "
-	depends on (RTL_8812_SUPPORT || WLAN_HAL_8822BE)
+	depends on RTL_8812_SUPPORT
 	default n	
 
 config RTL_HOSTAPD_SUPPORT
@@ -765,12 +748,7 @@ config SHARE_XCAP_SUPPORT
 
 config RF_DPK_SETTING_SUPPORT
 	bool "DPK support"
-	depends on (WLAN_HAL_8197F && (SOC_RFE_TYPE_0 || SOC_RFE_TYPE_2 || SOC_RFE_TYPE_3))
-	default n
-
-config RF_KFREE_SUPPORT
-	bool "KFree support"
-	depends on (WLAN_HAL_8197F || WLAN_HAL_8198F  || WLAN_HAL_8822BE)
+	depends on (WLAN_HAL_8197F)
 	default n
 
 #config HIGH_POWER_EXT_PA
@@ -983,14 +961,6 @@ config RTL_MESH_CROSSBAND
           and 5GHz WiFI clients trunk to 2.4GHZ Mesh. It is implemented
           through GUEST_ZONE in bridge layer.
 
-config RTL_MESH_METRIC_REFINE
-	bool "Support Auto Cross-Band"
-	depends on RTL8192CD && RTL_MESH_SUPPORT
-	default n
-	help
-	  This feature is a refinement on the metric calculation for dynamically
-	  choosing the best path between mesh points across 5GHz and 2.4GHz interfaces.
-
 config RTL_A4_STA_SUPPORT
 	bool "RTL A4_STA Support"
 	depends on RTL8192CD
@@ -1026,11 +996,6 @@ config RTK_SMART_ROAMING
 	bool "RTK Smart Roaming Support"
 	depends on RTL8192CD
 	default n
-
-config RTL_CROSSBAND_REPEATER_SUPPORT
-	depends on RTL8192CD && RTL_REPEATER_MODE_SUPPORT && ((USE_PCIE_SLOT_0 && USE_PCIE_SLOT_1) || (SOC_WIFI && USE_PCIE_SLOT_0)|| RTL_92D_DMDP) 
-	bool "Crossband Repeater Support" 
-	default n
 	
 config RTL_SIMPLE_CONFIG
 	bool "Realtek Simple Config Support"
@@ -1047,7 +1012,7 @@ config RTL_DOT11K_SUPPORT
 	default n
 
 config RTL_11V_SUPPORT
-#	depends on RTL_DOT11K_SUPPORT
+	depends on RTL_DOT11K_SUPPORT
 	bool "IEEE 802.11V Support(BSS Transition)"
     	default n
 	
@@ -1085,11 +1050,6 @@ config STA_ROAMING_CHECK
     bool "sta roaming check"
     default n
 		
-config WLAN_VDEV_SUPPORT
-    bool "Wlan virtual device support"
-    depends on RTL_ISP_MULTI_WAN_SUPPORT
-    default n
-
 ##########################################################################
 # Select WiFi Band on Wlan0
 ##########################################################################

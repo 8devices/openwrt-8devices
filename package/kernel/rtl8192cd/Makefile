@@ -4,6 +4,74 @@
 # Makefile for the Linux Wireless network device drivers.
 #
 
+CONFIG_BAND_5G_ON_WLAN0=y
+CONFIG_FREE_WBB_PIN=y
+CONFIG_MAC_PHY_RF_Parameter_V702B_Skyworth=y
+CONFIG_PCI_HCI=y
+CONFIG_PHY_EAT_40MHZ=y
+CONFIG_RTL_5G_SLOT_0=y
+CONFIG_RTL_CLIENT_MODE_SUPPORT=y
+CONFIG_RTL_COMAPI_WLTOOLS=y
+CONFIG_RTL_DFS_SUPPORT=y
+CONFIG_RTL_DISABLE_WLAN_MIPS16=y
+CONFIG_RTL_ODM_WLAN_DRIVER=y
+CONFIG_RTL_REPEATER_MODE_SUPPORT=y
+CONFIG_RTL_TDLS_SUPPORT=y
+CONFIG_RTL_VAP_SUPPORT=y
+CONFIG_RTL_WPS2_SUPPORT=y
+CONFIG_SLOT_0_8822BE=y
+CONFIG_SLOT_0_RFE_TYPE_10=y
+CONFIG_SLOT_0_TX_BEAMFORMING=y
+CONFIG_SOC_RFE_TYPE_0=y
+CONFIG_SOC_WIFI=y
+CONFIG_TXPWR_LMT=y
+CONFIG_USE_PCIE_SLOT_0=y
+CONFIG_WIRELESS_LAN_MODULE=y
+CONFIG_WLAN_HAL=y
+CONFIG_WLAN_HAL_8197F=y
+CONFIG_WLAN_HAL_8822BE=y
+CONFIG_WLAN_HAL_88XX=y
+CONFIG_WLAN_MACHAL_API=y
+CONFIG_RTL_819X_SWCORE=y
+CONFIG_RTL_NO_BR_SHORTCUT=y
+
+ccflags-y += -DCONFIG_RTL_COMAPI_WLTOOLS
+ccflags-y += -DCONFIG_BAND_5G_ON_WLAN0
+ccflags-y += -DCONFIG_FREE_WBB_PIN
+ccflags-y += -DCONFIG_MAC_PHY_RF_Parameter_V702B_Skyworth
+ccflags-y += -DCONFIG_PCI_HCI
+ccflags-y += -DCONFIG_PHY_EAT_40MHZ
+ccflags-y += -DCONFIG_RTL_5G_SLOT_0
+ccflags-y += -DCONFIG_RTL_CLIENT_MODE_SUPPORT
+ccflags-y += -DCONFIG_RTL_DFS_SUPPORT
+ccflags-y += -DCONFIG_RTL_DISABLE_WLAN_MIPS16
+ccflags-y += -DCONFIG_RTL_ODM_WLAN_DRIVER
+ccflags-y += -DCONFIG_RTL_REPEATER_MODE_SUPPORT
+ccflags-y += -DCONFIG_RTL_TDLS_SUPPORT
+ccflags-y += -DCONFIG_RTL_VAP_SUPPORT
+ccflags-y += -DCONFIG_RTL_WPS2_SUPPORT
+ccflags-y += -DCONFIG_SLOT_0_8822BE
+ccflags-y += -DCONFIG_SLOT_0_RFE_TYPE_10
+ccflags-y += -DCONFIG_SLOT_0_TX_BEAMFORMING
+ccflags-y += -DCONFIG_SOC_RFE_TYPE_0
+ccflags-y += -DCONFIG_SOC_WIFI
+ccflags-y += -DCONFIG_TXPWR_LMT
+ccflags-y += -DCONFIG_USE_PCIE_SLOT_0
+ccflags-y += -DCONFIG_WIRELESS_LAN_MODULE
+ccflags-y += -DCONFIG_WLAN_HAL
+ccflags-y += -DCONFIG_WLAN_HAL_8197F
+ccflags-y += -DCONFIG_WLAN_HAL_8822BE
+ccflags-y += -DCONFIG_WLAN_HAL_88XX
+ccflags-y += -DCONFIG_WLAN_MACHAL_API
+ccflags-y += -DCONFIG_RTL_819X_SWCORE
+ccflags-y += -DCONFIG_RTL_NO_BR_SHORTCUT
+
+$(info CFLAGS BL $(CFLAGS))
+
+ifeq ($(CPTCFG_RTL8192CD),m)
+CONFIG_RTL8192CD:=m
+endif
+
 ifeq ($(CONFIG_RTL_92C_SUPPORT),y)
 RTL_WLAN_DATA_DIR := data
 endif
@@ -133,13 +201,9 @@ endif
 
 ifeq ($(CONFIG_RTK_SMART_ROAMING),y)
 	rtl8192cd-objs += 8192cd_smart_roaming.o
-else
-ifeq ($(CONFIG_RTL_11V_SUPPORT),y)
-	rtl8192cd-objs += 8192cd_smart_roaming.o
-endif
 endif
 
-obj-$(CONFIG_RTL_WAPI_SUPPORT) += wapi_wai.o wapiCrypto.o wapiRandom.o
+#obj-$(CONFIG_RTL_WAPI_SUPPORT) += wapi_wai.o wapiCrypto.o wapiRandom.o
 obj-$(CONFIG_RTL8192CD) += rtl8192cd.o
 
 ifeq ($(CONFIG_RTL_88E_SUPPORT),y)
@@ -279,11 +343,11 @@ endif
 ifeq ($(CONFIG_BT_COEXIST),y)
 	EXTRA_CFLAGS += -I$(src)/btcoexist
 	rtl8192cd-objs += \
-	8192cd_btcoexist.o \
-	btcoexist/btcoexist_cmd.o \
-	btcoexist/btcoexist_init.o \
-	btcoexist/hal/hal_btcoexist.o \
-	btcoexist/hal/hal_btc/hal_btc_chip/hal_btc_8197f.o 
+	btcoexist/rtl_btc.o
+	ifeq ($(CONFIG_BT_COEXIST_SOCKET),y)
+		rtl8192cd-objs += \
+		btcoexist/halbtc_socket.o
+	endif
 endif
 
 rtl8192cd-objs +=\
@@ -296,7 +360,6 @@ rtl8192cd-objs +=\
 	8192cd_security.o\
 	8192cd_tkip.o\
 	8192cd_aes.o\
-	8192cd_debug.o\
 	8192cd_proc.o\
 	8192cd_br_ext.o\
 	8192cd_eeprom.o\
@@ -347,7 +410,7 @@ obj-y += 8192cd_p2p.o
 endif
 endif
 ifeq ($(CONFIG_RTL_COMAPI_WLTOOLS),y)
-obj-y += 8192cd_comapi.o
+rtl8192cd-objs += 8192cd_comapi.o
 endif
 ifeq ($(CONFIG_PACP_SUPPORT),y)
 obj-y += 8192cd_comapi.o
@@ -554,6 +617,10 @@ $(obj)/data_%.c: $(src)/$(RTL_WLAN_DATA_DIR_92E)/%.bin FORCE
 $(obj)/data_%.c: $(src)/$(RTL_WLAN_DATA_DIR_92E)/%.BIN FORCE
 	$(obj)/bin2c.pl $(notdir $(basename $@)) < $< > $@
 
+ifneq ($(TARGET_PROFILE),)
+$(obj)/data_%.c: $(src)/$(RTL_WLAN_DATA_DIR_97F)/%_$(TARGET_PROFILE).override FORCE
+	$(obj)/bin2c.pl $(notdir $(basename $@)) < $< > $@
+endif
 $(obj)/data_%.c: $(src)/$(RTL_WLAN_DATA_DIR_97F)/%.txt FORCE
 	$(obj)/bin2c.pl $(notdir $(basename $@)) < $< > $@
 $(obj)/data_%.c: $(src)/$(RTL_WLAN_DATA_DIR_97F)/%.bin FORCE
@@ -561,6 +628,10 @@ $(obj)/data_%.c: $(src)/$(RTL_WLAN_DATA_DIR_97F)/%.bin FORCE
 $(obj)/data_%.c: $(src)/$(RTL_WLAN_DATA_DIR_97F)/%.BIN FORCE
 	$(obj)/bin2c.pl $(notdir $(basename $@)) < $< > $@
 
+ifneq ($(TARGET_PROFILE),)
+$(obj)/data_%.c: $(src)/$(RTL_WLAN_DATA_DIR_8822B)/%_$(TARGET_PROFILE).override FORCE
+	$(obj)/bin2c.pl $(notdir $(basename $@)) < $< > $@
+endif
 $(obj)/data_%.c: $(src)/$(RTL_WLAN_DATA_DIR_8822B)/%.txt FORCE
 	$(obj)/bin2c.pl $(notdir $(basename $@)) < $< > $@
 $(obj)/data_%.c: $(src)/$(RTL_WLAN_DATA_DIR_8822B)/%.bin FORCE

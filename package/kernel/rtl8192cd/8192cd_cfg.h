@@ -3933,7 +3933,7 @@
 #define NUM_TX_DESC    128
 #define RTL8192CD_NUM_VWLAN  4
 #else
-#define RTL8192CD_NUM_VWLAN  (8+1) //eric-vap, add one more for open-wrt scan iface
+#define RTL8192CD_NUM_VWLAN  4 //eric-vap, add one more for open-wrt scan iface
 #endif
 
 //#define CUSTOMIZE_FLASH_EFUSE //Only 8812 read EFUSE except MAC address
@@ -4103,7 +4103,6 @@
 #define STA_CONNECT_AUTH_TIME_OUT		10	// authenticating time out
 #define STA_CONNECT_4_WAY_TIME_OUT		11	// 4-way handshake time out
 #define STA_CONNECT_4_WAY_ONDEAUTH		12	// Receive Deauth in 4-way handshake
-
 
 #endif // _8192CD_CFG_H_
 

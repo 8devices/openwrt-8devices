@@ -1159,63 +1159,66 @@ static __inline__ unsigned int check_icverr_drop(struct rtl8192cd_priv *priv, st
 #endif
 
 #ifdef BR_SHORTCUT
-#ifdef CONFIG_RTL8672
-extern struct net_device *get_eth_cached_dev(unsigned char *da);
-#else
-#ifdef CONFIG_RTL_819X
-__inline__ struct net_device *get_eth_cached_dev(unsigned char *da)
-{
-#if defined(CONFIG_RTL_819X_SWCORE)	
-    extern unsigned char cached_eth_addr[MACADDRLEN];
-    extern struct net_device *cached_dev;
+    #ifdef CONFIG_RTL8672
+	extern struct net_device *get_eth_cached_dev(unsigned char *da);
+    #else
+	#ifdef CONFIG_RTL_819X
+	    __inline__ struct net_device *get_eth_cached_dev(unsigned char *da)
+	    {
+		#if defined(CONFIG_RTL_819X_SWCORE)	
+		    extern unsigned char cached_eth_addr[MACADDRLEN];
+		    extern struct net_device *cached_dev;
 
-    #if !defined(NOT_RTK_BSP) && !defined(__ECOS)
-    extern unsigned char cached_eth_addr2[MACADDRLEN];
-    extern struct net_device *cached_dev2;
+		    #if !defined(NOT_RTK_BSP) && !defined(__ECOS)
+			extern unsigned char cached_eth_addr2[MACADDRLEN];
+			extern struct net_device *cached_dev2;
 
-    extern unsigned char cached_eth_addr3[MACADDRLEN];
-    extern struct net_device *cached_dev3;
+			extern unsigned char cached_eth_addr3[MACADDRLEN];
+			extern struct net_device *cached_dev3;
 
-    extern unsigned char cached_eth_addr4[MACADDRLEN];
-    extern struct net_device *cached_dev4;
-    #endif // !NOT_RTK_BSP
-#endif
+			extern unsigned char cached_eth_addr4[MACADDRLEN];
+			extern struct net_device *cached_dev4;
+		    #endif // !NOT_RTK_BSP
+		#endif
 
-    struct net_device * dev = NULL;
-    #if defined(__KERNEL__) || defined(__OSK__)
-    struct net_bridge_port *br_port;
+		struct net_device * dev = NULL;
+		
+		#if defined(__KERNEL__) || defined(__OSK__)
+		    struct net_bridge_port *br_port;
+		#endif
+
+		#if defined(CONFIG_RTL_819X_SWCORE)	
+		    if (cached_dev && isEqualMACAddr(da, cached_eth_addr))
+    			dev = cached_dev;
+    			
+		    #if !defined(NOT_RTK_BSP) && !defined(__ECOS)
+			else if (cached_dev2 && isEqualMACAddr(da, cached_eth_addr2))
+    			    dev = cached_dev2;
+			else if (cached_dev3 && isEqualMACAddr(da, cached_eth_addr3))
+    			    dev = cached_dev3;
+			else if (cached_dev4 && isEqualMACAddr(da, cached_eth_addr4))	
+    			    dev = cached_dev4;
+		    #endif // !NOT_RTK_BSP
+		#endif
+
+
+		#if defined(__KERNEL__) || defined(__OSK__)
+		    if (dev) {
+    			br_port = GET_BR_PORT(dev);
+    			if (br_port) {
+        		    if (br_port->br->stp_enabled && br_port->state != BR_STATE_FORWARDING) {               
+            			dev = NULL;
+        		    }
+    			}  
+		    }
+		#endif            
+
+		return dev;      
+	    }
+	#endif
     #endif
-
-#if defined(CONFIG_RTL_819X_SWCORE)	
-    if (cached_dev && isEqualMACAddr(da, cached_eth_addr))
-        dev = cached_dev;
-    #if !defined(NOT_RTK_BSP) && !defined(__ECOS)
-    else if (cached_dev2 && isEqualMACAddr(da, cached_eth_addr2))
-        dev = cached_dev2;
-    else if (cached_dev3 && isEqualMACAddr(da, cached_eth_addr3))
-        dev = cached_dev3;
-    else if (cached_dev4 && isEqualMACAddr(da, cached_eth_addr4))	
-        dev = cached_dev4;
-    #endif // !NOT_RTK_BSP
 #endif
 
-
-    #if defined(__KERNEL__) || defined(__OSK__)
-    if(dev) {
-        br_port = GET_BR_PORT(dev);
-        if(br_port) {
-            if(br_port->br->stp_enabled && br_port->state != BR_STATE_FORWARDING) {               
-                dev = NULL;
-            }
-        }  
-    }
-    #endif            
-
-    return dev;      
-}
-#endif
-#endif
-#endif
 
 #if ((defined(CONFIG_RTK_VLAN_SUPPORT) && defined(CONFIG_RTK_VLAN_FOR_CABLE_MODEM)) || defined(MCAST2UI_REFINE))
 extern struct net_device* re865x_get_netdev_by_name(const char* name);

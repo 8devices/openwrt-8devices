@@ -30569,8 +30569,8 @@ void clean_for_join(struct rtl8192cd_priv *priv)
 			((priv->pmib->dot1180211AuthEntry.dot11PrivacyAlgrthm == _TKIP_PRIVACY_) ||
 			 (priv->pmib->dot1180211AuthEntry.dot11PrivacyAlgrthm == _CCMP_PRIVACY_) ||
 			 (priv->pmib->dot1180211AuthEntry.dot11PrivacyAlgrthm == _WEP_WPA_MIXED_PRIVACY_))) {
-		priv->wpa_global_info->GN = 0;
-		memset(&priv->wpa_global_info->GTK, 0, NumGroupKey * GTK_LEN);
+///////		priv->wpa_global_info->GN = 0;
+///////		memset(&priv->wpa_global_info->GTK, 0, NumGroupKey * GTK_LEN);
 		memset(&(priv->pmib->dot11GroupKeysTable), 0, sizeof(struct Dot11KeyMappingsEntry));
 #ifdef UNIVERSAL_REPEATER
 		if (IS_ROOT_INTERFACE(priv))

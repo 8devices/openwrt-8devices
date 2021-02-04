@@ -14898,17 +14898,17 @@ int MDL_INIT __rtl8192cd_init(unsigned long base_addr)
 #endif
 
 #if defined(CONFIG_WIRELESS_LAN_MODULE) && !defined(NOT_RTK_BSP)
-	wirelessnet_hook = GetCpuCanSuspend;
+////	wirelessnet_hook = GetCpuCanSuspend;
 #ifdef BR_SHORTCUT
-	wirelessnet_hook_shortcut = get_shortcut_dev;
+////	wirelessnet_hook_shortcut = get_shortcut_dev;
 #endif
 #ifdef PERF_DUMP
 	Fn_rtl8651_romeperfEnterPoint = rtl8651_romeperfEnterPoint;
 	Fn_rtl8651_romeperfExitPoint = rtl8651_romeperfExitPoint;
 #endif
 #ifdef CONFIG_RTL8190_PRIV_SKB
-	wirelessnet_hook_is_priv_buf = is_rtl8190_priv_buf;
-	wirelessnet_hook_free_priv_buf = free_rtl8190_priv_buf;
+////	wirelessnet_hook_is_priv_buf = is_rtl8190_priv_buf;
+////	wirelessnet_hook_free_priv_buf = free_rtl8190_priv_buf;
 #endif
 #endif // CONFIG_WIRELESS_LAN_MODULE && !NOT_RTK_BSP
 #endif // __KERNEL__
@@ -15175,17 +15175,17 @@ void MDL_EXIT rtl8192cd_exit (void)
 #endif
 
 #if defined(CONFIG_WIRELESS_LAN_MODULE) && !defined(NOT_RTK_BSP)
-	wirelessnet_hook = NULL;
+////	wirelessnet_hook = NULL;
 #ifdef BR_SHORTCUT
-	wirelessnet_hook_shortcut = NULL;
+////	wirelessnet_hook_shortcut = NULL;
 #endif
 #ifdef PERF_DUMP
 	Fn_rtl8651_romeperfEnterPoint = NULL;
 	Fn_rtl8651_romeperfExitPoint = NULL;
  #endif
 #ifdef CONFIG_RTL8190_PRIV_SKB
-	wirelessnet_hook_is_priv_buf = NULL;
-	wirelessnet_hook_free_priv_buf = NULL;
+////	wirelessnet_hook_is_priv_buf = NULL;
+////	wirelessnet_hook_free_priv_buf = NULL;
 #endif
 #endif // CONFIG_WIRELESS_LAN_MODULE && !NOT_RTK_BSP
 

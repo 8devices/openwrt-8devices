@@ -2020,7 +2020,7 @@ EXTERN void HostPCIe_Close(void);
 #define EXTERN
 #endif
 
-EXTERN void ToDrv_SetIE(struct rtl8192cd_priv *priv); 
+//EXTERN void ToDrv_SetIE(struct rtl8192cd_priv *priv); 
 EXTERN void ConstructIE(struct rtl8192cd_priv *priv, unsigned char *pucOut, int *usOutLen);
 EXTERN void derivePSK(struct rtl8192cd_priv *priv);
 EXTERN void psk_init(struct rtl8192cd_priv *priv);
