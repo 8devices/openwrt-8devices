@@ -63,7 +63,7 @@ Signed-off-by: Seevalamuthu Mariappan <seevalam@codeaurora.org>
  
  	if (test_bit(ATH11K_FLAG_CRASH_FLUSH, &ar->ab->dev_flags))
  		return -ESHUTDOWN;
-@@ -198,6 +226,36 @@ tcl_ring_sel:
+@@ -203,6 +231,36 @@ tcl_ring_sel:
  		goto fail_remove_idr;
  	}
  
@@ -100,7 +100,7 @@ Signed-off-by: Seevalamuthu Mariappan <seevalam@codeaurora.org>
  	ti.paddr = dma_map_single(ab->dev, skb->data, skb->len, DMA_TO_DEVICE);
  	if (dma_mapping_error(ab->dev, ti.paddr)) {
  		atomic_inc(&ab->soc_stats.tx_err.misc_fail);
-@@ -206,7 +264,7 @@ tcl_ring_sel:
+@@ -211,7 +269,7 @@ tcl_ring_sel:
  		goto fail_remove_idr;
  	}
  
@@ -109,7 +109,7 @@ Signed-off-by: Seevalamuthu Mariappan <seevalam@codeaurora.org>
  	skb_cb->paddr = ti.paddr;
  	skb_cb->vif = arvif->vif;
  	skb_cb->ar = ar;
-@@ -259,6 +317,8 @@ fail_unmap_dma:
+@@ -265,6 +323,8 @@ fail_unmap_dma:
  	dma_unmap_single(ab->dev, ti.paddr, ti.data_len, DMA_TO_DEVICE);
  
  fail_remove_idr:
@@ -327,7 +327,7 @@ Signed-off-by: Seevalamuthu Mariappan <seevalam@codeaurora.org>
  		 struct sk_buff *skb);
 --- a/drivers/net/wireless/ath/ath11k/mac.c
 +++ b/drivers/net/wireless/ath/ath11k/mac.c
-@@ -7763,6 +7763,9 @@ static int __ath11k_mac_register(struct
+@@ -7966,6 +7966,9 @@ static int __ath11k_mac_register(struct
  		goto err_free;
  	}
  
@@ -349,7 +349,7 @@ Signed-off-by: Seevalamuthu Mariappan <seevalam@codeaurora.org>
  /* misc utils */
  
  static inline void ieee80211_tx_stats(struct net_device *dev, u32 len)
-@@ -3945,6 +3948,7 @@ void __ieee80211_subif_start_xmit(struct
+@@ -3941,6 +3944,7 @@ void __ieee80211_subif_start_xmit(struct
  	struct ieee80211_local *local = sdata->local;
  	struct sta_info *sta;
  	struct sk_buff *next;
@@ -357,7 +357,7 @@ Signed-off-by: Seevalamuthu Mariappan <seevalam@codeaurora.org>
  
  	if (unlikely(skb->len < ETH_HLEN)) {
  		kfree_skb(skb);
-@@ -3959,6 +3963,16 @@ void __ieee80211_subif_start_xmit(struct
+@@ -3955,6 +3959,16 @@ void __ieee80211_subif_start_xmit(struct
  	if (IS_ERR(sta))
  		sta = NULL;
  

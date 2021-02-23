@@ -13,11 +13,9 @@ Signed-off-by: Aloka Dixit <alokad@codeaurora.org>
  drivers/net/wireless/ath/ath11k/mac.c | 2 +-
  1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/drivers/net/wireless/ath/ath11k/mac.c b/drivers/net/wireless/ath/ath11k/mac.c
-index b4c075802b42..655d310a2a3a 100644
 --- a/drivers/net/wireless/ath/ath11k/mac.c
 +++ b/drivers/net/wireless/ath/ath11k/mac.c
-@@ -7671,7 +7671,7 @@ static const u8 ath11k_if_types_ext_capa_ap[] = {
+@@ -7802,7 +7802,7 @@ static const u8 ath11k_if_types_ext_capa
  	[2] = WLAN_EXT_CAPA3_MULTI_BSSID_SUPPORT,
  	[7] = WLAN_EXT_CAPA8_OPMODE_NOTIF,
  	[9] = WLAN_EXT_CAPA10_TWT_RESPONDER_SUPPORT,
@@ -26,6 +24,3 @@ index b4c075802b42..655d310a2a3a 100644
  };
  
  static const struct wiphy_iftype_ext_capab ath11k_iftypes_ext_capa[] = {
--- 
-2.25.0
-

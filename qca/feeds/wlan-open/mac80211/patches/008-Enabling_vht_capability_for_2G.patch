@@ -1,6 +1,6 @@
 --- a/net/mac80211/mlme.c
 +++ b/net/mac80211/mlme.c
-@@ -4855,8 +4855,6 @@ static int ieee80211_prep_channel(struct
+@@ -4863,8 +4863,6 @@ static int ieee80211_prep_channel(struct
  	bool is_6ghz = cbss->channel->band == NL80211_BAND_6GHZ;
  	struct ieee80211_bss *bss = (void *)cbss->priv;
  	int ret;
@@ -9,7 +9,7 @@
  
  	sband = local->hw.wiphy->bands[cbss->channel->band];
  
-@@ -4938,20 +4936,6 @@ static int ieee80211_prep_channel(struct
+@@ -4946,20 +4944,6 @@ static int ieee80211_prep_channel(struct
  			ifmgd->flags |= IEEE80211_STA_DISABLE_HE;
  	}
  

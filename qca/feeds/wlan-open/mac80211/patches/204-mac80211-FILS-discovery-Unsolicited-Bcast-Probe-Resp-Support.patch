@@ -1,6 +1,8 @@
---- a/drivers/net/wireless/ath/ath11k/mac.c
-+++ b/drivers/net/wireless/ath/ath11k/mac.c
-@@ -2434,6 +2434,63 @@ static void ath11k_recalculate_mgmt_rate
+Index: backports-20200902_001-5.4.55-931c337125/drivers/net/wireless/ath/ath11k/mac.c
+===================================================================
+--- backports-20200902_001-5.4.55-931c337125.orig/drivers/net/wireless/ath/ath11k/mac.c
++++ backports-20200902_001-5.4.55-931c337125/drivers/net/wireless/ath/ath11k/mac.c
+@@ -2544,6 +2544,63 @@ static void ath11k_recalculate_mgmt_rate
  		ath11k_warn(ar->ab, "failed to set beacon tx rate %d\n", ret);
  }
  
@@ -61,10 +63,10 @@
 +	return ret;
 +}
 +
- static void ath11k_mac_op_nss_bss_info_changed(struct ieee80211_hw *hw,
+ static void ath11k_mac_op_bss_info_changed(struct ieee80211_hw *hw,
  					   struct ieee80211_vif *vif,
- 					   u32 changed)
-@@ -2722,6 +2779,10 @@ static void ath11k_mac_op_bss_info_chang
+ 					   struct ieee80211_bss_conf *info,
+@@ -2810,6 +2867,10 @@ static void ath11k_mac_op_bss_info_chang
  		}
  	}
  
@@ -75,8 +77,10 @@
  	mutex_unlock(&ar->conf_mutex);
  }
  
---- a/drivers/net/wireless/ath/ath11k/wmi.c
-+++ b/drivers/net/wireless/ath/ath11k/wmi.c
+Index: backports-20200902_001-5.4.55-931c337125/drivers/net/wireless/ath/ath11k/wmi.c
+===================================================================
+--- backports-20200902_001-5.4.55-931c337125.orig/drivers/net/wireless/ath/ath11k/wmi.c
++++ backports-20200902_001-5.4.55-931c337125/drivers/net/wireless/ath/ath11k/wmi.c
 @@ -127,6 +127,10 @@ static const struct wmi_tlv_policy wmi_t
  		= { .min_len = sizeof(struct wmi_stats_event) },
  	[WMI_TAG_PDEV_CTL_FAILSAFE_CHECK_EVENT]
@@ -88,7 +92,7 @@
  	[WMI_TAG_TWT_ADD_DIALOG_COMPLETE_EVENT]
  		= { .min_len = sizeof(struct wmi_twt_add_dialog_event) },
  	[WMI_TAG_VDEV_DELETE_RESP_EVENT]
-@@ -3465,6 +3469,138 @@ int ath11k_wmi_send_bss_color_change_ena
+@@ -3483,6 +3487,138 @@ int ath11k_wmi_send_bss_color_change_ena
  	return ret;
  }
  
@@ -227,7 +231,7 @@
  static void
  ath11k_fill_band_to_mac_param(struct ath11k_base  *soc,
  			      struct wmi_host_pdev_band_to_mac *band_to_mac)
-@@ -7546,6 +7682,68 @@ static void ath11k_bcn_tx_status_event(s
+@@ -7592,6 +7728,68 @@ static void ath11k_bcn_tx_status_event(s
  }
  
  
@@ -296,7 +300,7 @@
  static void ath11k_wmi_tlv_op_rx(struct ath11k_base *ab, struct sk_buff *skb)
  {
  	struct wmi_cmd_hdr *cmd_hdr;
-@@ -7638,6 +7836,12 @@ static void ath11k_wmi_tlv_op_rx(struct
+@@ -7684,6 +7882,12 @@ static void ath11k_wmi_tlv_op_rx(struct
  	case WMI_TWT_ADD_DIALOG_EVENTID:
  		ath11k_wmi_twt_add_dialog_event(ab, skb);
  		break;
@@ -309,8 +313,10 @@
  	/* add Unsupported events here */
  	case WMI_TBTTOFFSET_EXT_UPDATE_EVENTID:
  	case WMI_PEER_OPER_MODE_CHANGE_EVENTID:
---- a/drivers/net/wireless/ath/ath11k/wmi.h
-+++ b/drivers/net/wireless/ath/ath11k/wmi.h
+Index: backports-20200902_001-5.4.55-931c337125/drivers/net/wireless/ath/ath11k/wmi.h
+===================================================================
+--- backports-20200902_001-5.4.55-931c337125.orig/drivers/net/wireless/ath/ath11k/wmi.h
++++ backports-20200902_001-5.4.55-931c337125/drivers/net/wireless/ath/ath11k/wmi.h
 @@ -349,6 +349,7 @@ enum wmi_tlv_cmd_id {
  	WMI_BCN_OFFLOAD_CTRL_CMDID,
  	WMI_BSS_COLOR_CHANGE_ENABLE_CMDID,
@@ -345,7 +351,7 @@
  	WMI_TAG_TPC_STATS_GET_CMD = 0x38B,
  	WMI_TAG_TPC_STATS_EVENT_FIXED_PARAM,
  	WMI_TAG_TPC_STATS_CONFIG_EVENT,
-@@ -4202,6 +4208,17 @@ struct wmi_peer_assoc_conf_arg {
+@@ -4223,6 +4229,17 @@ struct wmi_peer_assoc_conf_arg {
  	const u8 *macaddr;
  };
  
@@ -363,7 +369,7 @@
  /*
   * PDEV statistics
   */
-@@ -5234,6 +5251,30 @@ struct wmi_dma_buf_release_meta_data {
+@@ -5255,6 +5272,30 @@ struct wmi_dma_buf_release_meta_data {
  	u32 ch_width;
  } __packed;
  
@@ -394,7 +400,7 @@
  struct target_resource_config {
  	u32 num_vdevs;
  	u32 num_peers;
-@@ -5638,6 +5679,11 @@ int ath11k_wmi_vdev_spectral_enable(stru
+@@ -5659,6 +5700,11 @@ int ath11k_wmi_vdev_spectral_enable(stru
  				    u32 trigger, u32 enable);
  int ath11k_wmi_vdev_spectral_conf(struct ath11k *ar,
  				  struct ath11k_wmi_vdev_spectral_conf_param *param);
@@ -406,9 +412,11 @@
  int ath11k_wmi_pdev_m3_dump_enable(struct ath11k *ar, u32 enable);
  int ath11k_wmi_pdev_get_tpc_table_cmdid(struct ath11k *ar);
  void ath11k_wmi_free_tpc_stats_mem(struct ath11k *ar);
---- a/include/net/cfg80211.h
-+++ b/include/net/cfg80211.h
-@@ -1053,6 +1053,39 @@ struct cfg80211_acl_data {
+Index: backports-20200902_001-5.4.55-931c337125/include/net/cfg80211.h
+===================================================================
+--- backports-20200902_001-5.4.55-931c337125.orig/include/net/cfg80211.h
++++ backports-20200902_001-5.4.55-931c337125/include/net/cfg80211.h
+@@ -1070,6 +1070,39 @@ struct cfg80211_acl_data {
  };
  
  /**
@@ -448,7 +456,7 @@
   * enum cfg80211_ap_settings_flags - AP settings flags
   *
   * Used by cfg80211_ap_settings
-@@ -1099,6 +1132,8 @@ enum cfg80211_ap_settings_flags {
+@@ -1116,6 +1149,8 @@ enum cfg80211_ap_settings_flags {
   * @he_obss_pd: OBSS Packet Detection settings
   * @he_bss_color: BSS Color settings
   * @he_oper: HE operation IE (or %NULL if HE isn't enabled)
@@ -457,7 +465,7 @@
   */
  struct cfg80211_ap_settings {
  	struct cfg80211_chan_def chandef;
-@@ -1129,6 +1164,8 @@ struct cfg80211_ap_settings {
+@@ -1146,6 +1181,8 @@ struct cfg80211_ap_settings {
  	u32 flags;
  	struct ieee80211_he_obss_pd he_obss_pd;
  	struct cfg80211_he_bss_color he_bss_color;
@@ -466,8 +474,10 @@
  };
  
  /**
---- a/include/net/mac80211.h
-+++ b/include/net/mac80211.h
+Index: backports-20200902_001-5.4.55-931c337125/include/net/mac80211.h
+===================================================================
+--- backports-20200902_001-5.4.55-931c337125.orig/include/net/mac80211.h
++++ backports-20200902_001-5.4.55-931c337125/include/net/mac80211.h
 @@ -317,6 +317,9 @@ struct ieee80211_vif_chanctx_switch {
   * @BSS_CHANGED_TWT: TWT status changed
   * @BSS_CHANGED_HE_OBSS_PD: OBSS Packet Detection status changed.
@@ -487,7 +497,7 @@
  
  	/* when adding here, make sure to change ieee80211_reconfig */
  };
-@@ -505,6 +510,18 @@ struct ieee80211_ftm_responder_params {
+@@ -491,6 +496,18 @@ struct ieee80211_ftm_responder_params {
  };
  
  /**
@@ -506,26 +516,26 @@
   * struct ieee80211_bss_conf - holds the BSS's changing parameters
   *
   * This structure keeps information about a BSS (and an association
-@@ -622,6 +639,9 @@ struct ieee80211_ftm_responder_params {
+@@ -607,6 +624,9 @@ struct ieee80211_ftm_responder_params {
+  * @he_oper: HE operation information of the AP we are connected to
   * @he_obss_pd: OBSS Packet Detection parameters.
   * @he_bss_color: BSS coloring settings, if BSS supports HE
-  * @nss_ap_isolate: Used for notifying the NSS host about AP isolate feature
 + * @fils_discovery: FILS discovery configuration
 + * @unsol_bcast_probe_resp_interval: Unsolicited broadcast probe response
 + *	interval.
   */
  struct ieee80211_bss_conf {
  	const u8 *bssid;
-@@ -691,6 +711,8 @@ struct ieee80211_bss_conf {
+@@ -675,6 +695,8 @@ struct ieee80211_bss_conf {
+ 	struct ieee80211_he_obss_pd he_obss_pd;
  	struct ieee80211_he_cap_elem  he_cap_elem;
  	struct cfg80211_he_bss_color he_bss_color;
- 	bool nss_ap_isolate;
 +	struct ieee80211_fils_discovery fils_discovery;
 +	u32 unsol_bcast_probe_resp_interval;
  };
  
  /**
-@@ -1258,7 +1280,7 @@ ieee80211_tx_info_clear_status(struct ie
+@@ -1245,7 +1267,7 @@ ieee80211_tx_info_clear_status(struct ie
   * @RX_FLAG_AMPDU_EOF_BIT_KNOWN: The EOF value is known
   * @RX_FLAG_RADIOTAP_HE: HE radiotap data is present
   *	(&struct ieee80211_radiotap_he, mac80211 will fill in
@@ -534,7 +544,7 @@
   *	 - DATA3_DATA_MCS
   *	 - DATA3_DATA_DCM
   *	 - DATA3_CODING
-@@ -1266,7 +1288,7 @@ ieee80211_tx_info_clear_status(struct ie
+@@ -1253,7 +1275,7 @@ ieee80211_tx_info_clear_status(struct ie
   *	 - DATA5_DATA_BW_RU_ALLOC
   *	 - DATA6_NSTS
   *	 - DATA3_STBC
@@ -543,7 +553,7 @@
   *	from the RX info data, so leave those zeroed when building this data)
   * @RX_FLAG_RADIOTAP_HE_MU: HE MU radiotap data is present
   *	(&struct ieee80211_radiotap_he_mu)
-@@ -6629,4 +6651,30 @@ void ieee80211_update_muedca_params(stru
+@@ -6604,4 +6626,30 @@ void ieee80211_update_muedca_params(stru
  				    struct ieee80211_mu_edca_param_set
  				    *params);
  
@@ -574,9 +584,11 @@
 +					  struct ieee80211_vif *vif);
 +
  #endif /* MAC80211_H */
---- a/include/uapi/linux/nl80211.h
-+++ b/include/uapi/linux/nl80211.h
-@@ -2514,6 +2514,14 @@ enum nl80211_commands {
+Index: backports-20200902_001-5.4.55-931c337125/include/uapi/linux/nl80211.h
+===================================================================
+--- backports-20200902_001-5.4.55-931c337125.orig/include/uapi/linux/nl80211.h
++++ backports-20200902_001-5.4.55-931c337125/include/uapi/linux/nl80211.h
+@@ -2524,6 +2524,14 @@ enum nl80211_commands {
   * @NL80211_ATTR_HE_MUEDCA_PARAMS: MU-EDCA AC parameters for the
   *	%NL80211_CMD_UPDATE_HE_MUEDCA_PARAMS command.
   *
@@ -591,7 +603,7 @@
   * @NUM_NL80211_ATTR: total number of nl80211_attrs available
   * @NL80211_ATTR_MAX: highest attribute number currently defined
   * @__NL80211_ATTR_AFTER_LAST: internal use
-@@ -2997,6 +3005,11 @@ enum nl80211_attrs {
+@@ -3007,6 +3015,11 @@ enum nl80211_attrs {
  	NL80211_ATTR_HE_6GHZ_CAPABILITY,
  
  	NL80211_ATTR_HE_MUEDCA_PARAMS,
@@ -603,7 +615,7 @@
  	/* add attributes here, update the policy in nl80211.c */
  
  	__NL80211_ATTR_AFTER_LAST,
-@@ -6967,4 +6980,61 @@ enum nl80211_iftype_akm_attributes {
+@@ -7017,4 +7030,61 @@ enum nl80211_iftype_akm_attributes {
  	NL80211_IFTYPE_AKM_ATTR_MAX = __NL80211_IFTYPE_AKM_ATTR_LAST - 1,
  };
  
@@ -665,8 +677,10 @@
 +		__NL80211_UNSOL_BCAST_PROBE_RESP_LAST - 1
 +};
  #endif /* __LINUX_NL80211_H */
---- a/net/mac80211/cfg.c
-+++ b/net/mac80211/cfg.c
+Index: backports-20200902_001-5.4.55-931c337125/net/mac80211/cfg.c
+===================================================================
+--- backports-20200902_001-5.4.55-931c337125.orig/net/mac80211/cfg.c
++++ backports-20200902_001-5.4.55-931c337125/net/mac80211/cfg.c
 @@ -838,6 +838,59 @@ static int ieee80211_set_probe_resp(stru
  	return 0;
  }
@@ -727,7 +741,7 @@
  static int ieee80211_set_ftm_responder_params(
  				struct ieee80211_sub_if_data *sdata,
  				const u8 *lci, size_t lci_len,
-@@ -1109,6 +1162,23 @@ static int ieee80211_start_ap(struct wip
+@@ -1111,6 +1164,23 @@ static int ieee80211_start_ap(struct wip
  	}
  	changed |= err;
  
@@ -751,7 +765,7 @@
  	err = drv_start_ap(sdata->local, sdata);
  	if (err) {
  		old = sdata_dereference(sdata->u.ap.beacon, sdata);
-@@ -1164,6 +1234,8 @@ static int ieee80211_stop_ap(struct wiph
+@@ -1166,6 +1236,8 @@ static int ieee80211_stop_ap(struct wiph
  	struct ieee80211_local *local = sdata->local;
  	struct beacon_data *old_beacon;
  	struct probe_resp *old_probe_resp;
@@ -760,7 +774,7 @@
  	struct cfg80211_chan_def chandef;
  
  	sdata_assert_lock(sdata);
-@@ -1172,6 +1244,11 @@ static int ieee80211_stop_ap(struct wiph
+@@ -1174,6 +1246,11 @@ static int ieee80211_stop_ap(struct wiph
  	if (!old_beacon)
  		return -ENOENT;
  	old_probe_resp = sdata_dereference(sdata->u.ap.probe_resp, sdata);
@@ -772,7 +786,7 @@
  
  	/* abort any running channel switch */
  	mutex_lock(&local->mtx);
-@@ -1195,9 +1272,15 @@ static int ieee80211_stop_ap(struct wiph
+@@ -1197,9 +1274,15 @@ static int ieee80211_stop_ap(struct wiph
  	/* remove beacon and probe response */
  	RCU_INIT_POINTER(sdata->u.ap.beacon, NULL);
  	RCU_INIT_POINTER(sdata->u.ap.probe_resp, NULL);
@@ -788,9 +802,11 @@
  
  	kfree(sdata->vif.bss_conf.ftmr_params);
  	sdata->vif.bss_conf.ftmr_params = NULL;
---- a/net/mac80211/ieee80211_i.h
-+++ b/net/mac80211/ieee80211_i.h
-@@ -272,6 +272,18 @@ struct probe_resp {
+Index: backports-20200902_001-5.4.55-931c337125/net/mac80211/ieee80211_i.h
+===================================================================
+--- backports-20200902_001-5.4.55-931c337125.orig/net/mac80211/ieee80211_i.h
++++ backports-20200902_001-5.4.55-931c337125/net/mac80211/ieee80211_i.h
+@@ -271,6 +271,18 @@ struct probe_resp {
  	u8 data[];
  };
  
@@ -809,7 +825,7 @@
  struct ps_data {
  	/* yes, this looks ugly, but guarantees that we can later use
  	 * bitmap_empty :)
-@@ -287,6 +299,8 @@ struct ps_data {
+@@ -286,6 +298,8 @@ struct ps_data {
  struct ieee80211_if_ap {
  	struct beacon_data __rcu *beacon;
  	struct probe_resp __rcu *probe_resp;
@@ -818,9 +834,11 @@
  
  	/* to be used after channel switch. */
  	struct cfg80211_beacon_data *next_beacon;
---- a/net/mac80211/tx.c
-+++ b/net/mac80211/tx.c
-@@ -5010,6 +5010,57 @@ out:
+Index: backports-20200902_001-5.4.55-931c337125/net/mac80211/tx.c
+===================================================================
+--- backports-20200902_001-5.4.55-931c337125.orig/net/mac80211/tx.c
++++ backports-20200902_001-5.4.55-931c337125/net/mac80211/tx.c
+@@ -4999,6 +4999,57 @@ out:
  }
  EXPORT_SYMBOL(ieee80211_proberesp_get);
  
@@ -878,8 +896,10 @@
  struct sk_buff *ieee80211_pspoll_get(struct ieee80211_hw *hw,
  				     struct ieee80211_vif *vif)
  {
---- a/net/wireless/nl80211.c
-+++ b/net/wireless/nl80211.c
+Index: backports-20200902_001-5.4.55-931c337125/net/wireless/nl80211.c
+===================================================================
+--- backports-20200902_001-5.4.55-931c337125.orig/net/wireless/nl80211.c
++++ backports-20200902_001-5.4.55-931c337125/net/wireless/nl80211.c
 @@ -441,6 +441,21 @@ nl80211_tid_config_attr_policy[NL80211_T
  			NLA_POLICY_NESTED(nl80211_txattr_policy),
  };
@@ -986,11 +1006,10 @@
  static void nl80211_check_ap_rate_selectors(struct cfg80211_ap_settings *params,
  					    const u8 *rates)
  {
-@@ -5143,6 +5221,21 @@ static int nl80211_start_ap(struct sk_bu
- 		if (err)
- 			return err;
+@@ -5145,6 +5223,21 @@ static int nl80211_start_ap(struct sk_bu
+ 			goto out;
  	}
-+
+ 
 +	if (info->attrs[NL80211_ATTR_FILS_DISCOVERY]) {
 +		err = nl80211_parse_fils_discovery(info->attrs[NL80211_ATTR_FILS_DISCOVERY],
 +						   &params);
@@ -1005,6 +1024,7 @@
 +		if (err)
 +			return err;
 +	}
- 
++
  	nl80211_calculate_ap_params(&params);
  
+ 	if (info->attrs[NL80211_ATTR_EXTERNAL_AUTH_SUPPORT])

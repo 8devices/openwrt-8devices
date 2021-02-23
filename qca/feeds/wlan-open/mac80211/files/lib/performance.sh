@@ -34,7 +34,7 @@ perf_setup(){
                         return;
                 fi
 
-		if [ "$enable_nss" -eq 0 ]; then
+		if [ "$enable_nss" -eq 0 ] && [ -f /etc/init.d/qca-nss-ecm ]; then
 			/etc/init.d/qca-nss-ecm stop
 		fi
 
@@ -44,7 +44,7 @@ perf_setup(){
 		[ -d "/sys/class/net/wlan2" ] && echo e > /sys/class/net/wlan2/queues/rx-0/rps_cpus
 
 		[ -d "/proc/sys/dev/nss/n2hcfg/" ] && echo 2048 > /proc/sys/dev/nss/n2hcfg/n2h_queue_limit_core0
-		[ -d "/proc/sys/dev/nss/n2hcfg/" ] && echo 2048 > /proc/sys/dev/nss/n2hcfg/n2h_queue_limit_core1
+		# [ -d "/proc/sys/dev/nss/n2hcfg/" ] && echo 2048 > /proc/sys/dev/nss/n2hcfg/n2h_queue_limit_core1
 
 		[ -d "/proc/sys/dev/nss/rps/" ] && echo 14 > /proc/sys/dev/nss/rps/hash_bitmap
 	fi

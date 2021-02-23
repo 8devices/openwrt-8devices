@@ -34,7 +34,7 @@ Signed-off-by: P Praneesh <ppranees@codeaurora.org>
  	tcl_ring_retry = false;
 --- a/drivers/net/wireless/ath/ath11k/core.h
 +++ b/drivers/net/wireless/ath/ath11k/core.h
-@@ -837,9 +837,6 @@ struct ath11k_base {
+@@ -845,9 +845,6 @@ struct ath11k_base {
  	struct ath11k_ftm_event_obj ftm_event_obj;
  	u32 pktlog_defs_checksum;
  
@@ -43,4 +43,4 @@ Signed-off-by: P Praneesh <ppranees@codeaurora.org>
 -
  	struct ath11k_dbring_cap *db_caps;
  	u32 num_db_cap;
- 
+ 	u32 sw_pdev_id_map[MAX_RADIOS];

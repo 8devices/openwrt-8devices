@@ -7,6 +7,8 @@ without this ampdu density/smps is not being configured
 on 6ghz radio.
 Also fix smps configuration in peer assoc command.
 
+Add fix for sending Block ack with 256 bitmap in 11s mesh.
+
 Signed-off-by: Pradeep Kumar Chitrapu <pradeepc@codeaurora.org>
 ---
  drivers/net/wireless/ath/ath11k/mac.c | 89 +++++++++++++++++++++++----
@@ -16,8 +18,8 @@ Signed-off-by: Pradeep Kumar Chitrapu <pradeepc@codeaurora.org>
 
 --- a/drivers/net/wireless/ath/ath11k/mac.c
 +++ b/drivers/net/wireless/ath/ath11k/mac.c
-@@ -1919,17 +1919,76 @@ static void ath11k_peer_assoc_h_he(struc
- 		   sta->addr, arg->peer_nss, arg->peer_he_mcs_count);
+@@ -2002,17 +2002,76 @@ static void ath11k_peer_assoc_h_he(struc
+ 		   arg->peer_bw_rxnss_override);
  }
  
 +static void ath11k_peer_assoc_h_he_6ghz(struct ath11k *ar,
@@ -96,15 +98,15 @@ Signed-off-by: Pradeep Kumar Chitrapu <pradeepc@codeaurora.org>
  
  	switch (smps) {
  	case WLAN_HT_CAP_SM_PS_STATIC:
-@@ -2207,6 +2266,7 @@ static void ath11k_peer_assoc_prepare(st
+@@ -2291,6 +2350,7 @@ static void ath11k_peer_assoc_prepare(st
  	ath11k_peer_assoc_h_ht(ar, vif, sta, arg);
  	ath11k_peer_assoc_h_vht(ar, vif, sta, arg);
  	ath11k_peer_assoc_h_he(ar, vif, sta, arg);
 +	ath11k_peer_assoc_h_he_6ghz(ar, vif, sta, arg);
  	ath11k_peer_assoc_h_qos(ar, vif, sta, arg);
- 	ath11k_peer_assoc_h_phymode(ar, vif, sta, arg);
  	ath11k_peer_assoc_h_smps(sta, arg);
-@@ -2216,15 +2276,21 @@ static void ath11k_peer_assoc_prepare(st
+ 
+@@ -2299,15 +2359,21 @@ static void ath11k_peer_assoc_prepare(st
  
  static int ath11k_setup_peer_smps(struct ath11k *ar, struct ath11k_vif *arvif,
  				  const u8 *addr,
@@ -130,7 +132,7 @@ Signed-off-by: Pradeep Kumar Chitrapu <pradeepc@codeaurora.org>
  
  	if (smps >= ARRAY_SIZE(ath11k_smps_map))
  		return -EINVAL;
-@@ -2397,7 +2463,7 @@ static void ath11k_bss_assoc(struct ieee
+@@ -2480,7 +2546,7 @@ static void ath11k_bss_assoc(struct ieee
  	}
  
  	ret = ath11k_setup_peer_smps(ar, arvif, bss_conf->bssid,
@@ -139,7 +141,7 @@ Signed-off-by: Pradeep Kumar Chitrapu <pradeepc@codeaurora.org>
  	if (ret) {
  		ath11k_warn(ar->ab, "failed to setup peer SMPS for vdev %d: %d\n",
  			    arvif->vdev_id, ret);
-@@ -3623,7 +3689,7 @@ static int ath11k_station_assoc(struct a
+@@ -3706,7 +3772,7 @@ static int ath11k_station_assoc(struct a
  		return 0;
  
  	ret = ath11k_setup_peer_smps(ar, arvif, sta->addr,
@@ -148,7 +150,7 @@ Signed-off-by: Pradeep Kumar Chitrapu <pradeepc@codeaurora.org>
  	if (ret) {
  		ath11k_warn(ar->ab, "failed to setup peer SMPS for vdev %d: %d\n",
  			    arvif->vdev_id, ret);
-@@ -7643,7 +7709,7 @@ static int __ath11k_mac_register(struct
+@@ -7819,7 +7885,7 @@ static int __ath11k_mac_register(struct
  	ieee80211_hw_set(ar->hw, REPORTS_LOW_ACK);
  	ieee80211_hw_set(ar->hw, SUPPORTS_MULTI_BSSID);
  	ieee80211_hw_set(ar->hw, SUPPORTS_MULTI_BSSID_AP);
@@ -157,7 +159,7 @@ Signed-off-by: Pradeep Kumar Chitrapu <pradeepc@codeaurora.org>
  		ieee80211_hw_set(ar->hw, AMPDU_AGGREGATION);
  		ieee80211_hw_set(ar->hw, TX_AMPDU_SETUP_IN_HW);
  		ieee80211_hw_set(ar->hw, SUPPORTS_REORDERING_BUFFER);
-@@ -7658,7 +7724,7 @@ static int __ath11k_mac_register(struct
+@@ -7834,7 +7900,7 @@ static int __ath11k_mac_register(struct
  	 * for each band for a dual band capable radio. It will be tricky to
  	 * handle it when the ht capability different for each band.
  	 */
@@ -168,7 +170,7 @@ Signed-off-by: Pradeep Kumar Chitrapu <pradeepc@codeaurora.org>
  	ar->hw->wiphy->max_scan_ssids = WLAN_SCAN_PARAMS_MAX_SSID;
 --- a/include/linux/ieee80211.h
 +++ b/include/linux/ieee80211.h
-@@ -3394,6 +3394,8 @@ struct ieee80211_tspec_ie {
+@@ -3400,6 +3400,8 @@ struct ieee80211_tspec_ie {
  	__le16 medium_time;
  } __packed;
  
@@ -179,7 +181,17 @@ Signed-off-by: Pradeep Kumar Chitrapu <pradeepc@codeaurora.org>
  	__le16 capa;
 --- a/net/wireless/nl80211.c
 +++ b/net/wireless/nl80211.c
-@@ -6131,6 +6131,10 @@ static int nl80211_set_station_tdls(stru
+@@ -5239,8 +5239,7 @@ static int nl80211_start_ap(struct sk_bu
+ 		err = nl80211_parse_he_obss_pd(
+ 					info->attrs[NL80211_ATTR_HE_OBSS_PD],
+ 					&params.he_obss_pd);
+-		if (err)
+-			goto out;
++		goto out;
+ 	}
+ 
+ 	if (info->attrs[NL80211_ATTR_HE_BSS_COLOR]) {
+@@ -6133,6 +6132,10 @@ static int nl80211_set_station_tdls(stru
  
  		if (params->he_capa_len < NL80211_HE_MIN_CAPABILITY_LEN)
  			return -EINVAL;
@@ -190,3 +202,15 @@ Signed-off-by: Pradeep Kumar Chitrapu <pradeepc@codeaurora.org>
  	}
  
  	err = nl80211_parse_sta_channel_info(info, params);
+--- a/net/mac80211/mesh.c
++++ b/net/mac80211/mesh.c
+@@ -579,6 +579,9 @@ int mesh_add_he_cap_ie(struct ieee80211_
+ 	if (skb_tailroom(skb) < ie_len)
+ 		return -ENOMEM;
+ 
++	if (!sdata->vif.bss_conf.he_support)
++		sdata->vif.bss_conf.he_support = 1;
++
+ 	pos = skb_put(skb, ie_len);
+ 	ieee80211_ie_build_he_cap(pos, he_cap, pos + ie_len);
+ 

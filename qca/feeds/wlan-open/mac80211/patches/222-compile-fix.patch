@@ -1,0 +1,42 @@
+Index: backports-20200902_001-5.4.55-931c337125/net/mac80211/util.c
+===================================================================
+--- backports-20200902_001-5.4.55-931c337125.orig/net/mac80211/util.c
++++ backports-20200902_001-5.4.55-931c337125/net/mac80211/util.c
+@@ -3070,7 +3070,7 @@ u8 *ieee80211_ie_build_he_oper(u8 *pos,
+ 			he_6ghz_op->ccfs0 -= 8;
+ 		else
+ 			he_6ghz_op->ccfs0 += 8;
+-		/* fallthrough; */
++		break;
+ 	case NL80211_CHAN_WIDTH_80P80:
+ 		he_6ghz_op->control =
+ 			IEEE80211_HE_6GHZ_OPER_CTRL_CHANWIDTH_160MHZ;
+Index: backports-20200902_001-5.4.55-931c337125/drivers/net/wireless/ath/ath11k/peer.h
+===================================================================
+--- backports-20200902_001-5.4.55-931c337125.orig/drivers/net/wireless/ath/ath11k/peer.h
++++ backports-20200902_001-5.4.55-931c337125/drivers/net/wireless/ath/ath11k/peer.h
+@@ -26,6 +26,7 @@ struct ath11k_peer {
+ 	int peer_id;
+ 	u16 ast_hash;
+ 	u8 pdev_idx;
++	u16 hw_peer_id;
+ 
+ 	/* protected by ab->data_lock */
+ 	struct ieee80211_key_conf *keys[WMI_MAX_KEY_INDEX + 1];
+Index: backports-20200902_001-5.4.55-931c337125/include/linux/ath9k_platform.h
+===================================================================
+--- backports-20200902_001-5.4.55-931c337125.orig/include/linux/ath9k_platform.h
++++ backports-20200902_001-5.4.55-931c337125/include/linux/ath9k_platform.h
+@@ -49,6 +49,12 @@ struct ath9k_platform_data {
+ 
+ 	int num_leds;
+ 	const struct gpio_led *leds;
++
++	unsigned num_btns;
++	const struct gpio_keys_button *btns;
++	unsigned btn_poll_interval;
++
++	bool ubnt_hsr;
+ };
+ 
+ #endif /* _LINUX_ATH9K_PLATFORM_H */

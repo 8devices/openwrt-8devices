@@ -23,11 +23,9 @@ Signed-off-by: Aloka Dixit <alokad@codeaurora.org>
  net/mac80211/tx.c                     |  6 +--
  4 files changed, 98 insertions(+), 12 deletions(-)
 
-diff --git a/drivers/net/wireless/ath/ath11k/mac.c b/drivers/net/wireless/ath/ath11k/mac.c
-index 4ad9cc094d7b..ddc912303936 100644
 --- a/drivers/net/wireless/ath/ath11k/mac.c
 +++ b/drivers/net/wireless/ath/ath11k/mac.c
-@@ -1125,12 +1125,27 @@ static int ath11k_mac_setup_bcn_tmpl(struct ath11k_vif *arvif)
+@@ -1133,12 +1133,27 @@ static int ath11k_mac_setup_bcn_tmpl(str
  
  void ath11k_mac_bcn_tx_event(struct ath11k_vif *arvif)
  {
@@ -57,7 +55,7 @@ index 4ad9cc094d7b..ddc912303936 100644
  
  	if (!multiple_bssid)
  		return;
-@@ -5892,6 +5907,7 @@ ath11k_mac_vdev_start_restart(struct ath11k_vif *arvif,
+@@ -5984,6 +5999,7 @@ ath11k_mac_vdev_start_restart(struct ath
  	struct ath11k_base *ab = ar->ab;
  	struct wmi_vdev_start_req_arg arg = {};
  	int ret = 0;
@@ -65,7 +63,7 @@ index 4ad9cc094d7b..ddc912303936 100644
  
  	lockdep_assert_held(&ar->conf_mutex);
  
-@@ -5936,6 +5952,18 @@ ath11k_mac_vdev_start_restart(struct ath11k_vif *arvif,
+@@ -6028,6 +6044,18 @@ ath11k_mac_vdev_start_restart(struct ath
  
  	arg.channel.passive |= !!(chandef->chan->flags & IEEE80211_CHAN_NO_IR);
  
@@ -84,11 +82,9 @@ index 4ad9cc094d7b..ddc912303936 100644
  	ath11k_dbg(ab, ATH11K_DBG_MAC,
  		   "mac vdev %d start center_freq %d phymode %s\n",
  		   arg.vdev_id, arg.channel.freq,
-diff --git a/drivers/net/wireless/ath/ath11k/wmi.c b/drivers/net/wireless/ath/ath11k/wmi.c
-index 181ff2ae4422..58b65b84a372 100644
 --- a/drivers/net/wireless/ath/ath11k/wmi.c
 +++ b/drivers/net/wireless/ath/ath11k/wmi.c
-@@ -681,8 +681,13 @@ int ath11k_wmi_vdev_create(struct ath11k *ar, u8 *macaddr,
+@@ -691,8 +691,13 @@ int ath11k_wmi_vdev_create(struct ath11k
  	cmd->vdev_subtype = param->subtype;
  	cmd->num_cfg_txrx_streams = WMI_NUM_SUPPORTED_BAND_MAX;
  	cmd->pdev_id = param->pdev_id;
@@ -104,7 +100,7 @@ index 181ff2ae4422..58b65b84a372 100644
  	ether_addr_copy(cmd->vdev_macaddr.addr, macaddr);
  
  	ptr = skb->data + sizeof(*cmd);
-@@ -897,6 +902,12 @@ int ath11k_wmi_vdev_start(struct ath11k *ar, struct wmi_vdev_start_req_arg *arg,
+@@ -915,6 +920,12 @@ int ath11k_wmi_vdev_start(struct ath11k
  			cmd->flags |= WMI_VDEV_START_HIDDEN_SSID;
  		if (arg->pmf_enabled)
  			cmd->flags |= WMI_VDEV_START_PMF_ENABLED;
@@ -117,8 +113,6 @@ index 181ff2ae4422..58b65b84a372 100644
  	}
  
  	cmd->flags |= WMI_VDEV_START_LDPC_RX_ENABLED;
-diff --git a/drivers/net/wireless/ath/ath11k/wmi.h b/drivers/net/wireless/ath/ath11k/wmi.h
-index 297282a60fbd..5b7255afb912 100644
 --- a/drivers/net/wireless/ath/ath11k/wmi.h
 +++ b/drivers/net/wireless/ath/ath11k/wmi.h
 @@ -139,9 +139,11 @@ enum {
@@ -177,7 +171,7 @@ index 297282a60fbd..5b7255afb912 100644
  
  	WMI_MAX_EXT_SERVICE
  };
-@@ -2543,8 +2579,8 @@ struct wmi_vdev_create_cmd {
+@@ -2564,8 +2600,8 @@ struct wmi_vdev_create_cmd {
  	struct wmi_mac_addr vdev_macaddr;
  	u32 num_cfg_txrx_streams;
  	u32 pdev_id;
@@ -188,7 +182,7 @@ index 297282a60fbd..5b7255afb912 100644
  } __packed;
  
  struct wmi_vdev_txrx_streams {
-@@ -2626,6 +2662,9 @@ struct wmi_vdev_start_request_cmd {
+@@ -2647,6 +2683,9 @@ struct wmi_vdev_start_request_cmd {
  	u32 he_ops;
  	u32 cac_duration_ms;
  	u32 regdomain;
@@ -198,7 +192,7 @@ index 297282a60fbd..5b7255afb912 100644
  } __packed;
  
  #define MGMT_TX_DL_FRM_LEN		     64
-@@ -2795,6 +2834,9 @@ struct wmi_vdev_start_req_arg {
+@@ -2816,6 +2855,9 @@ struct wmi_vdev_start_req_arg {
  	u32 pref_rx_streams;
  	u32 pref_tx_streams;
  	u32 num_noa_descriptors;
@@ -208,7 +202,7 @@ index 297282a60fbd..5b7255afb912 100644
  };
  
  struct peer_create_params {
-@@ -3558,6 +3600,11 @@ struct wmi_bcn_tmpl_cmd {
+@@ -3579,6 +3621,11 @@ struct wmi_bcn_tmpl_cmd {
  	u32 csa_event_bitmap;
  	u32 mbssid_ie_offset;
  	u32 esp_ie_offset;
@@ -220,11 +214,9 @@ index 297282a60fbd..5b7255afb912 100644
  } __packed;
  
  struct wmi_key_seq_counter {
-diff --git a/net/mac80211/tx.c b/net/mac80211/tx.c
-index abb9b052e53e..a0b40b516e76 100644
 --- a/net/mac80211/tx.c
 +++ b/net/mac80211/tx.c
-@@ -4744,12 +4744,11 @@ static void
+@@ -4745,12 +4745,11 @@ static void
  ieee80211_beacon_add_multiple_bssid_config(struct ieee80211_vif *vif, struct sk_buff *skb,
  					   struct cfg80211_multiple_bssid_data *config)
  {
@@ -239,7 +231,7 @@ index abb9b052e53e..a0b40b516e76 100644
  	*pos++ = vif->bss_conf.multiple_bssid.count;
  	*pos++ = config->cnt;
  }
-@@ -4831,6 +4830,7 @@ __ieee80211_beacon_get(struct ieee80211_hw *hw,
+@@ -4832,6 +4831,7 @@ __ieee80211_beacon_get(struct ieee80211_
  					     beacon->multiple_bssid.len[beacon->ema_index]);
  				if (offs)
  					offs->multiple_bssid_offset = skb->len - ema_len;
@@ -247,6 +239,3 @@ index abb9b052e53e..a0b40b516e76 100644
  				beacon->ema_index++;
  				beacon->ema_index %= beacon->multiple_bssid.cnt;
  			}
--- 
-2.25.0
-

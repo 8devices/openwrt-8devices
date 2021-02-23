@@ -4,6 +4,7 @@
 [ -e /lib/netifd/hostapd.sh ] && . /lib/netifd/hostapd.sh
 [ -e /lib/wifi/hostapd.sh ] && . /lib/wifi/hostapd.sh
 [ -e /lib/wifi/wpa_supplicant.sh ] && . /lib/wifi/wpa_supplicant.sh
+
 . /lib/netifd/mac80211.sh
 
 init_wireless_driver "$@"
@@ -84,10 +85,11 @@ drv_mac80211_init_device_config() {
 	config_add_string path phy 'macaddr:macaddr'
 	config_add_string hwmode
 	config_add_string board_file
-	config_add_int beacon_int chanbw frag rts fils_discovery unsol_bcast_presp
+	config_add_int beacon_int chanbw frag rts
 	config_add_int rxantenna txantenna antenna_gain txpower distance band
 	mu_edca_init_config
 	config_add_boolean noscan he_mu_edca
+	config_add_int he_spr_sr_control he_spr_non_srg_obss_pd_max_offset
 	config_add_array ht_capab
 	config_add_array channels
 	config_add_boolean \
@@ -111,7 +113,7 @@ drv_mac80211_init_device_config() {
                short_gi_40 \
 	       max_amsdu \
                dsss_cck_40
-	config_add_boolean multiple_bssid
+	config_add_boolean multiple_bssid ema
 }
 
 drv_mac80211_init_iface_config() {
@@ -125,6 +127,7 @@ drv_mac80211_init_iface_config() {
 	config_add_int dtim_period start_disabled
 
 	config_add_int fq_limit
+	config_add_int fils_discovery unsol_bcast_presp
 
 	# mesh
 	config_add_string mesh_id
@@ -251,6 +254,7 @@ mac80211_hostapd_setup_base() {
 	[ "$auto_channel" -gt 0 ] && json_get_values channel_list channels
 
 	json_get_vars noscan he_mu_edca:-he_mu_edca=0
+	json_get_vars he_spr_sr_control he_spr_non_srg_obss_pd_max_offset:1
 	json_get_values ht_capab_list ht_capab
 
 	if [ "$band" != 3 ]; then
@@ -484,18 +488,26 @@ mac80211_hostapd_setup_base() {
 	# 802.11ax
 	enable_ax=0
 	idx="$channel"
+	is_6ghz=0
+	if [ -n "$band" ] && [ "$band" -eq 3 ]; then
+		is_6ghz=1
+	fi
 
 	case "$htmode" in
 		HE20)	enable_ax=1
-			if [ $freq -gt 5950 ] && [ $freq -le 7115 ]; then
-				append base_cfg "op_class=131" "$N"
+			if [ "$is_6ghz" == "1" ]; then
+				if [ $freq == 5935 ]; then
+					append base_cfg "op_class=136" "$N"
+				else
+					append base_cfg "op_class=131" "$N"
+				fi
 			fi
 			;;
 		HE40)
 			enable_ax=1
 			idx="$(mac80211_get_seg0 "40")"
-			if [ $freq -ge 5180 ] && [ $freq != 5935 ]; then
-				if [ $freq -gt 5950 ] && [ $freq -le 7115 ]; then
+			if [ $freq -ge 5180 ]; then
+				if [ "$is_6ghz" == "1" ]; then
 					append base_cfg "op_class=132" "$N"
 				fi
 				append base_cfg "he_oper_chwidth=0" "$N"
@@ -505,24 +517,16 @@ mac80211_hostapd_setup_base() {
 		HE80)
 			enable_ax=1
 			idx="$(mac80211_get_seg0 "80")"
-			if [ $freq != 5935 ]; then
-				if [ $freq -gt 5950 ] && [ $freq -le 7115 ]; then
-					append base_cfg "op_class=133" "$N"
-				fi
-				append base_cfg "he_oper_chwidth=1" "$N"
-				append base_cfg "he_oper_centr_freq_seg0_idx=$idx" "$N"
-			fi
+			[ "$is_6ghz" == "1" ] && append base_cfg "op_class=133" "$N"
+			append base_cfg "he_oper_chwidth=1" "$N"
+			append base_cfg "he_oper_centr_freq_seg0_idx=$idx" "$N"
 			;;
 		HE160)
 			enable_ax=1
 			idx="$(mac80211_get_seg0 "160")"
-			if [ $freq != 5935 ]; then
-				if [ $freq -gt 5950 ] && [ $freq -le 7115 ]; then
-					append base_cfg "op_class=134" "$N"
-				fi
-				append base_cfg "he_oper_chwidth=2" "$N"
-				append base_cfg "he_oper_centr_freq_seg0_idx=$idx" "$N"
-			fi
+			[ "$is_6ghz" == "1" ] && append base_cfg "op_class=134" "$N"
+			append base_cfg "he_oper_chwidth=2" "$N"
+			append base_cfg "he_oper_centr_freq_seg0_idx=$idx" "$N"
 			;;
 	esac
 
@@ -534,7 +538,7 @@ mac80211_hostapd_setup_base() {
 		he_mu_beamformer:1 \
 		he_twt_required:0 \
 		he_spr_sr_control:0 \
-		multiple_bssid:0
+		multiple_bssid ema
 
 
 		append base_cfg "ieee80211ax=1" "$N"
@@ -549,10 +553,10 @@ mac80211_hostapd_setup_base() {
 		he_su_beamformee:${he_phy_cap:8:2}:0x1:$he_su_beamformee \
 		he_mu_beamformer:${he_phy_cap:8:2}:0x2:$he_mu_beamformer \
 		he_spr_sr_control:${he_phy_cap:14:2}:0x1:$he_spr_sr_control \
-		he_twt_required:${he_mac_cap:0:2}:0x6:$he_twt_required \
+		he_twt_required:${he_mac_cap:0:2}:0x6:$he_twt_required
 
 		append base_cfg "he_default_pe_duration=4" "$N"
-		append base_cfg "multiple_bssid=${multiple_bssid}" "$N"
+
 		[ "$he_mu_edca" != "0" ] && {
 			json_select ..
 			append base_cfg "he_mu_edca_qos_info_param_count=0" "$N"
@@ -562,14 +566,30 @@ mac80211_hostapd_setup_base() {
 			mac80211_set_he_muedca_params $HE_MU_EDCA_PARAMS_DEFAULT
 		}
 
-		if [ $freq == 5935 ] || ([ $freq -gt 5950 ] && [ $freq -le 7115 ]); then
-			if [ -z $fils_discovery ] && [ -z $unsol_bcast_presp ]; then
-				append base_cfg "fils_discovery_max_interval=20" "$N"
-			elif [ -n $fils_discovery ] && [ $fils_discovery -gt 0 ] && [ $fils_discovery -le 20 ]; then
-				append base_cfg "fils_discovery_max_interval=$fils_discovery" "$N"
-			elif [ -n $unsol_bcast_presp ] && [ $unsol_bcast_presp -gt 0 ] && [ $unsol_bcast_presp -le 20 ]; then
-				append base_cfg "unsol_bcast_probe_resp_interval=$unsol_bcast_presp" "$N"
+		[ "$he_spr_sr_control" != "0" ] && {
+			append base_cfg "he_spr_sr_control=$he_spr_sr_control" "$N"
+			append base_cfg "he_spr_non_srg_obss_pd_max_offset=$he_spr_non_srg_obss_pd_max_offset" "$N"
+		}
+		config_get enable_color mac80211 enable_color 1
+                if [ $enable_color -eq 1 ]; then
+                        bsscolor=$(head -1 /dev/urandom | tr -dc '0-9' | head -c2)
+                        bsscolor=$(($bsscolor % 63))
+                        bsscolor=$(($bsscolor + 1))
+                fi
+
+		[ -n "$bsscolor" ] && append base_cfg "he_bss_color=$bsscolor" "$N"
+
+		if [ "$is_6ghz" == "1" ]; then
+			if [ -z $multiple_bssid ] && [ -z $ema ]; then
+				multiple_bssid=1
+				ema=1
 			fi
+			append base_cfg "he_co_locate=1" "$N"
+		fi
+
+		if [ "$has_ap" -gt 1 ]; then
+			[ -n $multiple_bssid ] && [ $multiple_bssid -gt 0 ] && append base_cfg "multiple_bssid=1" "$N"
+			[ -n $ema ] && [ $ema -gt 0 ] && append base_cfg "ema=1" "$N"
 		fi
 	fi
 
@@ -614,6 +634,7 @@ mac80211_hostapd_setup_bss() {
 
 	hostapd_set_bss_options hostapd_cfg "$vif" || return 1
 	json_get_vars wds dtim_period max_listen_int start_disabled
+	json_get_vars fils_discovery:0 unsol_bcast_presp:0
 
 	set_default wds 0
 	set_default start_disabled 0
@@ -644,6 +665,23 @@ mac80211_hostapd_setup_bss() {
 		fi
 	fi
 
+	if [ "$is_6ghz" == "1" ]; then
+		fils_cfg=
+		if [ "$unsol_bcast_presp" -gt 0 ] && [ "$unsol_bcast_presp" -le 20 ]; then
+			append fils_cfg "unsol_bcast_probe_resp_interval=$unsol_bcast_presp" "$N"
+		elif [ "$fils_discovery" -gt 0 ] && [ "$fils_discovery" -le 20 ]; then
+			append fils_cfg "fils_discovery_max_interval=$fils_discovery" "$N"
+		else
+			append fils_cfg "fils_discovery_max_interval=20" "$N"
+		fi
+
+		if [ -n "$multiple_bssid" ] && [ "$multiple_bssid" -eq 1 ] && [ "$type" == "interface" ]; then
+			append hostapd_cfg "$fils_cfg" "$N"
+		elif [ -z "$multiple_bssid" ] || [ "$multiple_bssid" -eq 0 ]; then
+			append hostapd_cfg "$fils_cfg" "$N"
+		fi
+	fi
+
 	cat >> /var/run/hostapd-$phy.conf <<EOF
 $hostapd_cfg
 bssid=$macaddr
@@ -662,6 +700,7 @@ mac80211_get_addr() {
 mac80211_generate_mac() {
 	local phy="$1"
 	local id="${macidx:-0}"
+	local mode="$2"
 
 	local ref="$(cat /sys/class/ieee80211/${phy}/macaddress)"
 	local mask="$(cat /sys/class/ieee80211/${phy}/address_mask)"
@@ -687,7 +726,7 @@ mac80211_generate_mac() {
 
 	macidx=$(($id + 1))
 
-	if [ $multiple_bssid -eq 1 ] && [ $id -gt 0 ]; then
+	if [ "$mode" == "ap" ] && [ $multiple_bssid -eq 1 ] && [ $id -gt 0 ]; then
 		local ref_dec=$( printf '%d\n' $( echo "0x$ref" | tr -d ':' ) )
 		local bssid_l_mask=$(((1 << $max_bssid_ind) - 1))
 		local bssid_l=$(((($ref_dec & $bssid_l_mask) + $id) % $max_bssid))
@@ -718,6 +757,8 @@ mac80211_generate_mac() {
 
 find_phy() {
 	[ -n "$phy" -a -d /sys/class/ieee80211/$phy ] && return 0
+
+
 	[ -n "$path" ] && {
 		phy="$(mac80211_path_to_phy "$path")"
 		[ -n "$phy" ] && return 0
@@ -794,7 +835,7 @@ mac80211_prepare_vif() {
 	json_select ..
 
 	[ -n "$macaddr" ] || {
-		macaddr="$(mac80211_generate_mac $phy)"
+		macaddr="$(mac80211_generate_mac $phy $mode)"
 		macidx="$(($macidx + 1))"
 	}
 
@@ -1110,12 +1151,12 @@ mac80211_interface_cleanup() {
 		wdev_phy="$(basename "$wdev_phy")"
 		[ -n "$wdev_phy" -a "$wdev_phy" != "$phy" ] && continue
 
-		# 11ad uses single hostapd and single wpa_supplicant instance
-		[ -f "/var/run/hostapd-${wdev}.lock" ] && [ $hwmode = "ad" ] && { \
-			hostapd_cli -p /var/run/hostapd raw REMOVE ${wdev}
+		[ -f "/var/run/hostapd-${wdev}.lock" ] && { \
+			hostapd_cli -iglobal raw REMOVE ${wdev}
 			rm /var/run/hostapd-${wdev}.lock
+			rm /var/run/hostapd/${wdev}
 		}
-		[ -f "/var/run/wpa_supplicant-${wdev}.lock" ] && [ $hwmode = "ad" ] && { \
+		[ -f "/var/run/wpa_supplicant-${wdev}.lock" ] && { \
 			wpa_cli -g /var/run/wpa_supplicantglobal interface_remove ${wdev}
 			rm /var/run/wpa_supplicant-${wdev}.lock
 		}
@@ -1126,30 +1167,27 @@ mac80211_interface_cleanup() {
 }
 
 drv_mac80211_cleanup() {
-	if eval "type hostapd_common_cleanup" 2>/dev/null >/dev/null; then
-		hostapd_common_cleanup
-	else
-		# 11ad uses single hostapd and single wpa_supplicant instance
-		for phy in $(ls /sys/class/ieee80211 2>/dev/null); do
-			for wdev in $(list_phy_interfaces "$phy"); do
-				#Ensure the interface belongs to the correct phy
-				phy_name="$(cat /sys/class/ieee80211/${phy}/device/net/${wdev}/phy80211/name)"
-				if ["$phy_name" != $phy]; then
-					continue
-				fi
-				if [ -f "/var/run/hostapd-${wdev}.lock" ]; then
-					hostapd_cli -p /var/run/hostapd raw REMOVE ${wdev}
-					rm /var/run/hostapd-${wdev}.lock
-				fi
-				if [ -f "/var/run/wpa_supplicant-${wdev}.lock" ]; then
-					wpa_cli -g /var/run/wpa_supplicantglobal interface_remove ${wdev}
-					rm /var/run/wpa_supplicant-${wdev}.lock
-				fi
+	for phy in $(ls /sys/class/ieee80211 2>/dev/null); do
+		for wdev in $(list_phy_interfaces "$phy"); do
+			#Ensure the interface belongs to the correct phy
+			phy_name="$(cat /sys/class/ieee80211/${phy}/device/net/${wdev}/phy80211/name)"
+			if ["$phy_name" != $phy]; then
+				continue
+			fi
+			if [ -f "/var/run/hostapd-${wdev}.lock" ]; then
+				hostapd_cli -iglobal raw REMOVE ${wdev}
+				rm /var/run/hostapd-${wdev}.lock
 				ifconfig "$wdev" down 2>/dev/null
 				iw dev "$wdev" del
-			done
+			fi
+			if [ -f "/var/run/wpa_supplicant-${wdev}.lock" ]; then
+				wpa_cli -g /var/run/wpa_supplicantglobal interface_remove ${wdev}
+				rm /var/run/wpa_supplicant-${wdev}.lock
+				ifconfig "$wdev" down 2>/dev/null
+				iw dev "$wdev" del
+			fi
 		done
-	fi
+	done
 }
 
 mac80211_map_config_ifaces_to_json() {
@@ -1193,11 +1231,24 @@ drv_mac80211_setup() {
 		txpower antenna_gain \
 		rxantenna txantenna \
 		frag rts beacon_int:100 \
-		htmode band multiple_bssid \
-		fils_discovery unsol_bcast_presp
+		htmode band multiple_bssid
 
 	json_get_values basic_rate_list basic_rate
 	json_select ..
+
+	count=0
+
+	while [ $count -le 10 ]
+	do
+		sleep 1
+		if lsmod | grep ath11k_pci
+		then
+			[ "$count" -gt 0 ] && read -t 3
+			break;
+		else
+			count=$(( count+1 ))
+		fi
+	done
 
 	find_phy $1 || {
 		echo "Could not find PHY for device '$1'"
@@ -1278,34 +1329,12 @@ drv_mac80211_setup() {
 	}
 
 	[ -n "$hostapd_ctrl" ] && {
-		# 11ad uses single hostapd instance
-		if [ $hwmode = "11ad" ]; then
-			if ! [ -f "/var/run/hostapd-global.pid" ]
-			then
-				# run the single instance of hostapd
-				hostapd -g /var/run/hostapd/global -B -P /var/run/hostapd-global.pid
-				ret="$?"
-				wireless_add_process "$(cat /var/run/hostapd-global.pid)" "/usr/sbin/hostapd" 1
-				[ "$ret" != 0 ] && {
-					wireless_setup_failed HOSTAPD_START_FAILED
-					return
-				}
-			fi
-			ifname="wlan${phy#phy}"
-			[ -f "/var/run/hostapd-$ifname.lock" ] &&
-				rm /var/run/hostapd-$ifname.lock
-			# let hostapd manage interface $ifname
-			hostapd_cli -p /var/run/hostapd raw ADD bss_config=$ifname:$hostapd_conf_file
-			touch /var/run/hostapd-$ifname.lock
-		else
-			/usr/sbin/hostapd -P /var/run/wifi-$phy.pid -B "$hostapd_conf_file"
-			ret="$?"
-			wireless_add_process "$(cat /var/run/wifi-$phy.pid)" "/usr/sbin/hostapd" 1
-			[ "$ret" != 0 ] && {
-				wireless_setup_failed HOSTAPD_START_FAILED
-				return
-			}
-		fi
+		ifname="wlan${phy#phy}"
+		[ -f "/var/run/hostapd-$ifname.lock" ] &&
+			rm /var/run/hostapd-$ifname.lock
+		# let hostapd manage interface $ifname
+		hostapd_cli -iglobal raw ADD bss_config=$ifname:$hostapd_conf_file
+		touch /var/run/hostapd-$ifname.lock
 	}
 
 	for_each_interface "ap sta adhoc mesh monitor" mac80211_setup_vif

@@ -14,7 +14,7 @@ Signed-off-by: Lavanya Suresh <lavaks@codeaurora.org>
 
 --- a/drivers/net/wireless/ath/ath11k/mac.c
 +++ b/drivers/net/wireless/ath/ath11k/mac.c
-@@ -1500,10 +1500,12 @@ static void ath11k_peer_assoc_h_vht(stru
+@@ -1514,10 +1514,12 @@ static void ath11k_peer_assoc_h_vht(stru
  	struct ath11k_vif *arvif = (void *)vif->drv_priv;
  	struct cfg80211_chan_def def;
  	enum nl80211_band band;
@@ -28,7 +28,7 @@ Signed-off-by: Lavanya Suresh <lavaks@codeaurora.org>
  
  	if (WARN_ON(ath11k_mac_vif_chan(vif, &def)))
  		return;
-@@ -1546,6 +1548,23 @@ static void ath11k_peer_assoc_h_vht(stru
+@@ -1560,6 +1562,23 @@ static void ath11k_peer_assoc_h_vht(stru
  	if (sta->bandwidth == IEEE80211_STA_RX_BW_160)
  		arg->bw_160 = true;
  
@@ -52,7 +52,7 @@ Signed-off-by: Lavanya Suresh <lavaks@codeaurora.org>
  	/* Calculate peer NSS capability from VHT capabilities if STA
  	 * supports VHT.
  	 */
-@@ -1667,11 +1686,13 @@ static void ath11k_peer_assoc_h_he(struc
+@@ -1681,11 +1700,13 @@ static void ath11k_peer_assoc_h_he(struc
  	struct cfg80211_chan_def def;
  	const struct ieee80211_sta_he_cap *he_cap = &sta->he_cap;
  	enum nl80211_band band;
@@ -67,7 +67,7 @@ Signed-off-by: Lavanya Suresh <lavaks@codeaurora.org>
  
  	if (WARN_ON(ath11k_mac_vif_chan(vif, &def)))
  		return;
-@@ -1756,6 +1777,23 @@ static void ath11k_peer_assoc_h_he(struc
+@@ -1770,6 +1791,23 @@ static void ath11k_peer_assoc_h_he(struc
  	if (he_cap->he_cap_elem.mac_cap_info[0] & IEEE80211_HE_MAC_CAP0_TWT_REQ)
  		arg->twt_requester = true;
  

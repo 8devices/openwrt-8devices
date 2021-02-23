@@ -15,7 +15,7 @@ Signed-off-by: Miles Hu <milehu@codeaurora.org>
 
 --- a/drivers/net/wireless/ath/ath11k/mac.c
 +++ b/drivers/net/wireless/ath/ath11k/mac.c
-@@ -2042,6 +2042,118 @@ static int ath11k_setup_peer_smps(struct
+@@ -2050,6 +2050,118 @@ static int ath11k_setup_peer_smps(struct
  					 ath11k_smps_map[smps]);
  }
  
@@ -134,7 +134,7 @@ Signed-off-by: Miles Hu <milehu@codeaurora.org>
  static void ath11k_bss_assoc(struct ieee80211_hw *hw,
  			     struct ieee80211_vif *vif,
  			     struct ieee80211_bss_conf *bss_conf)
-@@ -2050,6 +2162,7 @@ static void ath11k_bss_assoc(struct ieee
+@@ -2058,6 +2170,7 @@ static void ath11k_bss_assoc(struct ieee
  	struct ath11k_vif *arvif = (void *)vif->drv_priv;
  	struct peer_assoc_params peer_arg;
  	struct ieee80211_sta *ap_sta;
@@ -142,7 +142,7 @@ Signed-off-by: Miles Hu <milehu@codeaurora.org>
  	int ret;
  
  	lockdep_assert_held(&ar->conf_mutex);
-@@ -2066,6 +2179,8 @@ static void ath11k_bss_assoc(struct ieee
+@@ -2074,6 +2187,8 @@ static void ath11k_bss_assoc(struct ieee
  		rcu_read_unlock();
  		return;
  	}
@@ -151,7 +151,7 @@ Signed-off-by: Miles Hu <milehu@codeaurora.org>
  
  	ath11k_peer_assoc_prepare(ar, vif, ap_sta, &peer_arg, false);
  
-@@ -2092,6 +2207,12 @@ static void ath11k_bss_assoc(struct ieee
+@@ -2100,6 +2215,12 @@ static void ath11k_bss_assoc(struct ieee
  		return;
  	}
  
@@ -164,7 +164,7 @@ Signed-off-by: Miles Hu <milehu@codeaurora.org>
  	WARN_ON(arvif->is_up);
  
  	arvif->aid = bss_conf->aid;
-@@ -2307,8 +2428,11 @@ static void ath11k_mac_op_bss_info_chang
+@@ -2315,8 +2436,11 @@ static void ath11k_mac_op_bss_info_chang
  	if (changed & BSS_CHANGED_BSSID && !is_zero_ether_addr(info->bssid))
  		ether_addr_copy(arvif->bssid, info->bssid);
  
@@ -177,7 +177,7 @@ Signed-off-by: Miles Hu <milehu@codeaurora.org>
  
  	if (changed & BSS_CHANGED_ERP_CTS_PROT) {
  		u32 cts_prot;
-@@ -4194,6 +4318,39 @@ static __le16 ath11k_mac_setup_he_6ghz_c
+@@ -4202,6 +4326,39 @@ static __le16 ath11k_mac_setup_he_6ghz_c
  	return cpu_to_le16(bcap->he_6ghz_capa);
  }
  
@@ -217,7 +217,7 @@ Signed-off-by: Miles Hu <milehu@codeaurora.org>
  static int ath11k_mac_copy_he_cap(struct ath11k *ar,
  				  struct ath11k_pdev_cap *cap,
  				  struct ieee80211_sband_iftype_data *data,
-@@ -4258,18 +4415,7 @@ static int ath11k_mac_copy_he_cap(struct
+@@ -4266,18 +4423,7 @@ static int ath11k_mac_copy_he_cap(struct
  			break;
  		}
  
@@ -237,7 +237,7 @@ Signed-off-by: Miles Hu <milehu@codeaurora.org>
  
  		memset(he_cap->ppe_thres, 0, sizeof(he_cap->ppe_thres));
  		if (he_cap_elem->phy_cap_info[6] &
-@@ -4771,69 +4917,6 @@ ath11k_mac_setup_vdev_create_params(stru
+@@ -4786,69 +4932,6 @@ ath11k_mac_setup_vdev_create_params(stru
  	}
  }
  
@@ -307,7 +307,7 @@ Signed-off-by: Miles Hu <milehu@codeaurora.org>
  static int ath11k_mac_vdev_delete(struct ath11k_vif *arvif)
  {
  	struct ath11k *ar = arvif->ar;
-@@ -5352,7 +5435,6 @@ ath11k_mac_vdev_start_restart(struct ath
+@@ -5367,7 +5450,6 @@ ath11k_mac_vdev_start_restart(struct ath
  	struct ath11k *ar = arvif->ar;
  	struct ath11k_base *ab = ar->ab;
  	struct wmi_vdev_start_req_arg arg = {};
@@ -315,7 +315,7 @@ Signed-off-by: Miles Hu <milehu@codeaurora.org>
  	int ret = 0;
  
  	lockdep_assert_held(&ar->conf_mutex);
-@@ -5394,14 +5476,6 @@ ath11k_mac_vdev_start_restart(struct ath
+@@ -5409,14 +5491,6 @@ ath11k_mac_vdev_start_restart(struct ath
  		spin_unlock_bh(&ab->base_lock);
  
  		/* TODO: Notify if secondary 80Mhz also needs radar detection */
@@ -365,8 +365,8 @@ Signed-off-by: Miles Hu <milehu@codeaurora.org>
  
 --- a/net/mac80211/cfg.c
 +++ b/net/mac80211/cfg.c
-@@ -1021,6 +1021,11 @@ static int ieee80211_start_ap(struct wip
- 			      IEEE80211_HE_OPERATION_RTS_THRESHOLD_MASK);
+@@ -1023,6 +1023,11 @@ static int ieee80211_start_ap(struct wip
+ 			changed |= BSS_CHANGED_HE_BSS_COLOR;
  	}
  
 +	if (params->he_cap) {

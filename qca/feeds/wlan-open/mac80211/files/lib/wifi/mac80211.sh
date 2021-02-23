@@ -1,4 +1,5 @@
 #!/bin/sh
+
 . /lib/netifd/mac80211.sh
 
 append DRIVERS "mac80211"
@@ -62,13 +63,21 @@ check_mac80211_device() {
 
 detect_mac80211() {
 	devidx=0
+	nss=0
+
+	board=$(cat /tmp/sysinfo/board_name)
+	case "$board" in
+		ap-mp*)nss=1 ;;
+	esac
+
 	config_load wireless
 
 	if [ ! -f "/etc/config/wireless" ] || ! grep -q "enable_smp_affinity" "/etc/config/wireless"; then
 		cat <<EOF
 config smp_affinity  mac80211
 	option enable_smp_affinity	1
-	option enable_nss		0
+	option enable_nss		$nss
+	option enable_color		1
 
 EOF
 	fi
@@ -105,6 +114,8 @@ EOF
 		channel="36"
 		htmode=""
 		ht_capab=""
+		encryption="none"
+		security=""
 
 		iw phy "$dev" info | grep -q '5180 MHz' || iw phy "$dev" info | grep -q '5955 MHz' || { mode_band="g"; channel="11"; }
 		(iw phy "$dev" info | grep -q '5745 MHz' && (iw phy "$dev" info | grep -q -F '5180 MHz [36] (disabled)')) && { mode_band="a"; channel="149"; }
@@ -117,13 +128,18 @@ EOF
 
 		iw phy "$dev" info | grep -q '5180 MHz' || iw phy "$dev" info | grep -q '5745 MHz' || {
 			iw phy "$dev" info | grep -q '5955 MHz' && {
-				channel="53"; htmode="HE80";
+				channel="49"; htmode="HE80"; encryption="sae";
 				append ht_capab "	option band	3" "$N"
 			}
 		}
 
 		[ -n $htmode ] && append ht_capab "	option htmode	$htmode" "$N"
 
+		append security "	option encryption  $encryption" "$N"
+		if [ $encryption == "sae" ]; then
+			append security "	option sae_pwe	1" "$N"
+			append security "	option key	0123456789" "$N"
+		fi
 		path="$(mac80211_phy_to_path "$dev")"
 		if [ -n "$path" ]; then
 			dev_id="	option path	'$path'"
@@ -147,7 +163,7 @@ config wifi-iface
 	option network  lan
 	option mode     ap
 	option ssid     OpenWrt
-	option encryption none
+$security
 
 EOF
 	devidx=$(($devidx + 1))
@@ -192,6 +208,7 @@ post_mac80211() {
 	local action=${1}
 
 	config_get enable_smp_affinity mac80211 enable_smp_affinity 0
+	config_get enable_nss mac80211 enable_nss 0
 
 	if [ "$enable_smp_affinity" -eq 1 ]; then
 		[ -f "/lib/smp_affinity_settings.sh" ] && {
@@ -211,6 +228,17 @@ post_mac80211() {
 			}
 			if [ -f "/etc/init.d/lbd" ]; then
 				start_lbd &
+			fi
+
+			nss_modval=$(cat /sys/module/ath11k/parameters/nss_offload)
+
+			if [ "$enable_nss" -ne $nss_modval ] && [ -f /sys/module/ath11k/parameters/nss_offload ]; then
+				echo  $enable_nss > /sys/module/ath11k/parameters/nss_offload
+				rmmod ath11k_pci
+				rmmod ath11k_ahb
+				sleep 1
+				insmod ath11k_ahb
+				insmod ath11k_pci
 			fi
 		;;
 	esac

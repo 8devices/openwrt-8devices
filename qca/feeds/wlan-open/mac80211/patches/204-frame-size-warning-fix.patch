@@ -17,7 +17,7 @@ Signed-off-by: Karthikeyan Kathirvel <kathirve@codeaurora.org>
 
 --- a/drivers/net/wireless/ath/ath11k/mac.c
 +++ b/drivers/net/wireless/ath/ath11k/mac.c
-@@ -2894,7 +2894,7 @@ static int ath11k_mac_op_hw_scan(struct
+@@ -3048,7 +3048,7 @@ static int ath11k_mac_op_hw_scan(struct
  	struct ath11k *ar = hw->priv;
  	struct ath11k_vif *arvif = ath11k_vif_to_arvif(vif);
  	struct cfg80211_scan_request *req = &hw_req->req;
@@ -26,7 +26,7 @@ Signed-off-by: Karthikeyan Kathirvel <kathirve@codeaurora.org>
  	int ret = 0;
  	int i;
  
-@@ -2921,41 +2921,48 @@ static int ath11k_mac_op_hw_scan(struct
+@@ -3075,41 +3075,48 @@ static int ath11k_mac_op_hw_scan(struct
  	if (ret)
  		goto exit;
  
@@ -93,7 +93,7 @@ Signed-off-by: Karthikeyan Kathirvel <kathirve@codeaurora.org>
  	if (ret) {
  		ath11k_warn(ar->ab, "failed to start hw scan: %d\n", ret);
  		spin_lock_bh(&ar->data_lock);
-@@ -2965,12 +2972,15 @@ static int ath11k_mac_op_hw_scan(struct
+@@ -3119,12 +3126,15 @@ static int ath11k_mac_op_hw_scan(struct
  
  	/* Add a 200ms margin to account for event/command processing */
  	ieee80211_queue_delayed_work(ar->hw, &ar->scan.timeout,

@@ -41,7 +41,7 @@ Signed-off-by: Muna Sinada <msinada@codeaurora.org>
  
  };
  
-@@ -6181,17 +6184,6 @@ static void ath11k_vdev_start_resp_event
+@@ -6192,17 +6195,6 @@ static void ath11k_vdev_start_resp_event
  		   vdev_start_resp.vdev_id);
  }
  
@@ -59,7 +59,7 @@ Signed-off-by: Muna Sinada <msinada@codeaurora.org>
  static void ath11k_vdev_stopped_event(struct ath11k_base *ab, struct sk_buff *skb)
  {
  	struct ath11k *ar;
-@@ -7483,6 +7475,86 @@ exit:
+@@ -7508,6 +7500,86 @@ exit:
  	kfree(tb);
  }
  
@@ -146,7 +146,7 @@ Signed-off-by: Muna Sinada <msinada@codeaurora.org>
  static void ath11k_wmi_tlv_op_rx(struct ath11k_base *ab, struct sk_buff *skb)
  {
  	struct wmi_cmd_hdr *cmd_hdr;
-@@ -7596,6 +7668,9 @@ static void ath11k_wmi_tlv_op_rx(struct
+@@ -7621,6 +7693,9 @@ static void ath11k_wmi_tlv_op_rx(struct
  	case WMI_PDEV_GET_TPC_STATS_EVENTID:
  		ath11k_process_tpc_stats(ab, skb);
  		break;
@@ -174,7 +174,7 @@ Signed-off-by: Muna Sinada <msinada@codeaurora.org>
  	WMI_TAG_TPC_STATS_GET_CMD = 0x38B,
  	WMI_TAG_TPC_STATS_EVENT_FIXED_PARAM,
  	WMI_TAG_TPC_STATS_CONFIG_EVENT,
-@@ -4404,6 +4406,16 @@ struct wmi_pdev_temperature_event {
+@@ -4395,6 +4397,16 @@ struct wmi_pdev_temperature_event {
  	u32 pdev_id;
  } __packed;
  
@@ -193,9 +193,9 @@ Signed-off-by: Muna Sinada <msinada@codeaurora.org>
  #define WMI_RX_STATUS_ERR_DECRYPT		0x08
 --- a/include/net/cfg80211.h
 +++ b/include/net/cfg80211.h
-@@ -7892,4 +7892,15 @@ void cfg80211_update_owe_info_event(stru
- 				    struct cfg80211_update_owe_info *owe_info,
- 				    gfp_t gfp);
+@@ -7925,4 +7925,15 @@ void cfg80211_update_owe_info_event(stru
+  */
+ void cfg80211_bss_flush(struct wiphy *wiphy);
  
 +/**
 + * cfg80211_update_muedca_params_event - Notify the updated MU-EDCA parameters
@@ -211,7 +211,7 @@ Signed-off-by: Muna Sinada <msinada@codeaurora.org>
  #endif /* __NET_CFG80211_H */
 --- a/include/net/mac80211.h
 +++ b/include/net/mac80211.h
-@@ -6599,4 +6599,17 @@ u32 ieee80211_calc_tx_airtime(struct iee
+@@ -6627,4 +6627,17 @@ u32 ieee80211_calc_tx_airtime(struct iee
   */
  bool ieee80211_set_hw_80211_encap(struct ieee80211_vif *vif, bool enable);
  
@@ -231,7 +231,7 @@ Signed-off-by: Muna Sinada <msinada@codeaurora.org>
  #endif /* MAC80211_H */
 --- a/include/uapi/linux/nl80211.h
 +++ b/include/uapi/linux/nl80211.h
-@@ -1170,6 +1170,10 @@
+@@ -1179,6 +1179,10 @@
   *	includes the contents of the frame. %NL80211_ATTR_ACK flag is included
   *	if the recipient acknowledged the frame.
   *
@@ -242,7 +242,7 @@ Signed-off-by: Muna Sinada <msinada@codeaurora.org>
   * @NL80211_CMD_MAX: highest used command number
   * @__NL80211_CMD_AFTER_LAST: internal use
   */
-@@ -1400,6 +1404,8 @@ enum nl80211_commands {
+@@ -1409,6 +1413,8 @@ enum nl80211_commands {
  
  	NL80211_CMD_CONTROL_PORT_FRAME_TX_STATUS,
  
@@ -251,7 +251,7 @@ Signed-off-by: Muna Sinada <msinada@codeaurora.org>
  	/* add new commands above here */
  
  	/* used to define NL80211_CMD_MAX below */
-@@ -2505,6 +2511,9 @@ enum nl80211_commands {
+@@ -2515,6 +2521,9 @@ enum nl80211_commands {
   * @NL80211_ATTR_HE_6GHZ_CAPABILITY: HE 6 GHz Band Capability element (from
   *	association request when used with NL80211_CMD_NEW_STATION).
   *
@@ -261,7 +261,7 @@ Signed-off-by: Muna Sinada <msinada@codeaurora.org>
   * @NUM_NL80211_ATTR: total number of nl80211_attrs available
   * @NL80211_ATTR_MAX: highest attribute number currently defined
   * @__NL80211_ATTR_AFTER_LAST: internal use
-@@ -2987,6 +2996,7 @@ enum nl80211_attrs {
+@@ -2997,6 +3006,7 @@ enum nl80211_attrs {
  
  	NL80211_ATTR_HE_6GHZ_CAPABILITY,
  
@@ -271,7 +271,7 @@ Signed-off-by: Muna Sinada <msinada@codeaurora.org>
  	__NL80211_ATTR_AFTER_LAST,
 --- a/net/mac80211/mlme.c
 +++ b/net/mac80211/mlme.c
-@@ -5795,3 +5795,16 @@ void ieee80211_cqm_beacon_loss_notify(st
+@@ -5803,3 +5803,16 @@ void ieee80211_cqm_beacon_loss_notify(st
  	cfg80211_cqm_beacon_loss_notify(sdata->dev, gfp);
  }
  EXPORT_SYMBOL(ieee80211_cqm_beacon_loss_notify);
@@ -290,7 +290,7 @@ Signed-off-by: Muna Sinada <msinada@codeaurora.org>
 +EXPORT_SYMBOL(ieee80211_update_muedca_params);
 --- a/net/mac80211/trace.h
 +++ b/net/mac80211/trace.h
-@@ -2758,6 +2758,26 @@ TRACE_EVENT(drv_get_ftm_responder_stats,
+@@ -2791,6 +2791,26 @@ TRACE_EVENT(drv_get_ftm_responder_stats,
  	)
  );
  
@@ -319,7 +319,7 @@ Signed-off-by: Muna Sinada <msinada@codeaurora.org>
  #undef TRACE_INCLUDE_PATH
 --- a/net/wireless/nl80211.c
 +++ b/net/wireless/nl80211.c
-@@ -17673,6 +17673,42 @@ nla_put_failure:
+@@ -17678,6 +17678,42 @@ nla_put_failure:
  }
  EXPORT_SYMBOL(cfg80211_update_owe_info_event);
  
