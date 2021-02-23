@@ -21,7 +21,7 @@ Signed-off-by: Pradeep Kumar Chitrapu <pradeepc@codeaurora.org>
 
 --- a/hostapd/config_file.c
 +++ b/hostapd/config_file.c
-@@ -4592,6 +4592,8 @@ static int hostapd_config_fill(struct ho
+@@ -4598,6 +4598,8 @@ static int hostapd_config_fill(struct ho
  #endif /* CONFIG_MACSEC */
  	} else if (os_strcmp(buf, "multiple_bssid") == 0) {
  		conf->multiple_bssid = atoi(pos);
@@ -32,7 +32,7 @@ Signed-off-by: Pradeep Kumar Chitrapu <pradeepc@codeaurora.org>
  			   "Line %d: unknown configuration item '%s'",
 --- a/hostapd/hostapd.conf
 +++ b/hostapd/hostapd.conf
-@@ -2786,6 +2786,9 @@ own_ip_addr=127.0.0.1
+@@ -2799,6 +2799,9 @@ own_ip_addr=127.0.0.1
  # that allows sending of such data. Default: 0.
  #stationary_ap=0
  
@@ -44,7 +44,7 @@ Signed-off-by: Pradeep Kumar Chitrapu <pradeepc@codeaurora.org>
  # Set the airtime policy operating mode:
 --- a/src/ap/ap_config.h
 +++ b/src/ap/ap_config.h
-@@ -869,6 +869,7 @@ struct hostapd_bss_config {
+@@ -870,6 +870,7 @@ struct hostapd_bss_config {
  #endif /* CONFIG_MACSEC */
  
  	u32 unsol_bcast_probe_resp_interval;
@@ -54,7 +54,7 @@ Signed-off-by: Pradeep Kumar Chitrapu <pradeepc@codeaurora.org>
  /**
 --- a/src/ap/beacon.c
 +++ b/src/ap/beacon.c
-@@ -1475,6 +1475,7 @@ int ieee802_11_build_ap_params(struct ho
+@@ -1483,6 +1483,7 @@ int ieee802_11_build_ap_params(struct ho
  	tail_len += hostapd_mbo_ie_len(hapd);
  	tail_len += hostapd_eid_owe_trans_len(hapd);
  	tail_len += hostapd_eid_dpp_cc_len(hapd);
@@ -62,7 +62,7 @@ Signed-off-by: Pradeep Kumar Chitrapu <pradeepc@codeaurora.org>
  
  	tailpos = tail = os_malloc(tail_len);
  	if (head == NULL || tail == NULL) {
-@@ -1648,6 +1649,7 @@ int ieee802_11_build_ap_params(struct ho
+@@ -1652,6 +1653,7 @@ int ieee802_11_build_ap_params(struct ho
  	tailpos = hostapd_eid_owe_trans(hapd, tailpos,
  					tail + tail_len - tailpos);
  	tailpos = hostapd_eid_dpp_cc(hapd, tailpos, tail + tail_len - tailpos);
@@ -72,7 +72,7 @@ Signed-off-by: Pradeep Kumar Chitrapu <pradeepc@codeaurora.org>
  		os_memcpy(tailpos, wpabuf_head(hapd->conf->vendor_elements),
 --- a/src/ap/ieee802_11.c
 +++ b/src/ap/ieee802_11.c
-@@ -5762,4 +5762,93 @@ u8 * hostapd_eid_multiple_bssid(struct h
+@@ -5784,4 +5784,93 @@ u8 * hostapd_eid_multiple_bssid(struct h
  	return eid;
  }
  
@@ -179,7 +179,7 @@ Signed-off-by: Pradeep Kumar Chitrapu <pradeepc@codeaurora.org>
  void sae_clear_retransmit_timer(struct hostapd_data *hapd,
 --- a/src/common/ieee802_11_defs.h
 +++ b/src/common/ieee802_11_defs.h
-@@ -2387,4 +2387,18 @@ enum edmg_bw_config {
+@@ -2412,4 +2412,18 @@ enum mscs_description_subelem {
   */
  #define FILS_DISCOVERY_CAP_PHY_INDEX_HE                   4
  #define FILS_DISCOVERY_MAX_INTERVAL_6GHZ                  20

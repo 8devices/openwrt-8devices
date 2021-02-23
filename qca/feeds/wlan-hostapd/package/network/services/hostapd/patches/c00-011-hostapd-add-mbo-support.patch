@@ -1,6 +1,6 @@
 --- a/hostapd/config_file.c
 +++ b/hostapd/config_file.c
-@@ -4065,10 +4065,12 @@ static int hostapd_config_fill(struct ho
+@@ -4069,10 +4069,12 @@ static int hostapd_config_fill(struct ho
  #ifdef CONFIG_MBO
  	} else if (os_strcmp(buf, "mbo") == 0) {
  		bss->mbo_enabled = atoi(pos);
@@ -17,7 +17,7 @@
  #define PARSE_TEST_PROBABILITY(_val)				\
 --- a/hostapd/ctrl_iface.c
 +++ b/hostapd/ctrl_iface.c
-@@ -880,10 +880,11 @@ static int hostapd_ctrl_iface_bss_tm_req
+@@ -881,10 +881,11 @@ static int hostapd_ctrl_iface_bss_tm_req
  	if (pos) {
  		pos += 10;
  		req_mode |= WNM_BSS_TM_REQ_BSS_TERMINATION_INCLUDED;
@@ -33,7 +33,7 @@
  			wpa_printf(MSG_DEBUG, "Invalid bss_term data");
 --- a/src/ap/ap_config.h
 +++ b/src/ap/ap_config.h
-@@ -712,6 +712,11 @@ struct hostapd_bss_config {
+@@ -713,6 +713,11 @@ struct hostapd_bss_config {
  	 *  - Set BIT(2) to enable OCE in AP mode
  	 */
  	unsigned int oce;
@@ -131,7 +131,7 @@
  u8 * hostapd_eid_mbo(struct hostapd_data *hapd, u8 *eid, size_t len);
 --- a/src/ap/ieee802_11_shared.c
 +++ b/src/ap/ieee802_11_shared.c
-@@ -797,11 +797,13 @@ u8 * hostapd_eid_mbo(struct hostapd_data
+@@ -798,11 +798,13 @@ u8 * hostapd_eid_mbo(struct hostapd_data
  	    !OCE_STA_CFON_ENABLED(hapd) && !OCE_AP_ENABLED(hapd))
  		return eid;
  
@@ -196,19 +196,20 @@
  
  #define MAX_TFS_IE_LEN  1024
  
-@@ -364,11 +365,26 @@ static int ieee802_11_send_bss_trans_mgm
+@@ -364,11 +365,27 @@ static int ieee802_11_send_bss_trans_mgm
  						  u8 dialog_token)
  {
  	struct ieee80211_mgmt *mgmt;
 -	size_t len;
 -	u8 *pos;
 +	size_t len, nr_len = 0;
-+	u8 *pos, *nr_pos;
++	u8 *pos;
 +	u8 req_mode = 0;
  	int res;
  
 -	mgmt = os_zalloc(sizeof(*mgmt));
 +#ifdef CONFIG_MBO
++	u8 *nr_pos;
 +	struct hostapd_neighbor_entry *nr;
 +	struct wpabuf *nrbuf = NULL;
 +	if (hapd->conf->mbo_enabled) {
@@ -226,7 +227,7 @@
  	if (mgmt == NULL)
  		return -1;
  	os_memcpy(mgmt->da, addr, ETH_ALEN);
-@@ -379,7 +395,11 @@ static int ieee802_11_send_bss_trans_mgm
+@@ -379,7 +396,11 @@ static int ieee802_11_send_bss_trans_mgm
  	mgmt->u.action.category = WLAN_ACTION_WNM;
  	mgmt->u.action.u.bss_tm_req.action = WNM_BSS_TRANS_MGMT_REQ;
  	mgmt->u.action.u.bss_tm_req.dialog_token = dialog_token;
@@ -239,7 +240,7 @@
  	mgmt->u.action.u.bss_tm_req.disassoc_timer = host_to_le16(0);
  	mgmt->u.action.u.bss_tm_req.validity_interval = 1;
  	pos = mgmt->u.action.u.bss_tm_req.variable;
-@@ -392,6 +412,25 @@ static int ieee802_11_send_bss_trans_mgm
+@@ -392,6 +413,25 @@ static int ieee802_11_send_bss_trans_mgm
  		   le_to_host16(mgmt->u.action.u.bss_tm_req.disassoc_timer),
  		   mgmt->u.action.u.bss_tm_req.validity_interval);
  

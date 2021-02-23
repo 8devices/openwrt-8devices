@@ -1,0 +1,292 @@
+From 642c46b78b65fe2e895f2e5c869b737a36b44650 Mon Sep 17 00:00:00 2001
+From: Rajkumar Manoharan <rmanohar@codeaurora.org>
+Date: Mon, 14 Sep 2020 21:22:40 -0700
+Subject: [PATCH] nl80211: Allow HE MCS rate selection for beacon frame
+
+Allow HE MCS rate to be used for beacon transmission when the driver
+advertises the support.
+
+Signed-off-by: Rajkumar Manoharan <rmanohar@codeaurora.org>
+---
+ hostapd/config_file.c             | 10 +++++++++
+ hostapd/hostapd.conf              |  2 ++
+ src/common/defs.h                 |  3 ++-
+ src/drivers/driver.h              | 10 +++++----
+ src/drivers/driver_nl80211.c      | 44 ++++++++++++++++++++++++++++++++++-----
+ src/drivers/driver_nl80211_capa.c |  4 ++++
+ src/drivers/nl80211_copy.h        | 25 ++++++++++++++++++++--
+ 7 files changed, 86 insertions(+), 12 deletions(-)
+
+diff --git a/hostapd/config_file.c b/hostapd/config_file.c
+index f5e9d56c7042..826379e7563b 100644
+--- a/hostapd/config_file.c
++++ b/hostapd/config_file.c
+@@ -3259,6 +3259,16 @@ static int hostapd_config_fill(struct hostapd_config *conf,
+ 			}
+ 			conf->rate_type = BEACON_RATE_VHT;
+ 			conf->beacon_rate = val;
++		} else if (os_strncmp(pos, "he:", 3) == 0) {
++			val = atoi(pos + 3);
++			if (val < 0 || val > 11) {
++				wpa_printf(MSG_ERROR,
++					   "Line %d: invalid beacon_rate HE-MCS %d",
++					   line, val);
++				return 1;
++			}
++			conf->rate_type = BEACON_RATE_HE;
++			conf->beacon_rate = val;
+ 		} else {
+ 			val = atoi(pos);
+ 			if (val < 10 || val > 10000) {
+diff --git a/hostapd/hostapd.conf b/hostapd/hostapd.conf
+index 6255cc8fcb07..010bd6b0de17 100644
+--- a/hostapd/hostapd.conf
++++ b/hostapd/hostapd.conf
+@@ -279,6 +279,8 @@ fragm_threshold=-1
+ #    beacon_rate=ht:<HT MCS>
+ # VHT:
+ #    beacon_rate=vht:<VHT MCS>
++# HE:
++#    beacon_rate=he:<HE MCS>
+ #
+ # For example, beacon_rate=10 for 1 Mbps or beacon_rate=60 for 6 Mbps (OFDM).
+ #beacon_rate=10
+diff --git a/src/common/defs.h b/src/common/defs.h
+index bbe3120de82f..f2dea89cda31 100644
+--- a/src/common/defs.h
++++ b/src/common/defs.h
+@@ -402,7 +402,8 @@ enum wpa_radio_work_band {
+ enum beacon_rate_type {
+ 	BEACON_RATE_LEGACY,
+ 	BEACON_RATE_HT,
+-	BEACON_RATE_VHT
++	BEACON_RATE_VHT,
++	BEACON_RATE_HE
+ };
+ 
+ enum eap_proxy_sim_state {
+diff --git a/src/drivers/driver.h b/src/drivers/driver.h
+index e8defaba2118..7e44b2f710ee 100644
+--- a/src/drivers/driver.h
++++ b/src/drivers/driver.h
+@@ -1256,14 +1256,14 @@ struct wpa_driver_ap_params {
+ 	 *
+ 	 * This parameter can be used to set a specific Beacon frame data rate
+ 	 * for the BSS. The interpretation of this value depends on the
+-	 * rate_type (legacy: in 100 kbps units, HT: HT-MCS, VHT: VHT-MCS). If
+-	 * beacon_rate == 0 and rate_type == 0 (BEACON_RATE_LEGACY), the default
+-	 * Beacon frame data rate is used.
++	 * rate_type (legacy: in 100 kbps units, HT: HT-MCS, VHT: VHT-MCS,
++	 * HE: HE-MCS). If beacon_rate == 0 and rate_type == 0
++	 * (BEACON_RATE_LEGACY), the default Beacon frame data rate is used.
+ 	 */
+ 	unsigned int beacon_rate;
+ 
+ 	/**
+-	 * beacon_rate_type: Beacon data rate type (legacy/HT/VHT)
++	 * beacon_rate_type: Beacon data rate type (legacy/HT/VHT/HE)
+ 	 */
+ 	enum beacon_rate_type rate_type;
+ 
+@@ -1933,6 +1933,8 @@ struct wpa_driver_capa {
+ #define WPA_DRIVER_FLAGS2_CONTROL_PORT_RX	0x0000000000000001ULL
+ /** Driver supports TX status reports for EAPOL frames through control port */
+ #define WPA_DRIVER_FLAGS2_CONTROL_PORT_TX_STATUS 0x0000000000000002ULL
++/** Driver supports Beacon frame TX rate configuration (HE rates) */
++#define WPA_DRIVER_FLAGS2_BEACON_RATE_HE	0x0000000000000004ULL
+ 	u64 flags2;
+ 
+ #define FULL_AP_CLIENT_STATE_SUPP(drv_flags) \
+diff --git a/src/drivers/driver_nl80211.c b/src/drivers/driver_nl80211.c
+index 2ee34d11d64e..9e769aafaa6b 100644
+--- a/src/drivers/driver_nl80211.c
++++ b/src/drivers/driver_nl80211.c
+@@ -4160,11 +4160,13 @@ static int nl80211_set_mesh_config(void *priv,
+ #endif /* CONFIG_MESH */
+ 
+ 
+-static int nl80211_put_beacon_rate(struct nl_msg *msg, const u64 flags,
++static int nl80211_put_beacon_rate(struct nl_msg *msg,
++				   const u64 flags, const u64 flags2,
+ 				   struct wpa_driver_ap_params *params)
+ {
+ 	struct nlattr *bands, *band;
+ 	struct nl80211_txrate_vht vht_rate;
++	struct nl80211_txrate_he he_rate;
+ 
+ 	if (!params->freq ||
+ 	    (params->beacon_rate == 0 &&
+@@ -4181,7 +4183,10 @@ static int nl80211_put_beacon_rate(struct nl_msg *msg, const u64 flags,
+ 		band = nla_nest_start(msg, NL80211_BAND_2GHZ);
+ 		break;
+ 	case HOSTAPD_MODE_IEEE80211A:
+-		band = nla_nest_start(msg, NL80211_BAND_5GHZ);
++		if (is_6ghz_freq(params->freq->freq))
++			band = nla_nest_start(msg, NL80211_BAND_6GHZ);
++		else
++			band = nla_nest_start(msg, NL80211_BAND_5GHZ);
+ 		break;
+ 	case HOSTAPD_MODE_IEEE80211AD:
+ 		band = nla_nest_start(msg, NL80211_BAND_60GHZ);
+@@ -4194,6 +4199,7 @@ static int nl80211_put_beacon_rate(struct nl_msg *msg, const u64 flags,
+ 		return -1;
+ 
+ 	os_memset(&vht_rate, 0, sizeof(vht_rate));
++	os_memset(&he_rate, 0, sizeof(he_rate));
+ 
+ 	switch (params->rate_type) {
+ 	case BEACON_RATE_LEGACY:
+@@ -4208,7 +4214,10 @@ static int nl80211_put_beacon_rate(struct nl_msg *msg, const u64 flags,
+ 		    nla_put(msg, NL80211_TXRATE_HT, 0, NULL) ||
+ 		    (params->freq->vht_enabled &&
+ 		     nla_put(msg, NL80211_TXRATE_VHT, sizeof(vht_rate),
+-			     &vht_rate)))
++			     &vht_rate)) ||
++		    (params->freq->he_enabled &&
++		     nla_put(msg, NL80211_TXRATE_HE, sizeof(he_rate),
++			     &he_rate)))
+ 			return -1;
+ 
+ 		wpa_printf(MSG_DEBUG, " * beacon_rate = legacy:%u (* 100 kbps)",
+@@ -4224,7 +4233,10 @@ static int nl80211_put_beacon_rate(struct nl_msg *msg, const u64 flags,
+ 		    nla_put_u8(msg, NL80211_TXRATE_HT, params->beacon_rate) ||
+ 		    (params->freq->vht_enabled &&
+ 		     nla_put(msg, NL80211_TXRATE_VHT, sizeof(vht_rate),
+-			     &vht_rate)))
++			     &vht_rate)) ||
++		    (params->freq->he_enabled &&
++		     nla_put(msg, NL80211_TXRATE_HE, sizeof(he_rate),
++			     &he_rate)))
+ 			return -1;
+ 		wpa_printf(MSG_DEBUG, " * beacon_rate = HT-MCS %u",
+ 			   params->beacon_rate);
+@@ -4243,9 +4255,30 @@ static int nl80211_put_beacon_rate(struct nl_msg *msg, const u64 flags,
+ 		if (nla_put(msg, NL80211_TXRATE_VHT, sizeof(vht_rate),
+ 			    &vht_rate))
+ 			return -1;
++		if (nla_put(msg, NL80211_TXRATE_HE, sizeof(he_rate), &he_rate))
++			return -1;
+ 		wpa_printf(MSG_DEBUG, " * beacon_rate = VHT-MCS %u",
+ 			   params->beacon_rate);
+ 		break;
++	case BEACON_RATE_HE:
++		if (!(flags2 & WPA_DRIVER_FLAGS2_BEACON_RATE_HE)) {
++			wpa_printf(MSG_INFO,
++				   "nl80211: Driver does not support setting Beacon frame rate (HE)");
++			return -1;
++		}
++		he_rate.mcs[0] = BIT(params->beacon_rate);
++		if (nla_put(msg, NL80211_TXRATE_LEGACY, 0, NULL))
++			return -1;
++		if (nla_put(msg, NL80211_TXRATE_HT, 0, NULL))
++			return -1;
++		if (nla_put(msg, NL80211_TXRATE_VHT, sizeof(vht_rate),
++			    &vht_rate))
++			return -1;
++		if (nla_put(msg, NL80211_TXRATE_HE, sizeof(he_rate), &he_rate))
++			return -1;
++		wpa_printf(MSG_DEBUG, " * beacon_rate = HE-MCS %u",
++			   params->beacon_rate);
++		break;
+ 	}
+ 
+ 	nla_nest_end(msg, band);
+@@ -4344,7 +4377,8 @@ static int wpa_driver_nl80211_set_ap(void *priv,
+ 	    nla_put(msg, NL80211_ATTR_BEACON_TAIL, params->tail_len,
+ 		    params->tail) ||
+ 	    nl80211_put_beacon_int(msg, params->beacon_int) ||
+-	    nl80211_put_beacon_rate(msg, drv->capa.flags, params) ||
++	    nl80211_put_beacon_rate(msg, drv->capa.flags, drv->capa.flags2,
++				    params) ||
+ 	    nl80211_put_dtim_period(msg, params->dtim_period) ||
+ 	    nla_put(msg, NL80211_ATTR_SSID, params->ssid_len, params->ssid))
+ 		goto fail;
+diff --git a/src/drivers/driver_nl80211_capa.c b/src/drivers/driver_nl80211_capa.c
+index 46f61fdbf925..c533f090ccfa 100644
+--- a/src/drivers/driver_nl80211_capa.c
++++ b/src/drivers/driver_nl80211_capa.c
+@@ -559,6 +559,10 @@ static void wiphy_info_ext_feature_flags(struct wiphy_info_data *info,
+ 		capa->flags |= WPA_DRIVER_FLAGS_BEACON_RATE_VHT;
+ 
+ 	if (ext_feature_isset(ext_features, len,
++			      NL80211_EXT_FEATURE_BEACON_RATE_HE))
++		capa->flags2 |= WPA_DRIVER_FLAGS2_BEACON_RATE_HE;
++
++	if (ext_feature_isset(ext_features, len,
+ 			      NL80211_EXT_FEATURE_SET_SCAN_DWELL))
+ 		capa->rrm_flags |= WPA_DRIVER_FLAGS_SUPPORT_SET_SCAN_DWELL;
+ 
+diff --git a/src/drivers/nl80211_copy.h b/src/drivers/nl80211_copy.h
+index dad8c8f8581f..2de646a3c18d 100644
+--- a/src/drivers/nl80211_copy.h
++++ b/src/drivers/nl80211_copy.h
+@@ -1743,8 +1743,9 @@ enum nl80211_commands {
+  *	specify just a single bitrate, which is to be used for the beacon.
+  *	The driver must also specify support for this with the extended
+  *	features NL80211_EXT_FEATURE_BEACON_RATE_LEGACY,
+- *	NL80211_EXT_FEATURE_BEACON_RATE_HT and
+- *	NL80211_EXT_FEATURE_BEACON_RATE_VHT.
++ *	NL80211_EXT_FEATURE_BEACON_RATE_HT,
++ *	NL80211_EXT_FEATURE_BEACON_RATE_VHT and
++ *	NL80211_EXT_FEATURE_BEACON_RATE_HE.
+  *
+  * @NL80211_ATTR_FRAME_MATCH: A binary attribute which typically must contain
+  *	at least one byte, currently used with @NL80211_CMD_REGISTER_FRAME.
+@@ -4702,6 +4703,10 @@ enum nl80211_key_attributes {
+  * @NL80211_TXRATE_VHT: VHT rates allowed for TX rate selection,
+  *	see &struct nl80211_txrate_vht
+  * @NL80211_TXRATE_GI: configure GI, see &enum nl80211_txrate_gi
++ * @NL80211_TXRATE_HE: HE rates allowed for TX rate selection,
++ *	see &struct nl80211_txrate_he
++ * @NL80211_TXRATE_HE_GI: configure HE GI, 0.8us, 1.6us and 3.2us.
++ * @NL80211_TXRATE_HE_LTF: configure HE LTF, 1XLTF, 2XLTF and 4XLTF.
+  * @__NL80211_TXRATE_AFTER_LAST: internal
+  * @NL80211_TXRATE_MAX: highest TX rate attribute
+  */
+@@ -4711,6 +4716,9 @@ enum nl80211_tx_rate_attributes {
+ 	NL80211_TXRATE_HT,
+ 	NL80211_TXRATE_VHT,
+ 	NL80211_TXRATE_GI,
++	NL80211_TXRATE_HE,
++	NL80211_TXRATE_HE_GI,
++	NL80211_TXRATE_HE_LTF,
+ 
+ 	/* keep last */
+ 	__NL80211_TXRATE_AFTER_LAST,
+@@ -4728,6 +4736,15 @@ struct nl80211_txrate_vht {
+ 	__u16 mcs[NL80211_VHT_NSS_MAX];
+ };
+ 
++#define NL80211_HE_NSS_MAX		8
++/**
++ * struct nl80211_txrate_he - HE MCS/NSS txrate bitmap
++ * @mcs: MCS bitmap table for each NSS (array index 0 for 1 stream, etc.)
++ */
++struct nl80211_txrate_he {
++	__u16 mcs[NL80211_HE_NSS_MAX];
++};
++
+ enum nl80211_txrate_gi {
+ 	NL80211_TXRATE_DEFAULT_GI,
+ 	NL80211_TXRATE_FORCE_SGI,
+@@ -5773,6 +5790,9 @@ enum nl80211_feature_flags {
+  * @NL80211_EXT_FEATURE_CONTROL_PORT_OVER_NL80211_TX_STATUS: The driver
+  *	can report tx status for control port over nl80211 tx operations.
+  *
++ * @NL80211_EXT_FEATURE_BEACON_RATE_HE: Driver supports beacon rate
++ *	configuration (AP/mesh) with HE rates.
++ *
+  * @NUM_NL80211_EXT_FEATURES: number of extended features.
+  * @MAX_NL80211_EXT_FEATURES: highest extended feature index.
+  */
+@@ -5828,6 +5848,7 @@ enum nl80211_ext_feature_index {
+ 	NL80211_EXT_FEATURE_BEACON_PROTECTION_CLIENT,
+ 	NL80211_EXT_FEATURE_SCAN_FREQ_KHZ,
+ 	NL80211_EXT_FEATURE_CONTROL_PORT_OVER_NL80211_TX_STATUS,
++	NL80211_EXT_FEATURE_BEACON_RATE_HE,
+ 
+ 	/* add new features before the definition below */
+ 	NUM_NL80211_EXT_FEATURES,
+-- 
+2.7.4
+

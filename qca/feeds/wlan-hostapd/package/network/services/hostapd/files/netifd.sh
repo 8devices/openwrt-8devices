@@ -129,9 +129,9 @@ EOF
 
 hostapd_common_add_bss_config() {
 	config_add_string 'bssid:macaddr' 'ssid:string'
-	config_add_boolean wds wmm uapsd hidden
+	config_add_boolean wds wmm uapsd rnr
 
-	config_add_int maxassoc max_inactivity
+	config_add_int maxassoc max_inactivity hidden
 	config_add_boolean disassoc_low_ack isolate short_preamble
 
 	config_add_int \
@@ -142,6 +142,7 @@ hostapd_common_add_bss_config() {
 
 	config_add_boolean rsn_preauth auth_cache
 	config_add_int ieee80211w sae_pwe
+	config_add_string sae_password
 
 	config_add_string 'auth_server:host' 'server:host'
 	config_add_string auth_secret
@@ -218,7 +219,8 @@ hostapd_set_bss_options() {
 		wps_model_name wps_model_number wps_serial_number \
 		macfilter ssid wmm uapsd hidden short_preamble rsn_preauth \
 		iapp_interface obss_interval vendor_elements \
-		bss_load_update_period rrm wnm wnm_sleep chan_util_avg_period
+		bss_load_update_period rrm wnm wnm_sleep chan_util_avg_period \
+		rnr
 
 	json_get_vars airtime_bss_weight airtime_bss_limit
 	json_get_values airtime_sta_weight_list airtime_sta_weight
@@ -234,6 +236,7 @@ hostapd_set_bss_options() {
 	set_default obss_interval 0
 	set_default airtime_bss_weight 0
 	set_default airtime_bss_limit 0
+	set_default rnr 0
 
 	append bss_conf "ctrl_interface=/var/run/hostapd"
 	if [ "$isolate" -gt 0 ]; then
@@ -254,6 +257,7 @@ hostapd_set_bss_options() {
 	append bss_conf "wmm_enabled=$wmm" "$N"
 	append bss_conf "ignore_broadcast_ssid=$hidden" "$N"
 	append bss_conf "uapsd_advertisement_enabled=$uapsd" "$N"
+	[ $rnr -gt 0 ] && append bss_conf "rnr_beacon=$rnr" "$N"
 
 	[ "$wpa" -gt 0 ] && {
 		[ -n "$wpa_group_rekey"  ] && append bss_conf "wpa_group_rekey=$wpa_group_rekey" "$N"
@@ -372,6 +376,8 @@ hostapd_set_bss_options() {
 			append bss_conf "ieee80211w=1" "$N"
 			append bss_conf "sae_require_mfp=1" "$N"
 			append wpa_key_mgmt "SAE"
+			json_get_vars sae_password
+			[ -n "$sae_password" ] && append bss_conf "sae_password=$sae_password" "$N"
 		;;
 		owe)
 			append wpa_key_mgmt "OWE"
@@ -742,13 +748,15 @@ wpa_supplicant_add_network() {
 		sae)
 			local passphrase
 
-			key_mgmt="$wpa_key_mgmt"
+			key_mgmt="SAE"
+
 			if [ ${#key} -eq 64 ]; then
 				passphrase="psk=${key}"
 			else
 				passphrase="psk=\"${key}\""
 			fi
 			append network_data "$passphrase" "$N$T"
+			append network_data "ieee80211w=2" "$N$T"
 		;;
 	esac
 
@@ -772,12 +780,15 @@ wpa_supplicant_add_network() {
 	[ -n "$bssid" ] && append network_data "bssid=$bssid" "$N$T"
 	[ -n "$beacon_int" ] && append network_data "beacon_int=$beacon_int" "$N$T"
 
-	local bssid_blacklist bssid_whitelist
+	local bssid_blacklist bssid_whitelist saepwe
 	json_get_values bssid_blacklist bssid_blacklist
 	json_get_values bssid_whitelist bssid_whitelist
+	json_get_var sae_pwe sae_pwe
 
 	[ -n "$bssid_blacklist" ] && append network_data "bssid_blacklist=$bssid_blacklist" "$N$T"
 	[ -n "$bssid_whitelist" ] && append network_data "bssid_whitelist=$bssid_whitelist" "$N$T"
+
+	[ -n "$sae_pwe" ] && append saepwe "sae_pwe=$sae_pwe" "$N$T"
 
 	[ -n "$basic_rate" ] && {
 		local br rate_list=
@@ -825,6 +836,7 @@ $model_name
 $model_number
 $serial_number
 $config_methods
+$saepwe
 
 network={
 	$scan_ssid

@@ -19,29 +19,13 @@ than 20 MHz.
 
 Signed-off-by: Pradeep Kumar Chitrapu <pradeepc@codeaurora.org>
 ---
- src/ap/hostapd.c                |  2 +-
  wpa_supplicant/mesh.c           |  6 ++++
  wpa_supplicant/wpa_supplicant.c | 54 +++++++++++++++++++++------------
- 3 files changed, 41 insertions(+), 21 deletions(-)
+ 2 files changed, 41 insertions(+), 21 deletions(-)
 
-diff --git a/src/ap/hostapd.c b/src/ap/hostapd.c
-index a000e5b08f93..94e02d267d6f 100644
---- a/src/ap/hostapd.c
-+++ b/src/ap/hostapd.c
-@@ -1710,7 +1710,7 @@ static int setup_interface2(struct hostapd_iface *iface)
- 			ch_width = op_class_to_ch_width(iface->conf->op_class);
- 			hostapd_set_oper_chwidth(iface->conf, ch_width);
- 			if (is_6ghz_op_class(iface->conf->op_class) && !iface->conf->secondary_channel &&
--			    center_idx_to_bw_6ghz(iface->conf->he_oper_centr_freq_seg0_idx))
-+			    center_idx_to_bw_6ghz(iface->conf->he_oper_centr_freq_seg0_idx) > 0)
- 				iface->conf->secondary_channel = (((iface->conf->channel - 1) / 4 ) % 2) ? -1 : 1 ;
- 		}
- 
-diff --git a/wpa_supplicant/mesh.c b/wpa_supplicant/mesh.c
-index c085466b1e71..c1630d09a254 100644
 --- a/wpa_supplicant/mesh.c
 +++ b/wpa_supplicant/mesh.c
-@@ -333,6 +333,12 @@ static int wpa_supplicant_mesh_init(struct wpa_supplicant *wpa_s,
+@@ -333,6 +333,12 @@ static int wpa_supplicant_mesh_init(stru
  			   frequency);
  		goto out_free;
  	}
@@ -54,22 +38,20 @@ index c085466b1e71..c1630d09a254 100644
  	if (ssid->ht40)
  		conf->secondary_channel = ssid->ht40;
  	if (conf->hw_mode == HOSTAPD_MODE_IEEE80211A && ssid->vht) {
-diff --git a/wpa_supplicant/wpa_supplicant.c b/wpa_supplicant/wpa_supplicant.c
-index 4f8619c2f881..5cf0a51fce35 100644
 --- a/wpa_supplicant/wpa_supplicant.c
 +++ b/wpa_supplicant/wpa_supplicant.c
-@@ -2348,7 +2348,9 @@ void ibss_mesh_setup_freq(struct wpa_supplicant *wpa_s,
+@@ -2365,7 +2365,9 @@ void ibss_mesh_setup_freq(struct wpa_sup
  	struct hostapd_hw_modes *mode = NULL;
  	int ht40plus[] = { 36, 44, 52, 60, 100, 108, 116, 124, 132, 149, 157,
  			   184, 192 };
 -	int vht80[] = { 36, 52, 100, 116, 132, 149 };
 +	unsigned int bw80[] = { 5180, 5260, 5500, 5580, 5660, 5745, 5955,
 +				6035, 6115, 6195, 6275, 6355, 6435, 6515,
-+				6595, 6675, 6755, 6835, 6195, 6995 };
++				6595, 6675, 6755, 6835, 6915, 6995 };
  	struct hostapd_channel_data *pri_chan = NULL, *sec_chan = NULL;
  	u8 channel;
  	int i, chan_idx, ht40 = -1, res, obss_scan = 1;
-@@ -2356,7 +2358,7 @@ void ibss_mesh_setup_freq(struct wpa_supplicant *wpa_s,
+@@ -2373,7 +2375,7 @@ void ibss_mesh_setup_freq(struct wpa_sup
  	struct hostapd_freq_params vht_freq;
  	int chwidth, seg0, seg1;
  	u32 vht_caps = 0;
@@ -78,7 +60,7 @@ index 4f8619c2f881..5cf0a51fce35 100644
  
  	freq->freq = ssid->frequency;
  
-@@ -2408,9 +2410,16 @@ void ibss_mesh_setup_freq(struct wpa_supplicant *wpa_s,
+@@ -2425,9 +2427,16 @@ void ibss_mesh_setup_freq(struct wpa_sup
  	if (!mode)
  		return;
  
@@ -95,7 +77,7 @@ index 4f8619c2f881..5cf0a51fce35 100644
  #ifdef CONFIG_HT_OVERRIDES
  	if (ssid->disable_ht) {
  		freq->ht_enabled = 0;
-@@ -2543,8 +2552,6 @@ skip_ht40:
+@@ -2560,8 +2569,6 @@ skip_ht40:
  	    !(wpa_s->drv_flags & WPA_DRIVER_FLAGS_VHT_IBSS))
  		return;
  
@@ -104,7 +86,7 @@ index 4f8619c2f881..5cf0a51fce35 100644
  #ifdef CONFIG_VHT_OVERRIDES
  	if (ssid->disable_vht) {
  		freq->vht_enabled = 0;
-@@ -2552,12 +2559,16 @@ skip_ht40:
+@@ -2569,12 +2576,16 @@ skip_ht40:
  	}
  #endif /* CONFIG_VHT_OVERRIDES */
  
@@ -123,7 +105,7 @@ index 4f8619c2f881..5cf0a51fce35 100644
  
  #ifdef CONFIG_HE_OVERRIDES
  	if (is_24ghz)
-@@ -2565,16 +2576,14 @@ skip_ht40:
+@@ -2582,16 +2593,14 @@ skip_ht40:
  #endif /* CONFIG_HE_OVERRIDES */
  
  	/* setup center_freq1, bandwidth */
@@ -144,7 +126,7 @@ index 4f8619c2f881..5cf0a51fce35 100644
  		struct hostapd_channel_data *chan;
  
  		chan = hw_get_channel_chan(mode, i, NULL);
-@@ -2587,16 +2596,20 @@ skip_ht40:
+@@ -2604,16 +2613,20 @@ skip_ht40:
  	}
  
  	chwidth = CHANWIDTH_80MHZ;
@@ -169,7 +151,7 @@ index 4f8619c2f881..5cf0a51fce35 100644
  				struct hostapd_channel_data *chan;
  
  				chan = hw_get_channel_chan(mode, i, NULL);
-@@ -2610,9 +2623,10 @@ skip_ht40:
+@@ -2627,9 +2640,10 @@ skip_ht40:
  
  				/* Found a suitable second segment for 80+80 */
  				chwidth = CHANWIDTH_80P80MHZ;
@@ -183,7 +165,7 @@ index 4f8619c2f881..5cf0a51fce35 100644
  			}
  
  			if (chwidth == CHANWIDTH_80P80MHZ)
-@@ -2630,7 +2644,7 @@ skip_ht40:
+@@ -2647,7 +2661,7 @@ skip_ht40:
  		}
  	} else if (ssid->max_oper_chwidth == CHANWIDTH_USE_HT) {
  		chwidth = CHANWIDTH_USE_HT;
@@ -192,6 +174,57 @@ index 4f8619c2f881..5cf0a51fce35 100644
  #ifdef CONFIG_HT_OVERRIDES
  		if (ssid->disable_ht40)
  			seg0 = 0;
--- 
-2.17.1
-
+--- a/wpa_supplicant/ap.c
++++ b/wpa_supplicant/ap.c
+@@ -237,11 +237,11 @@ int wpa_supplicant_conf_ap_ht(struct wpa
+ 				wpas_conf_ap_vht(wpa_s, ssid, conf, mode);
+ 			}
+ 
+-			if (mode->he_capab[wpas_mode_to_ieee80211_mode(
+-					    ssid->mode)].he_supported &&
+-			    ssid->he)
+-				conf->ieee80211ax = 1;
+ 		}
++		if (mode->he_capab[wpas_mode_to_ieee80211_mode(
++				    ssid->mode)].he_supported && ssid->he)
++			conf->ieee80211ax = 1;
++
+ 	}
+ 
+ 	if (conf->secondary_channel) {
+--- a/wpa_supplicant/mesh_mpm.c
++++ b/wpa_supplicant/mesh_mpm.c
+@@ -251,6 +251,9 @@ static void mesh_mpm_send_plink_action(s
+ 			   HE_MAX_MCS_CAPAB_SIZE +
+ 			   HE_MAX_PPET_CAPAB_SIZE;
+ 		buf_len += 3 + sizeof(struct ieee80211_he_operation);
++                if (is_6ghz_op_class(bss->iconf->op_class))
++                        buf_len += sizeof(struct ieee80211_he_6ghz_oper_info) +
++                                3 + sizeof(struct ieee80211_he_6ghz_band_cap);
+ 	}
+ #endif /* CONFIG_IEEE80211AX */
+ 	if (type != PLINK_CLOSE)
+@@ -380,6 +383,7 @@ static void mesh_mpm_send_plink_action(s
+ 		pos = hostapd_eid_he_capab(bss, he_capa_oper,
+ 					   IEEE80211_MODE_MESH);
+ 		pos = hostapd_eid_he_operation(bss, pos);
++		pos = hostapd_eid_he_6ghz_band_cap(bss, pos);
+ 		wpabuf_put_data(buf, he_capa_oper, pos - he_capa_oper);
+ 	}
+ #endif /* CONFIG_IEEE80211AX */
+@@ -749,6 +753,7 @@ static struct sta_info * mesh_mpm_add_pe
+ #ifdef CONFIG_IEEE80211AX
+ 	copy_sta_he_capab(data, sta, IEEE80211_MODE_MESH,
+ 			  elems->he_capabilities, elems->he_capabilities_len);
++	copy_sta_he_6ghz_capab(data, sta, elems->he_6ghz_band_cap);
+ #endif /* CONFIG_IEEE80211AX */
+ 
+ 	if (hostapd_get_aid(data, sta) < 0) {
+@@ -770,6 +775,7 @@ static struct sta_info * mesh_mpm_add_pe
+ 	params.vht_capabilities = sta->vht_capabilities;
+ 	params.he_capab = sta->he_capab;
+ 	params.he_capab_len = sta->he_capab_len;
++	params.he_6ghz_capab = sta->he_6ghz_capab;
+ 	params.flags |= WPA_STA_WMM;
+ 	params.flags_mask |= WPA_STA_AUTHENTICATED;
+ 	if (conf->security == MESH_CONF_SEC_NONE) {

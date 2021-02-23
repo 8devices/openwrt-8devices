@@ -16,7 +16,7 @@
  
  
  static int hostapd_cli_cmd_disassoc_imminent(struct wpa_ctrl *ctrl, int argc,
-@@ -1538,7 +1536,6 @@ static const struct hostapd_cli_cmd host
+@@ -1562,7 +1560,6 @@ static const struct hostapd_cli_cmd host
  #endif /* CONFIG_TAXONOMY */
  	{ "sa_query", hostapd_cli_cmd_sa_query, hostapd_complete_stations,
  	  "<addr> = send SA Query to a station" },
@@ -24,7 +24,7 @@
  	{ "wps_pin", hostapd_cli_cmd_wps_pin, NULL,
  	  "<uuid> <pin> [timeout] [addr] = add WPS Enrollee PIN" },
  	{ "wps_check_pin", hostapd_cli_cmd_wps_check_pin, NULL,
-@@ -1563,7 +1560,6 @@ static const struct hostapd_cli_cmd host
+@@ -1587,7 +1584,6 @@ static const struct hostapd_cli_cmd host
  	  "<SSID> <auth> <encr> <key> = configure AP" },
  	{ "wps_get_status", hostapd_cli_cmd_wps_get_status, NULL,
  	  "= show current WPS status" },

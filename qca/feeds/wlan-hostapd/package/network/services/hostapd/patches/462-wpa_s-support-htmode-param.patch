@@ -27,7 +27,7 @@ Signed-off-by: Antonio Quartulli <ordex@autistici.org>
  	 * bssid_hint - BSSID of a proposed AP
 --- a/src/drivers/driver_nl80211.c
 +++ b/src/drivers/driver_nl80211.c
-@@ -5728,6 +5728,22 @@ retry:
+@@ -5732,6 +5732,22 @@ retry:
  		nla_put_u32(msg, NL80211_ATTR_MCAST_RATE, params->mcast_rate);
  	}
  
@@ -145,7 +145,7 @@ Signed-off-by: Antonio Quartulli <ordex@autistici.org>
  	/**
 --- a/wpa_supplicant/wpa_supplicant.c
 +++ b/wpa_supplicant/wpa_supplicant.c
-@@ -3594,6 +3594,8 @@ static void wpas_start_assoc_cb(struct w
+@@ -3645,6 +3645,8 @@ static void wpas_start_assoc_cb(struct w
  			i++;
  		}
  		params.mcast_rate = ssid->mcast_rate;

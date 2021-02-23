@@ -1,6 +1,6 @@
 --- a/hostapd/ctrl_iface.c
 +++ b/hostapd/ctrl_iface.c
-@@ -2658,9 +2658,9 @@ static int hostapd_ctrl_iface_chan_switc
+@@ -2672,9 +2672,9 @@ static int hostapd_ctrl_iface_chan_switc
  
  	for (i = 0; i < iface->num_bss; i++) {
  
@@ -15,7 +15,7 @@
  		if (ret) {
 --- a/src/ap/ap_config.h
 +++ b/src/ap/ap_config.h
-@@ -1039,6 +1039,13 @@ struct hostapd_config {
+@@ -1040,6 +1040,13 @@ struct hostapd_config {
  	u8 he_oper_centr_freq_seg1_idx;
  #endif /* CONFIG_IEEE80211AX */
  
@@ -31,7 +31,7 @@
  #define CH_SWITCH_VHT_DISABLED BIT(1)
 --- a/src/ap/ctrl_iface_ap.c
 +++ b/src/ap/ctrl_iface_ap.c
-@@ -1084,6 +1084,7 @@ int hostapd_parse_csa_settings(const cha
+@@ -1082,6 +1082,7 @@ int hostapd_parse_csa_settings(const cha
  	SET_CSA_SETTING(sec_channel_offset);
  	settings->freq_params.ht_enabled = !!os_strstr(pos, " ht");
  	settings->freq_params.vht_enabled = !!os_strstr(pos, " vht");
@@ -95,7 +95,7 @@
  				  int sec_channel, u8 *op_class, u8 *channel);
 --- a/src/common/ieee802_11_defs.h
 +++ b/src/common/ieee802_11_defs.h
-@@ -1293,7 +1293,7 @@ struct ieee80211_ampe_ie {
+@@ -1296,7 +1296,7 @@ struct ieee80211_ampe_ie {
  
  #define VHT_RX_NSS_MAX_STREAMS			    8
  
@@ -106,7 +106,7 @@
  #define CHANWIDTH_160MHZ	2
 --- a/src/ap/drv_callbacks.c
 +++ b/src/ap/drv_callbacks.c
-@@ -862,9 +862,10 @@ void hostapd_event_ch_switch(struct host
+@@ -881,9 +881,10 @@ void hostapd_event_ch_switch(struct host
  
  	hostapd_logger(hapd, NULL, HOSTAPD_MODULE_IEEE80211,
  		       HOSTAPD_LEVEL_INFO,
@@ -119,7 +119,7 @@
  		       width, channel_width_to_string(width), cf1, cf2);
  
  	if (!hapd->iface->current_mode) {
-@@ -919,16 +920,30 @@ void hostapd_event_ch_switch(struct host
+@@ -947,16 +948,30 @@ void hostapd_event_ch_switch(struct host
  	hapd->iconf->ieee80211n = ht;
  	if (!ht) {
  		hapd->iconf->ieee80211ac = 0;
@@ -169,33 +169,9 @@
  int hostapd_switch_channel(struct hostapd_data *hapd,
  			   struct csa_settings *settings);
  void
---- a/src/ap/beacon.c
-+++ b/src/ap/beacon.c
-@@ -580,6 +580,10 @@ static u8 * hostapd_gen_probe_resp(struc
- 	}
- #endif /* CONFIG_IEEE80211AX */
- 
-+	if ((hapd->iconf->ieee80211ac && !hapd->conf->disable_11ac) ||
-+	     hapd->iconf->ieee80211ax)
-+		pos = hostapd_eid_wb_chsw_wrapper(hapd, pos);
-+
- #ifdef CONFIG_IEEE80211AC
- 	if (hapd->conf->vendor_vht)
- 		pos = hostapd_eid_vendor_vht(hapd, pos);
-@@ -1317,6 +1321,10 @@ int ieee802_11_build_ap_params(struct ho
- 	}
- #endif /* CONFIG_IEEE80211AX */
- 
-+	if ((hapd->iconf->ieee80211ac && !hapd->conf->disable_11ac) ||
-+	     hapd->iconf->ieee80211ax)
-+		tailpos = hostapd_eid_wb_chsw_wrapper(hapd, tailpos);
-+
- #ifdef CONFIG_IEEE80211AC
- 	if (hapd->conf->vendor_vht)
- 		tailpos = hostapd_eid_vendor_vht(hapd, tailpos);
 --- a/src/drivers/driver_nl80211.c
 +++ b/src/drivers/driver_nl80211.c
-@@ -4672,7 +4672,7 @@ static int nl80211_put_freq_params(struc
+@@ -4676,7 +4676,7 @@ static int nl80211_put_freq_params(struc
  		     nla_put_u32(msg, NL80211_ATTR_CENTER_FREQ2,
  				 freq->center_freq2)))
  			return -ENOBUFS;

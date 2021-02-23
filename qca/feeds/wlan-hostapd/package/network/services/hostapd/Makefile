@@ -7,9 +7,9 @@
 include $(TOPDIR)/rules.mk
 
 PKG_NAME:=hostapd
-PKG_VERSION:=2020-07-02
+PKG_VERSION:=2020-10-14
 PKG_RELEASE:=1
-PKG_REV:=58b384f467
+PKG_REV:=0f07230eb968
 
 PKG_SOURCE:=$(PKG_NAME)-$(PKG_VERSION).tar.bz2
 PKG_SOURCE_URL:=http://w1.fi/hostap.git
@@ -125,6 +125,17 @@ define Package/hostapd/description
  Authenticator.
 endef
 
+define Package/hostapd-macsec
+$(call Package/hostapd/Default)
+  TITLE+= (macsec)
+  DEPENDS+= @TARGET_ipq +kmod-qca-nss-macsec +libopenssl
+  VARIANT:=macsec
+endef
+
+define Package/hostapd-macsec/description
+ This package is Hostapd Authenticator for macsec support.
+endef
+
 define Package/hostapd-mini
 $(call Package/hostapd/Default)
   TITLE+= (WPA-PSK only)
@@ -206,6 +217,18 @@ endef
 
 define Package/wpa-supplicant/config
 	source "$(SOURCE)/Config.in"
+endef
+
+define Package/wpa-supplicant-macsec
+  $(call Package/wpa-supplicant)
+  TITLE:=WPA Supplicant (MACSEC)
+  DEPENDS+= @TARGET_ipq +kmod-qca-nss-macsec
+  CONFLICTS:=
+  VARIANT:=supplicant-macsec
+endef
+
+define Package/wpa-supplicant-macsec/Description
+  WPA Supplicant with MACSEC support.
 endef
 
 define Package/wpa-supplicant-p2p
@@ -301,7 +324,7 @@ TARGET_CPPFLAGS := \
 	-D_GNU_SOURCE \
 	$(if $(CONFIG_WPA_MSG_MIN_PRIORITY),-DCONFIG_MSG_MIN_PRIORITY=$(CONFIG_WPA_MSG_MIN_PRIORITY))
 
-TARGET_CFLAGS += -ffunction-sections -fdata-sections
+TARGET_CFLAGS += -ffunction-sections -fdata-sections  -Wall -Werror -Wno-pointer-sign
 TARGET_LDFLAGS += -Wl,--gc-sections
 ifeq ($(findstring supplicant,$(BUILD_VARIANT)),)
   TARGET_LDFLAGS += -lubox -lubus
@@ -309,6 +332,12 @@ endif
 
 ifdef CONFIG_PACKAGE_kmod-cfg80211
   TARGET_LDFLAGS += -lm -lnl-3 -lnl-genl-3 -lnl-route-3
+endif
+
+ifeq ($(LOCAL_VARIANT),macsec)
+	TARGET_LDFLAGS += -lcrypto -lssl -lfal -L$(STAGING_DIR)/usr/lib
+	TARGET_CPPFLAGS += \
+	-I$(STAGING_DIR)/usr/include/qca-nss-macsec
 endif
 
 define Build/RunMake
@@ -375,7 +404,9 @@ define Build/InstallDev
 	$(INSTALL_DIR) $(1)/usr/lib/
 	$(CP) $(PKG_BUILD_DIR)/src/common/wpa_ctrl.h $(1)/usr/include
 ifneq ($(CONFIG_PACKAGE_hostapd-utils),)
+ifneq ($(LOCAL_VARIANT),macsec)
 	$(CP) $(PKG_BUILD_DIR)/wpa_supplicant/libwpa_client.so $(1)/usr/lib
+endif
 endif
 endef
 
@@ -390,6 +421,8 @@ endef
 define Package/hostapd-common/install
 	$(INSTALL_DIR) $(1)/lib/netifd
 	$(INSTALL_DATA) ./files/netifd.sh $(1)/lib/netifd/hostapd.sh
+	$(INSTALL_DIR) $(1)/etc/init.d
+	$(INSTALL_BIN) ./files/wpad.init $(1)/etc/init.d/wpad
 endef
 
 define Package/hostapd-common-old/install
@@ -401,15 +434,24 @@ endef
 define Package/hostapd/install
 	$(call Install/hostapd,$(1))
 	$(INSTALL_BIN) $(PKG_BUILD_DIR)/hostapd/hostapd $(1)/usr/sbin/
+	$(INSTALL_BIN) $(PKG_BUILD_DIR)/hostapd/hostapd_cli $(1)/usr/sbin/
 endef
+
+define Package/hostapd-macsec/install
+	$(call Install/hostapd,$(1))
+	$(INSTALL_BIN) $(PKG_BUILD_DIR)/hostapd/hostapd $(1)/usr/sbin/hostapd-macsec
+endef
+
 Package/hostapd-mini/install = $(Package/hostapd/install)
 
 ifneq ($(LOCAL_TYPE),supplicant)
+ifneq ($(LOCAL_VARIANT),macsec)
   define Package/hostapd-utils/install
 	$(INSTALL_DIR) $(1)/usr/sbin $(1)/etc/rc.button
 	$(INSTALL_BIN) $(PKG_BUILD_DIR)/hostapd/hostapd_cli $(1)/usr/sbin/
 	$(INSTALL_BIN) ./files/wps-hotplug.sh $(1)/etc/rc.button/wps
   endef
+endif
 endif
 
 define Package/wpad/install
@@ -429,14 +471,22 @@ define Package/wpa-supplicant/install
 	$(call Install/supplicant,$(1))
 	$(INSTALL_BIN) $(PKG_BUILD_DIR)/wpa_supplicant/wpa_supplicant $(1)/usr/sbin/
 endef
+
+define Package/wpa-supplicant-macsec/install
+	$(call Install/supplicant,$(1))
+	$(INSTALL_BIN) $(PKG_BUILD_DIR)/wpa_supplicant/wpa_supplicant $(1)/usr/sbin/wpa_supplicant-macsec
+endef
+
 Package/wpa-supplicant-mini/install = $(Package/wpa-supplicant/install)
 Package/wpa-supplicant-p2p/install = $(Package/wpa-supplicant/install)
 
 ifneq ($(LOCAL_TYPE),hostapd)
+ifneq ($(LOCAL_VARIANT),macsec)
   define Package/wpa-cli/install
 	$(INSTALL_DIR) $(1)/usr/sbin
 	$(CP) $(PKG_BUILD_DIR)/wpa_supplicant/wpa_cli $(1)/usr/sbin/
   endef
+endif
 endif
 
 ifeq ($(BUILD_VARIANT),supplicant-full)
@@ -448,10 +498,12 @@ endif
 
 $(eval $(call BuildPackage,hostapd))
 $(eval $(call BuildPackage,hostapd-mini))
+$(eval $(call BuildPackage,hostapd-macsec))
 $(eval $(call BuildPackage,wpad))
 $(eval $(call BuildPackage,wpad-mesh))
 $(eval $(call BuildPackage,wpad-mini))
 $(eval $(call BuildPackage,wpa-supplicant))
+$(eval $(call BuildPackage,wpa-supplicant-macsec))
 $(eval $(call BuildPackage,wpa-supplicant-mesh))
 $(eval $(call BuildPackage,wpa-supplicant-mini))
 $(eval $(call BuildPackage,wpa-supplicant-p2p))

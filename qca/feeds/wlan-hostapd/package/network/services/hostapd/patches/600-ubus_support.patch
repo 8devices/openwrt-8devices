@@ -1,8 +1,8 @@
 --- a/hostapd/Makefile
 +++ b/hostapd/Makefile
-@@ -171,6 +171,11 @@ OBJS += ../src/common/hw_features_common
- 
- OBJS += ../src/eapol_auth/eapol_auth_sm.o
+@@ -380,6 +380,11 @@ else
+ OBJS += ../src/l2_packet/l2_packet_none.o
+ endif
  
 +ifdef CONFIG_UBUS
 +CFLAGS += -DUBUS_SUPPORT
@@ -10,8 +10,8 @@
 +LIBS += -lubox -lubus
 +endif
  
- ifdef CONFIG_CODE_COVERAGE
- CFLAGS += -O0 -fprofile-arcs -ftest-coverage
+ ifdef CONFIG_ERP
+ CFLAGS += -DCONFIG_ERP
 --- a/src/ap/hostapd.h
 +++ b/src/ap/hostapd.h
 @@ -17,6 +17,7 @@
@@ -691,7 +691,7 @@
  
  
  u8 * hostapd_eid_multi_ap(struct hostapd_data *hapd, u8 *eid)
-@@ -1572,7 +1573,7 @@ void auth_sae_process_commit(void *eloop
+@@ -1573,7 +1574,7 @@ void auth_sae_process_commit(void *eloop
  		   "SAE: Process next available message from queue");
  	dl_list_del(&q->list);
  	handle_auth(hapd, (const struct ieee80211_mgmt *) q->msg, q->len,
@@ -700,7 +700,7 @@
  	os_free(q);
  
  	if (eloop_is_timeout_registered(auth_sae_process_commit, hapd, NULL))
-@@ -2295,7 +2296,8 @@ ieee802_11_set_radius_info(struct hostap
+@@ -2296,7 +2297,8 @@ ieee802_11_set_radius_info(struct hostap
  
  static void handle_auth(struct hostapd_data *hapd,
  			const struct ieee80211_mgmt *mgmt, size_t len,
@@ -710,7 +710,7 @@
  {
  	u16 auth_alg, auth_transaction, status_code;
  	u16 resp = WLAN_STATUS_SUCCESS;
-@@ -2307,6 +2309,11 @@ static void handle_auth(struct hostapd_d
+@@ -2308,6 +2310,11 @@ static void handle_auth(struct hostapd_d
  	size_t resp_ies_len = 0;
  	u16 seq_ctrl;
  	struct radius_sta rad_info;
@@ -722,7 +722,7 @@
  
  	if (len < IEEE80211_HDRLEN + sizeof(mgmt->u.auth)) {
  		wpa_printf(MSG_INFO, "handle_auth - too short payload (len=%lu)",
-@@ -2466,6 +2473,14 @@ static void handle_auth(struct hostapd_d
+@@ -2467,6 +2474,14 @@ static void handle_auth(struct hostapd_d
  		resp = WLAN_STATUS_UNSPECIFIED_FAILURE;
  		goto fail;
  	}
@@ -737,7 +737,7 @@
  	if (res == HOSTAPD_ACL_PENDING)
  		return;
  
-@@ -4140,7 +4155,7 @@ void fils_hlp_timeout(void *eloop_ctx, v
+@@ -4162,7 +4177,7 @@ void fils_hlp_timeout(void *eloop_ctx, v
  
  static void handle_assoc(struct hostapd_data *hapd,
  			 const struct ieee80211_mgmt *mgmt, size_t len,
@@ -746,7 +746,7 @@
  {
  	u16 capab_info, listen_interval, seq_ctrl, fc;
  	int resp = WLAN_STATUS_SUCCESS;
-@@ -4359,6 +4374,11 @@ static void handle_assoc(struct hostapd_
+@@ -4381,6 +4396,11 @@ static void handle_assoc(struct hostapd_
  		left = res;
  	}
  #endif /* CONFIG_FILS */
@@ -758,7 +758,7 @@
  
  	/* followed by SSID and Supported rates; and HT capabilities if 802.11n
  	 * is used */
-@@ -4523,6 +4543,13 @@ static void handle_assoc(struct hostapd_
+@@ -4545,6 +4565,13 @@ static void handle_assoc(struct hostapd_
  					    pos, left, rssi, omit_rsnxe);
  	os_free(tmp);
  
@@ -770,9 +770,9 @@
 +	}
 +
  	/*
- 	 * Remove the station in case tranmission of a success response fails
+ 	 * Remove the station in case transmission of a success response fails
  	 * (the STA was added associated to the driver) or if the station was
-@@ -4932,7 +4959,7 @@ int ieee802_11_mgmt(struct hostapd_data
+@@ -4954,7 +4981,7 @@ int ieee802_11_mgmt(struct hostapd_data
  	}
  
  	if (stype == WLAN_FC_STYPE_PROBE_REQ) {
@@ -781,7 +781,7 @@
  		return 1;
  	}
  
-@@ -4952,17 +4979,17 @@ int ieee802_11_mgmt(struct hostapd_data
+@@ -4974,17 +5001,17 @@ int ieee802_11_mgmt(struct hostapd_data
  	switch (stype) {
  	case WLAN_FC_STYPE_AUTH:
  		wpa_printf(MSG_DEBUG, "mgmt::auth");
@@ -852,7 +852,7 @@
  int ieee802_11_update_beacons(struct hostapd_iface *iface);
 --- a/src/ap/drv_callbacks.c
 +++ b/src/ap/drv_callbacks.c
-@@ -119,6 +119,10 @@ int hostapd_notif_assoc(struct hostapd_d
+@@ -145,6 +145,10 @@ int hostapd_notif_assoc(struct hostapd_d
  	u16 reason = WLAN_REASON_UNSPECIFIED;
  	int status = WLAN_STATUS_SUCCESS;
  	const u8 *p2p_dev_addr = NULL;
@@ -863,7 +863,7 @@
  
  	if (addr == NULL) {
  		/*
-@@ -211,6 +215,12 @@ int hostapd_notif_assoc(struct hostapd_d
+@@ -237,6 +241,12 @@ int hostapd_notif_assoc(struct hostapd_d
  		goto fail;
  	}
  

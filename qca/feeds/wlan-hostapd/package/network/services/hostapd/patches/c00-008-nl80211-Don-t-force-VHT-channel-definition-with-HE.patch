@@ -20,7 +20,7 @@ Signed-off-by: Sven Eckelmann <seckelmann@datto.com>
 
 --- a/src/drivers/driver_nl80211.c
 +++ b/src/drivers/driver_nl80211.c
-@@ -4633,8 +4633,8 @@ static int nl80211_put_freq_params(struc
+@@ -4637,8 +4637,8 @@ static int nl80211_put_freq_params(struc
  	wpa_printf(MSG_DEBUG, "  * ht_enabled=%d", freq->ht_enabled);
  
  	hw_mode = ieee80211_freq_to_chan(freq->freq, &channel);

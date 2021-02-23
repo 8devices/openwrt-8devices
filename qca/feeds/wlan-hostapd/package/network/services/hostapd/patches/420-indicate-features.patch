@@ -8,7 +8,7 @@
  #include "crypto/random.h"
  #include "crypto/tls.h"
  #include "common/version.h"
-@@ -691,7 +692,7 @@ int main(int argc, char *argv[])
+@@ -690,7 +691,7 @@ int main(int argc, char *argv[])
  #endif /* CONFIG_DPP */
  
  	for (;;) {
@@ -17,7 +17,7 @@
  		if (c < 0)
  			break;
  		switch (c) {
-@@ -728,6 +729,8 @@ int main(int argc, char *argv[])
+@@ -727,6 +728,8 @@ int main(int argc, char *argv[])
  			break;
  #endif /* CONFIG_DEBUG_LINUX_TRACING */
  		case 'v':

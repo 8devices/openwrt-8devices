@@ -1,14 +1,14 @@
 --- a/hostapd/Makefile
 +++ b/hostapd/Makefile
-@@ -31,6 +31,7 @@ CFLAGS += -I$(abspath ../src/utils)
- export BINDIR ?= /usr/local/bin/
+@@ -165,6 +165,7 @@ OBJS += ../src/common/hw_features_common
  
- -include .config
+ OBJS += ../src/eapol_auth/eapol_auth_sm.o
+ 
 +-include $(if $(MULTICALL), ../wpa_supplicant/.config)
  
- ifndef CONFIG_NO_GITVER
- # Add VERSION_STR postfix for builds from a git repository
-@@ -204,7 +205,8 @@ endif
+ ifdef CONFIG_CODE_COVERAGE
+ CFLAGS += -O0 -fprofile-arcs -ftest-coverage
+@@ -199,7 +200,8 @@ endif
  
  ifdef CONFIG_NO_VLAN
  CFLAGS += -DCONFIG_NO_VLAN
@@ -18,7 +18,7 @@
  OBJS += ../src/ap/vlan_init.o
  OBJS += ../src/ap/vlan_ifconfig.o
  OBJS += ../src/ap/vlan.o
-@@ -354,10 +356,14 @@ CFLAGS += -DCONFIG_MBO
+@@ -349,10 +351,14 @@ CFLAGS += -DCONFIG_MBO
  OBJS += ../src/ap/mbo_ap.o
  endif
  
@@ -36,9 +36,9 @@
  LIBS += $(DRV_AP_LIBS)
  
  ifdef CONFIG_L2_PACKET
-@@ -1311,6 +1317,12 @@ install: $(addprefix $(DESTDIR)$(BINDIR)
- 
- BCHECK=../src/drivers/build.hostapd
+@@ -1267,6 +1273,12 @@ install: $(addprefix $(DESTDIR)$(BINDIR)
+ _OBJS_VAR := OBJS
+ include ../src/objs.mk
  
 +hostapd_multi.a: $(BCHECK) $(OBJS)
 +	$(Q)$(CC) -c -o hostapd_multi.o -Dmain=hostapd_main $(CFLAGS) main.c
@@ -46,12 +46,12 @@
 +	@rm -f $@
 +	@$(AR) cr $@ hostapd_multi.o $(OBJS)
 +
- hostapd: $(BCHECK) $(OBJS)
+ hostapd: $(OBJS)
  	$(Q)$(CC) $(LDFLAGS) -o hostapd $(OBJS) $(LIBS)
  	@$(E) "  LD " $@
-@@ -1374,6 +1386,12 @@ SOBJS += ../src/crypto/sha256-kdf.o
- SOBJS += ../src/crypto/sha384-kdf.o
- SOBJS += ../src/crypto/sha512-kdf.o
+@@ -1341,6 +1353,12 @@ include ../src/objs.mk
+ _OBJS_VAR := SOBJS
+ include ../src/objs.mk
  
 +dump_cflags:
 +	@echo -n $(CFLAGS) " "
@@ -86,7 +86,7 @@
  	dpp_conf.cb_ctx = &interfaces;
 --- a/src/ap/drv_callbacks.c
 +++ b/src/ap/drv_callbacks.c
-@@ -1789,7 +1789,7 @@ err:
+@@ -1817,7 +1817,7 @@ err:
  #endif /* CONFIG_OWE */
  
  
@@ -95,7 +95,7 @@
  			  union wpa_event_data *data)
  {
  	struct hostapd_data *hapd = ctx;
-@@ -2035,8 +2035,8 @@ void wpa_supplicant_event(void *ctx, enu
+@@ -2063,8 +2063,8 @@ void wpa_supplicant_event(void *ctx, enu
  }
  
  
@@ -143,15 +143,15 @@
  {
 --- a/wpa_supplicant/Makefile
 +++ b/wpa_supplicant/Makefile
-@@ -27,6 +27,7 @@ CFLAGS += -I$(abspath ../src)
+@@ -38,6 +38,7 @@ PKG_CONFIG ?= pkg-config
+ CFLAGS += $(EXTRA_CFLAGS)
+ CFLAGS += -I$(abspath ../src)
  CFLAGS += -I$(abspath ../src/utils)
- 
- -include .config
 +-include $(if $(MULTICALL),../hostapd/.config)
  
  ifndef CONFIG_NO_GITVER
  # Add VERSION_STR postfix for builds from a git repository
-@@ -890,6 +891,10 @@ ifdef CONFIG_DYNAMIC_EAP_METHODS
+@@ -874,6 +875,10 @@ ifdef CONFIG_DYNAMIC_EAP_METHODS
  CFLAGS += -DCONFIG_DYNAMIC_EAP_METHODS
  LIBS += -ldl -rdynamic
  endif
@@ -162,7 +162,7 @@
  endif
  
  ifdef CONFIG_AP
-@@ -897,9 +902,11 @@ NEED_EAP_COMMON=y
+@@ -881,9 +886,11 @@ NEED_EAP_COMMON=y
  NEED_RSN_AUTHENTICATOR=y
  CFLAGS += -DCONFIG_AP
  OBJS += ap.o
@@ -174,7 +174,7 @@
  OBJS += ../src/ap/hostapd.o
  OBJS += ../src/ap/wpa_auth_glue.o
  OBJS += ../src/ap/utils.o
-@@ -979,6 +986,12 @@ endif
+@@ -963,6 +970,12 @@ endif
  ifdef CONFIG_HS20
  OBJS += ../src/ap/hs20.o
  endif
@@ -187,7 +187,7 @@
  endif
  
  ifdef CONFIG_MBO
-@@ -987,7 +1000,9 @@ CFLAGS += -DCONFIG_MBO
+@@ -971,7 +984,9 @@ CFLAGS += -DCONFIG_MBO
  endif
  
  ifdef NEED_RSN_AUTHENTICATOR
@@ -197,10 +197,10 @@
  NEED_AES_WRAP=y
  OBJS += ../src/ap/wpa_auth.o
  OBJS += ../src/ap/wpa_auth_ie.o
-@@ -1897,6 +1912,12 @@ wpa_priv: $(BCHECK) $(OBJS_priv)
+@@ -1860,6 +1875,12 @@ wpa_priv: $(BCHECK) $(OBJS_priv)
  
- $(OBJS_c) $(OBJS_t) $(OBJS_t2) $(OBJS) $(BCHECK) $(EXTRA_progs): .config
- 
+ _OBJS_VAR := OBJS
+ include ../src/objs.mk
 +wpa_supplicant_multi.a: .config $(BCHECK) $(OBJS) $(EXTRA_progs)
 +	$(Q)$(CC) -c -o wpa_supplicant_multi.o -Dmain=wpa_supplicant_main $(CFLAGS) main.c
 +	@$(E) "  CC " $<
@@ -210,7 +210,7 @@
  wpa_supplicant: $(BCHECK) $(OBJS) $(EXTRA_progs)
  	$(Q)$(LDO) $(LDFLAGS) -o wpa_supplicant $(OBJS) $(LIBS) $(EXTRALIBS)
  	@$(E) "  LD " $@
-@@ -1997,6 +2018,12 @@ endif
+@@ -1965,6 +1986,12 @@ eap_eke.so: ../src/eap_peer/eap_eke.c ..
  	$(Q)sed -e 's|\@BINDIR\@|$(BINDIR)|g' $< >$@
  	@$(E) "  sed" $<
  
@@ -260,7 +260,7 @@
  	os_memset(&eapol_test, 0, sizeof(eapol_test));
 --- a/wpa_supplicant/events.c
 +++ b/wpa_supplicant/events.c
-@@ -4604,7 +4604,7 @@ static void wpas_event_unprot_beacon(str
+@@ -4621,7 +4621,7 @@ static void wpas_event_unprot_beacon(str
  }
  
  
@@ -269,7 +269,7 @@
  			  union wpa_event_data *data)
  {
  	struct wpa_supplicant *wpa_s = ctx;
-@@ -5423,7 +5423,7 @@ void wpa_supplicant_event(void *ctx, enu
+@@ -5442,7 +5442,7 @@ void wpa_supplicant_event(void *ctx, enu
  }
  
  
@@ -311,7 +311,7 @@
  	os_memset(&global, 0, sizeof(global));
 --- a/wpa_supplicant/wpa_supplicant.c
 +++ b/wpa_supplicant/wpa_supplicant.c
-@@ -5992,6 +5992,10 @@ int radio_add_work(struct wpa_supplicant
+@@ -6148,6 +6148,10 @@ int radio_add_work(struct wpa_supplicant
  	return 0;
  }
  
@@ -322,7 +322,7 @@
  
  /**
   * radio_work_done - Indicate that a radio work item has been completed
-@@ -6891,6 +6895,9 @@ struct wpa_global * wpa_supplicant_init(
+@@ -7058,6 +7062,9 @@ struct wpa_global * wpa_supplicant_init(
  	wpa_msg_register_ifname_cb(wpa_supplicant_msg_ifname_cb);
  #endif /* CONFIG_NO_WPA_MSG */
  

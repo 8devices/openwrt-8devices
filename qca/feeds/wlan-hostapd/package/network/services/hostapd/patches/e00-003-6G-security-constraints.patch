@@ -1,4 +1,4 @@
-From dea995bbaf7693c59c37c08b69ac23d5a04d25eb Mon Sep 17 00:00:00 2001
+From 0fb1ecdb420b94319f56542d3deb5c61f6ae27ee Mon Sep 17 00:00:00 2001
 From: Aloka Dixit <alokad@codeaurora.org>
 Date: Tue, 8 Sep 2020 16:36:32 -0700
 Subject: [PATCH] AP: Add 6GHz security constraints
@@ -14,15 +14,13 @@ Signed-off-by: Aloka Dixit <alokad@codeaurora.org>
 ---
  src/ap/beacon.c              |   2 +
  src/drivers/driver.h         |  14 ++++
- src/drivers/driver_nl80211.c | 140 +++++++++++++++++++++++++++++++----
+ src/drivers/driver_nl80211.c | 135 +++++++++++++++++++++++++++++++----
  wpa_supplicant/ap.c          |   1 +
- 4 files changed, 144 insertions(+), 13 deletions(-)
+ 4 files changed, 140 insertions(+), 12 deletions(-)
 
-diff --git a/src/ap/beacon.c b/src/ap/beacon.c
-index 26422b65f321..3094979907c3 100644
 --- a/src/ap/beacon.c
 +++ b/src/ap/beacon.c
-@@ -1699,6 +1699,8 @@ int ieee802_11_build_ap_params(struct hostapd_data *hapd,
+@@ -1695,6 +1695,8 @@ int ieee802_11_build_ap_params(struct ho
  	params->auth_algs = hapd->conf->auth_algs;
  	params->wpa_version = hapd->conf->wpa;
  	params->privacy = hapd->conf->wpa;
@@ -31,14 +29,12 @@ index 26422b65f321..3094979907c3 100644
  #ifdef CONFIG_WEP
  	params->privacy |= hapd->conf->ssid.wep.keys_set ||
  		(hapd->conf->ieee802_1x &&
-diff --git a/src/drivers/driver.h b/src/drivers/driver.h
-index 1a44254405ef..d574d8179c65 100644
 --- a/src/drivers/driver.h
 +++ b/src/drivers/driver.h
-@@ -1201,6 +1201,10 @@ struct wpa_driver_associate_params {
-  	*/
- 	int disable_he;
- #endif /* CONFIG_HE_OVERRIDES */
+@@ -1195,6 +1195,10 @@ struct wpa_driver_associate_params {
+ 	 * fils_erp_rrk_len - Length of fils_erp_rrk in bytes
+ 	 */
+ 	size_t fils_erp_rrk_len;
 +	/**
 +	 * PWE derivation mechanism for SAE
 +	 */
@@ -46,7 +42,7 @@ index 1a44254405ef..d574d8179c65 100644
  };
  
  enum hide_ssid {
-@@ -1592,6 +1596,16 @@ struct wpa_driver_ap_params {
+@@ -1586,6 +1590,16 @@ struct wpa_driver_ap_params {
  	 * multiple_bssid_ie_count - The the number of offsets inside multiple_bssid_ie_offsets
  	 */
  	int multiple_bssid_ie_count;
@@ -63,11 +59,9 @@ index 1a44254405ef..d574d8179c65 100644
  };
  
  struct wpa_driver_mesh_bss_params {
-diff --git a/src/drivers/driver_nl80211.c b/src/drivers/driver_nl80211.c
-index 89607cfa3ecb..1c79c54c4018 100644
 --- a/src/drivers/driver_nl80211.c
 +++ b/src/drivers/driver_nl80211.c
-@@ -4369,6 +4369,46 @@ static int nl80211_unsol_bcast_probe_resp(struct i802_bss *bss,
+@@ -4408,6 +4408,46 @@ error:
  }
  #endif /* CONFIG_IEEE80211AX */
  
@@ -114,30 +108,21 @@ index 89607cfa3ecb..1c79c54c4018 100644
  static int wpa_driver_nl80211_set_ap(void *priv,
  				     struct wpa_driver_ap_params *params)
  {
-@@ -4380,7 +4420,7 @@ static int wpa_driver_nl80211_set_ap(void *priv,
- 	int beacon_set;
+@@ -4420,6 +4460,7 @@ static int wpa_driver_nl80211_set_ap(voi
  	int num_suites;
  	u32 suites[20], suite;
--	u32 ver;
-+	u32 ver, band = 0;
+ 	u32 ver;
++	int is_6ghz = 0;
  #ifdef CONFIG_MESH
  	struct wpa_driver_mesh_bss_params mesh_params;
  #endif /* CONFIG_MESH */
-@@ -4461,12 +4501,25 @@ static int wpa_driver_nl80211_set_ap(void *priv,
- 			goto fail;
- 	}
- 
-+	if ((params->freq->freq > 5950 && params->freq->freq <= 7115) ||
-+	     params->freq->freq == 5935)
-+	     band = NL80211_BAND_6GHZ;
-+
- 	wpa_printf(MSG_DEBUG, "nl80211: wpa_version=0x%x", params->wpa_version);
- 	ver = 0;
- 	if (params->wpa_version & WPA_PROTO_WPA)
+@@ -4506,6 +4547,17 @@ static int wpa_driver_nl80211_set_ap(voi
  		ver |= NL80211_WPA_VERSION_1;
  	if (params->wpa_version & WPA_PROTO_RSN)
  		ver |= NL80211_WPA_VERSION_2;
-+	if (band == NL80211_BAND_6GHZ) {
++
++	is_6ghz = is_6ghz_freq(params->freq->freq);
++	if (is_6ghz) {
 +		if (ver != NL80211_WPA_VERSION_2) {
 +			wpa_printf(MSG_DEBUG, "nl80211: Only WPA3 allowed in 6GHz\n");
 +			goto fail;
@@ -149,7 +134,7 @@ index 89607cfa3ecb..1c79c54c4018 100644
  	if (ver &&
  	    nla_put_u32(msg, NL80211_ATTR_WPA_VERSIONS, ver))
  		goto fail;
-@@ -4479,10 +4532,17 @@ static int wpa_driver_nl80211_set_ap(void *priv,
+@@ -4518,10 +4570,17 @@ static int wpa_driver_nl80211_set_ap(voi
  		wpa_printf(MSG_DEBUG,
  			   "nl80211: Not enough room for all AKM suites (num_suites=%d > NL80211_MAX_NR_AKM_SUITES)",
  			   num_suites);
@@ -158,7 +143,7 @@ index 89607cfa3ecb..1c79c54c4018 100644
 -			 suites))
 -		goto fail;
 +	else if (num_suites) {
-+		if (band == NL80211_BAND_6GHZ &&
++		if (is_6ghz &&
 +		    !wpa_driver_6g_crypto_validity(num_suites, suites,
 +						   NL80211_ATTR_AKM_SUITES,
 +						   params->sae_pwe))
@@ -171,7 +156,7 @@ index 89607cfa3ecb..1c79c54c4018 100644
  
  	if (params->key_mgmt_suites & WPA_KEY_MGMT_IEEE8021X_NO_WPA &&
  	    (!params->pairwise_ciphers ||
-@@ -4500,17 +4560,31 @@ static int wpa_driver_nl80211_set_ap(void *priv,
+@@ -4539,17 +4598,31 @@ static int wpa_driver_nl80211_set_ap(voi
  		   params->pairwise_ciphers);
  	num_suites = wpa_cipher_to_cipher_suites(params->pairwise_ciphers,
  						 suites, ARRAY_SIZE(suites));
@@ -179,7 +164,7 @@ index 89607cfa3ecb..1c79c54c4018 100644
 -	    nla_put(msg, NL80211_ATTR_CIPHER_SUITES_PAIRWISE,
 -		    num_suites * sizeof(u32), suites))
 +	if (num_suites) {
-+		if (band == NL80211_BAND_6GHZ &&
++		if (is_6ghz &&
 +		    !wpa_driver_6g_crypto_validity(num_suites, suites,
 +						   NL80211_ATTR_CIPHER_SUITES_PAIRWISE,
 +						   params->sae_pwe))
@@ -197,7 +182,7 @@ index 89607cfa3ecb..1c79c54c4018 100644
 -	    nla_put_u32(msg, NL80211_ATTR_CIPHER_SUITE_GROUP, suite))
 -		goto fail;
 +	if (suite) {
-+		if (band == NL80211_BAND_6GHZ &&
++		if (is_6ghz &&
 +		    !wpa_driver_6g_crypto_validity(num_suites, suites,
 +						   NL80211_ATTR_CIPHER_SUITE_GROUP,
 +						   params->sae_pwe))
@@ -209,31 +194,29 @@ index 89607cfa3ecb..1c79c54c4018 100644
  
  	if (params->beacon_ies) {
  		wpa_hexdump_buf(MSG_DEBUG, "nl80211: beacon_ies",
-@@ -5977,6 +6051,8 @@ static int nl80211_connect_common(struct wpa_driver_nl80211_data *drv,
+@@ -6014,6 +6087,8 @@ static int nl80211_connect_common(struct
  				  struct wpa_driver_associate_params *params,
  				  struct nl_msg *msg)
  {
-+	u32 band = 0;
++	int is_6ghz = 0;
 +
  	if (nla_put_flag(msg, NL80211_ATTR_IFACE_SOCKET_OWNER))
  		return -1;
  
-@@ -6001,6 +6077,10 @@ static int nl80211_connect_common(struct wpa_driver_nl80211_data *drv,
+@@ -6038,6 +6113,8 @@ static int nl80211_connect_common(struct
  				params->freq.freq))
  			return -1;
  		drv->assoc_freq = params->freq.freq;
 +
-+		if ((params->freq.freq > 5950 && params->freq.freq >= 7115) ||
-+			params->freq.freq == 5935)
-+			band = NL80211_BAND_6GHZ;
++		is_6ghz = is_6ghz_freq(params->freq.freq);
  	} else
  		drv->assoc_freq = 0;
  
-@@ -6048,6 +6128,19 @@ static int nl80211_connect_common(struct wpa_driver_nl80211_data *drv,
+@@ -6085,6 +6162,19 @@ static int nl80211_connect_common(struct
  	    nla_put(msg, NL80211_ATTR_IE, params->wpa_ie_len, params->wpa_ie))
  		return -1;
  
-+	if (band == NL80211_BAND_6GHZ) {
++	if (is_6ghz) {
 +		if (params->wpa_proto != NL80211_WPA_VERSION_2) {
 +			wpa_printf(MSG_DEBUG,
 +				   "nl80211: Only WPA3 allowed in 6GHz\n");
@@ -249,12 +232,12 @@ index 89607cfa3ecb..1c79c54c4018 100644
  	if (params->wpa_proto) {
  		enum nl80211_wpa_versions ver = 0;
  
-@@ -6064,6 +6157,13 @@ static int nl80211_connect_common(struct wpa_driver_nl80211_data *drv,
+@@ -6101,6 +6191,13 @@ static int nl80211_connect_common(struct
  	if (params->pairwise_suite != WPA_CIPHER_NONE) {
  		u32 cipher = wpa_cipher_to_cipher_suite(params->pairwise_suite);
  		wpa_printf(MSG_DEBUG, "  * pairwise=0x%x", cipher);
 +
-+		if (band == NL80211_BAND_6GHZ &&
++		if (is_6ghz &&
 +		    !wpa_driver_6g_crypto_validity(1, &cipher,
 +						   NL80211_ATTR_CIPHER_SUITES_PAIRWISE,
 +						   params->sae_pwe))
@@ -263,7 +246,7 @@ index 89607cfa3ecb..1c79c54c4018 100644
  		if (nla_put_u32(msg, NL80211_ATTR_CIPHER_SUITES_PAIRWISE,
  				cipher))
  			return -1;
-@@ -6076,10 +6176,17 @@ static int nl80211_connect_common(struct wpa_driver_nl80211_data *drv,
+@@ -6113,10 +6210,17 @@ static int nl80211_connect_common(struct
  		 * advertise support for operations without GTK.
  		 */
  		wpa_printf(MSG_DEBUG, "  * skip group cipher configuration for GTK_NOT_USED due to missing driver support advertisement");
@@ -273,7 +256,7 @@ index 89607cfa3ecb..1c79c54c4018 100644
  		wpa_printf(MSG_DEBUG, "  * group=0x%x", cipher);
 -		if (nla_put_u32(msg, NL80211_ATTR_CIPHER_SUITE_GROUP, cipher))
 +
-+		if (band == NL80211_BAND_6GHZ &&
++		if (is_6ghz &&
 +		    !wpa_driver_6g_crypto_validity(1, &cipher,
 +						   NL80211_ATTR_CIPHER_SUITE_GROUP,
 +						   params->sae_pwe))
@@ -283,12 +266,12 @@ index 89607cfa3ecb..1c79c54c4018 100644
  			return -1;
  	}
  
-@@ -6165,6 +6272,13 @@ static int nl80211_connect_common(struct wpa_driver_nl80211_data *drv,
+@@ -6202,6 +6306,13 @@ static int nl80211_connect_common(struct
  			break;
  		}
  		wpa_printf(MSG_DEBUG, "  * akm=0x%x", mgmt);
 +
-+		if (band == NL80211_BAND_6GHZ &&
++		if (is_6ghz &&
 +		    !wpa_driver_6g_crypto_validity(1, &mgmt,
 +						   NL80211_ATTR_AKM_SUITES,
 +						   params->sae_pwe))
@@ -297,11 +280,9 @@ index 89607cfa3ecb..1c79c54c4018 100644
  		if (nla_put_u32(msg, NL80211_ATTR_AKM_SUITES, mgmt))
  			return -1;
  	}
-diff --git a/wpa_supplicant/ap.c b/wpa_supplicant/ap.c
-index e961ff2983c0..0a0bc22fc514 100644
 --- a/wpa_supplicant/ap.c
 +++ b/wpa_supplicant/ap.c
-@@ -810,6 +810,7 @@ int wpa_supplicant_create_ap(struct wpa_supplicant *wpa_s,
+@@ -810,6 +810,7 @@ int wpa_supplicant_create_ap(struct wpa_
  	}
  	params.pairwise_suite = wpa_s->pairwise_cipher;
  	params.group_suite = params.pairwise_suite;
@@ -309,6 +290,3 @@ index e961ff2983c0..0a0bc22fc514 100644
  
  #ifdef CONFIG_P2P
  	if (ssid->mode == WPAS_MODE_P2P_GO ||
--- 
-2.25.0
-
