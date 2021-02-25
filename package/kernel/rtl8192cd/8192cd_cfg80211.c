@@ -627,8 +627,8 @@ void event_to_name(int event, char *event_name)
 	case CFG80211_SCAN_DONE:
 		strcpy(event_name, "CFG80211_SCAN_DONE");
 		break;
-	case CFG80211_SCAN_ABORDED:
-		strcpy(event_name, "CFG80211_SCAN_ABORDED");
+	case CFG80211_SCAN_ABORTED:
+		strcpy(event_name, "CFG80211_SCAN_ABORTED");
 		break;
 	case CFG80211_DEL_STA:
 		strcpy(event_name, "CFG80211_DEL_STA");
@@ -638,6 +638,9 @@ void event_to_name(int event, char *event_name)
 		break;
 	case CFG80211_RADAR_DETECTED:
 		strcpy(event_name, "CFG80211_RADAR_DETECTED");
+		break;
+	case CFG80211_RADAR_CAC_ABORTED:
+		strcpy(event_name, "CFG80211_RADAR_CAC_ABORTED");
 		break;
 	default:
 		strcpy(event_name, "UNKNOWN EVENT");
@@ -666,7 +669,8 @@ int event_indicate_cfg80211(struct rtl8192cd_priv *priv, unsigned char *mac, int
 	}
 
     /*cfg p2p 2014-0330 , report CFG80211_NEW_STA , ASAP*/ 
-	if( (event != CFG80211_SCAN_DONE)  && (event != CFG80211_NEW_STA) && (event != CFG80211_DEL_STA) && (event != CFG80211_RADAR_CAC_FINISHED) ){ //eric-bb
+	if( (event != CFG80211_SCAN_DONE)  && (event != CFG80211_NEW_STA) && (event != CFG80211_DEL_STA) \
+	    && (event != CFG80211_RADAR_CAC_ABORTED) && (event != CFG80211_RADAR_CAC_FINISHED) ){ //eric-bb
     	if( (OPMODE & WIFI_AP_STATE) && (priv->up_time <= HAPD_READY_RX_EVENT) ) 
     	{
     		NLMSG("ignore cfg event,up_time[%d],event[%d]\n", priv->up_time,event);
@@ -813,7 +817,7 @@ int event_indicate_cfg80211(struct rtl8192cd_priv *priv, unsigned char *mac, int
 				netif_wake_queue(priv->dev); //wrt-vap
 			}
 			break;
-		case CFG80211_SCAN_ABORDED:
+		case CFG80211_SCAN_ABORTED:
 			{
 				//NDEBUG2("cfg80211_event [CFG80211_SCAN_DONE][%d]\n", event);		
 				priv->ss_req_ongoing = 0;
@@ -868,6 +872,11 @@ int event_indicate_cfg80211(struct rtl8192cd_priv *priv, unsigned char *mac, int
 			NDEBUG("cfg80211_event [CFG80211_RADAR_DETECTED][%d]\n", event);
 			cfg80211_radar_event(wiphy, priv->pshare->dfs_chan_def, GFP_KERNEL);
 			break;
+		case CFG80211_RADAR_CAC_ABORTED:
+			NDEBUG("cfg80211_event [CFG80211_RADAR_CAC_ABORTED][%d]\n", event);
+			cfg80211_radar_event(wiphy, priv->pshare->dfs_chan_def, GFP_KERNEL);
+			break;
+
 		default:
 			NDEBUG("cfg80211_event [Unknown Event !!][%d]\n", event);            
     }

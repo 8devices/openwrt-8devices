@@ -855,6 +855,7 @@ void rtl8192cd_DFS_timer(unsigned long task_priv)
 		if (timer_pending(&priv->ch_avail_chk_timer)) {
 			del_timer(&priv->ch_avail_chk_timer);
 			RTL_W8(TXPAUSE, 0xff);
+			event_indicate_cfg80211(priv, NULL, CFG80211_RADAR_CAC_ABORTED, NULL);
 		}
 		else
 			RTL_W8(TXPAUSE, 0xf);	/* disable transmitter */
