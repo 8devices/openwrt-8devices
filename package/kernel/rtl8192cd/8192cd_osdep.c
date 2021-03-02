@@ -9858,6 +9858,9 @@ int rtl8192cd_close(struct net_device *dev)
 		close_vxd_vap(priv);
 	#endif
 
+	if (IS_ROOT_INTERFACE(priv) && priv->scan_req)
+		event_indicate_cfg80211(priv, NULL, CFG80211_SCAN_ABORTED, NULL);
+
 	if(is_WRT_scan_iface(dev->name))
 	{
 		//printk("No need to call close for scan iface !!\n");
