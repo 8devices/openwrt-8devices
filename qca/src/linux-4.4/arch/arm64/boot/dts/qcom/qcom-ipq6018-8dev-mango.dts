@@ -349,7 +349,7 @@
 		reg = <0>;
 		compatible = "n25q128a11";
 		linux,modalias = "m25p80", "n25q128a11";
-		spi-max-frequency = <50000000>;
+		spi-max-frequency = <25000000>;
 		use-default-sizes;
 
 		partition0 {
