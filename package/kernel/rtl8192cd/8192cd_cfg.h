@@ -3925,15 +3925,15 @@
 
 #if 0 //ndef RTK_NL80211_DMA
 //use SLUB to overcome the kmalloc issue , no need RTK_NL80211_DMA anymore!
-#undef NUM_RX_DESC
-#undef NUM_TX_DESC
-#undef RTL8192CD_NUM_VWLAN
+    #undef NUM_RX_DESC
+    #undef NUM_TX_DESC
+    #undef RTL8192CD_NUM_VWLAN
  
-#define NUM_RX_DESC    128
-#define NUM_TX_DESC    128
-#define RTL8192CD_NUM_VWLAN  4
+    #define NUM_RX_DESC    128
+    #define NUM_TX_DESC    128
+    #define RTL8192CD_NUM_VWLAN  4
 #else
-#define RTL8192CD_NUM_VWLAN  4 //eric-vap, add one more for open-wrt scan iface
+    #define RTL8192CD_NUM_VWLAN  7 //eric-vap, add one more for open-wrt scan iface
 #endif
 
 //#define CUSTOMIZE_FLASH_EFUSE //Only 8812 read EFUSE except MAC address
