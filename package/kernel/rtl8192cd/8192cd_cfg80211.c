@@ -41,8 +41,8 @@
 #include <linux/if_ether.h>
 #include <linux/nl80211.h>
 #include <linux/ieee80211.h>
-
-
+#include <linux/mtd/mtd.h>
+#include <linux/vmalloc.h>
 
 //#include "./nl80211_copy.h"
 
@@ -288,32 +288,94 @@ static int realtek_cancel_remain_on_channel(struct wiphy *wiphy,
 #endif //CONFIG_P2P
 
 #if defined(VAP_MAC_DRV_READ_FLASH)
+
 int read_flash_hw_mac_vap(unsigned char *mac, int vap_idx)
 {
 	unsigned int offset;
+	struct mtd_info *mtd;
+	size_t bytes_read;
+	int err;
 
-	//NLENTER;
-	
 	if(!mac)
 		return -1;
 
-	vap_idx +=1; 
-	
 	if(vap_idx > 7)
 		return -1;
-	
-	offset = HW_SETTING_OFFSET+ sizeof(struct param_header)+ HW_WLAN_SETTING_OFFSET + sizeof(struct hw_wlan_setting) * (rtk_phy_idx-1);
-	offset += (vap_idx*ETH_ALEN);
-	offset |= 0xbd000000;
-	memcpy(mac,(unsigned char *)offset,ETH_ALEN);
 
-	if(is_zero_mac(mac))
+	mtd = get_mtd_device_nm("hwpart");
+	if (IS_ERR(mtd))
 		return -1;
 
-	DEBUG_INFO("VAP[%d][%d]=%02x:%02x:%02x:%02x:%02x:%02x\n", (rtk_phy_idx-1), vap_idx, mac[0],mac[1],mac[2],mac[3],mac[4],mac[5]);
+	offset = sizeof(struct param_header)+ HW_WLAN_SETTING_OFFSET + 0x640 * (rtk_phy_idx-1);
+	offset += (vap_idx*ETH_ALEN);
+	err = mtd_read(mtd, offset, ETH_ALEN, &bytes_read, mac);
 
 	return 0;
 }
+
+int read_flash_hw_cal_data(struct rtl8192cd_priv *priv)
+{
+	struct mtd_info *mtd;
+	struct hw_wlan_setting *bdata;
+	unsigned int offset;
+	size_t read;
+	size_t len;
+
+	if(!priv || !IS_ROOT_INTERFACE(priv))
+		return -1;
+
+	mtd = get_mtd_device_nm("hwpart");
+	if (IS_ERR(mtd))
+		return -1;
+
+	len = sizeof(*bdata);
+	bdata = (struct hw_wlan_setting *)vzalloc(len);
+	if (!bdata)
+		return -1;
+
+	offset = sizeof(struct param_header)+ HW_WLAN_SETTING_OFFSET + 0x640 * (rtk_phy_idx-1);
+	mtd_read(mtd, offset, len, &read, bdata);
+	if (read != len) {
+		printk("Error reading caldata from flash for %i (%i/%i)\n", rtk_phy_idx-1, read, len);
+		vfree(bdata);
+		return -1;
+	}
+
+	priv->pmib->dot11RFEntry.xcap = bdata->xCap;
+	priv->pmib->dot11RFEntry.ther = bdata->Ther;
+
+	memcpy(priv->pmib->dot11RFEntry.pwrlevelCCK_A, bdata->pwrlevelCCK_A, sizeof(priv->pmib->dot11RFEntry.pwrlevelCCK_A));
+	memcpy(priv->pmib->dot11RFEntry.pwrlevelCCK_B, bdata->pwrlevelCCK_B, sizeof(priv->pmib->dot11RFEntry.pwrlevelCCK_B));
+	memcpy(priv->pmib->dot11RFEntry.pwrlevelHT40_1S_A, bdata->pwrlevelHT40_1S_A, sizeof(priv->pmib->dot11RFEntry.pwrlevelHT40_1S_A));
+	memcpy(priv->pmib->dot11RFEntry.pwrlevelHT40_1S_B, bdata->pwrlevelHT40_1S_B, sizeof(priv->pmib->dot11RFEntry.pwrlevelHT40_1S_B));
+	memcpy(priv->pmib->dot11RFEntry.pwrlevel5GHT40_1S_A, bdata->pwrlevel5GHT40_1S_A, sizeof(priv->pmib->dot11RFEntry.pwrlevel5GHT40_1S_A));
+	memcpy(priv->pmib->dot11RFEntry.pwrlevel5GHT40_1S_B, bdata->pwrlevel5GHT40_1S_B, sizeof(priv->pmib->dot11RFEntry.pwrlevel5GHT40_1S_B));
+	memcpy(priv->pmib->dot11RFEntry.pwrdiffHT40_2S, bdata->pwrdiffHT40_2S, sizeof(priv->pmib->dot11RFEntry.pwrdiffHT40_2S));
+	memcpy(priv->pmib->dot11RFEntry.pwrdiffHT20, bdata->pwrdiffHT20, sizeof(priv->pmib->dot11RFEntry.pwrdiffHT20));
+	memcpy(priv->pmib->dot11RFEntry.pwrdiffOFDM, bdata->pwrdiffOFDM, sizeof(priv->pmib->dot11RFEntry.pwrdiffOFDM));
+	memcpy(priv->pmib->dot11RFEntry.pwrdiff5GHT40_2S, bdata->pwrdiff5GHT40_2S, sizeof(priv->pmib->dot11RFEntry.pwrdiff5GHT40_2S));
+	memcpy(priv->pmib->dot11RFEntry.pwrdiff5GHT20, bdata->pwrdiff5GHT20, sizeof(priv->pmib->dot11RFEntry.pwrdiff5GHT20));
+	memcpy(priv->pmib->dot11RFEntry.pwrdiff5GOFDM, bdata->pwrdiff5GOFDM, sizeof(priv->pmib->dot11RFEntry.pwrdiff5GOFDM));
+#if defined(RTK_AC_SUPPORT)
+	memcpy(priv->pmib->dot11RFEntry.pwrdiff_20BW1S_OFDM1T_A, bdata->pwrdiff_20BW1S_OFDM1T_A, sizeof(priv->pmib->dot11RFEntry.pwrdiff_20BW1S_OFDM1T_A));
+	memcpy(priv->pmib->dot11RFEntry.pwrdiff_40BW2S_20BW2S_A, bdata->pwrdiff_40BW2S_20BW2S_A, sizeof(priv->pmib->dot11RFEntry.pwrdiff_40BW2S_20BW2S_A));
+	memcpy(priv->pmib->dot11RFEntry.pwrdiff_5G_20BW1S_OFDM1T_A, bdata->pwrdiff_5G_20BW1S_OFDM1T_A, sizeof(priv->pmib->dot11RFEntry.pwrdiff_5G_20BW1S_OFDM1T_A));
+	memcpy(priv->pmib->dot11RFEntry.pwrdiff_5G_40BW2S_20BW2S_A, bdata->pwrdiff_5G_40BW2S_20BW2S_A, sizeof(priv->pmib->dot11RFEntry.pwrdiff_5G_40BW2S_20BW2S_A));
+	memcpy(priv->pmib->dot11RFEntry.pwrdiff_5G_80BW1S_160BW1S_A, bdata->pwrdiff_5G_80BW1S_160BW1S_A, sizeof(priv->pmib->dot11RFEntry.pwrdiff_5G_80BW1S_160BW1S_A));
+	memcpy(priv->pmib->dot11RFEntry.pwrdiff_5G_80BW2S_160BW2S_A, bdata->pwrdiff_5G_80BW2S_160BW2S_A, sizeof(priv->pmib->dot11RFEntry.pwrdiff_5G_80BW2S_160BW2S_A));
+
+	memcpy(priv->pmib->dot11RFEntry.pwrdiff_20BW1S_OFDM1T_B, bdata->pwrdiff_20BW1S_OFDM1T_B, sizeof(priv->pmib->dot11RFEntry.pwrdiff_20BW1S_OFDM1T_B));
+	memcpy(priv->pmib->dot11RFEntry.pwrdiff_40BW2S_20BW2S_B, bdata->pwrdiff_40BW2S_20BW2S_B, sizeof(priv->pmib->dot11RFEntry.pwrdiff_40BW2S_20BW2S_B));
+	memcpy(priv->pmib->dot11RFEntry.pwrdiff_5G_20BW1S_OFDM1T_B, bdata->pwrdiff_5G_20BW1S_OFDM1T_B, sizeof(priv->pmib->dot11RFEntry.pwrdiff_5G_20BW1S_OFDM1T_B));
+	memcpy(priv->pmib->dot11RFEntry.pwrdiff_5G_40BW2S_20BW2S_B, bdata->pwrdiff_5G_40BW2S_20BW2S_B, sizeof(priv->pmib->dot11RFEntry.pwrdiff_5G_40BW2S_20BW2S_B));
+	memcpy(priv->pmib->dot11RFEntry.pwrdiff_5G_80BW1S_160BW1S_B, bdata->pwrdiff_5G_80BW1S_160BW1S_B, sizeof(priv->pmib->dot11RFEntry.pwrdiff_5G_80BW1S_160BW1S_B));
+	memcpy(priv->pmib->dot11RFEntry.pwrdiff_5G_80BW2S_160BW2S_B, bdata->pwrdiff_5G_80BW2S_160BW2S_B, sizeof(priv->pmib->dot11RFEntry.pwrdiff_5G_80BW2S_160BW2S_B));
+#endif
+
+	vfree(bdata);
+	return 0;
+}
+
 #endif
 
 //brian, get MAC address from utility, rtk_tx_calr

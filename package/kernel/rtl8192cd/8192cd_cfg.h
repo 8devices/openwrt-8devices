@@ -4104,5 +4104,7 @@
 #define STA_CONNECT_4_WAY_TIME_OUT		11	// 4-way handshake time out
 #define STA_CONNECT_4_WAY_ONDEAUTH		12	// Receive Deauth in 4-way handshake
 
+#define VAP_MAC_DRV_READ_FLASH
+
 #endif // _8192CD_CFG_H_
 
