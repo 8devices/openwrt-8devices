@@ -3933,7 +3933,7 @@
     #define NUM_TX_DESC    128
     #define RTL8192CD_NUM_VWLAN  4
 #else
-    #define RTL8192CD_NUM_VWLAN  7 //eric-vap, add one more for open-wrt scan iface
+    #define RTL8192CD_NUM_VWLAN  (8+1) //eric-vap, add one more for open-wrt scan iface
 #endif
 
 //#define CUSTOMIZE_FLASH_EFUSE //Only 8812 read EFUSE except MAC address
