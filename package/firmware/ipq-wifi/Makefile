@@ -25,6 +25,7 @@ endef
 
 ALLWIFIBOARDS:= \
 	8dev_habanero \
+	8dev_jalapeno \
 	alfa-network_ap120c-ac \
 	asus_map-ac2200 \
 	avm_fritzbox-7530 \
@@ -98,6 +99,7 @@ endef
 # Add $(eval $(call generate-ipq-wifi-package,<devicename>,<display name>))
 
 $(eval $(call generate-ipq-wifi-package,8dev_habanero,8devices Habanero))
+$(eval $(call generate-ipq-wifi-package,8dev_jalapeno,8devices Jalapeno))
 $(eval $(call generate-ipq-wifi-package,alfa-network_ap120c-ac,ALFA Network AP120C-AC))
 $(eval $(call generate-ipq-wifi-package,asus_map-ac2200,ASUS MAP-AC2200))
 $(eval $(call generate-ipq-wifi-package,avm_fritzbox-7530,AVM FRITZ!Box 7530))
