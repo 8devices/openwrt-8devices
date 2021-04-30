@@ -53,13 +53,15 @@ CT_FIRMWARE_FILE = $(1)-$($(1)_FIRMWARE_FILE_CT)
 CT_FIRMWARE_FILE_HTT = $(1)-$($(1)_FIRMWARE_FILE_CT_HTT)
 
 define Download/ct-firmware
-  URL:=https://www.candelatech.com/downloads/$(2)
+  URL:=https://www.candelatech.com/downloads/$(2) \
+       http://pkg.8devices.com/src/19.07/ath10k-firmware-ct/$(2)
   FILE:=$(call CT_FIRMWARE_FILE,$(1))
   URL_FILE:=$($(1)_FIRMWARE_FILE_CT)
 endef
 
 define Download/ct-firmware-htt
-  URL:=https://www.candelatech.com/downloads/$(2)
+  URL:=https://www.candelatech.com/downloads/$(2) \
+       http://pkg.8devices.com/src/19.07/ath10k-firmware-ct/$(2)
   FILE:=$(call CT_FIRMWARE_FILE_HTT,$(1))
   URL_FILE:=$($(1)_FIRMWARE_FILE_CT_HTT)
 endef
