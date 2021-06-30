@@ -256,7 +256,7 @@
 		qcom,mactype = <0>;
 		local-mac-address = [000000000000];
 		pinctrl-0 = <&sfp_sense_pins>;
-		sfp_sense_gpio = <&tlmm 49 GPIO_ACTIVE_LOW>;
+		/* sfp_sense_gpio = <&tlmm 49 GPIO_ACTIVE_LOW>; */
 		qcom,link-poll = <1>;
 		qcom,phy-mdio-addr = <24>;
 		phy-mode = "sgmii";
@@ -278,8 +278,8 @@
 		switch_mac_mode1 = <0xf>; /* mac mode for uniphy instance1*/
 		switch_mac_mode1_sfp = <0x14>; /* mac mode for uniphy instance1 in SFP case - only used if sfp_sense_gpio is defined*/
 		switch_mac_mode2 = <0xff>; /* mac mode for uniphy instance2*/
-		pinctrl-0 = <&sfp_sense_pins>;
-		sfp_sense_gpio = <&tlmm 49 GPIO_ACTIVE_LOW>;
+		/* pinctrl-0 = <&sfp_sense_pins>; */
+		/* sfp_sense_gpio = <&tlmm 49 GPIO_ACTIVE_LOW>; */
 		qcom,port_phyinfo {
 			port@3 {
 				port_id = <4>;
