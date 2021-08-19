@@ -4400,21 +4400,21 @@ static int qcom_nandc_probe(struct platform_device *pdev)
 	if (ret)
 		return ret;
 
-	ret = qcom_nandc_alloc(nandc);
-	if (ret)
-		goto err_core_clk;
-
 	ret = clk_prepare_enable(nandc->core_clk);
 	if (ret)
-		goto err_core_clk;
+		return ret;
 
 	ret = clk_prepare_enable(nandc->aon_clk);
 	if (ret)
 		goto err_aon_clk;
 
+	ret = qcom_nandc_alloc(nandc);
+	if (ret)
+		goto err_alloc;
+
 	ret = qcom_nandc_setup(nandc);
 	if (ret)
-		goto err_setup;
+		goto err_alloc;
 
 #if IS_ENABLED(CONFIG_MTD_NAND_SERIAL)
 	/* Initially enable feedback clock bit to avoid serial
@@ -4483,16 +4483,16 @@ static int qcom_nandc_probe(struct platform_device *pdev)
 err_cs_init:
 	list_for_each_entry(host, &nandc->host_list, node)
 		nand_release(nand_to_mtd(&host->chip));
+
 #if IS_ENABLED(CONFIG_MTD_NAND_SERIAL)
 err_io_macro_clk:
 	clk_disable_unprepare(nandc->io_macro_clk);
 #endif
-err_setup:
+err_alloc:
+	qcom_nandc_unalloc(nandc);
 	clk_disable_unprepare(nandc->aon_clk);
 err_aon_clk:
 	clk_disable_unprepare(nandc->core_clk);
-err_core_clk:
-	qcom_nandc_unalloc(nandc);
 
 	return ret;
 }
