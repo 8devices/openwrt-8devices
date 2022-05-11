@@ -80,6 +80,8 @@ ifeq (TRUE, $(IN_SFP_PHY))
     SRC_LIST += sfp_phy.c
 endif
 
+SRC_LIST += rtl8221_phy.c
+
 SRC_LIST += hsl_phy.c
 
 ifeq (linux, $(OS))

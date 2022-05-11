@@ -47,6 +47,7 @@
 #include <qca808x_phy.h>
 /*qca808x_end*/
 #endif
+#include <rtl8221_phy.h>
 #include <linux/of_gpio.h>
 /*qca808x_start*/
 #include "sw.h"
@@ -102,6 +103,7 @@ phy_driver_instance_t ssdk_phy_driver[] =
 	#else
 	{QCA808X_PHY_CHIP, {0}, NULL, NULL, NULL},
 	#endif
+	{RTL8221B_PHY_CHIP, {0}, NULL, rtl8221_phy_init, NULL},
 /*qca808x_start*/
 	{MAX_PHY_CHIP, {0}, NULL, NULL, NULL}
 };
@@ -267,6 +269,9 @@ phy_type_t hsl_phytype_get_by_phyid(a_uint32_t dev_id, a_uint32_t phy_id)
 /*qca808x_start*/
 		case QCA8081_PHY_V1_1:
 			phytype = QCA808X_PHY_CHIP;
+			break;
+		case RTL8221B_VB:
+			phytype = RTL8221B_PHY_CHIP;
 			break;
 		default:
 			phytype = MAX_PHY_CHIP;

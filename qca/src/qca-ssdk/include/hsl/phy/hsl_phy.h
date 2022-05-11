@@ -537,6 +537,7 @@ typedef enum
 	MPGE_PHY_CHIP,
 /*qca808x_start*/
 	QCA808X_PHY_CHIP,
+	RTL8221B_PHY_CHIP,
 	MAX_PHY_CHIP,
 } phy_type_t;
 
@@ -568,6 +569,7 @@ typedef struct {
 #define QCA8035_PHY             0x004DD072
 /*qca808x_start*/
 #define QCA8081_PHY_V1_1        0x004DD101
+#define RTL8221B_VB             0x001CC849
 #define INVALID_PHY_ID          0xFFFFFFFF
 
 /*qca808x_end*/
