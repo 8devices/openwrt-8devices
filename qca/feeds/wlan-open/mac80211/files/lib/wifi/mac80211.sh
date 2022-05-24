@@ -1,7 +1,4 @@
 #!/bin/sh
-
-. /lib/netifd/mac80211.sh
-
 append DRIVERS "mac80211"
 
 lookup_phy() {
@@ -9,12 +6,35 @@ lookup_phy() {
 		[ -d /sys/class/ieee80211/$phy ] && return
 	}
 
+	# Incase of multiple radios belonging to the same soc, the device path
+	# of these radio's would be same. To find the correct phy, we can
+	# get the phy index of the device in soc and use it during searching
+	# the global phy list
+	local radio_idx=${device:5:1}
+	local first_phy_idx=0
+	local delta=0
 	local devpath
 	config_get devpath "$device" path
+	while :; do
+	config_get devicepath "radio$first_phy_idx" path
+	[ -n "$devicepath" -a -n "$devpath" ] || break
+	[ "$devpath" == "$devicepath" ] && break
+	first_phy_idx=$(($first_phy_idx + 1))
+	done
+
+	delta=$(($radio_idx - $first_phy_idx))
 
 	[ -n "$devpath" ] && {
-		phy="$(mac80211_path_to_phy "$devpath")"
-		[ -n "$phy" ] && return
+		for phy in $(ls /sys/class/ieee80211 2>/dev/null); do
+			case "$(readlink -f /sys/class/ieee80211/$phy/device)" in
+			*$devpath)
+				if [ $delta -gt 0 ]; then
+					delta=$(($delta - 1))
+					continue;
+				fi
+				return;;
+			esac
+		done
 	}
 
 	local macaddr="$(config_get "$device" macaddr | tr 'A-Z' 'a-z')"
@@ -140,8 +160,17 @@ EOF
 			append security "	option sae_pwe	1" "$N"
 			append security "	option key	0123456789" "$N"
 		fi
-		path="$(mac80211_phy_to_path "$dev")"
+
+		if [ -x /usr/bin/readlink -a -h /sys/class/ieee80211/${dev} ]; then
+			path="$(readlink -f /sys/class/ieee80211/${dev}/device)"
+		else
+			path=""
+		fi
 		if [ -n "$path" ]; then
+			path="${path##/sys/devices/}"
+			case "$path" in
+				platform*/pci*) path="${path##platform/}";;
+			esac
 			dev_id="	option path	'$path'"
 		else
 			dev_id="	option macaddr	$(cat /sys/class/ieee80211/${dev}/macaddress)"
@@ -154,7 +183,6 @@ config wifi-device  radio$devidx
 	option hwmode	11${mode_11n}${mode_band}
 $dev_id
 $ht_capab
-	option phy	${dev}
 	# REMOVE THIS LINE TO ENABLE WIFI:
 	option disabled 1
 
@@ -232,7 +260,7 @@ post_mac80211() {
 
 			nss_modval=$(cat /sys/module/ath11k/parameters/nss_offload)
 
-			if [ "$enable_nss" -ne $nss_modval ] && [ -f /sys/module/ath11k/parameters/nss_offload ]; then
+			if [ "$enable_nss" -ne $nss_modval ]; then
 				echo  $enable_nss > /sys/module/ath11k/parameters/nss_offload
 				rmmod ath11k_pci
 				rmmod ath11k_ahb

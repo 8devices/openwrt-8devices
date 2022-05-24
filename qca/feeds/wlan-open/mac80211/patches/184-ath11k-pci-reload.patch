@@ -9,19 +9,8 @@ Signed-off-by: Anilkumar Kolli <akolli@codeaurora.org>
  drivers/net/wireless/ath/ath11k/pci.c | 33 ++++++++++++++++++++++++++++-----
  2 files changed, 29 insertions(+), 6 deletions(-)
 
-Index: backports-20200902_001-5.4.55-931c337125/drivers/net/wireless/ath/ath11k/pci.c
-===================================================================
---- backports-20200902_001-5.4.55-931c337125.orig/drivers/net/wireless/ath/ath11k/pci.c
-+++ backports-20200902_001-5.4.55-931c337125/drivers/net/wireless/ath/ath11k/pci.c
-@@ -702,7 +702,7 @@ static int ath11k_pci_enable_msi(struct
- 	num_vectors = pci_alloc_irq_vectors(ab_pci->pdev,
- 					    msi_config->total_vectors,
- 					    msi_config->total_vectors,
--					    PCI_IRQ_NOMSIX);
-+					    PCI_IRQ_LEGACY | PCI_IRQ_MSI);
- 	if (num_vectors != msi_config->total_vectors) {
- 		ath11k_err(ab, "failed to get %d MSI vectors, only %d available",
- 			   msi_config->total_vectors, num_vectors);
+--- a/drivers/net/wireless/ath/ath11k/pci.c
++++ b/drivers/net/wireless/ath/ath11k/pci.c
 @@ -1076,10 +1076,15 @@ static void ath11k_pci_remove(struct pci
  	struct ath11k_pci *ab_pci = ath11k_pci_priv(ab);
  

@@ -124,7 +124,7 @@ Signed-off-by: Muna Sinada <msinada@codeaurora.org>
 +				    (0xF & ev->ecwmin[3]);
 +	params->ac_vo.mu_edca_timer = ev->muedca_expiration_time[3];
 +
-+	ieee80211_update_muedca_params(ar->hw, params);
++	ieee80211_update_muedca_params(ar->hw, params, GFP_ATOMIC);
 +
 +	kfree(params);
 +exit:
@@ -211,7 +211,7 @@ Signed-off-by: Muna Sinada <msinada@codeaurora.org>
  #endif /* __NET_CFG80211_H */
 --- a/include/net/mac80211.h
 +++ b/include/net/mac80211.h
-@@ -6627,4 +6627,17 @@ u32 ieee80211_calc_tx_airtime(struct iee
+@@ -6627,4 +6627,18 @@ u32 ieee80211_calc_tx_airtime(struct iee
   */
  bool ieee80211_set_hw_80211_encap(struct ieee80211_vif *vif, bool enable);
  
@@ -223,10 +223,11 @@ Signed-off-by: Muna Sinada <msinada@codeaurora.org>
 + *
 + * @hw: pointer as obtained from ieee80211_alloc_hw()
 + * @params: updated MU-EDCA paramters
++ * @gfp: allocation flags
 + */
 +void ieee80211_update_muedca_params(struct ieee80211_hw *hw,
 +				    struct ieee80211_mu_edca_param_set
-+				    *params);
++				    *params, gfp_t gfp);
 +
  #endif /* MAC80211_H */
 --- a/include/uapi/linux/nl80211.h
@@ -271,21 +272,20 @@ Signed-off-by: Muna Sinada <msinada@codeaurora.org>
  	__NL80211_ATTR_AFTER_LAST,
 --- a/net/mac80211/mlme.c
 +++ b/net/mac80211/mlme.c
-@@ -5803,3 +5803,16 @@ void ieee80211_cqm_beacon_loss_notify(st
+@@ -5803,3 +5803,15 @@ void ieee80211_cqm_beacon_loss_notify(st
  	cfg80211_cqm_beacon_loss_notify(sdata->dev, gfp);
  }
  EXPORT_SYMBOL(ieee80211_cqm_beacon_loss_notify);
 +
 +void ieee80211_update_muedca_params(struct ieee80211_hw *hw,
 +				    struct ieee80211_mu_edca_param_set
-+				    *params)
++				    *params, gfp_t gfp)
 +{
 +	struct ieee80211_local *local = hw_to_local(hw);
 +
 +	trace_api_update_muedca_params(local, params);
 +
-+	cfg80211_update_muedca_params_event(local->hw.wiphy, params,
-+					    GFP_KERNEL);
++	cfg80211_update_muedca_params_event(local->hw.wiphy, params, gfp);
 +}
 +EXPORT_SYMBOL(ieee80211_update_muedca_params);
 --- a/net/mac80211/trace.h
@@ -319,7 +319,7 @@ Signed-off-by: Muna Sinada <msinada@codeaurora.org>
  #undef TRACE_INCLUDE_PATH
 --- a/net/wireless/nl80211.c
 +++ b/net/wireless/nl80211.c
-@@ -17678,6 +17678,42 @@ nla_put_failure:
+@@ -17679,6 +17679,42 @@ nla_put_failure:
  }
  EXPORT_SYMBOL(cfg80211_update_owe_info_event);
  

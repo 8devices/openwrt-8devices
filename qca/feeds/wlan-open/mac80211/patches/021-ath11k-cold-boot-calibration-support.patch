@@ -61,7 +61,7 @@
  #define HOST_CSTATE_BIT			0x04
  
 +/* set the default max assoc sta to max supported by driver */
-+bool enable_cold_boot_cal = 0;
++bool enable_cold_boot_cal = 1;
 +EXPORT_SYMBOL(enable_cold_boot_cal);
 +module_param(enable_cold_boot_cal, bool, 0644);
 +MODULE_PARM_DESC(enable_cold_boot_cal, "cold boot calibration enable:1 disable:0");

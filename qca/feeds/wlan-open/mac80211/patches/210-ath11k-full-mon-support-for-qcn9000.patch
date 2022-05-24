@@ -33,8 +33,10 @@ Signed-off-by: Anilkumar Kolli <akolli@codeaurora.org>
  drivers/net/wireless/ath/ath11k/mac.c      |  11 +
  14 files changed, 677 insertions(+), 24 deletions(-)
 
---- a/drivers/net/wireless/ath/ath11k/ahb.c
-+++ b/drivers/net/wireless/ath/ath11k/ahb.c
+Index: backports-20200902_001-4.4.60-931c337125/drivers/net/wireless/ath/ath11k/ahb.c
+===================================================================
+--- backports-20200902_001-4.4.60-931c337125.orig/drivers/net/wireless/ath/ath11k/ahb.c
++++ backports-20200902_001-4.4.60-931c337125/drivers/net/wireless/ath/ath11k/ahb.c
 @@ -12,6 +12,7 @@
  #include "debug.h"
  #include "hif.h"
@@ -43,8 +45,10 @@ Signed-off-by: Anilkumar Kolli <akolli@codeaurora.org>
  #include <linux/remoteproc.h>
  
  static const struct of_device_id ath11k_ahb_of_match[] = {
---- a/drivers/net/wireless/ath/ath11k/core.c
-+++ b/drivers/net/wireless/ath/ath11k/core.c
+Index: backports-20200902_001-4.4.60-931c337125/drivers/net/wireless/ath/ath11k/core.c
+===================================================================
+--- backports-20200902_001-4.4.60-931c337125.orig/drivers/net/wireless/ath/ath11k/core.c
++++ backports-20200902_001-4.4.60-931c337125/drivers/net/wireless/ath/ath11k/core.c
 @@ -45,6 +45,7 @@ static const struct ath11k_hw_params ath
  		.spectral_fft_sz = 2,
  		.max_radios = 3,
@@ -69,8 +73,10 @@ Signed-off-by: Anilkumar Kolli <akolli@codeaurora.org>
  		.hal_desc_sz = sizeof(struct hal_rx_desc_qcn9000),
  		.ring_mask = &ath11k_hw_ring_mask_qcn9000,
  		.regs = &qcn9000_regs,
---- a/drivers/net/wireless/ath/ath11k/dp.c
-+++ b/drivers/net/wireless/ath/ath11k/dp.c
+Index: backports-20200902_001-4.4.60-931c337125/drivers/net/wireless/ath/ath11k/dp.c
+===================================================================
+--- backports-20200902_001-4.4.60-931c337125.orig/drivers/net/wireless/ath/ath11k/dp.c
++++ backports-20200902_001-4.4.60-931c337125/drivers/net/wireless/ath/ath11k/dp.c
 @@ -791,9 +791,9 @@ int ath11k_dp_service_srng(struct ath11k
  				if (ab->hw_params.ring_mask->rx_mon_status[grp_id] &
  					BIT(id)) {
@@ -92,8 +98,10 @@ Signed-off-by: Anilkumar Kolli <akolli@codeaurora.org>
  	spin_lock_init(&dp->reo_cmd_lock);
  
  	dp->reo_cmd_cache_flush_count = 0;
---- a/drivers/net/wireless/ath/ath11k/dp.h
-+++ b/drivers/net/wireless/ath/ath11k/dp.h
+Index: backports-20200902_001-4.4.60-931c337125/drivers/net/wireless/ath/ath11k/dp.h
+===================================================================
+--- backports-20200902_001-4.4.60-931c337125.orig/drivers/net/wireless/ath/ath11k/dp.h
++++ backports-20200902_001-4.4.60-931c337125/drivers/net/wireless/ath/ath11k/dp.h
 @@ -86,6 +86,19 @@ struct dp_tx_ring {
  	int tx_status_tail;
  };
@@ -236,9 +244,20 @@ Signed-off-by: Anilkumar Kolli <akolli@codeaurora.org>
  /* HTT message target->host */
  
  enum htt_t2h_msg_type {
---- a/drivers/net/wireless/ath/ath11k/dp_rx.c
-+++ b/drivers/net/wireless/ath/ath11k/dp_rx.c
-@@ -3249,12 +3249,48 @@ fail_desc_get:
+Index: backports-20200902_001-4.4.60-931c337125/drivers/net/wireless/ath/ath11k/dp_rx.c
+===================================================================
+--- backports-20200902_001-4.4.60-931c337125.orig/drivers/net/wireless/ath/ath11k/dp_rx.c
++++ backports-20200902_001-4.4.60-931c337125/drivers/net/wireless/ath/ath11k/dp_rx.c
+@@ -504,6 +504,8 @@ static void ath11k_dp_rx_pdev_srng_free(
+ 	}
+ 
+ 	ath11k_dp_srng_cleanup(ab, &dp->rxdma_mon_buf_ring.refill_buf_ring);
++	ath11k_dp_srng_cleanup(ar->ab, &dp->rxdma_mon_dst_ring);
++	ath11k_dp_srng_cleanup(ar->ab, &dp->rxdma_mon_desc_ring);
+ }
+ 
+ void ath11k_dp_pdev_reo_cleanup(struct ath11k_base *ab)
+@@ -3249,12 +3251,48 @@ fail_desc_get:
  	return req_entries - num_remain;
  }
  
@@ -287,7 +306,7 @@ Signed-off-by: Anilkumar Kolli <akolli@codeaurora.org>
  	struct hal_srng *srng;
  	void *rx_mon_status_desc;
  	struct sk_buff *skb;
-@@ -3268,6 +3304,7 @@ static int ath11k_dp_rx_reap_mon_status_
+@@ -3268,6 +3306,7 @@ static int ath11k_dp_rx_reap_mon_status_
  
  	ar = ab->pdevs[ath11k_hw_mac_id_to_pdev_id(&ab->hw_params, mac_id)].ar;
  	dp = &ar->dp;
@@ -295,7 +314,7 @@ Signed-off-by: Anilkumar Kolli <akolli@codeaurora.org>
  	srng_id = ath11k_hw_mac_id_to_srng_id(&ab->hw_params, mac_id);
  	rx_ring = &dp->rx_mon_status_refill_ring[srng_id];
  
-@@ -3280,8 +3317,10 @@ static int ath11k_dp_rx_reap_mon_status_
+@@ -3280,8 +3319,10 @@ static int ath11k_dp_rx_reap_mon_status_
  		*budget -= 1;
  		rx_mon_status_desc =
  			ath11k_hal_srng_src_peek(ab, srng);
@@ -307,7 +326,7 @@ Signed-off-by: Anilkumar Kolli <akolli@codeaurora.org>
  
  		ath11k_hal_rx_buf_addr_info_get(rx_mon_status_desc, &paddr,
  						&cookie, &rbm);
-@@ -3294,6 +3333,7 @@ static int ath11k_dp_rx_reap_mon_status_
+@@ -3294,6 +3335,7 @@ static int ath11k_dp_rx_reap_mon_status_
  				ath11k_warn(ab, "rx monitor status with invalid buf_id %d\n",
  					    buf_id);
  				spin_unlock_bh(&rx_ring->idr_lock);
@@ -315,7 +334,7 @@ Signed-off-by: Anilkumar Kolli <akolli@codeaurora.org>
  				goto move_next;
  			}
  
-@@ -3317,15 +3357,23 @@ static int ath11k_dp_rx_reap_mon_status_
+@@ -3317,15 +3359,23 @@ static int ath11k_dp_rx_reap_mon_status_
  					    FIELD_GET(HAL_TLV_HDR_TAG,
  						      tlv->tl));
  				dev_kfree_skb_any(skb);
@@ -340,7 +359,7 @@ Signed-off-by: Anilkumar Kolli <akolli@codeaurora.org>
  		if (!skb) {
  			ath11k_hal_rx_buf_addr_info_set(rx_mon_status_desc, 0, 0,
  							HAL_RX_BUF_RBM_SW3_BM);
-@@ -3339,6 +3387,7 @@ move_next:
+@@ -3339,6 +3389,7 @@ move_next:
  
  		ath11k_hal_rx_buf_addr_info_set(rx_mon_status_desc, rxcb->paddr,
  						cookie, HAL_RX_BUF_RBM_SW3_BM);
@@ -348,7 +367,7 @@ Signed-off-by: Anilkumar Kolli <akolli@codeaurora.org>
  		ath11k_hal_srng_src_get_next_entry(ab, srng);
  		num_buffs_reaped++;
  	}
-@@ -3452,8 +3501,10 @@ int ath11k_dp_rx_process_mon_status(stru
+@@ -3452,8 +3503,10 @@ int ath11k_dp_rx_process_mon_status(stru
  		    (pmon->mon_ppdu_status == DP_PPDU_STATUS_START)) {
  			rx_mon_stats->status_ppdu_done++;
  			pmon->mon_ppdu_status = DP_PPDU_STATUS_DONE;
@@ -361,7 +380,7 @@ Signed-off-by: Anilkumar Kolli <akolli@codeaurora.org>
  		}
  
  		if (ppdu_info->peer_id == HAL_INVALID_PEERID ||
-@@ -3494,7 +3545,6 @@ int ath11k_dp_rx_process_mon_status(stru
+@@ -3494,7 +3547,6 @@ int ath11k_dp_rx_process_mon_status(stru
  
  		spin_unlock_bh(&ab->base_lock);
  		rcu_read_unlock();
@@ -369,7 +388,7 @@ Signed-off-by: Anilkumar Kolli <akolli@codeaurora.org>
  		dev_kfree_skb_any(skb);
  	}
  exit:
-@@ -5369,12 +5419,10 @@ static int ath11k_dp_rx_mon_deliver(stru
+@@ -5369,12 +5421,10 @@ static int ath11k_dp_rx_mon_deliver(stru
  
  	mon_skb = ath11k_dp_rx_mon_merg_msdus(ar, mac_id, head_msdu,
  					      tail_msdu, rxs);
@@ -382,7 +401,7 @@ Signed-off-by: Anilkumar Kolli <akolli@codeaurora.org>
  	rxs->flag = 0;
  	do {
  		skb_next = mon_skb->next;
-@@ -5413,11 +5461,11 @@ void ath11k_dp_rx_mon_dest_process(struc
+@@ -5413,11 +5463,11 @@ void ath11k_dp_rx_mon_dest_process(struc
  {
  	struct ath11k_pdev_dp *dp = &ar->dp;
  	struct ath11k_mon_data *pmon = (struct ath11k_mon_data *)&dp->mon_data;
@@ -395,7 +414,7 @@ Signed-off-by: Anilkumar Kolli <akolli@codeaurora.org>
  	u32	 npackets = 0;
  	u32 mpdu_rx_bufs_used;
  
-@@ -5479,6 +5527,7 @@ void ath11k_dp_rx_mon_dest_process(struc
+@@ -5479,6 +5529,7 @@ void ath11k_dp_rx_mon_dest_process(struc
  				   rx_mon_stats->dest_mon_stuck);
  			break;
  		}
@@ -403,7 +422,7 @@ Signed-off-by: Anilkumar Kolli <akolli@codeaurora.org>
  		if (head_msdu && tail_msdu) {
  			ath11k_dp_rx_mon_deliver(ar, dp->mac_id, head_msdu,
  						 &pmon->mon_ppdu_info,
-@@ -5502,15 +5551,6 @@ void ath11k_dp_rx_mon_dest_process(struc
+@@ -5502,15 +5553,6 @@ void ath11k_dp_rx_mon_dest_process(struc
  	}
  }
  
@@ -419,7 +438,7 @@ Signed-off-by: Anilkumar Kolli <akolli@codeaurora.org>
  static int ath11k_dp_rx_pdev_mon_status_attach(struct ath11k *ar)
  {
  	struct ath11k_pdev_dp *dp = &ar->dp;
-@@ -5582,3 +5622,355 @@ int ath11k_dp_rx_pdev_mon_detach(struct
+@@ -5582,3 +5624,374 @@ int ath11k_dp_rx_pdev_mon_detach(struct
  	ath11k_dp_mon_link_free(ar);
  	return 0;
  }
@@ -449,7 +468,7 @@ Signed-off-by: Anilkumar Kolli <akolli@codeaurora.org>
 +	u32 total_len = 0, frag_len = 0, sw_cookie;
 +	u16 num_msdus = 0;
 +	u8 rxdma_err;
-+	bool is_frag;
++	bool is_frag, is_first_msdu;
 +	bool drop_mpdu = false;
 +
 +	rx_mon_stats = &pmon->rx_mon_stats;
@@ -480,6 +499,9 @@ Signed-off-by: Anilkumar Kolli <akolli@codeaurora.org>
 +			drop_mpdu = true;
 +		}
 +	}
++
++	is_frag = false;
++	is_first_msdu = true;
 +
 +	do {
 +		rx_msdu_link_desc =
@@ -528,6 +550,16 @@ Signed-off-by: Anilkumar Kolli <akolli@codeaurora.org>
 +
 +			rx_pkt_offset = sizeof(struct hal_rx_desc);
 +			l2_hdr_offset = ath11k_dp_rx_h_msdu_end_l3pad(ar->ab, rx_desc);
++
++			if (is_first_msdu) {
++				if (!ath11k_dp_rxdesc_mpdu_valid(ar->ab, rx_desc)) {
++					drop_mpdu = true;
++					dev_kfree_skb_any(msdu);
++					msdu = NULL;
++					goto next_msdu;
++				}
++				is_first_msdu = false;
++			}
 +
 +			ath11k_dp_mon_get_buf_len(&msdu_list.msdu_info[i],
 +						  &is_frag, &total_len,
@@ -651,7 +683,7 @@ Signed-off-by: Anilkumar Kolli <akolli@codeaurora.org>
 +	struct ath11k_pdev_dp *dp = &ar->dp;
 +	struct ath11k_mon_data *pmon = (struct ath11k_mon_data *)&dp->mon_data;
 +	struct hal_sw_mon_ring_entries *sw_mon_entries;
-+	int quota = 0, work = 0;
++	int quota = 0, work = 0, count;
 +
 +	sw_mon_entries = &pmon->sw_mon_entries;
 +
@@ -659,6 +691,12 @@ Signed-off-by: Anilkumar Kolli <akolli@codeaurora.org>
 +		quota = ath11k_dp_rx_process_mon_status(ab, mac_id,
 +							napi, 1);
 +		if (pmon->mon_status_buf_state == DP_MON_STATUS_MATCH) {
++			count = sw_mon_entries->status_buf_count;
++			if (count > 1) {
++				quota += ath11k_dp_rx_process_mon_status(ab, mac_id,
++									 napi, count);
++			}
++
 +			ath11k_dp_rx_full_mon_deliver_ppdu(ar, dp->mac_id,
 +							   pmon, napi);
 +			pmon->hold_mon_dst_ring = false;
@@ -775,8 +813,10 @@ Signed-off-by: Anilkumar Kolli <akolli@codeaurora.org>
 +
 +	return quota;
 +}
---- a/drivers/net/wireless/ath/ath11k/dp_rx.h
-+++ b/drivers/net/wireless/ath/ath11k/dp_rx.h
+Index: backports-20200902_001-4.4.60-931c337125/drivers/net/wireless/ath/ath11k/dp_rx.h
+===================================================================
+--- backports-20200902_001-4.4.60-931c337125.orig/drivers/net/wireless/ath/ath11k/dp_rx.h
++++ backports-20200902_001-4.4.60-931c337125/drivers/net/wireless/ath/ath11k/dp_rx.h
 @@ -99,10 +99,6 @@ int ath11k_dp_htt_tlv_iter(struct ath11k
  			   int (*iter)(struct ath11k_base *ar, u16 tag, u16 len,
  				       const void *ptr, void *data),
@@ -788,8 +828,10 @@ Signed-off-by: Anilkumar Kolli <akolli@codeaurora.org>
  int ath11k_dp_rx_mon_status_bufs_replenish(struct ath11k_base *ab, int mac_id,
  					   struct dp_rxdma_ring *rx_ring,
  					   int req_entries,
---- a/drivers/net/wireless/ath/ath11k/dp_tx.c
-+++ b/drivers/net/wireless/ath/ath11k/dp_tx.c
+Index: backports-20200902_001-4.4.60-931c337125/drivers/net/wireless/ath/ath11k/dp_tx.c
+===================================================================
+--- backports-20200902_001-4.4.60-931c337125.orig/drivers/net/wireless/ath/ath11k/dp_tx.c
++++ backports-20200902_001-4.4.60-931c337125/drivers/net/wireless/ath/ath11k/dp_tx.c
 @@ -982,6 +982,46 @@ int ath11k_dp_tx_htt_h2t_ppdu_stats_req(
  	return 0;
  }
@@ -853,8 +895,10 @@ Signed-off-by: Anilkumar Kolli <akolli@codeaurora.org>
  	ring_id = dp->rxdma_mon_buf_ring.refill_buf_ring.ring_id;
  
  	if (!reset) {
---- a/drivers/net/wireless/ath/ath11k/dp_tx.h
-+++ b/drivers/net/wireless/ath/ath11k/dp_tx.h
+Index: backports-20200902_001-4.4.60-931c337125/drivers/net/wireless/ath/ath11k/dp_tx.h
+===================================================================
+--- backports-20200902_001-4.4.60-931c337125.orig/drivers/net/wireless/ath/ath11k/dp_tx.h
++++ backports-20200902_001-4.4.60-931c337125/drivers/net/wireless/ath/ath11k/dp_tx.h
 @@ -237,4 +237,6 @@ int ath11k_dp_tx_htt_rx_filter_setup(str
  enum hal_tcl_encap_type
  ath11k_dp_tx_get_encap_type(struct ath11k_vif *arvif, struct sk_buff *skb);
@@ -862,8 +906,10 @@ Signed-off-by: Anilkumar Kolli <akolli@codeaurora.org>
 +int ath11k_dp_tx_htt_rx_full_mon_setup(struct ath11k_base *ab, int mac_id,
 +				       bool config);
  #endif
---- a/drivers/net/wireless/ath/ath11k/hal_desc.h
-+++ b/drivers/net/wireless/ath/ath11k/hal_desc.h
+Index: backports-20200902_001-4.4.60-931c337125/drivers/net/wireless/ath/ath11k/hal_desc.h
+===================================================================
+--- backports-20200902_001-4.4.60-931c337125.orig/drivers/net/wireless/ath/ath11k/hal_desc.h
++++ backports-20200902_001-4.4.60-931c337125/drivers/net/wireless/ath/ath11k/hal_desc.h
 @@ -859,6 +859,25 @@ struct hal_reo_entrance_ring {
   *		this ring has looped around the ring.
   */
@@ -890,8 +936,10 @@ Signed-off-by: Anilkumar Kolli <akolli@codeaurora.org>
  #define HAL_REO_CMD_HDR_INFO0_CMD_NUMBER	GENMASK(15, 0)
  #define HAL_REO_CMD_HDR_INFO0_STATUS_REQUIRED	BIT(16)
  
---- a/drivers/net/wireless/ath/ath11k/hal_rx.c
-+++ b/drivers/net/wireless/ath/ath11k/hal_rx.c
+Index: backports-20200902_001-4.4.60-931c337125/drivers/net/wireless/ath/ath11k/hal_rx.c
+===================================================================
+--- backports-20200902_001-4.4.60-931c337125.orig/drivers/net/wireless/ath/ath11k/hal_rx.c
++++ backports-20200902_001-4.4.60-931c337125/drivers/net/wireless/ath/ath11k/hal_rx.c
 @@ -1652,3 +1652,50 @@ void ath11k_hal_rx_reo_ent_buf_paddr_get
  
  	*pp_buf_addr = (void *)buf_addr_info;
@@ -943,8 +991,10 @@ Signed-off-by: Anilkumar Kolli <akolli@codeaurora.org>
 +	sw_mon_entries->ppdu_id =
 +		FIELD_GET(HAL_SW_MON_RING_INFO1_PHY_PPDU_ID, sw_mon_ring->info1);
 +}
---- a/drivers/net/wireless/ath/ath11k/hal_rx.h
-+++ b/drivers/net/wireless/ath/ath11k/hal_rx.h
+Index: backports-20200902_001-4.4.60-931c337125/drivers/net/wireless/ath/ath11k/hal_rx.h
+===================================================================
+--- backports-20200902_001-4.4.60-931c337125.orig/drivers/net/wireless/ath/ath11k/hal_rx.h
++++ backports-20200902_001-4.4.60-931c337125/drivers/net/wireless/ath/ath11k/hal_rx.h
 @@ -134,6 +134,20 @@ struct hal_rx_user_status {
  	u32 mpdu_err_byte_count;
  };
@@ -976,8 +1026,10 @@ Signed-off-by: Anilkumar Kolli <akolli@codeaurora.org>
  enum hal_rx_mon_status
  ath11k_hal_rx_parse_mon_status(struct ath11k_base *ab,
  			       struct hal_rx_mon_ppdu_info *ppdu_info,
---- a/drivers/net/wireless/ath/ath11k/hw.c
-+++ b/drivers/net/wireless/ath/ath11k/hw.c
+Index: backports-20200902_001-4.4.60-931c337125/drivers/net/wireless/ath/ath11k/hw.c
+===================================================================
+--- backports-20200902_001-4.4.60-931c337125.orig/drivers/net/wireless/ath/ath11k/hw.c
++++ backports-20200902_001-4.4.60-931c337125/drivers/net/wireless/ath/ath11k/hw.c
 @@ -549,6 +549,18 @@ static u32 ath11k_get_reo_dest_remap_con
  	return ring_hash_map;
  }
@@ -1037,8 +1089,10 @@ Signed-off-by: Anilkumar Kolli <akolli@codeaurora.org>
  };
  
  #define ATH11K_TX_RING_MASK_0 0x1
---- a/drivers/net/wireless/ath/ath11k/hw.h
-+++ b/drivers/net/wireless/ath/ath11k/hw.h
+Index: backports-20200902_001-4.4.60-931c337125/drivers/net/wireless/ath/ath11k/hw.h
+===================================================================
+--- backports-20200902_001-4.4.60-931c337125.orig/drivers/net/wireless/ath/ath11k/hw.h
++++ backports-20200902_001-4.4.60-931c337125/drivers/net/wireless/ath/ath11k/hw.h
 @@ -118,6 +118,7 @@ enum ath11k_bus {
  
  struct hal_rx_desc;

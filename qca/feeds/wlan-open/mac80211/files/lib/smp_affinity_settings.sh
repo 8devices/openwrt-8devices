@@ -96,7 +96,6 @@ enable_smp_affinity_wifi() {
 		local board=$(ipq806x_board_name)
 
 		case "$board" in
-			8devices,mango | \
 			ap-cp01-c1 | \
 			ap-oak03 | \
 			ap-hk01-c1)

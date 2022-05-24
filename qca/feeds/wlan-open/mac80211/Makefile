@@ -44,7 +44,7 @@ endef
 define KernelPackage/cfg80211
   $(call KernelPackage/mac80211/Default)
   TITLE:=cfg80211 - wireless configuration API
-  DEPENDS+= +iw +LINUX_4_4:kmod-crypto-core +kmod-crypto-manager +wireless-regdb
+  DEPENDS+= +iw +kmod-crypto-core +kmod-crypto-manager +wireless-regdb
   FILES:= \
 	$(PKG_BUILD_DIR)/compat/compat.ko \
 	$(PKG_BUILD_DIR)/net/wireless/cfg80211.ko
@@ -68,8 +68,8 @@ endef
 define KernelPackage/mac80211
   $(call KernelPackage/mac80211/Default)
   TITLE:=Linux 802.11 Wireless Networking Stack
-  DEPENDS+= @TARGET_ipq50xx||TARGET_ipq807x||TARGET_ipq806x||TARGET_ipq||TARGET_ar71xx \
-	+LINUX_4_4:kmod-crypto-arc4 +LINUX_4_4:kmod-crypto-aes +kmod-cfg80211 +hostapd-common
+  DEPENDS+= @TARGET_ipq806x||TARGET_ipq||TARGET_ar71xx \
+	+kmod-crypto-arc4 +kmod-crypto-aes +kmod-cfg80211 +hostapd-common
   PKG_BUILD_DEPENDS+= PACKAGE_kmod-qca-nss-drv:kmod-qca-nss-drv
   KCONFIG:=\
 	CONFIG_AVERAGE=y
@@ -199,13 +199,24 @@ else
 endif
 
 
-define FastCloneKernel
+ifneq ($(call qstrip,$(_LINUX_SRC)),)
+# --reference option doesn't work on git trees synced with "repo", so instead
+# we're manually using clone & fetch to speed up sync time
+  define FastCloneKernel
+	git clone $(_LINUX_SRC) $(2) || \
+	(rm -rf $(2) && \
+	git clone $(_LINUX_SRC) $(2))
+	(cd $(2); git remote add src $(1); git fetch src)
+  endef
+else
+  define FastCloneKernel
 	GIT_NAME=$$$$(echo $(1) | sed -e 's:.*//[^/]*.::g'); \
 	git clone $(1) $(2) || \
 	([ -n "${CONFIG_GIT_MIRROR}" ] && \
 	rm -rf $(2) && \
 	git clone $(CONFIG_GIT_MIRROR)$$$$GIT_NAME $(2))
-endef
+  endef
+endif
 
 removeBackport ?= $(shell wget $(SERVER_PATH)/$(PKG_SOURCE) -P $(TOPDIR)/dl/);
 ifeq ($(FORCED_BACKPORTS),false)
@@ -233,13 +244,11 @@ define DownloadBackports
 	(rm -rf $(TMP_DIR)/dl/$(PKG_NAME)-source && \
 	git clone $(PKG_BACKPORTS_SOURCE_URL) $(TMP_DIR)/dl/$(PKG_NAME)-source)
 	cp files/copy-list.ath $(TMP_DIR)/dl/$(PKG_NAME)-source
-	cd $(TMP_DIR)/dl/$(PKG_NAME)-source; \
-	git checkout $(PKG_BACKPORTS_VERSION); \
-	git revert --no-edit b35b2767; \
+	(cd $(TMP_DIR)/dl/$(PKG_NAME)-source && git checkout $(PKG_BACKPORTS_VERSION) && \
+	git revert --no-edit b35b2767 && \
 	./gentree.py --clean --copy-list ./copy-list.ath \
-		$(TMP_DIR)/dl/$(PKG_NAME)-kernel $(TMP_DIR)/dl/$(SUBDIR)
-	(cd $(TMP_DIR)/dl ; if [ -z "$(call dl_tar_pack,$(TMP_DIR)/dl/$(FILE),$(SUBDIR))" ]; then $(call dl_pack,$(TMP_DIR)/dl/$(FILE),$(SUBDIR)); else : ; fi; \
-	$(call dl_tar_pack,$(TMP_DIR)/dl/$(FILE),$(SUBDIR)) )
+		$(TMP_DIR)/dl/$(PKG_NAME)-kernel $(TMP_DIR)/dl/$(SUBDIR))
+	(cd $(TMP_DIR)/dl; $(call dl_pack,$(TMP_DIR)/dl/$(FILE),$(SUBDIR)))
 	mv $(TMP_DIR)/dl/$(FILE) $(DL_DIR)
 	rm -rf $(TMP_DIR)/dl
 endef
@@ -510,6 +519,10 @@ ifneq ($(CONFIG_PACKAGE_kmod-cfg80211)$(CONFIG_PACKAGE_kmod-lib80211),)
  endef
 endif
 
+define Build/Configure
+	cmp $(PKG_BUILD_DIR)/include/linux/ath9k_platform.h $(LINUX_DIR)/include/linux/ath9k_platform.h
+endef
+
 define Build/Compile
 	$(SH_FUNC) var2file "$(call shvar,mac80211_config)" $(PKG_BUILD_DIR)/.config
 	$(MAKE) $(MAKE_OPTS) olddefconfig
@@ -537,7 +550,6 @@ define KernelPackage/cfg80211/install
 	$(INSTALL_DIR) $(1)/lib/wifi $(1)/etc/hotplug.d/devcoredump
 	$(INSTALL_DIR) $(1)/lib/wifi $(1)/lib/netifd/wireless
 	$(INSTALL_DATA) ./files/lib/wifi/mac80211.sh $(1)/lib/wifi
-	$(INSTALL_DATA) ./files/lib/netifd/mac80211.sh $(1)/lib/netifd
 	$(INSTALL_BIN) ./files/lib/netifd/wireless/mac80211.sh $(1)/lib/netifd/wireless
 	$(INSTALL_BIN) ./files/lib/performance.sh $(1)/lib
 	$(INSTALL_BIN) ./files/lib/smp_affinity_settings.sh $(1)/lib

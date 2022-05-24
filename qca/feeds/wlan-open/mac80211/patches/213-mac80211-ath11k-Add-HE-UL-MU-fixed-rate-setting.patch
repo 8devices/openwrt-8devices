@@ -1,0 +1,273 @@
+From b5291d6c8f0bec70680d76c234c7c9490694b657 Mon Sep 17 00:00:00 2001
+From: Muna Sinada <msinada@codeaurora.org>
+Date: Wed, 23 Sep 2020 05:55:02 -0700
+Subject: [PATCH] mac80211/ath11k:Add HE UL MU fixed rate setting
+
+HE UL MU fixed rate is informed to HE STA by HE Basic Trigger frame.
+The added code is reusing parts of the existing code path used for HE
+fixed rate, this includes nl80211 definitions, policies and parsing
+code required to pass HE UL MU fixed rate settings
+
+Signed-off-by: Muna Sinada <msinada@codeaurora.org>
+---
+ drivers/net/wireless/ath/ath11k/mac.c | 80 ++++++++++++++++++++++++++++++-----
+ drivers/net/wireless/ath/ath11k/wmi.h |  1 +
+ include/net/cfg80211.h                |  1 +
+ include/uapi/linux/nl80211.h          |  2 +
+ net/wireless/nl80211.c                | 12 ++++++
+ 5 files changed, 86 insertions(+), 10 deletions(-)
+
+diff --git a/drivers/net/wireless/ath/ath11k/mac.c b/drivers/net/wireless/ath/ath11k/mac.c
+index 874bda1c9a1a..d316b663f884 100644
+--- a/drivers/net/wireless/ath/ath11k/mac.c
++++ b/drivers/net/wireless/ath/ath11k/mac.c
+@@ -3786,6 +3786,20 @@ ath11k_mac_bitrate_mask_num_he_rates(struct ath11k *ar,
+ }
+ 
+ static int
++ath11k_mac_bitrate_mask_num_he_ul_rates(struct ath11k *ar,
++				     enum nl80211_band band,
++				     const struct cfg80211_bitrate_mask *mask)
++{
++	int num_rates = 0;
++	int i;
++
++	for (i = 0; i < ARRAY_SIZE(mask->control[band].he_ul_mcs); i++)
++		num_rates += hweight16(mask->control[band].he_ul_mcs[i]);
++
++	return num_rates;
++}
++
++static int
+ ath11k_mac_set_peer_vht_fixed_rate(struct ath11k_vif *arvif,
+ 				   struct ieee80211_sta *sta,
+ 				   const struct cfg80211_bitrate_mask *mask,
+@@ -7046,10 +7060,11 @@ ath11k_mac_set_auto_rate_GI_LTF(struct ath11k_vif *arvif, u16 he_gi, u8 he_ltf)
+ 
+ static int ath11k_mac_set_rate_params(struct ath11k_vif *arvif,
+ 				      u32 rate, u8 nss, u8 sgi, u8 ldpc,
+-				      u8 he_gi, u8 he_ltf, bool he_fixed_rate)
++				      u8 he_gi, u8 he_ltf, bool he_fixed_rate,
++				      u32 he_ul_rate, u8 he_ul_nss)
+ {
+ 	struct ath11k *ar = arvif->ar;
+-	u32 vdev_param;
++	u32 vdev_param, rate_code;
+ 	int ret;
+ 
+ 	lockdep_assert_held(&ar->conf_mutex);
+@@ -7111,6 +7126,17 @@ static int ath11k_mac_set_rate_params(struct ath11k_vif *arvif,
+ 		}
+ 	}
+ 
++	rate_code = ATH11K_HW_RATE_CODE(he_ul_rate, he_ul_nss - 1,
++					WMI_RATE_PREAMBLE_HE);
++
++	vdev_param = WMI_VDEV_PARAM_UL_FIXED_RATE;
++	ret = ath11k_wmi_vdev_set_param_cmd(ar, arvif->vdev_id, vdev_param, rate_code);
++
++	if(ret) {
++		ath11k_warn(ar->ab, "failed to set HE UL Fixed Rate:%d, error:%d\n",
++			    rate,ret);
++	}
++
+ 	return 0;
+ }
+ 
+@@ -7200,13 +7226,15 @@ ath11k_mac_validate_vht_he_fixed_rate_settings(struct ath11k *ar, enum nl80211_b
+ 					const struct cfg80211_bitrate_mask *mask)
+ {
+ 	bool he_fixed_rate = false, vht_fixed_rate = false;
++	bool he_ul_fixed_rate = false;
+ 	struct ath11k_peer *peer, *tmp;
+-	const u16 *vht_mcs_mask, *he_mcs_mask;
+-	u8 vht_nss, he_nss;
++	const u16 *vht_mcs_mask, *he_mcs_mask, *he_ul_mcs_mask;
++	u8 vht_nss, he_nss, he_ul_nss;
+ 	bool ret = true;
+ 
+ 	vht_mcs_mask = mask->control[band].vht_mcs;
+ 	he_mcs_mask = mask->control[band].he_mcs;
++	he_ul_mcs_mask = mask->control[band].he_ul_mcs;
+ 
+ 	if (ath11k_mac_bitrate_mask_num_vht_rates(ar, band, mask) == 1)
+ 		vht_fixed_rate = true;
+@@ -7214,11 +7242,15 @@ ath11k_mac_validate_vht_he_fixed_rate_settings(struct ath11k *ar, enum nl80211_b
+ 	if (ath11k_mac_bitrate_mask_num_he_rates(ar, band, mask) == 1)
+ 		he_fixed_rate = true;
+ 
+-	if(!vht_fixed_rate && !he_fixed_rate)
++	if (ath11k_mac_bitrate_mask_num_he_ul_rates(ar, band, mask) == 1)
++		he_ul_fixed_rate = true;
++
++	if(!vht_fixed_rate && !he_fixed_rate && !he_ul_fixed_rate)
+ 		return true;
+ 
+ 	vht_nss = ath11k_mac_max_vht_nss(vht_mcs_mask);
+ 	he_nss =  ath11k_mac_max_he_nss(he_mcs_mask);
++	he_ul_nss =  ath11k_mac_max_he_nss(he_ul_mcs_mask);
+ 
+ 	rcu_read_lock();
+ 	spin_lock_bh(&ar->ab->base_lock);
+@@ -7234,6 +7266,14 @@ ath11k_mac_validate_vht_he_fixed_rate_settings(struct ath11k *ar, enum nl80211_b
+ 				ret = false;
+ 				goto exit;
+ 			}
++			/* TODO:
++				check when UL is valid
++			*/
++			if (he_ul_fixed_rate && (!peer->sta->he_cap.has_he ||
++                            peer->sta->rx_nss < he_ul_nss)) {
++                                ret = false;
++                                goto exit;
++                        }
+ 		}
+ 	}
+ exit:
+@@ -7301,13 +7341,14 @@ ath11k_mac_op_set_bitrate_mask(struct ieee80211_hw *hw,
+ 	const u8 *ht_mcs_mask;
+ 	const u16 *vht_mcs_mask;
+ 	const u16 *he_mcs_mask;
+-	u32 rate;
+-	u8 nss;
++	const u16 *he_ul_mcs_mask;
++	u32 rate, he_ul_rate;
++	u8 nss, he_ul_nss;
+ 	u8 sgi;
+ 	u8 ldpc;
+ 	u8 he_gi = 0, he_ltf = 0;
+ 	int single_nss;
+-	int ret;
++	int ret, i;
+ 	int num_single_rates;
+ 	bool he_fixed_rate = false;
+ 
+@@ -7318,6 +7359,7 @@ ath11k_mac_op_set_bitrate_mask(struct ieee80211_hw *hw,
+ 	ht_mcs_mask = mask->control[band].ht_mcs;
+ 	vht_mcs_mask = mask->control[band].vht_mcs;
+ 	he_mcs_mask = mask->control[band].he_mcs;
++	he_ul_mcs_mask = mask->control[band].he_ul_mcs;
+ 	ldpc = !!(ar->ht_cap_info & WMI_HT_CAP_LDPC);
+ 
+ 	sgi = mask->control[band].gi;
+@@ -7327,6 +7369,15 @@ ath11k_mac_op_set_bitrate_mask(struct ieee80211_hw *hw,
+ 	he_gi = mask->control[band].he_gi;
+ 	he_ltf = mask->control[band].he_ltf;
+ 
++	for (i = 0; i < ARRAY_SIZE(mask->control[band].he_ul_mcs); i++) {
++		if (hweight16(mask->control[band].he_ul_mcs[i]) == 1) {
++			he_ul_nss = i + 1;
++			he_ul_rate = ffs((int)
++					 mask->control[band].he_ul_mcs[i]) - 1;
++			break;
++		}
++	}
++
+ 	/* mac80211 doesn't support sending a fixed HT/VHT MCS alone, rather it
+ 	 * requires passing atleast one of used basic rates along with them.
+ 	 * Fixed rate setting across different preambles(legacy, HT, VHT) is
+@@ -7414,6 +7465,14 @@ ath11k_mac_op_set_bitrate_mask(struct ieee80211_hw *hw,
+ 			return -EINVAL;
+ 		}
+ 
++		num_single_rates = ath11k_mac_bitrate_mask_num_he_ul_rates(ar, band,
++								    mask);
++		if(num_single_rates!=1) {
++			ath11k_warn(ar->ab,
++				    "Setting HE UL MCS Fixed Rate range is not supported\n");
++			return -EINVAL;
++		}
++
+ 		if (num_single_rates >= 1)
+ 			he_fixed_rate = true;
+ 
+@@ -7433,9 +7492,10 @@ ath11k_mac_op_set_bitrate_mask(struct ieee80211_hw *hw,
+ 	mutex_lock(&ar->conf_mutex);
+ 
+ 	ret = ath11k_mac_set_rate_params(arvif, rate, nss, sgi, ldpc, he_gi,
+-					 he_ltf, he_fixed_rate);
++					 he_ltf, he_fixed_rate, he_ul_rate,
++					 he_ul_nss);
+ 	if (ret) {
+-		ath11k_warn(ar->ab, "failed to set rate params on vdev %i: %d\n",
++		ath11k_warn(ar->ab, "failed to set fixed rate params on vdev %i: %d\n",
+ 			    arvif->vdev_id, ret);
+ 	}
+ 
+diff --git a/drivers/net/wireless/ath/ath11k/wmi.h b/drivers/net/wireless/ath/ath11k/wmi.h
+index 0b04b60a8a49..f5fed8112a5e 100644
+--- a/drivers/net/wireless/ath/ath11k/wmi.h
++++ b/drivers/net/wireless/ath/ath11k/wmi.h
+@@ -1079,6 +1079,7 @@ enum wmi_tlv_vdev_param {
+ 	WMI_VDEV_PARAM_BA_MODE = 0x7e,
+ 	WMI_VDEV_PARAM_AUTORATE_MISC_CFG = 0x80,
+ 	WMI_VDEV_PARAM_SET_HE_SOUNDING_MODE = 0x87,
++	WMI_VDEV_PARAM_UL_FIXED_RATE,
+ 	WMI_VDEV_PARAM_6GHZ_PARAMS = 0x99,
+ 	WMI_VDEV_PARAM_PROTOTYPE = 0x8000,
+ 	WMI_VDEV_PARAM_BSS_COLOR,
+diff --git a/include/net/cfg80211.h b/include/net/cfg80211.h
+index 159521ba959b..997d08107ea8 100644
+--- a/include/net/cfg80211.h
++++ b/include/net/cfg80211.h
+@@ -711,6 +711,7 @@ struct cfg80211_bitrate_mask {
+ 		enum nl80211_txrate_gi gi;
+ 		enum nl80211_he_gi he_gi;
+ 		enum nl80211_he_ltf he_ltf;
++		u16 he_ul_mcs[NL80211_HE_NSS_MAX];
+ 	} control[NUM_NL80211_BANDS];
+ };
+ 
+diff --git a/include/uapi/linux/nl80211.h b/include/uapi/linux/nl80211.h
+index b38ca3367bd2..903d802cf183 100644
+--- a/include/uapi/linux/nl80211.h
++++ b/include/uapi/linux/nl80211.h
+@@ -4846,6 +4846,7 @@ enum nl80211_key_attributes {
+  *	see &struct nl80211_txrate_he
+  * @NL80211_TXRATE_HE_GI: configure HE GI, 0.8us, 1.6us and 3.2us.
+  * @NL80211_TXRATE_HE_LTF: configure HE LTF, 1XLTF, 2XLTF and 4XLTF.
++ * @NL80211_TXRATE_HE_UL: HE MCS rates of connected HE STA for uplink traffic.
+  * @__NL80211_TXRATE_AFTER_LAST: internal
+  * @NL80211_TXRATE_MAX: highest TX rate attribute
+  */
+@@ -4858,6 +4859,7 @@ enum nl80211_tx_rate_attributes {
+ 	NL80211_TXRATE_HE,
+ 	NL80211_TXRATE_HE_GI,
+ 	NL80211_TXRATE_HE_LTF,
++	NL80211_TXRATE_HE_UL,
+ 
+ 	/* keep last */
+ 	__NL80211_TXRATE_AFTER_LAST,
+diff --git a/net/wireless/nl80211.c b/net/wireless/nl80211.c
+index a2e297f67981..44364d65fda5 100644
+--- a/net/wireless/nl80211.c
++++ b/net/wireless/nl80211.c
+@@ -424,6 +424,10 @@ static const struct nla_policy nl80211_txattr_policy[NL80211_TXRATE_MAX + 1] = {
+                 .len = sizeof(struct nl80211_txrate_he),
+         },
+         [NL80211_TXRATE_GI] = { .type = NLA_U8 },
++	[NL80211_TXRATE_HE_UL] = {
++		.type = NLA_EXACT_LEN_WARN,
++		.len = sizeof(struct nl80211_txrate_he),
++	},
+ };
+ 
+ static const struct nla_policy
+@@ -4659,6 +4663,14 @@ static int nl80211_parse_tx_bitrate_mask(struct genl_info *info,
+ 			if (mask->control[band].he_ltf > NL80211_RATE_INFO_HE_4XLTF)
+ 				return -EINVAL;
+ 		}
++		if (tb[NL80211_TXRATE_HE_UL]) {
++			if (!he_set_mcs_mask(
++					info,
++					sband,
++					nla_data(tb[NL80211_TXRATE_HE_UL]),
++					mask->control[band].he_ul_mcs))
++				return -EINVAL;
++		}
+ 
+ 		if (mask->control[band].legacy == 0) {
+ 			/* don't allow empty legacy rates if HT or VHT
+-- 
+2.7.4
+

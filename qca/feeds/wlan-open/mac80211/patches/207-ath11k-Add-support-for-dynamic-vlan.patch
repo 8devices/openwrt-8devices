@@ -21,7 +21,7 @@ Signed-off-by: Seevalamuthu Mariappan <seevalam@codeaurora.org>
 
 --- a/drivers/net/wireless/ath/ath11k/dp_tx.c
 +++ b/drivers/net/wireless/ath/ath11k/dp_tx.c
-@@ -76,6 +76,33 @@ enum hal_encrypt_type ath11k_dp_tx_get_e
+@@ -76,6 +76,34 @@ enum hal_encrypt_type ath11k_dp_tx_get_e
  	}
  }
  
@@ -47,6 +47,7 @@ Signed-off-by: Seevalamuthu Mariappan <seevalam@codeaurora.org>
 +	desc_ext = (struct htt_tx_msdu_desc_ext *)skb->data;
 +	desc_ext->valid_encrypt_type = 1;
 +	desc_ext->encrypt_type = 0;
++	desc_ext->host_tx_desc_pool = 1;
 +	*htt_metadata_size = htt_desc_size_aligned;
 +
 +	return 0;
@@ -55,7 +56,7 @@ Signed-off-by: Seevalamuthu Mariappan <seevalam@codeaurora.org>
  int ath11k_dp_tx(struct ath11k *ar, struct ath11k_vif *arvif,
  		 struct sk_buff *skb)
  {
-@@ -93,6 +120,7 @@ int ath11k_dp_tx(struct ath11k *ar, stru
+@@ -93,6 +121,7 @@ int ath11k_dp_tx(struct ath11k *ar, stru
  	int ret;
  	u8 ring_selector = 0, ring_map = 0;
  	bool tcl_ring_retry;
@@ -63,7 +64,7 @@ Signed-off-by: Seevalamuthu Mariappan <seevalam@codeaurora.org>
  
  	if (test_bit(ATH11K_FLAG_CRASH_FLUSH, &ar->ab->dev_flags))
  		return -ESHUTDOWN;
-@@ -203,6 +231,36 @@ tcl_ring_sel:
+@@ -203,6 +232,36 @@ tcl_ring_sel:
  		goto fail_remove_idr;
  	}
  
@@ -100,7 +101,7 @@ Signed-off-by: Seevalamuthu Mariappan <seevalam@codeaurora.org>
  	ti.paddr = dma_map_single(ab->dev, skb->data, skb->len, DMA_TO_DEVICE);
  	if (dma_mapping_error(ab->dev, ti.paddr)) {
  		atomic_inc(&ab->soc_stats.tx_err.misc_fail);
-@@ -211,7 +269,7 @@ tcl_ring_sel:
+@@ -211,7 +270,7 @@ tcl_ring_sel:
  		goto fail_remove_idr;
  	}
  
@@ -109,7 +110,7 @@ Signed-off-by: Seevalamuthu Mariappan <seevalam@codeaurora.org>
  	skb_cb->paddr = ti.paddr;
  	skb_cb->vif = arvif->vif;
  	skb_cb->ar = ar;
-@@ -265,6 +323,8 @@ fail_unmap_dma:
+@@ -265,6 +324,8 @@ fail_unmap_dma:
  	dma_unmap_single(ab->dev, ti.paddr, ti.data_len, DMA_TO_DEVICE);
  
  fail_remove_idr:

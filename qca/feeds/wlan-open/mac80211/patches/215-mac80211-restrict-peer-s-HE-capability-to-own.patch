@@ -36,7 +36,7 @@ Signed-off-by: P Praneesh <ppranees@codeaurora.org>
 +		peer_rx = le16_to_cpu(he_cap->he_mcs_nss_supp.rx_mcs_80);
 +		peer_rx = (peer_rx >> i * 2) & IEEE80211_HE_MCS_NOT_SUPPORTED;
 +		peer_tx = le16_to_cpu(he_cap->he_mcs_nss_supp.tx_mcs_80);
-+		peer_tx = (peer_rx >> i * 2) & IEEE80211_HE_MCS_NOT_SUPPORTED;
++		peer_tx = (peer_tx >> i * 2) & IEEE80211_HE_MCS_NOT_SUPPORTED;
 +
 +		if (peer_tx != IEEE80211_HE_MCS_NOT_SUPPORTED) {
 +			if (own_rx == IEEE80211_HE_MCS_NOT_SUPPORTED)
