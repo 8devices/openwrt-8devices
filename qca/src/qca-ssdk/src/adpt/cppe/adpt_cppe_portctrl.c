@@ -66,7 +66,7 @@ _adpt_cppe_port_mux_mac_set(a_uint32_t dev_id, fal_port_t port_id,
 						CPPE_PORT4_PCS_SEL_PCS0_CHANNEL3;
 				} else {
 					cppe_port_mux_ctrl.bf.port3_pcs_sel =
-						CPPE_PORT3_PCS_SEL_PCS0_CHANNEL2;
+						CPPE_PORT3_PCS_SEL_PCS0_CHANNEL4;
 					cppe_port_mux_ctrl.bf.port4_pcs_sel =
 						CPPE_PORT4_PCS_SEL_PCS0_CHANNEL3;
 				}
@@ -249,10 +249,10 @@ adpt_cppe_port_to_channel_convert(a_uint32_t dev_id, a_uint32_t port_id,
 	*channel_id = port_id;
 
 	if (port_id == SSDK_PHYSICAL_PORT3) {
-		if (hsl_port_phyid_get(dev_id,
-				port_id) == MALIBU2PORT_PHY) {
+	//	if (hsl_port_phyid_get(dev_id,
+	//			port_id) == MALIBU2PORT_PHY) {
 			*channel_id = SSDK_PHYSICAL_PORT5;
-		}
+	//	}
 	}
 	return SW_OK;
 }
