@@ -44,7 +44,7 @@ update_config(){
 
 compile(){
 	$RUN "make defconfig"
-	$RUN "make -j$(nproc)"
+	$RUN "make V=sc -j$(nproc)"
 }
 
 clean(){
