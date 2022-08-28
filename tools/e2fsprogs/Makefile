@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2010-2013 OpenWrt.org
+# Copyright (C) 2010-2015 OpenWrt.org
 #
 # This is free software, licensed under the GNU General Public License v2.
 # See /LICENSE for more information.
@@ -8,12 +8,12 @@
 include $(TOPDIR)/rules.mk
 
 PKG_NAME:=e2fsprogs
-PKG_VERSION:=1.42.8
-PKG_MD5SUM:=8ef664b6eb698aa6b733df59b17b9ed4
+PKG_VERSION:=1.44.1
+PKG_HASH:=0ca164c1c87724df904c918b2d7051ef989b51de725db66c67514dbe6dd2b9ef
 PKG_RELEASE:=1
 
-PKG_SOURCE:=$(PKG_NAME)-$(PKG_VERSION).tar.gz
-PKG_SOURCE_URL:=@SF/e2fsprogs
+PKG_SOURCE:=$(PKG_NAME)-$(PKG_VERSION).tar.xz
+PKG_SOURCE_URL:=@KERNEL/linux/kernel/people/tytso/e2fsprogs/v$(PKG_VERSION)/
 
 HOST_BUILD_PARALLEL:=1
 
@@ -22,10 +22,8 @@ include $(INCLUDE_DIR)/host-build.mk
 HOST_CFLAGS += $(FPIC)
 
 HOST_CONFIGURE_ARGS += \
-	--disable-shared \
 	--disable-elf-shlibs \
-	--enable-static \
-	--enable-dynamic-e2fsck \
+	--enable-libuuid \
 	--disable-tls \
 	--disable-nls
 

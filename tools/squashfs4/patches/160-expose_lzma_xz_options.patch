@@ -40,6 +40,7 @@
 +
 +
 +struct lzma_opts {
++	uint32_t dict_size;
 +	uint32_t flags;
 +#define LZMA_OPT_FLT_MASK	0xffff
 +#define LZMA_OPT_PRE_OFF	16
@@ -53,7 +54,6 @@
 +#define LZMA_OPT_PB_OFF		6
 +#define LZMA_OPT_PB_MASK	(0x7 << LZMA_OPT_PB_OFF)
 +	uint16_t fb;
-+	uint32_t dict_size;
 +};
 +
 +#if __BYTE_ORDER == __BIG_ENDIAN
@@ -637,7 +637,7 @@
  		}
  
  		name = argv[1];
-@@ -76,190 +73,50 @@ static int xz_options(char *argv[], int 
+@@ -76,190 +73,50 @@ static int xz_options(char *argv[], int
  			}
  			if(bcj[i].name == NULL) {
  				fprintf(stderr, "xz: -Xbcj unrecognised "
@@ -864,7 +864,7 @@
  		SQUASHFS_METADATA_SIZE;
  
  	filter[0].filter[0].id = LZMA_FILTER_LZMA2;
-@@ -323,14 +181,25 @@ static int xz_compress(void *strm, void 
+@@ -323,14 +181,25 @@ static int xz_compress(void *strm, void
          lzma_ret res = 0;
  	struct xz_stream *stream = strm;
  	struct filter *selected = NULL;

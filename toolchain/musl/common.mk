@@ -11,10 +11,13 @@ PKG_NAME:=musl
 PKG_VERSION:=$(call qstrip,$(CONFIG_MUSL_VERSION))
 PKG_RELEASE=1
 
-PKG_MD5SUM:=ac52ccaec6b06ab0f289d37e8436859b
+PKG_SOURCE_PROTO:=git
+PKG_SOURCE_SUBDIR:=$(PKG_NAME)-$(PKG_VERSION)
+PKG_SOURCE_VERSION:=769f53598e781ffc89191520f3f8a93cb58db91f
+PKG_MIRROR_HASH:=c148c570cc46471ab30a1b36e96531519837e41c4347f3164bf610ab98741d80
+PKG_SOURCE_URL:=git://git.musl-libc.org/musl
+PKG_SOURCE:=$(PKG_NAME)-$(PKG_VERSION)-$(PKG_SOURCE_VERSION).tar.xz
 
-PKG_SOURCE_URL:=http://www.musl-libc.org/releases
-PKG_SOURCE:=$(PKG_NAME)-$(PKG_VERSION).tar.gz
 LIBC_SO_VERSION:=$(PKG_VERSION)
 PATCH_DIR:=$(PATH_PREFIX)/patches
 
@@ -31,12 +34,8 @@ MUSL_CONFIGURE:= \
 		--prefix=/ \
 		--host=$(GNU_HOST_NAME) \
 		--target=$(REAL_GNU_TARGET_NAME) \
-		--disable-gcc-wrapper
-
-ifeq ($(CONFIG_MUSL_ENABLE_DEBUG),y)
-MUSL_CONFIGURE+= \
-	--enable-debug
-endif
+		--disable-gcc-wrapper \
+		--enable-debug
 
 define Host/Prepare
 	$(call Host/Prepare/Default)

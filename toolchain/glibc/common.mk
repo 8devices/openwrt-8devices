@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2006-2011 OpenWrt.org
+# Copyright (C) 2006-2016 OpenWrt.org
 #
 # This is free software, licensed under the GNU General Public License v2.
 # See /LICENSE for more information.
@@ -7,32 +7,23 @@
 include $(TOPDIR)/rules.mk
 
 
-MD5SUM_2.19 = 42dad4edd3bcb38006d13b5640b00b38
-REVISION_2.19 = 25243
-
-MD5SUM_2.21 = 76050a65c444d58b5c4aa0d6034736ed
-REVISION_2.21 = 16d0a0c
+HASH_2.24 = 714d26c0daf6a8acf73fc8b6053349880c79f240f96ca57b00ab0ecbbead2b73
+REVISION_2.24 = 8c716c2
 
 
 PKG_NAME:=glibc
 PKG_VERSION:=$(call qstrip,$(CONFIG_GLIBC_VERSION))
 
 PKG_REVISION:=$(REVISION_$(PKG_VERSION))
-PKG_MIRROR_MD5SUM:=$(MD5SUM_$(PKG_VERSION))
+PKG_MIRROR_HASH:=$(HASH_$(PKG_VERSION))
 
 PKG_SOURCE_PROTO:=git
 PKG_SOURCE_URL:=git://sourceware.org/git/glibc.git
 PKG_SOURCE_VERSION:=$(PKG_REVISION)
-PKG_SOURCE_SUBDIR:=$(PKG_NAME)-$(PKG_VERSION)-r$(PKG_REVISION)
+PKG_SOURCE_SUBDIR:=$(PKG_NAME)-$(PKG_VERSION)-$(PKG_REVISION)
 PKG_SOURCE:=$(PKG_SOURCE_SUBDIR).tar.bz2
 
 GLIBC_PATH:=
-ifneq ($(CONFIG_EGLIBC_VERSION_2_19),)
-  GLIBC_PATH:=libc/
-  PKG_SOURCE_PROTO:=svn
-  PKG_SOURCE:=$(PKG_SOURCE_SUBDIR).tar.bz2
-  PKG_SOURCE_URL:=svn://svn.eglibc.org/branches/eglibc-2_19
-endif
 
 PATCH_DIR:=$(PATH_PREFIX)/patches/$(PKG_VERSION)
 
@@ -58,10 +49,14 @@ ifeq ($(ARCH),mips64)
   endif
 endif
 
+
+# -Os miscompiles w. 2.24 gcc5/gcc6
+# only -O2 tested by upstream changeset
+# "Optimize i386 syscall inlining for GCC 5"
 GLIBC_CONFIGURE:= \
 	BUILD_CC="$(HOSTCC)" \
 	$(TARGET_CONFIGURE_OPTS) \
-	CFLAGS="$(TARGET_CFLAGS)" \
+	CFLAGS="-O2 $(filter-out -Os,$(call qstrip,$(TARGET_CFLAGS)))" \
 	libc_cv_slibdir="/lib" \
 	use_ldconfig=no \
 	$(HOST_BUILD_DIR)/$(GLIBC_PATH)configure \
@@ -77,16 +72,13 @@ GLIBC_CONFIGURE:= \
 		--$(if $(CONFIG_SOFT_FLOAT),without,with)-fp
 
 export libc_cv_ssp=no
+export libc_cv_ssp_strong=no
 export ac_cv_header_cpuid_h=yes
 export HOST_CFLAGS := $(HOST_CFLAGS) -idirafter $(CURDIR)/$(PATH_PREFIX)/include
 
 define Host/SetToolchainInfo
 	$(SED) 's,^\(LIBC_TYPE\)=.*,\1=$(PKG_NAME),' $(TOOLCHAIN_DIR)/info.mk
-ifneq ($(CONFIG_GLIBC_VERSION_2_21),)
 	$(SED) 's,^\(LIBC_URL\)=.*,\1=http://www.gnu.org/software/libc/,' $(TOOLCHAIN_DIR)/info.mk
-else
-	$(SED) 's,^\(LIBC_URL\)=.*,\1=http://www.eglibc.org/,' $(TOOLCHAIN_DIR)/info.mk
-endif
 	$(SED) 's,^\(LIBC_VERSION\)=.*,\1=$(PKG_VERSION),' $(TOOLCHAIN_DIR)/info.mk
 	$(SED) 's,^\(LIBC_SO_VERSION\)=.*,\1=$(PKG_VERSION),' $(TOOLCHAIN_DIR)/info.mk
 endef
@@ -98,7 +90,6 @@ define Host/Configure
 		touch $(HOST_BUILD_DIR)/.autoconf; \
 	}
 	mkdir -p $(CUR_BUILD_DIR)
-	grep 'CONFIG_EGLIBC_OPTION_' $(TOPDIR)/.config | sed -e "s,\\(# \)\\?CONFIG_EGLIBC_\\(.*\\),\\1\\2,g" > $(CUR_BUILD_DIR)/option-groups.config
 	( cd $(CUR_BUILD_DIR); rm -f config.cache; \
 		$(GLIBC_CONFIGURE) \
 	);
@@ -107,9 +98,6 @@ endef
 define Host/Prepare
 	$(call Host/Prepare/Default)
 	ln -snf $(PKG_SOURCE_SUBDIR) $(BUILD_DIR_TOOLCHAIN)/$(PKG_NAME)
-ifeq ($(CONFIG_GLIBC_VERSION_2_21),)
-	$(SED) 's,y,n,' $(HOST_BUILD_DIR)/libc/option-groups.defaults
-endif
 endef
 
 define Host/Clean

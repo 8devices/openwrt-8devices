@@ -6,8 +6,8 @@ PKG_VERSION:=2019-07-24
 PKG_RELEASE:=$(PKG_SOURCE_VERSION)
 
 PKG_SOURCE_PROTO:=git
-PKG_SOURCE_URL:=git://github.com/andersson/qrtr.git
-PKG_SOURCE_VERSION:=cd6bedd5d00f211e6c1e3803ff2f9f53c246435e
+PKG_SOURCE_URL:=https://github.com/andersson/qrtr.git
+PKG_SOURCE_VERSION:=9dc7a88548c27983e06465d3fbba2ba27d4bc050
 PKG_SOURCE:=$(PKG_NAME)-$(PKG_VERSION)-$(PKG_SOURCE_VERSION).tar.gz
 
 include $(INCLUDE_DIR)/package.mk
