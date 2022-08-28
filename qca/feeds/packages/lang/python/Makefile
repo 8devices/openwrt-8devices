@@ -216,7 +216,8 @@ endef
 
 HOST_CFLAGS+= \
 	-I/usr/include/ncursesw \
-	-I/usr/include/ncurses
+	-I/usr/include/ncurses \
+	-I/usr/include/tirpc
 
 HOST_CONFIGURE_ARGS+= \
 	--without-cxx-main \
