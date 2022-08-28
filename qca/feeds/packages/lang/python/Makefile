@@ -55,7 +55,7 @@ endef
 define Package/python-base
 $(call Package/python/Default)
   TITLE:=Python $(PYTHON_VERSION) interpreter
-  DEPENDS:=+libpthread +zlib
+  DEPENDS:=+libpthread +zlib +librpc
 endef
 
 define Package/python-base/description
