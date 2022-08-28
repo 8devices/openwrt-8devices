@@ -28,8 +28,8 @@ define Build/Compile
 		CC="$(TARGET_CC)" \
 		LD="$(TARGET_CC)" \
 		LDFLAGS="$(TARGET_LDFLAGS)" \
-		CFLAGS="$(TARGET_CFLAGS) -I$(LINUX_DIR)/user_headers/include -I$(LINUX_DIR)/include/uapi/ -Ilib" \
-		all
+		CFLAGS="$(TARGET_CFLAGS) -I$(LINUX_DIR)/user_headers/include -I$(LINUX_DIR)/include/uapi/ \
+		-I$(LINUX_DIR)/include -Ilib" all
 endef
 
 define Package/$(PKG_NAME)/install
