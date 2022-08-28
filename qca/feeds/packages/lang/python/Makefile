@@ -16,8 +16,7 @@ PKG_RELEASE:=1
 
 PKG_SOURCE:=Python-$(PKG_VERSION).tar.xz
 PKG_SOURCE_URL:=https://www.python.org/ftp/python/$(PKG_VERSION)
-PKG_MD5SUM:=53b43534153bb2a0363f08bae8b9d990
-PKG_HASH:=35d543986882f78261f97787fd3e06274bfa6df29fac9b4a94f73930ff98f731
+PKG_MD5SUM:=57dffcee9cee8bb2ab5f82af1d8e9a69
 
 PKG_LICENSE:=PSF
 PKG_LICENSE_FILES:=LICENSE Modules/_ctypes/libffi_msvc/LICENSE Modules/_ctypes/darwin/LICENSE Modules/_ctypes/libffi/LICENSE Modules/_ctypes/libffi_osx/LICENSE Tools/pybench/LICENSE
@@ -30,7 +29,7 @@ PKG_BUILD_DIR:=$(BUILD_DIR)/Python-$(PKG_VERSION)
 HOST_BUILD_DIR:=$(BUILD_DIR_HOST)/Python-$(PKG_VERSION)
 
 PKG_BUILD_DEPENDS:=python/host
-HOST_BUILD_DEPENDS:=bzip2/host expat/host libffi/host
+HOST_BUILD_DEPENDS:=bzip2/host expat/host
 
 include $(INCLUDE_DIR)/host-build.mk
 include $(INCLUDE_DIR)/package.mk
@@ -224,7 +223,6 @@ HOST_CONFIGURE_ARGS+= \
 	--without-pymalloc \
 	--with-threads \
 	--with-system-expat=$(STAGING_DIR_HOST) \
-	--with-system-ffi=$(STAGING_DIR_HOST) \
 	--prefix=$(STAGING_DIR_HOST) \
 	--with-ensurepip=upgrade \
 	CONFIG_SITE= \
