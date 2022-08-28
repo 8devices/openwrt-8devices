@@ -1,0 +1,12 @@
+diff '--color=auto' -aur a/Makefile.in b/Makefile.in
+--- a/Makefile.in	2022-08-28 07:51:26.608346062 -0400
++++ b/Makefile.in	2022-08-28 07:53:50.128063834 -0400
+@@ -408,7 +408,7 @@
+ CFLAGS = @CFLAGS@
+ LDFLAGS = @LDFLAGS@
+ LIBCFLAGS = $(CFLAGS)
+-CXXFLAGS = @CXXFLAGS@
++CXXFLAGS = @CXXFLAGS@ --std=c++03
+ LIBCXXFLAGS = $(CXXFLAGS) -fno-implicit-templates
+ GOCFLAGS = $(CFLAGS)
+ 
