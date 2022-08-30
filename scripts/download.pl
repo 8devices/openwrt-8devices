@@ -267,19 +267,19 @@ foreach my $mirror (@ARGV) {
 push @mirrors, 'https://sources.openwrt.org';
 push @mirrors, 'https://mirror2.openwrt.org/sources';
 
-my @clo_mirrors;
+my @caf_mirrors;
 if ($nfs_server) {
-	push @clo_mirrors, "file://${nfs_server}";
+	push @caf_mirrors, "file://${nfs_server}";
 } else {
-	push @clo_mirrors, 'file:///prj/qct/openwrt/caf_mirrored_tarballs';
+	push @caf_mirrors, 'file:///prj/qct/openwrt/caf_mirrored_tarballs';
 }
 
 if (!$is_network_down) {
-	push @clo_mirrors, 'https://codelinaro.jfrog.io/artifactory/codelinaro-qsdk/';
+	push @caf_mirrors, 'https://source.codeaurora.org/mirrored_source/quic/qsdk';
 }
-#first check in NFS and CLO server
+#first check in NFS and CAF server
 while (!$ok and !-f "$target/$filename") {
-	my $mirror = shift @clo_mirrors;
+	my $mirror = shift @caf_mirrors;
 	$mirror or last;
 
 	download($mirror,$url_filename);
@@ -287,7 +287,7 @@ while (!$ok and !-f "$target/$filename") {
 }
 
 if(!-f "$target/$filename") {
-	print ("The $target/$filename is not present in clo\n");
+	print ("The $target/$filename is not present in caf\n");
 	#exit -1;
 }
 
