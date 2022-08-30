@@ -1,0 +1,15 @@
+if ARCH_DEVSOC
+
+config SYS_CPU
+       default "devsoc"
+
+config SYS_BOARD
+       default "devsoc"
+
+config SYS_VENDOR
+       default "qca/arm"
+
+config SYS_CONFIG_NAME
+       default "devsoc"
+
+endif

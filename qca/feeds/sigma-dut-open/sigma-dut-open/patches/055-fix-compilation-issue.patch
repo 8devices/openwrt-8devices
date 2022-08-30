@@ -1,0 +1,29 @@
+From 58495db6befc3dde657de5eed1f0baf0be31e965 Mon Sep 17 00:00:00 2001
+From: Karthikeyan Kathirvel <quic_kathirve@quicinc.com>
+Date: Mon, 7 Mar 2022 19:53:39 +0530
+Subject: [PATCH] sigma-dut: fix compilation issue
+
+Fix below compilation issue:
+
+sta.c: In function 'twt_event_handler':
+sta.c:9736:4: error: format '%ld' expects argument of type 'long int',
+    but argument 4 has type 'size_t {aka unsigned int}'
+    [-Werror=format=]
+        "event data len %ld", len);
+
+Signed-off-by: Karthikeyan Kathirvel <quic_kathirve@quicinc.com>
+---
+ sta.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+--- a/sta.c
++++ b/sta.c
+@@ -9733,7 +9733,7 @@ static int twt_event_handler(struct nl_m
+ 		return NL_SKIP;
+ 	}
+ 	sigma_dut_print(wait->dut, DUT_MSG_DEBUG,
+-			"event data len %ld", len);
++			"event data len %lu", (unsigned long int)len);
+ 	hex_dump(wait->dut, data, len);
+ 	if (nla_parse(twt_rsp, QCA_WLAN_VENDOR_ATTR_CONFIG_TWT_MAX,
+ 		      (struct nlattr *) data, len, NULL)) {

@@ -1,0 +1,142 @@
+#!/bin/sh
+#
+#Copyright (c) 2021, Qualcomm Innovation Center, Inc. All rights reserved.
+#
+#Permission to use, copy, modify, and/or distribute this software for any
+#purpose with or without fee is hereby granted, provided that the above
+#copyright notice and this permission notice appear in all copies.
+#
+#THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
+#WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF
+#MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR
+#ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES
+#WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN
+#ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
+#OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
+
+export status="off"
+
+gps_start_org4572() {
+        on_off_gpio_pin=$(cat /proc/device-tree/soc/pinctrl@1000000/gps_pins/gps_on_off/pins | sed s/"gpio"//)
+        [ -z "$on_off_gpio_pin" ] && { echo "ERROR: GPIO not available" > /dev/console ; return; }
+        gpio_base=$(cat /sys/class/gpio/gpiochip*/base | head -n1)
+        gpio_on_off=$(( gpio_base + on_off_gpio_pin ))
+        if [[ ! -e /sys/class/gpio/gpio$gpio_on_off ]]; then
+                echo $gpio_on_off > /sys/class/gpio/export
+                echo out > /sys/class/gpio/gpio$gpio_on_off/direction
+                status=off
+                echo $status > gps_status.txt
+        fi
+}
+gps_on_org4572() {
+        #echo "Enabling GPS_ORG4572 Module..." > /dev/console
+        echo 0 > /sys/class/gpio/gpio$gpio_on_off/value;
+        sleep 1;
+        echo 1 > /sys/class/gpio/gpio$gpio_on_off/value;
+        sleep 1;
+        status=on
+        echo $status > gps_status.txt
+        #echo "Module turned ON!!" > /dev/console
+}
+gps_off_org4572() {
+        echo 1 > /sys/class/gpio/gpio$gpio_on_off/value;
+        sleep 1;
+        echo 0 > /sys/class/gpio/gpio$gpio_on_off/value;
+        sleep 1;
+        status=off
+        echo $status > gps_status.txt
+        #echo "GPS_ORG4572 Module is turned off..." > /dev/console
+}
+
+while [ -n "$1" ]; do
+	case "$1" in
+		-h|--help) HELP=1; break;;
+		-*)
+			echo "Invalid option: $1"
+			ERROR=1;
+			break
+		;;
+		*)break;;
+	esac
+	shift
+done
+
+[ -n "$HELP" -o -n "$ERROR" ] && {
+	        cat <<EOF
+Usage: $0 [-h]
+gps_start options:
+	-h	print this help
+
+Example:
+gps_start
+EOF
+	# If we requested the help flag, then exit normally.
+	# Else, it's probably an error so report it as such.
+	[ -n "$HELP" ] && exit 0
+	exit 1
+}
+
+
+# Check if stty is installed
+which stty
+if [ $? -ne 0 ]; then
+echo "ERROR: stty is not installed. Exiting.."
+exit 1
+fi
+
+# Check if gpsd is installed
+which gpsd
+if [ $? -ne 0 ]; then
+echo "ERROR: GPSD is not installed. Exiting.."
+exit 1
+fi
+
+#Change baud rate to 4800:
+echo -e "\nSetting UART3 baud rate to 4800\n"
+stty -F /dev/ttyMSM2 4800
+
+gps_start_org4572
+gpsd /dev/ttyMSM2
+
+if [ "$1" == "on" ]; then
+        status=$(cat gps_status.txt)
+        if [ $status == "off" ]; then
+                gps_on_org4572
+		echo "GPS_ORG4572 module is turned on!!" > /dev/console
+        else
+                echo -e "\nGPS module is already turned ON!!!\n"
+        fi
+elif [ "$1" == "off" ]; then
+	status=$(cat gps_status.txt)
+        if [ $status == "on" ]; then
+                gps_off_org4572
+		echo "GPS_ORG4572 module is turned off!!" > /dev/console
+	else
+		echo -e "\nGPS module is already turned off..Please turn it on\n"
+	fi
+elif [ "$1" == "parse" ]; then
+        i=0
+	echo "Waiting for GPS data...." > /dev/console
+	while [ $i -lt 20 ]
+	do
+	#echo "Iteration:$((i+1))"
+	i=$((i+1))
+	gps_on_org4572
+        gpsclient
+        if [ $? -eq 0 ]; then
+		exit 0
+        else
+		gps_off_org4572
+        fi
+	done
+	if [ $i -eq 20 ]; then
+		echo -e "\nGPS wait timed out...exiting\n"
+		exit 1
+	fi
+else
+	echo "Turning on GPS_ORG4572 module" > /dev/console
+	gps_on_org4572
+fi
+#echo -e "\nReading GPS data : \n"
+#cat /dev/ttyMSM2
+#gpspipe -r -n 20

@@ -1,0 +1,267 @@
+ifeq ($(obj),)
+obj := .
+endif
+
+DEPTH := ../../../..
+OSDEP_SRC := $(DEPTH)/os/linux/src
+HOST_COMP_CONVG_SRC := $(DEPTH)/component_dev
+HOST_CMN_CONVG_SRC := $(DEPTH)/cmn_dev
+HOST_CMN_CONVG_HIF_SRC := $(DEPTH)/cmn_dev/hif/src
+HOST_CMN_CONVG_HIF_INC1 := $(DEPTH)/cmn_dev/hif
+HOST_CMN_CONVG_HTC_INC := $(DEPTH)/cmn_dev/htc
+HOST_CMN_CONVG_DP_INC := $(DEPTH)/cmn_dev/dp/wifi3.0
+HOST_CMN_CONVG_CFG_INC := $(DEPTH)/cmn_dev/wlan_cfg
+HOST_CMN_CONVG_HAL_INC := $(DEPTH)/cmn_dev/hal/inc
+HOST_CMN_CONVG_HAL_WIFI_INC := $(DEPTH)/cmn_dev/hal/wifi3.0
+PERF_PWR_OFFLOAD_WMI_SRC := $(DEPTH)/cmn_dev/wmi
+PERF_PWR_OFFLOAD_REGDMN_SRC := $(DEPTH)/offload/wlan/regdmn
+PERF_PWR_OFFLOAD_TARGET_IF_SRC := $(DEPTH)/cmn_dev/target_if
+
+obj-m += monitor.o
+
+include $(obj)/$(DEPTH)/os/linux/Makefile-linux.common
+
+INCS += -I$(obj)/$(DEPTH)/include \
+        -I$(obj)/$(DEPTH)/os/linux/src \
+        -I$(obj)/$(DEPTH)/umac/base/ \
+        -I$(obj)/$(DEPTH)/ini_cfg/inc/ \
+        -I$(obj)/$(DEPTH)/offload/hw/include/ \
+        -I$(obj)/$(DEPTH)/umac/son/dispatcher/inc/ \
+        -I$(obj)/$(DEPTH)/umac/sa_api/dispatcher/inc/ \
+        -I$(obj)/$(DEPTH)/lmac/ath_pktlog \
+        -I$(obj)/$(DEPTH)/cmn_dev/hif/src/ce \
+        -I$(obj)/$(DEPTH)/cmn_dev/wbuff/inc \
+        -I$(obj)/$(DEPTH)/cmn_dev/os_if/linux/scan/inc \
+        -I$(obj)/$(DEPTH)/cmn_dev/target_if/core/inc/ \
+        -I$(obj)/$(DEPTH)/cmn_dev/hif/src/pcie/ \
+        -I$(obj)/$(DEPTH)/cmn_dev/umac/thermal/dispatcher/inc/ \
+        -I$(obj)/$(DEPTH)/cmn_dev/umac/green_ap/dispatcher/inc/ \
+        -I$(obj)/$(DEPTH)/cmn_dev/umac/cfr/dispatcher/inc/ \
+        -I$(obj)/$(DEPTH)/cmn_dev/target_if/init_deinit/inc/ \
+        -I$(obj)/$(DEPTH)/cmn_dev/umac/mlme/vdev_mgr/dispatcher/inc/ \
+        -I$(obj)/$(DEPTH)/cmn_dev/umac/mlme/connection_mgr/dispatcher/inc/ \
+        -I$(obj)/$(DEPTH)/cmn_dev/umac/cmn_services/obj_mgr/inc/ \
+        -I$(obj)/$(DEPTH)/cmn_dev/umac/cmn_services/obj_mgr/src/ \
+        -I$(obj)/$(DEPTH)/cmn_dev/umac/regulatory/dispatcher/inc/ \
+	-I$(obj)/$(DEPTH)/cmn_dev/umac/cmn_services/regulatory/inc/ \
+        -I$(obj)/$(DEPTH)/cmn_dev/umac/mlme/mlme_objmgr/dispatcher/inc/ \
+        -I$(obj)/$(DEPTH)/cmn_dev/umac/mlme/pdev_mgr/dispatcher/inc/ \
+        -I$(obj)/$(DEPTH)/cmn_dev/umac/dfs/dispatcher/inc/ \
+        -I$(obj)/$(DEPTH)/cmn_dev/umac/cmn_services/crypto/inc/ \
+        -I$(obj)/$(DEPTH)/cmn_dev/fwcommon \
+        -I$(obj)/$(DEPTH)/cmn_dev/spectral/dispatcher/inc/ \
+        -I$(obj)/$(DEPTH)/cmn_dev/umac/cmn_services/utils/inc/ \
+        -I$(obj)/$(DEPTH)/cmn_dev/qdf/inc \
+        -I$(obj)/$(DEPTH)/cmn_dev/qdf/linux/src \
+        -I$(obj)/$(DEPTH)/cmn_dev/dp/inc \
+        -I$(obj)/$(DEPTH)/cmn_dev/wlan_cfg \
+        -I$(obj)/$(DEPTH)/cmn_dev/umac/cmn_services/obj_mgr/src/ \
+	-I$(obj)/$(DEPTH)/cmn_dev/dp/cmn_dp_api \
+        -I$(obj)/$(DEPTH)/cmn_dev/cfg/inc \
+        -I$(obj)/$(DEPTH)/component_dev/dp/inc \
+        -I$(obj)/$(DEPTH)/component_dev/wmi/inc/ \
+        -I$(obj)/$(DEPTH)/component_dev/dp/inc \
+        -I$(obj)/$(DEPTH)/component_dev/dp/wifi3.0 \
+        -I$(obj)/$(DEPTH)/component_dev/dp/wifi3.0/monitor/inc \
+        -I$(obj)/$(DEPTH)/component_dev/crypto/inc/ \
+        -I$(obj)/$(DEPTH)/component_dev/umac/sawf/inc \
+        -I$(obj)/$(DEPTH)/cmn_dev/dp/wifi3.0 \
+        -I$(obj)/$(DEPTH)/cmn_dev/dp/wifi3.0/monitor \
+        -I$(obj)/$(DEPTH)/cmn_dev/hal/wifi3.0 \
+        -I$(obj)/$(DEPTH)/cmn_dev/qal/inc/ \
+        -I$(obj)/$(DEPTH)/cmn_dev/qal/linux/src/ \
+        -I$(obj)/$(DEPTH)/cmn_dev/wmi/inc/ \
+        -I$(obj)/$(DEPTH)/dp/ \
+        -I$(obj)/$(HOST_CMN_CONVG_SRC)/ipa/core/inc \
+        -I$(obj)/$(HOST_CMN_CONVG_SRC)/ipa/core/src \
+        -I$(obj)/$(HOST_CMN_CONVG_SRC)/ipa/dispatcher/inc \
+        -I$(obj)/$(HOST_CMN_CONVG_SRC)/ipa/dispatcher/src \
+        -I$(obj)/$(DEPTH)/cmn_dev/target_if/ipa/inc \
+        -I$(obj)/$(DEPTH)/cmn_dev/target_if/ipa/src \
+        -I$(obj)/$(DEPTH)/pld/inc  \
+        -I$(obj)/$(HOST_CMN_CONVG_SRC)/umac/mlo_mgr/inc \
+        -I$(obj)/$(DEPTH)/cmn_dev/fw_hdr/fw/
+
+INCS += -I$(obj)/$(DEPTH)/cmn_dev/umac/twt/dispatcher/inc
+
+PERF_PWR_OFFLOAD_INC :=  \
+        -I$(PERF_PWR_OFFLOAD_DIR_PATH)/wlan/include \
+        -I$(PERF_PWR_OFFLOAD_DIR_PATH)/wlan/ath_pktlog/include \
+        -I$(PERF_PWR_OFFLOAD_DIR_PATH)/htt/include \
+        -I$(PERF_PWR_OFFLOAD_DIR_PATH)/wlan/txrx/include \
+        -I$(PERF_PWR_OFFLOAD_DIR_PATH)/include \
+        -I$(PERF_PWR_OFFLOAD_DIR_PATH)/include \
+        -I$(PERF_PWR_OFFLOAD_DIR_PATH)/os/linux/include \
+        -I$(PERF_PWR_OFFLOAD_DIR_PATH)/wlan/regdmn \
+        -I$(PERF_PWR_OFFLOAD_DIR_PATH)/wlan/lmac_offload_if \
+        -I$(HOST_CMN_CONVG_HIF_INC1)/inc \
+        -I$(HOST_CMN_CONVG_HIF_INC1)/src \
+        -I$(HOST_CMN_CONVG_HIF_SRC)/ce \
+        -I$(HOST_CMN_CONVG_HTC_INC) \
+        -I$(HOST_CMN_CONVG_CFG_INC) \
+        -I$(HOST_CMN_CONVG_DP_INC) \
+        -I$(HOST_CMN_CONVG_HAL_INC) \
+        -I$(HOST_CMN_CONVG_HAL_WIFI_INC) \
+        -I$(PERF_PWR_OFFLOAD_WMI_SRC)/inc \
+        -I$(obj)/$(DEPTH)/offload/extra_include \
+        -I$(obj)/$(DEPTH)/cmn_dev/wbuff/inc
+
+MONITOR_2_0_INC += -I$(obj)/$(DEPTH)/cmn_dev/dp/wifi3.0/monitor/2.0/
+MONITOR_1_0_INC += -I$(obj)/$(DEPTH)/cmn_dev/dp/wifi3.0/monitor/1.0/
+
+FW_HDRS_QCN9224_INC_PATH += -I$(PERF_PWR_OFFLOAD_DIR_PATH)/../cmn_dev/fw_hdr/hw/qcn9224
+
+PERF_PWR_OFFLOAD_HW_LI_INC += -I$(PERF_PWR_OFFLOAD_DIR_PATH)/include/qca8074/v1/
+
+PERF_PWR_OFFLOAD_HAL_LI_INC += -I$(obj)/$(DEPTH)/cmn_dev/hal/wifi3.0/li
+
+PERF_PWR_OFFLOAD_HW_BE_INC += $(FW_HDRS_QCN9224_INC_PATH)
+
+PERF_PWR_OFFLOAD_HAL_BE_INC += -I$(obj)/$(DEPTH)/cmn_dev/hal/wifi3.0/be
+DP_BE_INC += -I$(obj)/$(DEPTH)/cmn_dev/dp/wifi3.0/be
+
+ifeq ($(QCA_AIRTIME_FAIRNESS), 1)
+ccflags-y+= -DWLAN_ATF_ENABLE
+INCS += -I$(obj)/$(DEPTH)/umac/airtime_fairness/dispatcher/inc
+PERF_PWR_OFFLOAD_INC += -I$(PERF_PWR_OFFLOAD_DIR_PATH)/wlan/target_if/atf
+endif
+
+ifeq ($(UNIFIED_SMARTANTENNA), 1)
+ccflags-y+= -DWLAN_SA_API_ENABLE
+INCS += -I$(obj)/$(DEPTH)/umac/sa_api/dispatcher/inc
+PERF_PWR_OFFLOAD_INC += -I$(PERF_PWR_OFFLOAD_DIR_PATH)/wlan/target_if/sa_api
+endif
+
+PERF_PWR_OFFLOAD_INC += -I$(PERF_PWR_OFFLOAD_DIR_PATH)/include/qca8074/v1/
+
+INCS += $(PERF_PWR_OFFLOAD_INC)
+
+ccflags-y+= $(INCS) $(COPTS)
+
+ifeq ($(strip ${QCA_PARTNER_MAKE_F_SUPPORT}),1)
+MOD_CFLAGS = -D"KBUILD_STR(s)=\#s" -D"KBUILD_BASENAME=KBUILD_STR(monitor.mod)"  -D"KBUILD_MODNAME=KBUILD_STR(monitor)"
+endif
+
+monitor-objs := \
+	$(HOST_CMN_CONVG_SRC)/dp/wifi3.0/monitor/dp_mon_filter.o \
+	$(HOST_CMN_CONVG_SRC)/dp/wifi3.0/monitor/dp_mon.o \
+	$(HOST_CMN_CONVG_SRC)/dp/wifi3.0/monitor/dp_rx_mon.o \
+	$(HOST_CMN_CONVG_SRC)/../component_dev/dp/wifi3.0/monitor/src/dp_full_mon.o \
+	$(HOST_CMN_CONVG_SRC)/../component_dev/dp/wifi3.0/monitor/src/dp_mon_ol.o \
+	$(HOST_CMN_CONVG_SRC)/../component_dev/dp/wifi3.0/monitor/src/dp_rx_mon_feature.o \
+	$(HOST_CMN_CONVG_SRC)/../component_dev/dp/wifi3.0/monitor/src/dp_tx_capture.o \
+	$(HOST_CMN_CONVG_SRC)/../component_dev/os_if/linux/dp/src/dp_mon_osif.o \
+	$(HOST_CMN_CONVG_SRC)/../component_dev/os_if/linux/dp/src/dp_mon_cfg80211.o \
+	$(HOST_CMN_CONVG_SRC)/../component_dev/dp/wifi3.0/monitor/linux/dp_mon_module.o
+
+monitor-objs += \
+	$(HOST_CMN_CONVG_SRC)/dp/wifi3.0/monitor/1.0/dp_rx_mon_status_1.0.o \
+	$(HOST_CMN_CONVG_SRC)/dp/wifi3.0/monitor/1.0/dp_rx_mon_dest_1.0.o \
+	$(HOST_CMN_CONVG_SRC)/dp/wifi3.0/monitor/1.0/dp_mon_1.0.o \
+	$(HOST_CMN_CONVG_SRC)/dp/wifi3.0/monitor/1.0/dp_mon_filter_1.0.o
+
+ifeq ($(strip ${CONFIG_BERYLLIUM}),1)
+ifeq ($(strip ${QCA_MONITOR_2_0_SUPPORT}),1)
+monitor-objs += \
+       $(HOST_CMN_CONVG_SRC)/dp/wifi3.0/monitor/2.0/dp_rx_mon_status_2.0.o \
+       $(HOST_CMN_CONVG_SRC)/dp/wifi3.0/monitor/2.0/dp_rx_mon_2.0.o \
+       $(HOST_CMN_CONVG_SRC)/dp/wifi3.0/monitor/2.0/dp_tx_mon_status_2.0.o \
+       $(HOST_CMN_CONVG_SRC)/dp/wifi3.0/monitor/2.0/dp_tx_mon_2.0.o \
+	$(HOST_CMN_CONVG_SRC)/dp/wifi3.0/monitor/2.0/dp_mon_2.0.o \
+       $(HOST_CMN_CONVG_SRC)/dp/wifi3.0/monitor/2.0/dp_mon_filter_2.0.o
+endif
+endif
+
+clean-files := modules.order
+
+################ QCA_GCC7_0_SUPPORT - START ##################
+ifeq ($(QCA_GCC7_0_SUPPORT), 1)
+CFLAGS_$(obj)/$(DEPTH)/component_dev/dp/wifi3.0/monitor/src/dp_full_mon.o := $(MONITOR_1_0_INC)
+CFLAGS_$(obj)/$(DEPTH)/component_dev/dp/wifi3.0/monitor/src/dp_tx_capture.o := $(MONITOR_1_0_INC)
+CFLAGS_$(HOST_CMN_CONVG_SRC)/dp/wifi3.0/monitor/1.0/dp_rx_mon_status_1.0.o := $(PERF_PWR_OFFLOAD_HW_LI_INC) $(PERF_PWR_OFFLOAD_HAL_LI_INC) -I$(PERF_PWR_OFFLOAD_DIR_PATH)/include/fwcommon $(MONITOR_1_0_INC)
+CFLAGS_$(HOST_CMN_CONVG_SRC)/dp/wifi3.0/monitor/1.0/dp_rx_mon_dest_1.0.o := $(PERF_PWR_OFFLOAD_HW_LI_INC) $(PERF_PWR_OFFLOAD_HAL_LI_INC) -I$(PERF_PWR_OFFLOAD_DIR_PATH)/include/fwcommon $(MONITOR_1_0_INC)
+CFLAGS_$(HOST_CMN_CONVG_SRC)/dp/wifi3.0/monitor/1.0/dp_mon_1.0.o := $(PERF_PWR_OFFLOAD_HW_LI_INC) $(PERF_PWR_OFFLOAD_HAL_LI_INC) -I$(PERF_PWR_OFFLOAD_DIR_PATH)/include/fwcommon $(MONITOR_1_0_INC)
+CFLAGS_$(HOST_CMN_CONVG_SRC)/dp/wifi3.0/monitor/1.0/dp_mon_filter_1.0.o := $(PERF_PWR_OFFLOAD_HW_LI_INC) $(PERF_PWR_OFFLOAD_HAL_LI_INC) -I$(PERF_PWR_OFFLOAD_DIR_PATH)/include/fwcommon $(MONITOR_1_0_INC)
+
+CFLAGS_REMOVE_$(HOST_CMN_CONVG_SRC)/dp/wifi3.0/monitor/1.0/dp_rx_mon_status_1.0.o := $(PERF_PWR_OFFLOAD_HAL_BE_INC) $(MONITOR_2_0_INC)
+CFLAGS_REMOVE_$(HOST_CMN_CONVG_SRC)/dp/wifi3.0/monitor/1.0/dp_rx_mon_dest_1.0.o := $(PERF_PWR_OFFLOAD_HAL_BE_INC) $(MONITOR_2_0_INC)
+CFLAGS_REMOVE_$(HOST_CMN_CONVG_SRC)/dp/wifi3.0/monitor/1.0/dp_mon_1.0.o := $(PERF_PWR_OFFLOAD_HAL_BE_INC) $(MONITOR_2_0_INC)
+CFLAGS_REMOVE_$(HOST_CMN_CONVG_SRC)/dp/wifi3.0/monitor/1.0/dp_mon_filter_1.0.o := $(PERF_PWR_OFFLOAD_HAL_BE_INC) $(MONITOR_2_0_INC)
+CFLAGS_REMOVE_$(obj)/$(DEPTH)/component_dev/dp/wifi3.0/monitor/src/dp_full_mon.o := $(MONITOR_2_0_INC)
+CFLAGS_REMOVE_$(obj)/$(DEPTH)/component_dev/dp/wifi3.0/monitor/src/dp_tx_capture.o := $(MONITOR_2_0_INC)
+
+ifeq ($(strip ${CONFIG_BERYLLIUM}),1)
+CFLAGS_$(HOST_CMN_CONVG_SRC)/dp/wifi3.0/monitor/2.0/dp_rx_mon_status_2.0.o := $(PERF_PWR_OFFLOAD_HW_BE_INC) $(PERF_PWR_OFFLOAD_HAL_BE_INC) -I$(PERF_PWR_OFFLOAD_DIR_PATH)/include/fwcommon $(MONITOR_2_0_INC) $(DP_BE_INC)
+CFLAGS_$(HOST_CMN_CONVG_SRC)/dp/wifi3.0/monitor/2.0/dp_rx_mon_2.0.o := $(PERF_PWR_OFFLOAD_HW_BE_INC) $(PERF_PWR_OFFLOAD_HAL_BE_INC) -I$(PERF_PWR_OFFLOAD_DIR_PATH)/include/fwcommon $(MONITOR_2_0_INC) $(DP_BE_INC)
+CFLAGS_$(HOST_CMN_CONVG_SRC)/dp/wifi3.0/monitor/2.0/dp_tx_mon_status_2.0.o := $(PERF_PWR_OFFLOAD_HW_BE_INC) $(PERF_PWR_OFFLOAD_HAL_BE_INC) -I$(PERF_PWR_OFFLOAD_DIR_PATH)/include/fwcommon $(MONITOR_2_0_INC) $(DP_BE_INC)
+CFLAGS_$(HOST_CMN_CONVG_SRC)/dp/wifi3.0/monitor/2.0/dp_tx_mon_2.0.o := $(PERF_PWR_OFFLOAD_HW_BE_INC) $(PERF_PWR_OFFLOAD_HAL_BE_INC) -I$(PERF_PWR_OFFLOAD_DIR_PATH)/include/fwcommon $(MONITOR_2_0_INC) $(DP_BE_INC)
+CFLAGS_$(HOST_CMN_CONVG_SRC)/dp/wifi3.0/monitor/2.0/dp_mon_filter_2.0.o := $(PERF_PWR_OFFLOAD_HW_BE_INC) $(PERF_PWR_OFFLOAD_HAL_BE_INC) -I$(PERF_PWR_OFFLOAD_DIR_PATH)/include/fwcommon $(MONITOR_2_0_INC) $(DP_BE_INC)
+CFLAGS_$(HOST_CMN_CONVG_SRC)/dp/wifi3.0/monitor/2.0/dp_mon_2.0.o := $(PERF_PWR_OFFLOAD_HW_BE_INC) $(PERF_PWR_OFFLOAD_HAL_BE_INC) -I$(PERF_PWR_OFFLOAD_DIR_PATH)/include/fwcommon $(MONITOR_2_0_INC) $(DP_BE_INC)
+
+CFLAGS_REMOVE_$(HOST_CMN_CONVG_SRC)/dp/wifi3.0/monitor/2.0/dp_rx_mon_status_2.0.o := $(PERF_PWR_OFFLOAD_HW_LI_INC) $(MONITOR_1_0_INC)
+CFLAGS_REMOVE_$(HOST_CMN_CONVG_SRC)/dp/wifi3.0/monitor/2.0/dp_rx_mon_2.0.o := $(PERF_PWR_OFFLOAD_HW_LI_INC) $(MONITOR_1_0_INC)
+CFLAGS_REMOVE_$(HOST_CMN_CONVG_SRC)/dp/wifi3.0/monitor/2.0/dp_tx_mon_status_2.0.o := $(PERF_PWR_OFFLOAD_HW_LI_INC) $(MONITOR_1_0_INC)
+CFLAGS_REMOVE_$(HOST_CMN_CONVG_SRC)/dp/wifi3.0/monitor/2.0/dp_tx_mon_2.0.o := $(PERF_PWR_OFFLOAD_HW_LI_INC) $(MONITOR_1_0_INC)
+CFLAGS_REMOVE_$(HOST_CMN_CONVG_SRC)/dp/wifi3.0/monitor/2.0/dp_mon_filter_2.0.o := $(PERF_PWR_OFFLOAD_HW_LI_INC) $(MONITOR_1_0_INC)
+CFLAGS_REMOVE_$(HOST_CMN_CONVG_SRC)/dp/wifi3.0/monitor/2.0/dp_mon_2.0.o := $(PERF_PWR_OFFLOAD_HW_LI_INC) $(MONITOR_1_0_INC)
+endif
+##### Else part of QCA_GCC7_0_SUPPORT (below used for build) ###########
+else
+CFLAGS_dp_full_mon.o := $(MONITOR_1_0_INC)
+CFLAGS_dp_tx_capture.o := $(MONITOR_1_0_INC)
+CFLAGS_dp_rx_mon_status_1.0.o := $(PERF_PWR_OFFLOAD_HW_LI_INC) $(PERF_PWR_OFFLOAD_HAL_LI_INC) -I$(PERF_PWR_OFFLOAD_DIR_PATH)/include/fwcommon $(MONITOR_1_0_INC)
+CFLAGS_dp_rx_mon_dest_1.0.o := $(PERF_PWR_OFFLOAD_HW_LI_INC) $(PERF_PWR_OFFLOAD_HAL_LI_INC) -I$(PERF_PWR_OFFLOAD_DIR_PATH)/include/fwcommon $(MONITOR_1_0_INC)
+CFLAGS_dp_mon_1.0.o := $(PERF_PWR_OFFLOAD_HW_LI_INC) $(PERF_PWR_OFFLOAD_HAL_LI_INC) -I$(PERF_PWR_OFFLOAD_DIR_PATH)/include/fwcommon $(MONITOR_1_0_INC)
+CFLAGS_dp_mon_filter_1.0.o := $(PERF_PWR_OFFLOAD_HW_LI_INC) $(PERF_PWR_OFFLOAD_HAL_LI_INC) -I$(PERF_PWR_OFFLOAD_DIR_PATH)/include/fwcommon $(MONITOR_1_0_INC)
+
+CFLAGS_REMOVE_dp_rx_mon_status_1.0.o := $(PERF_PWR_OFFLOAD_HAL_BE_INC) $(MONITOR_2_0_INC)
+CFLAGS_REMOVE_dp_rx_mon_dest_1.0.o := $(PERF_PWR_OFFLOAD_HAL_BE_INC) $(MONITOR_2_0_INC)
+CFLAGS_REMOVE_dp_mon_1.0.o := $(PERF_PWR_OFFLOAD_HAL_BE_INC) $(MONITOR_2_0_INC)
+CFLAGS_REMOVE_dp_mon_filter_1.0.o := $(PERF_PWR_OFFLOAD_HAL_BE_INC) $(MONITOR_2_0_INC)
+CFLAGS_REMOVE_dp_full_mon.o := $(MONITOR_2_0_INC)
+CFLAGS_REMOVE_dp_tx_capture.o := $(MONITOR_2_0_INC)
+
+ifeq ($(strip ${CONFIG_BERYLLIUM}),1)
+CFLAGS_dp_rx_mon_status_2.0.o := $(PERF_PWR_OFFLOAD_HW_BE_INC) $(PERF_PWR_OFFLOAD_HAL_BE_INC) -I$(PERF_PWR_OFFLOAD_DIR_PATH)/include/fwcommon $(MONITOR_2_0_INC) $(DP_BE_INC)
+CFLAGS_dp_rx_mon_2.0.o := $(PERF_PWR_OFFLOAD_HW_BE_INC) $(PERF_PWR_OFFLOAD_HAL_BE_INC) -I$(PERF_PWR_OFFLOAD_DIR_PATH)/include/fwcommon $(MONITOR_2_0_INC) $(DP_BE_INC)
+CFLAGS_dp_tx_mon_status_2.0.o := $(PERF_PWR_OFFLOAD_HW_BE_INC) $(PERF_PWR_OFFLOAD_HAL_BE_INC) -I$(PERF_PWR_OFFLOAD_DIR_PATH)/include/fwcommon $(MONITOR_2_0_INC) $(DP_BE_INC)
+CFLAGS_dp_tx_mon_2.0.o := $(PERF_PWR_OFFLOAD_HW_BE_INC) $(PERF_PWR_OFFLOAD_HAL_BE_INC) -I$(PERF_PWR_OFFLOAD_DIR_PATH)/include/fwcommon $(MONITOR_2_0_INC) $(DP_BE_INC)
+CFLAGS_dp_mon_filter_2.0.o := $(PERF_PWR_OFFLOAD_HW_BE_INC) $(PERF_PWR_OFFLOAD_HAL_BE_INC) -I$(PERF_PWR_OFFLOAD_DIR_PATH)/include/fwcommon $(MONITOR_2_0_INC) $(DP_BE_INC)
+CFLAGS_dp_mon_2.0.o := $(PERF_PWR_OFFLOAD_HW_BE_INC) $(PERF_PWR_OFFLOAD_HAL_BE_INC) -I$(PERF_PWR_OFFLOAD_DIR_PATH)/include/fwcommon $(MONITOR_2_0_INC) $(DP_BE_INC)
+
+CFLAGS_REMOVE_dp_rx_mon_status_2.0.o := $(PERF_PWR_OFFLOAD_HW_LI_INC) $(MONITOR_1_0_INC)
+CFLAGS_REMOVE_dp_rx_mon_2.0.o := $(PERF_PWR_OFFLOAD_HW_LI_INC) $(MONITOR_1_0_INC)
+CFLAGS_REMOVE_dp_tx_mon_status_2.0.o := $(PERF_PWR_OFFLOAD_HW_LI_INC) $(MONITOR_1_0_INC)
+CFLAGS_REMOVE_dp_tx_mon_2.0.o := $(PERF_PWR_OFFLOAD_HW_LI_INC) $(MONITOR_1_0_INC)
+CFLAGS_REMOVE_dp_mon_filter_2.0.o := $(PERF_PWR_OFFLOAD_HW_LI_INC) $(MONITOR_1_0_INC)
+CFLAGS_REMOVE_dp_mon_2.0.o := $(PERF_PWR_OFFLOAD_HW_LI_INC) $(MONITOR_1_0_INC)
+endif
+endif
+################ QCA_GCC7_0_SUPPORT - END ####################
+
+ifeq ($(CONFIG_LITHIUM), 1)
+EXTRA_CFLAGS += $(PERF_PWR_OFFLOAD_HW_LI_INC) $(MONITOR_1_0_INC)
+else
+ifeq ($(CONFIG_BERYLLIUM), 1)
+EXTRA_CFLAGS += $(PERF_PWR_OFFLOAD_HW_BE_INC) $(MONITOR_2_0_INC)
+else
+$(error none of Lithium or Beryllium is enabled)
+endif
+endif
+
+ifeq ($(strip ${QCA_PARTNER_MAKE_F_SUPPORT}),1)
+all: monitor.ko
+
+monitor.mod.o: monitor.mod.c
+        ${CC} -c -o $@ ${ccflags-y} ${MOD_CFLAGS} $<
+
+monitor.o: ${monitor-objs}
+        $(LD) -m elf32btsmip -r -o monitor.o $(monitor-objs)
+        $(KERNELPATH)/scripts/mod/modpost monitor.o
+
+monitor.ko: monitor.o monitor.mod.o
+        $(LD) $(LDOPTS) -o monitor.ko monitor.o monitor.mod.o
+
+%.o: %.c
+        ${CC} -c -o $@ ${ccflags-y} $<
+endif

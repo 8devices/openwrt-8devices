@@ -1,0 +1,1211 @@
+#  statistics.pot
+#  generated from ./applications/luci-statistics/luasrc/i18n/statistics.en.lua
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"PO-Revision-Date: 2022-01-27 19:54+0000\n"
+"Last-Translator: Simona Iacob <s@zp1.net>\n"
+"Language-Team: Romanian <https://hosted.weblate.org/projects/openwrt/"
+"luciapplicationsstatistics/ro/>\n"
+"Language: ro\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=3; plural=n==1 ? 0 : (n==0 || (n%100 > 0 && n%100 < "
+"20)) ? 1 : 2;\n"
+"X-Generator: Weblate 4.11-dev\n"
+
+#: applications/luci-app-statistics/luasrc/statistics/plugins/apcups.lua:7
+#: applications/luci-app-statistics/luasrc/statistics/rrdtool/definitions/apcups.lua:7
+msgid "APC UPS"
+msgstr "APC UPS"
+
+#: applications/luci-app-statistics/luasrc/model/cbi/luci_statistics/apcups.lua:5
+msgid "APCUPS Plugin Configuration"
+msgstr "Configurarea Plugin-ului APCUPS"
+
+#: applications/luci-app-statistics/luasrc/model/cbi/luci_statistics/memory.lua:15
+msgid "Absolute values"
+msgstr "Valori absolute"
+
+#: applications/luci-app-statistics/luasrc/model/cbi/luci_statistics/iptables.lua:70
+msgid "Action (target)"
+msgstr ""
+
+#: applications/luci-app-statistics/luasrc/model/cbi/luci_statistics/exec.lua:22
+msgid "Add command for reading values"
+msgstr "Adăugați comanda pentru citirea valorilor"
+
+#: applications/luci-app-statistics/luasrc/model/cbi/luci_statistics/iptables.lua:34
+msgid "Add matching rule"
+msgstr ""
+
+#: applications/luci-app-statistics/luasrc/model/cbi/luci_statistics/apcups.lua:18
+#: applications/luci-app-statistics/luasrc/model/cbi/luci_statistics/ping.lua:19
+msgid "Add multiple hosts separated by space."
+msgstr ""
+
+#: applications/luci-app-statistics/luasrc/model/cbi/luci_statistics/exec.lua:50
+msgid "Add notification command"
+msgstr "Adăugați comanda de notificare"
+
+#: applications/luci-app-statistics/luasrc/model/cbi/luci_statistics/ping.lua:24
+msgid "Address family"
+msgstr "Familie de adrese"
+
+#: applications/luci-app-statistics/luasrc/model/cbi/luci_statistics/openvpn.lua:23
+msgid "Aggregate number of connected users"
+msgstr "Numărul agregat de utilizatori conectați"
+
+#: applications/luci-app-statistics/luasrc/model/cbi/luci_statistics/collectd.lua:24
+msgid "Base Directory"
+msgstr "Directorul de baza"
+
+#: applications/luci-app-statistics/luasrc/model/cbi/luci_statistics/netlink.lua:24
+msgid "Basic monitoring"
+msgstr "Monitorizare de bază"
+
+#: applications/luci-app-statistics/luasrc/model/cbi/luci_statistics/cpu.lua:18
+msgid "By setting this, CPU is not aggregate of all processors on the system"
+msgstr ""
+"Prin această setare, CPU nu este un agregat al tuturor procesoarelor de pe "
+"sistem"
+
+#: applications/luci-app-statistics/luasrc/model/cbi/luci_statistics/contextswitch.lua:4
+msgid "CPU Context Switches Plugin Configuration"
+msgstr "Comutarea contextului CPU Configurarea plugin-ului"
+
+#: applications/luci-app-statistics/luasrc/statistics/plugins/cpufreq.lua:7
+#: applications/luci-app-statistics/luasrc/statistics/rrdtool/definitions/cpufreq.lua:9
+msgid "CPU Frequency"
+msgstr "Frecvența CPU"
+
+#: applications/luci-app-statistics/luasrc/model/cbi/luci_statistics/cpufreq.lua:4
+msgid "CPU Frequency Plugin Configuration"
+msgstr "Configurarea Plugin-ului de frecvență CPU"
+
+#: applications/luci-app-statistics/luasrc/model/cbi/luci_statistics/cpu.lua:5
+msgid "CPU Plugin Configuration"
+msgstr "Configurarea pluginului CPU"
+
+#: applications/luci-app-statistics/luasrc/statistics/plugins/csv.lua:7
+msgid "CSV Output"
+msgstr "Afisarea CSV"
+
+#: applications/luci-app-statistics/luasrc/model/cbi/luci_statistics/csv.lua:5
+msgid "CSV Plugin Configuration"
+msgstr "Configurarea pluginului CVS"
+
+#: applications/luci-app-statistics/luasrc/model/cbi/luci_statistics/rrdtool.lua:91
+msgid "Cache collected data for"
+msgstr "Stocarea în memoria cache a datelor colectate pentru"
+
+#: applications/luci-app-statistics/luasrc/model/cbi/luci_statistics/network.lua:78
+msgid "Cache flush interval"
+msgstr ""
+
+#: applications/luci-app-statistics/luasrc/model/cbi/luci_statistics/iptables.lua:59
+msgid "Chain"
+msgstr "Legătură"
+
+#: applications/luci-app-statistics/luasrc/model/cbi/luci_statistics/olsrd.lua:24
+msgid "CollectLinks"
+msgstr "ColecteazăLink-uri"
+
+#: applications/luci-app-statistics/luasrc/model/cbi/luci_statistics/olsrd.lua:31
+msgid "CollectRoutes"
+msgstr "ColecteazăRutele"
+
+#: applications/luci-app-statistics/luasrc/model/cbi/luci_statistics/olsrd.lua:38
+msgid "CollectTopology"
+msgstr "ColecteazăTopologia"
+
+#: applications/luci-app-statistics/luasrc/model/cbi/luci_statistics/collectd.lua:8
+msgid "Collectd Settings"
+msgstr "Setarile Collectd"
+
+#: applications/luci-app-statistics/luasrc/model/cbi/luci_statistics/collectd.lua:10
+msgid ""
+"Collectd is a small daemon for collecting data from various sources through "
+"different plugins. On this page you can change general settings for the "
+"collectd daemon."
+msgstr ""
+"Collectd e un serviciu mic pentru colectarea de date din diferite surse prin "
+"diferite pluginuri. In aceasta pagina poti schimba setarile generale pentru "
+"Collectd."
+
+#: applications/luci-app-statistics/luasrc/statistics/plugins/conntrack.lua:7
+#: applications/luci-app-statistics/luasrc/statistics/rrdtool/definitions/conntrack.lua:7
+msgid "Conntrack"
+msgstr "Urmărirea conexiunii"
+
+#: applications/luci-app-statistics/luasrc/model/cbi/luci_statistics/conntrack.lua:5
+msgid "Conntrack Plugin Configuration"
+msgstr "Configurarea Plugin-ului Conntrack"
+
+#: applications/luci-app-statistics/luasrc/statistics/plugins/contextswitch.lua:7
+#: applications/luci-app-statistics/luasrc/statistics/rrdtool/definitions/contextswitch.lua:6
+msgid "Context Switches"
+msgstr "Comutatoare de context"
+
+#: applications/luci-app-statistics/luasrc/model/cbi/luci_statistics/df.lua:5
+msgid "DF Plugin Configuration"
+msgstr "Configurația DF Plugin"
+
+#: applications/luci-app-statistics/luasrc/statistics/plugins/dns.lua:7
+#: applications/luci-app-statistics/luasrc/statistics/rrdtool/definitions/dns.lua:7
+msgid "DNS"
+msgstr "DNS"
+
+#: applications/luci-app-statistics/luasrc/model/cbi/luci_statistics/dns.lua:8
+msgid "DNS Plugin Configuration"
+msgstr "Configurarea plugin-ului DNS"
+
+#: applications/luci-app-statistics/luasrc/model/cbi/luci_statistics/collectd.lua:44
+msgid "Data collection interval"
+msgstr "Intervalul de colectare date"
+
+#: applications/luci-app-statistics/luasrc/model/cbi/luci_statistics/collectd.lua:40
+msgid "Datasets definition file"
+msgstr "Fisierul de definitii dataseturi"
+
+#: applications/luci-app-statistics/luasrc/model/cbi/luci_statistics/iptables.lua:96
+msgid "Destination ip range"
+msgstr ""
+
+#: applications/luci-app-statistics/luasrc/model/cbi/luci_statistics/collectd.lua:32
+msgid "Directory for collectd plugins"
+msgstr "Directorul pentru pluginurile collectd"
+
+#: applications/luci-app-statistics/luasrc/model/cbi/luci_statistics/collectd.lua:28
+msgid "Directory for sub-configurations"
+msgstr "Directorul pentru sub-configuratii"
+
+#: applications/luci-app-statistics/luasrc/model/cbi/luci_statistics/disk.lua:5
+msgid "Disk Plugin Configuration"
+msgstr "Configurarea Disk Plugin"
+
+#: applications/luci-app-statistics/luasrc/statistics/plugins/df.lua:7
+#: applications/luci-app-statistics/luasrc/statistics/rrdtool/definitions/df.lua:7
+msgid "Disk Space Usage"
+msgstr "Utilizarea spatiului pe disc"
+
+#: applications/luci-app-statistics/luasrc/statistics/plugins/disk.lua:7
+#: applications/luci-app-statistics/luasrc/statistics/rrdtool/definitions/disk.lua:7
+msgid "Disk Usage"
+msgstr "Utilizarea discului"
+
+#: applications/luci-app-statistics/luasrc/view/public_statistics/graph.htm:17
+msgid "Display Host »"
+msgstr "Afișează gazda »"
+
+#: applications/luci-app-statistics/luasrc/view/public_statistics/graph.htm:23
+msgid "Display timespan »"
+msgstr "Afișează intervalul de timp »"
+
+#: applications/luci-app-statistics/luasrc/model/cbi/luci_statistics/email.lua:5
+msgid "E-Mail Plugin Configuration"
+msgstr "Configurarea plugin-ului de e-mail"
+
+#: applications/luci-app-statistics/luasrc/statistics/plugins/email.lua:7
+msgid "Email"
+msgstr "Email"
+
+#: applications/luci-app-statistics/luasrc/model/cbi/luci_statistics/thermal.lua:19
+msgid "Empty value = monitor all"
+msgstr "Valoare goală = monitorizează toate"
+
+#: applications/luci-app-statistics/luasrc/model/cbi/luci_statistics/curl.lua:17
+msgid "Enable"
+msgstr "Activați"
+
+#: applications/luci-app-statistics/luasrc/model/cbi/luci_statistics/apcups.lua:14
+#: applications/luci-app-statistics/luasrc/model/cbi/luci_statistics/conntrack.lua:10
+#: applications/luci-app-statistics/luasrc/model/cbi/luci_statistics/contextswitch.lua:11
+#: applications/luci-app-statistics/luasrc/model/cbi/luci_statistics/cpu.lua:12
+#: applications/luci-app-statistics/luasrc/model/cbi/luci_statistics/cpufreq.lua:11
+#: applications/luci-app-statistics/luasrc/model/cbi/luci_statistics/csv.lua:15
+#: applications/luci-app-statistics/luasrc/model/cbi/luci_statistics/curl.lua:8
+#: applications/luci-app-statistics/luasrc/model/cbi/luci_statistics/df.lua:15
+#: applications/luci-app-statistics/luasrc/model/cbi/luci_statistics/disk.lua:15
+#: applications/luci-app-statistics/luasrc/model/cbi/luci_statistics/dns.lua:18
+#: applications/luci-app-statistics/luasrc/model/cbi/luci_statistics/email.lua:18
+#: applications/luci-app-statistics/luasrc/model/cbi/luci_statistics/entropy.lua:10
+#: applications/luci-app-statistics/luasrc/model/cbi/luci_statistics/exec.lua:16
+#: applications/luci-app-statistics/luasrc/model/cbi/luci_statistics/interface.lua:18
+#: applications/luci-app-statistics/luasrc/model/cbi/luci_statistics/iptables.lua:28
+#: applications/luci-app-statistics/luasrc/model/cbi/luci_statistics/irq.lua:16
+#: applications/luci-app-statistics/luasrc/model/cbi/luci_statistics/iwinfo.lua:12
+#: applications/luci-app-statistics/luasrc/model/cbi/luci_statistics/load.lua:14
+#: applications/luci-app-statistics/luasrc/model/cbi/luci_statistics/memory.lua:10
+#: applications/luci-app-statistics/luasrc/model/cbi/luci_statistics/netlink.lua:20
+#: applications/luci-app-statistics/luasrc/model/cbi/luci_statistics/network.lua:18
+#: applications/luci-app-statistics/luasrc/model/cbi/luci_statistics/nut.lua:9
+#: applications/luci-app-statistics/luasrc/model/cbi/luci_statistics/olsrd.lua:10
+#: applications/luci-app-statistics/luasrc/model/cbi/luci_statistics/openvpn.lua:13
+#: applications/luci-app-statistics/luasrc/model/cbi/luci_statistics/ping.lua:15
+#: applications/luci-app-statistics/luasrc/model/cbi/luci_statistics/processes.lua:15
+#: applications/luci-app-statistics/luasrc/model/cbi/luci_statistics/rrdtool.lua:18
+#: applications/luci-app-statistics/luasrc/model/cbi/luci_statistics/sensors.lua:70
+#: applications/luci-app-statistics/luasrc/model/cbi/luci_statistics/splash_leases.lua:10
+#: applications/luci-app-statistics/luasrc/model/cbi/luci_statistics/tcpconns.lua:15
+#: applications/luci-app-statistics/luasrc/model/cbi/luci_statistics/thermal.lua:14
+#: applications/luci-app-statistics/luasrc/model/cbi/luci_statistics/unixsock.lua:15
+#: applications/luci-app-statistics/luasrc/model/cbi/luci_statistics/uptime.lua:10
+msgid "Enable this plugin"
+msgstr "Activați acest plugin"
+
+#: applications/luci-app-statistics/luasrc/statistics/plugins/entropy.lua:7
+#: applications/luci-app-statistics/luasrc/statistics/rrdtool/definitions/entropy.lua:7
+msgid "Entropy"
+msgstr "Entropie"
+
+#: applications/luci-app-statistics/luasrc/model/cbi/luci_statistics/entropy.lua:5
+msgid "Entropy Plugin Configuration"
+msgstr "Configurarea Plugin-ului Entropie"
+
+#: applications/luci-app-statistics/luasrc/statistics/plugins/exec.lua:2
+msgid "Exec"
+msgstr "Executabil"
+
+#: applications/luci-app-statistics/luasrc/model/cbi/luci_statistics/exec.lua:5
+msgid "Exec Plugin Configuration"
+msgstr "Configurarea Plugin-ului Exec"
+
+#: applications/luci-app-statistics/luasrc/model/cbi/luci_statistics/cpufreq.lua:15
+msgid "Extra items"
+msgstr "Articole suplimentare"
+
+#: applications/luci-app-statistics/luasrc/model/cbi/luci_statistics/netlink.lua:68
+msgid "Filter class monitoring"
+msgstr "Monitorizarea clasei de filtrare"
+
+#: applications/luci-app-statistics/luasrc/statistics/plugins/iptables.lua:2
+#: applications/luci-app-statistics/luasrc/statistics/rrdtool/definitions/iptables.lua:7
+msgid "Firewall"
+msgstr "Firewall"
+
+#: applications/luci-app-statistics/luasrc/statistics/rrdtool/definitions/ip6tables.lua:7
+msgid "Firewall (IPv6)"
+msgstr "Firewall (IPv6)"
+
+#: applications/luci-app-statistics/luasrc/model/cbi/luci_statistics/rrdtool.lua:100
+msgid "Flush cache after"
+msgstr "Ștergeți memoria cache după"
+
+#: applications/luci-app-statistics/luasrc/model/cbi/luci_statistics/network.lua:71
+msgid "Forwarding between listen and server addresses"
+msgstr "Redirecționarea între adresele de ascultare și cele de server"
+
+#: applications/luci-app-statistics/luasrc/model/cbi/luci_statistics/openvpn.lua:29
+msgid "Gather compression statistics"
+msgstr "Adunați statisticile de compresie"
+
+#: applications/luci-app-statistics/luasrc/controller/luci_statistics/luci_statistics.lua:23
+msgid "General plugins"
+msgstr "Plugin-uri generale"
+
+#: applications/luci-app-statistics/luasrc/model/cbi/luci_statistics/openvpn.lua:17
+msgid "Generate a separate graph for each logged user"
+msgstr "Generați un grafic separat pentru fiecare utilizator logat"
+
+#: applications/luci-app-statistics/luasrc/controller/luci_statistics/luci_statistics.lua:73
+msgid "Graphs"
+msgstr "Grafice"
+
+#: applications/luci-app-statistics/luasrc/model/cbi/luci_statistics/exec.lua:42
+#: applications/luci-app-statistics/luasrc/model/cbi/luci_statistics/exec.lua:71
+msgid "Group"
+msgstr "Grup"
+
+#: applications/luci-app-statistics/luasrc/model/cbi/luci_statistics/exec.lua:24
+msgid ""
+"Here you can define external commands which will be started by collectd in "
+"order to read certain values. The values will be read from stdout."
+msgstr ""
+"Aici puteți defini comenzi externe care vor fi lansate de collectd pentru a "
+"citi anumite valori. Valorile vor fi citite din stdout."
+
+#: applications/luci-app-statistics/luasrc/model/cbi/luci_statistics/exec.lua:52
+msgid ""
+"Here you can define external commands which will be started by collectd when "
+"certain threshold values have been reached. The values leading to invocation "
+"will be fed to the the called programs stdin."
+msgstr ""
+"Aici puteți defini comenzi externe care vor fi lansate de collectd atunci "
+"când sunt atinse anumite valori de prag. Valorile care conduc la invocare "
+"vor fi transmise în stdin-ul programelor apelate."
+
+#: applications/luci-app-statistics/luasrc/model/cbi/luci_statistics/iptables.lua:36
+msgid ""
+"Here you can define various criteria by which the monitored iptables rules "
+"are selected."
+msgstr ""
+"Aici puteți defini diverse criterii în funcție de care sunt selectate "
+"regulile iptables monitorizate."
+
+#: applications/luci-app-statistics/luasrc/model/cbi/luci_statistics/sensors.lua:86
+msgid "Hold Ctrl to select multiple items or to deselect entries."
+msgstr ""
+
+#: applications/luci-app-statistics/luasrc/model/cbi/luci_statistics/olsrd.lua:13
+msgid "Host"
+msgstr "Gazdă"
+
+#: applications/luci-app-statistics/luasrc/model/cbi/luci_statistics/collectd.lua:19
+msgid "Hostname"
+msgstr "Numele gazdei ( hostname )"
+
+#: applications/luci-app-statistics/luasrc/model/cbi/luci_statistics/olsrd.lua:13
+msgid "IP or hostname where to get the txtinfo output from"
+msgstr "IP sau numele de gazdă de unde se obține rezultatul txtinfo"
+
+#: applications/luci-app-statistics/luasrc/model/cbi/luci_statistics/irq.lua:5
+msgid "IRQ Plugin Configuration"
+msgstr "Configurație IRQ Plugin"
+
+#: applications/luci-app-statistics/luasrc/model/cbi/luci_statistics/dns.lua:32
+msgid "Ignore source addresses"
+msgstr "Ignoră adresele sursă"
+
+#: applications/luci-app-statistics/luasrc/model/cbi/luci_statistics/iptables.lua:103
+msgid "Incoming interface"
+msgstr ""
+
+#: applications/luci-app-statistics/luasrc/model/cbi/luci_statistics/interface.lua:8
+msgid "Interface Plugin Configuration"
+msgstr "Configurarea plugin-ului de interfață"
+
+#: applications/luci-app-statistics/luasrc/statistics/plugins/interface.lua:7
+#: applications/luci-app-statistics/luasrc/statistics/rrdtool/definitions/interface.lua:7
+msgid "Interfaces"
+msgstr "Interfețe"
+
+#: applications/luci-app-statistics/luasrc/statistics/plugins/irq.lua:7
+#: applications/luci-app-statistics/luasrc/statistics/rrdtool/definitions/irq.lua:7
+msgid "Interrupts"
+msgstr "Intreruperi"
+
+#: applications/luci-app-statistics/luasrc/model/cbi/luci_statistics/ping.lua:38
+msgid "Interval for pings"
+msgstr "Interval pentru ping"
+
+#: applications/luci-app-statistics/luasrc/model/cbi/luci_statistics/iptables.lua:18
+msgid "Iptables Plugin Configuration"
+msgstr "Configurarea plugin-ului iptables"
+
+#: applications/luci-app-statistics/luasrc/model/cbi/luci_statistics/iwinfo.lua:16
+msgid "Leave unselected to automatically determine interfaces to monitor."
+msgstr ""
+"Lăsați neselectat pentru a determina automat interfețele de monitorizat."
+
+#: applications/luci-app-statistics/luasrc/model/cbi/luci_statistics/network.lua:33
+msgid "Listen host"
+msgstr "Ascultați gazda"
+
+#: applications/luci-app-statistics/luasrc/model/cbi/luci_statistics/network.lua:37
+msgid "Listen port"
+msgstr "Port de ascultare"
+
+#: applications/luci-app-statistics/luasrc/model/cbi/luci_statistics/network.lua:24
+msgid "Listener interfaces"
+msgstr "Interfețe de ascultare"
+
+#: applications/luci-app-statistics/luasrc/model/cbi/luci_statistics/load.lua:5
+msgid "Load Plugin Configuration"
+msgstr "Încărcați configurația plugin-ului"
+
+#: applications/luci-app-statistics/luasrc/model/cbi/luci_statistics/rrdtool.lua:60
+msgid ""
+"Max values for a period can be used instead of averages when not using 'only "
+"average RRAs'"
+msgstr ""
+"Valorile maxime pentru o perioadă pot fi utilizate în locul mediilor atunci "
+"când nu se utilizează 'numai RRA medii'"
+
+#: applications/luci-app-statistics/luasrc/model/cbi/luci_statistics/email.lua:41
+msgid "Maximum allowed connections"
+msgstr "Numărul maxim de conexiuni permise"
+
+#: applications/luci-app-statistics/luasrc/statistics/plugins/memory.lua:7
+#: applications/luci-app-statistics/luasrc/statistics/rrdtool/definitions/memory.lua:7
+msgid "Memory"
+msgstr "Memorie"
+
+#: applications/luci-app-statistics/luasrc/model/cbi/luci_statistics/memory.lua:5
+msgid "Memory Plugin Configuration"
+msgstr "Configurarea plugin-ului de memorie"
+
+#: applications/luci-app-statistics/luasrc/model/cbi/luci_statistics/df.lua:37
+#: applications/luci-app-statistics/luasrc/model/cbi/luci_statistics/disk.lua:25
+#: applications/luci-app-statistics/luasrc/model/cbi/luci_statistics/interface.lua:31
+#: applications/luci-app-statistics/luasrc/model/cbi/luci_statistics/irq.lua:25
+#: applications/luci-app-statistics/luasrc/model/cbi/luci_statistics/iwinfo.lua:22
+#: applications/luci-app-statistics/luasrc/model/cbi/luci_statistics/netlink.lua:79
+#: applications/luci-app-statistics/luasrc/model/cbi/luci_statistics/sensors.lua:118
+#: applications/luci-app-statistics/luasrc/model/cbi/luci_statistics/thermal.lua:24
+msgid "Monitor all except specified"
+msgstr "Monitorizarea tuturor, cu excepția celor specificate"
+
+#: applications/luci-app-statistics/luasrc/model/cbi/luci_statistics/tcpconns.lua:19
+msgid "Monitor all local listen ports"
+msgstr "Monitorizarea tuturor porturilor de ascultare locale"
+
+#: applications/luci-app-statistics/luasrc/model/cbi/luci_statistics/sensors.lua:74
+msgid "Monitor all sensors"
+msgstr ""
+
+#: applications/luci-app-statistics/luasrc/model/cbi/luci_statistics/thermal.lua:18
+msgid "Monitor device(s) / thermal zone(s)"
+msgstr ""
+"Monitorizarea dispozitivului (dispozitivelor) / zonei (zonelor) termice"
+
+#: applications/luci-app-statistics/luasrc/model/cbi/luci_statistics/df.lua:19
+msgid "Monitor devices"
+msgstr "Monitorizarea dispozitivelor"
+
+#: applications/luci-app-statistics/luasrc/model/cbi/luci_statistics/disk.lua:19
+msgid "Monitor disks and partitions"
+msgstr "Monitorizarea discurilor și a partițiilor"
+
+#: applications/luci-app-statistics/luasrc/model/cbi/luci_statistics/df.lua:31
+msgid "Monitor filesystem types"
+msgstr "Monitorizarea tipurilor de sisteme de fișiere"
+
+#: applications/luci-app-statistics/luasrc/model/cbi/luci_statistics/apcups.lua:18
+msgid "Monitor host"
+msgstr "Monitorizarea gazdei"
+
+#: applications/luci-app-statistics/luasrc/model/cbi/luci_statistics/ping.lua:19
+msgid "Monitor hosts"
+msgstr "Monitorizați gazdele"
+
+#: applications/luci-app-statistics/luasrc/model/cbi/luci_statistics/dns.lua:22
+#: applications/luci-app-statistics/luasrc/model/cbi/luci_statistics/interface.lua:22
+#: applications/luci-app-statistics/luasrc/model/cbi/luci_statistics/iwinfo.lua:15
+msgid "Monitor interfaces"
+msgstr "Monitorizarea interfețelor"
+
+#: applications/luci-app-statistics/luasrc/model/cbi/luci_statistics/irq.lua:20
+msgid "Monitor interrupts"
+msgstr "Monitorizarea întreruperilor"
+
+#: applications/luci-app-statistics/luasrc/model/cbi/luci_statistics/tcpconns.lua:24
+msgid "Monitor local ports"
+msgstr "Monitorizarea porturilor locale"
+
+#: applications/luci-app-statistics/luasrc/model/cbi/luci_statistics/df.lua:25
+msgid "Monitor mount points"
+msgstr "Monitorizarea punctelor de montare"
+
+#: applications/luci-app-statistics/luasrc/model/cbi/luci_statistics/processes.lua:19
+msgid "Monitor processes"
+msgstr "Monitorizarea proceselor"
+
+#: applications/luci-app-statistics/luasrc/model/cbi/luci_statistics/tcpconns.lua:29
+msgid "Monitor remote ports"
+msgstr "Monitorizarea porturilor la distanță"
+
+#: applications/luci-app-statistics/luasrc/model/cbi/luci_statistics/cpufreq.lua:15
+msgid "More details about frequency usage and transitions"
+msgstr "Mai multe detalii despre utilizarea frecvențelor și tranziții"
+
+#: applications/luci-app-statistics/luasrc/model/cbi/luci_statistics/curl.lua:20
+msgid "Name"
+msgstr "Nume"
+
+#: applications/luci-app-statistics/luasrc/model/cbi/luci_statistics/iptables.lua:45
+msgid "Name of the rule"
+msgstr ""
+
+#: applications/luci-app-statistics/luasrc/statistics/plugins/netlink.lua:7
+#: applications/luci-app-statistics/luasrc/statistics/rrdtool/definitions/netlink.lua:7
+msgid "Netlink"
+msgstr "Legatura de retea"
+
+#: applications/luci-app-statistics/luasrc/model/cbi/luci_statistics/netlink.lua:10
+msgid "Netlink Plugin Configuration"
+msgstr "Configurarea Plugin-ului Netlink"
+
+#: applications/luci-app-statistics/luasrc/statistics/plugins/network.lua:2
+msgid "Network"
+msgstr "Rețea"
+
+#: applications/luci-app-statistics/luasrc/model/cbi/luci_statistics/network.lua:5
+msgid "Network Plugin Configuration"
+msgstr "Configurarea plugin-ului de rețea"
+
+#: applications/luci-app-statistics/luasrc/controller/luci_statistics/luci_statistics.lua:24
+msgid "Network plugins"
+msgstr "Pluginuri de retea"
+
+#: applications/luci-app-statistics/luasrc/model/cbi/luci_statistics/iptables.lua:81
+msgid "Network protocol"
+msgstr ""
+
+#: applications/luci-app-statistics/luasrc/model/cbi/luci_statistics/rrdtool.lua:24
+msgid ""
+"Note: as pages are rendered by user 'nobody', the *.rrd files, the storage "
+"directory and all its parent directories need to be world readable."
+msgstr ""
+"Notă: deoarece paginile sunt redate de către utilizatorul \"nobody\", "
+"fișierele *.rrd, directorul de stocare și toate directoarele părinte trebuie "
+"să fie ușor de citit."
+
+#: applications/luci-app-statistics/luasrc/model/cbi/luci_statistics/collectd.lua:49
+msgid "Number of threads for data collection"
+msgstr "Numarul de threaduri pentru colectarea datelor"
+
+#: applications/luci-app-statistics/luasrc/statistics/plugins/olsrd.lua:7
+#: applications/luci-app-statistics/luasrc/statistics/rrdtool/definitions/olsrd.lua:7
+msgid "OLSRd"
+msgstr "OLSRd"
+
+#: applications/luci-app-statistics/luasrc/model/cbi/luci_statistics/olsrd.lua:5
+msgid "OLSRd Plugin Configuration"
+msgstr "Configurarea plugin-ului OLSRd"
+
+#: applications/luci-app-statistics/luasrc/model/cbi/luci_statistics/rrdtool.lua:53
+msgid "Only create average RRAs"
+msgstr "Creează doar RRA medii"
+
+#: applications/luci-app-statistics/luasrc/statistics/plugins/openvpn.lua:7
+#: applications/luci-app-statistics/luasrc/statistics/rrdtool/definitions/openvpn.lua:7
+msgid "OpenVPN"
+msgstr "OpenVPN"
+
+#: applications/luci-app-statistics/luasrc/model/cbi/luci_statistics/openvpn.lua:7
+msgid "OpenVPN Plugin Configuration"
+msgstr "Configurarea plugin-ului OpenVPN"
+
+#: applications/luci-app-statistics/luasrc/model/cbi/luci_statistics/openvpn.lua:41
+msgid "OpenVPN status files"
+msgstr "Fișiere de stare OpenVPN"
+
+#: applications/luci-app-statistics/luasrc/model/cbi/luci_statistics/iptables.lua:115
+msgid "Options"
+msgstr ""
+
+#: applications/luci-app-statistics/luasrc/model/cbi/luci_statistics/iptables.lua:109
+msgid "Outgoing interface"
+msgstr ""
+
+#: applications/luci-app-statistics/luasrc/controller/luci_statistics/luci_statistics.lua:22
+msgid "Output plugins"
+msgstr "Pluginuri de iesire"
+
+#: applications/luci-app-statistics/luasrc/model/cbi/luci_statistics/memory.lua:23
+msgid "Percent values"
+msgstr "Valori procentuale"
+
+#: applications/luci-app-statistics/luasrc/statistics/plugins/ping.lua:7
+#: applications/luci-app-statistics/luasrc/statistics/rrdtool/definitions/ping.lua:7
+msgid "Ping"
+msgstr "Ping"
+
+#: applications/luci-app-statistics/luasrc/model/cbi/luci_statistics/ping.lua:5
+msgid "Ping Plugin Configuration"
+msgstr "Configurarea Plugin-ului Ping"
+
+#: applications/luci-app-statistics/luasrc/model/cbi/luci_statistics/olsrd.lua:18
+msgid "Port"
+msgstr "Port"
+
+#: applications/luci-app-statistics/luasrc/model/cbi/luci_statistics/apcups.lua:23
+msgid "Port for apcupsd communication"
+msgstr "Port pentru comunicarea apcupsd"
+
+#: applications/luci-app-statistics/luasrc/statistics/plugins/processes.lua:7
+#: applications/luci-app-statistics/luasrc/statistics/rrdtool/definitions/processes.lua:7
+msgid "Processes"
+msgstr "Procese"
+
+#: applications/luci-app-statistics/luasrc/model/cbi/luci_statistics/processes.lua:5
+msgid "Processes Plugin Configuration"
+msgstr "Procese Configurare Plugin"
+
+#: applications/luci-app-statistics/luasrc/model/cbi/luci_statistics/processes.lua:20
+msgid "Processes to monitor separated by space"
+msgstr ""
+
+#: applications/luci-app-statistics/luasrc/statistics/plugins/cpu.lua:7
+#: applications/luci-app-statistics/luasrc/statistics/rrdtool/definitions/cpu.lua:10
+msgid "Processor"
+msgstr "Procesor"
+
+#: applications/luci-app-statistics/luasrc/model/cbi/luci_statistics/netlink.lua:46
+msgid "Qdisc monitoring"
+msgstr "Monitorizarea Qdisc"
+
+#: applications/luci-app-statistics/luasrc/model/cbi/luci_statistics/rrdtool.lua:82
+msgid "RRD XFiles Factor"
+msgstr "Factorul RRD XFiles"
+
+#: applications/luci-app-statistics/luasrc/model/cbi/luci_statistics/rrdtool.lua:44
+msgid "RRD heart beat interval"
+msgstr "Intervalul bătăilor inimii RRD"
+
+#: applications/luci-app-statistics/luasrc/model/cbi/luci_statistics/rrdtool.lua:35
+msgid "RRD step interval"
+msgstr "Intervalul pasului RRD"
+
+#: applications/luci-app-statistics/luasrc/statistics/plugins/rrdtool.lua:7
+msgid "RRDTool"
+msgstr "InstrumentulRRD"
+
+#: applications/luci-app-statistics/luasrc/model/cbi/luci_statistics/rrdtool.lua:5
+msgid "RRDTool Plugin Configuration"
+msgstr "Configurarea plugin-ului RRDTool Plugin"
+
+#: applications/luci-app-statistics/luasrc/model/cbi/luci_statistics/cpu.lua:17
+msgid "Report by CPU"
+msgstr "Raport realizat de CPU"
+
+#: applications/luci-app-statistics/luasrc/model/cbi/luci_statistics/cpu.lua:25
+msgid "Report by state"
+msgstr "Raport pe stat"
+
+#: applications/luci-app-statistics/luasrc/model/cbi/luci_statistics/cpu.lua:33
+msgid "Report in percent"
+msgstr "Raport în procente"
+
+#: applications/luci-app-statistics/luasrc/model/cbi/luci_statistics/rrdtool.lua:74
+msgid "Rows per RRA"
+msgstr "Rânduri pe RAR"
+
+#: applications/luci-app-statistics/luasrc/model/cbi/luci_statistics/exec.lua:32
+#: applications/luci-app-statistics/luasrc/model/cbi/luci_statistics/exec.lua:61
+msgid "Script"
+msgstr "Scenariu"
+
+#: applications/luci-app-statistics/luasrc/model/cbi/luci_statistics/collectd.lua:44
+#: applications/luci-app-statistics/luasrc/model/cbi/luci_statistics/network.lua:78
+#: applications/luci-app-statistics/luasrc/model/cbi/luci_statistics/ping.lua:38
+#: applications/luci-app-statistics/luasrc/model/cbi/luci_statistics/rrdtool.lua:35
+#: applications/luci-app-statistics/luasrc/model/cbi/luci_statistics/rrdtool.lua:44
+#: applications/luci-app-statistics/luasrc/model/cbi/luci_statistics/rrdtool.lua:91
+#: applications/luci-app-statistics/luasrc/model/cbi/luci_statistics/rrdtool.lua:100
+msgid "Seconds"
+msgstr "Secunde"
+
+#: applications/luci-app-statistics/luasrc/model/cbi/luci_statistics/sensors.lua:86
+msgid "Sensor list"
+msgstr "Lista de senzori"
+
+#: applications/luci-app-statistics/luasrc/statistics/plugins/sensors.lua:7
+#: applications/luci-app-statistics/luasrc/statistics/rrdtool/definitions/sensors.lua:7
+msgid "Sensors"
+msgstr "Senzori"
+
+#: applications/luci-app-statistics/luasrc/model/cbi/luci_statistics/sensors.lua:64
+msgid "Sensors Plugin Configuration"
+msgstr "Configurarea Plugin-ului senzorilor"
+
+#: applications/luci-app-statistics/luasrc/model/cbi/luci_statistics/network.lua:54
+msgid "Server host"
+msgstr "Gazda serverului"
+
+#: applications/luci-app-statistics/luasrc/model/cbi/luci_statistics/network.lua:58
+msgid "Server port"
+msgstr "Port de server"
+
+#: applications/luci-app-statistics/luasrc/controller/luci_statistics/luci_statistics.lua:48
+msgid "Setup"
+msgstr "Configurare"
+
+#: applications/luci-app-statistics/luasrc/model/cbi/luci_statistics/netlink.lua:57
+msgid "Shaping class monitoring"
+msgstr "Monitorizarea clasei de modelare"
+
+#: applications/luci-app-statistics/luasrc/model/cbi/luci_statistics/rrdtool.lua:59
+msgid "Show max values instead of averages"
+msgstr "Afișați valorile maxime în locul mediilor"
+
+#: applications/luci-app-statistics/luasrc/model/cbi/luci_statistics/email.lua:22
+msgid "Socket file"
+msgstr "Fișier Socket"
+
+#: applications/luci-app-statistics/luasrc/model/cbi/luci_statistics/email.lua:27
+msgid "Socket group"
+msgstr "Grup de prize"
+
+#: applications/luci-app-statistics/luasrc/model/cbi/luci_statistics/email.lua:34
+msgid "Socket permissions"
+msgstr "Permisiuni Socket"
+
+#: applications/luci-app-statistics/luasrc/model/cbi/luci_statistics/iptables.lua:90
+msgid "Source ip range"
+msgstr ""
+
+#: applications/luci-app-statistics/luasrc/model/cbi/luci_statistics/olsrd.lua:25
+msgid "Specifies what information to collect about links."
+msgstr "Specifică ce informații trebuie colectate despre legături."
+
+#: applications/luci-app-statistics/luasrc/model/cbi/luci_statistics/olsrd.lua:32
+msgid "Specifies what information to collect about routes."
+msgstr "Specifică ce informații se colectează despre rute."
+
+#: applications/luci-app-statistics/luasrc/model/cbi/luci_statistics/olsrd.lua:39
+msgid "Specifies what information to collect about the global topology."
+msgstr "Specifică ce informații se colectează despre topologia globală."
+
+#: applications/luci-app-statistics/luasrc/statistics/plugins/splash_leases.lua:7
+#: applications/luci-app-statistics/luasrc/statistics/rrdtool/definitions/splash_leases.lua:7
+msgid "Splash Leases"
+msgstr "Splash Leasing"
+
+#: applications/luci-app-statistics/luasrc/model/cbi/luci_statistics/splash_leases.lua:5
+msgid "Splash Leases Plugin Configuration"
+msgstr "Configurarea Plugin-ului Splash Leasing"
+
+#: applications/luci-app-statistics/luasrc/controller/luci_statistics/luci_statistics.lua:45
+#: applications/luci-app-statistics/luasrc/view/admin_statistics/index.htm:9
+#: applications/luci-app-statistics/luasrc/view/public_statistics/graph.htm:9
+msgid "Statistics"
+msgstr "Statistici"
+
+#: applications/luci-app-statistics/luasrc/model/cbi/luci_statistics/rrdtool.lua:23
+msgid "Storage directory"
+msgstr "Director de stocare"
+
+#: applications/luci-app-statistics/luasrc/model/cbi/luci_statistics/csv.lua:19
+msgid "Storage directory for the csv files"
+msgstr "Director de stocare pentru fișierele csv"
+
+#: applications/luci-app-statistics/luasrc/model/cbi/luci_statistics/csv.lua:24
+msgid "Store data values as rates instead of absolute values"
+msgstr "Stocarea valorilor datelor ca rate în loc de valori absolute"
+
+#: applications/luci-app-statistics/luasrc/model/cbi/luci_statistics/rrdtool.lua:67
+msgid "Stored timespans"
+msgstr "Perioade de timp stocate"
+
+#: applications/luci-app-statistics/luasrc/statistics/plugins/load.lua:7
+#: applications/luci-app-statistics/luasrc/statistics/rrdtool/definitions/load.lua:7
+msgid "System Load"
+msgstr "Incarcarea de sistem"
+
+#: applications/luci-app-statistics/luasrc/statistics/plugins/tcpconns.lua:7
+#: applications/luci-app-statistics/luasrc/statistics/rrdtool/definitions/tcpconns.lua:7
+msgid "TCP Connections"
+msgstr "Conexiuni TCP"
+
+#: applications/luci-app-statistics/luasrc/model/cbi/luci_statistics/tcpconns.lua:5
+msgid "TCPConns Plugin Configuration"
+msgstr "Configurarea Plugin-ului TCPConns"
+
+#: applications/luci-app-statistics/luasrc/model/cbi/luci_statistics/network.lua:64
+msgid "TTL for network packets"
+msgstr "TTL pentru pachetele de rețea"
+
+#: applications/luci-app-statistics/luasrc/model/cbi/luci_statistics/ping.lua:32
+msgid "TTL for ping packets"
+msgstr "TTL pentru pachetele ping"
+
+#: applications/luci-app-statistics/luasrc/model/cbi/luci_statistics/iptables.lua:48
+msgid "Table"
+msgstr "Tabelul"
+
+#: applications/luci-app-statistics/luasrc/model/cbi/luci_statistics/apcups.lua:7
+msgid "The APCUPS plugin collects statistics about the APC UPS."
+msgstr "Plugin-ul APCUPS colectează statistici despre UPS-ul APC."
+
+#: applications/luci-app-statistics/luasrc/model/cbi/luci_statistics/nut.lua:5
+msgid "The NUT plugin reads information about Uninterruptible Power Supplies."
+msgstr ""
+"Plugin-ul NUT citește informații despre sursele de alimentare "
+"neîntreruptibile."
+
+#: applications/luci-app-statistics/luasrc/model/cbi/luci_statistics/olsrd.lua:6
+msgid ""
+"The OLSRd plugin reads information about meshed networks from the txtinfo "
+"plugin of OLSRd."
+msgstr ""
+"Plugin-ul OLSRd citește informații despre rețelele cu ochiuri de plasă din "
+"pluginul txtinfo al OLSRd."
+
+#: applications/luci-app-statistics/luasrc/model/cbi/luci_statistics/openvpn.lua:8
+msgid ""
+"The OpenVPN plugin gathers information about the current vpn connection "
+"status."
+msgstr ""
+"Plugin-ul OpenVPN colectează informații despre starea curentă a conexiunii "
+"VPN."
+
+#: applications/luci-app-statistics/luasrc/model/cbi/luci_statistics/conntrack.lua:6
+msgid ""
+"The conntrack plugin collects statistics about the number of tracked "
+"connections."
+msgstr ""
+"Plugin-ul conntrack colectează statistici cu privire la numărul de conexiuni "
+"urmărite."
+
+#: applications/luci-app-statistics/luasrc/model/cbi/luci_statistics/cpu.lua:6
+msgid "The cpu plugin collects basic statistics about the processor usage."
+msgstr ""
+"Pluginul pentru CPU colecteaza statistici de baza despre utilizarea "
+"procesorului."
+
+#: applications/luci-app-statistics/luasrc/model/cbi/luci_statistics/csv.lua:7
+msgid ""
+"The csv plugin stores collected data in csv file format for further "
+"processing by external programs."
+msgstr ""
+"Plugin-ul csv stochează datele colectate în format de fișier csv pentru "
+"procesarea ulterioară de către programe externe."
+
+#: applications/luci-app-statistics/luasrc/model/cbi/luci_statistics/df.lua:7
+msgid ""
+"The df plugin collects statistics about the disk space usage on different "
+"devices, mount points or filesystem types."
+msgstr ""
+"Plugin-ul df colectează statistici despre utilizarea spațiului pe disc pe "
+"diferite dispozitive, puncte de montare sau tipuri de sisteme de fișiere."
+
+#: applications/luci-app-statistics/luasrc/model/cbi/luci_statistics/disk.lua:7
+msgid ""
+"The disk plugin collects detailed usage statistics for selected partitions "
+"or whole disks."
+msgstr ""
+"Plugin-ul pentru discuri colectează statistici detaliate de utilizare pentru "
+"partițiile selectate sau pentru discurile întregi."
+
+#: applications/luci-app-statistics/luasrc/model/cbi/luci_statistics/dns.lua:10
+msgid ""
+"The dns plugin collects detailed statistics about dns related traffic on "
+"selected interfaces."
+msgstr ""
+"Plugin-ul dns colectează statistici detaliate despre traficul legat de dns "
+"pe interfețele selectate."
+
+#: applications/luci-app-statistics/luasrc/model/cbi/luci_statistics/email.lua:7
+msgid ""
+"The email plugin creates a unix socket which can be used to transmit email-"
+"statistics to a running collectd daemon. This plugin is primarily intended "
+"to be used in conjunction with Mail::SpamAssasin::Plugin::Collectd but can "
+"be used in other ways as well."
+msgstr ""
+"Plugin-ul de e-mail creează un socket unix care poate fi folosit pentru a "
+"transmite statisticile de e-mail către un daemon collectd care rulează. "
+"Acest plugin este destinat în primul rând pentru a fi utilizat împreună cu "
+"Mail::SpamAssasin::Plugin::Collectd, dar poate fi utilizat și în alte moduri."
+
+#: applications/luci-app-statistics/luasrc/model/cbi/luci_statistics/entropy.lua:6
+msgid "The entropy plugin collects statistics about the available entropy."
+msgstr ""
+"Plugin-ul de entropie colectează statistici cu privire la entropia "
+"disponibilă."
+
+#: applications/luci-app-statistics/luasrc/model/cbi/luci_statistics/exec.lua:7
+msgid ""
+"The exec plugin starts external commands to read values from or to notify "
+"external processes when certain threshold values have been reached."
+msgstr ""
+"Plugin-ul exec pornește comenzi externe pentru a citi valori de la procese "
+"externe sau pentru a notifica procesele externe atunci când anumite valori "
+"de prag au fost atinse."
+
+#: applications/luci-app-statistics/luasrc/model/cbi/luci_statistics/interface.lua:10
+msgid ""
+"The interface plugin collects traffic statistics on selected interfaces."
+msgstr ""
+"Plugin-ul de interfață colectează statistici de trafic pe interfețele "
+"selectate."
+
+#: applications/luci-app-statistics/luasrc/model/cbi/luci_statistics/iptables.lua:20
+msgid ""
+"The iptables plugin will monitor selected firewall rules and collect "
+"information about processed bytes and packets per rule."
+msgstr ""
+"Plugin-ul iptables va monitoriza regulile de firewall selectate și va "
+"colecta informații despre octeții și pachetele procesate pentru fiecare "
+"regulă."
+
+#: applications/luci-app-statistics/luasrc/model/cbi/luci_statistics/irq.lua:7
+msgid ""
+"The irq plugin will monitor the rate of issues per second for each selected "
+"interrupt. If no interrupt is selected then all interrupts are monitored."
+msgstr ""
+"Plugin-ul irq va monitoriza rata de emitere pe secundă pentru fiecare "
+"întrerupere selectată. Dacă nu este selectată nicio întrerupere, atunci sunt "
+"monitorizate toate întreruperile."
+
+#: applications/luci-app-statistics/luasrc/model/cbi/luci_statistics/iwinfo.lua:8
+msgid ""
+"The iwinfo plugin collects statistics about wireless signal strength, noise "
+"and quality."
+msgstr ""
+"Plugin-ul iwinfo colectează statistici despre puterea, zgomotul și calitatea "
+"semnalului wireless."
+
+#: applications/luci-app-statistics/luasrc/model/cbi/luci_statistics/load.lua:7
+msgid "The load plugin collects statistics about the general system load."
+msgstr ""
+"Plugin-ul de încărcare colectează statistici despre încărcarea generală a "
+"sistemului."
+
+#: applications/luci-app-statistics/luasrc/model/cbi/luci_statistics/memory.lua:6
+msgid "The memory plugin collects statistics about the memory usage."
+msgstr ""
+"Plugin-ul de memorie colectează statistici cu privire la utilizarea memoriei."
+
+#: applications/luci-app-statistics/luasrc/model/cbi/luci_statistics/netlink.lua:12
+msgid ""
+"The netlink plugin collects extended information like qdisc-, class- and "
+"filter-statistics for selected interfaces."
+msgstr ""
+"Plugin-ul netlink colectează informații extinse, cum ar fi qdisc-, class- și "
+"filter-statistics pentru interfețele selectate."
+
+#: applications/luci-app-statistics/luasrc/model/cbi/luci_statistics/network.lua:7
+msgid ""
+"The network plugin provides network based communication between different "
+"collectd instances. Collectd can operate both in client and server mode. In "
+"client mode locally collected data is transferred to a collectd server "
+"instance, in server mode the local instance receives data from other hosts."
+msgstr ""
+"Plugin-ul de rețea asigură comunicarea bazată pe rețea între diferite "
+"instanțe collectd. Collectd poate funcționa atât în modul client, cât și în "
+"modul server. În modul client, datele colectate la nivel local sunt "
+"transferate către o instanță de server collectd, iar în modul server, "
+"instanța locală primește date de la alte gazde."
+
+#: applications/luci-app-statistics/luasrc/model/cbi/luci_statistics/ping.lua:7
+msgid ""
+"The ping plugin will send icmp echo replies to selected hosts and measure "
+"the roundtrip time for each host."
+msgstr ""
+"Plugin-ul ping va trimite răspunsuri de tip icmp echo către gazdele "
+"selectate și va măsura timpul de călătorie dus-întors pentru fiecare gazdă."
+
+#: applications/luci-app-statistics/luasrc/model/cbi/luci_statistics/processes.lua:7
+msgid ""
+"The processes plugin collects information like cpu time, page faults and "
+"memory usage of selected processes."
+msgstr ""
+"Plugin-ul pentru procese colectează informații cum ar fi timpul de "
+"procesare, erori de pagină și utilizarea memoriei pentru procesele selectate."
+
+#: applications/luci-app-statistics/luasrc/model/cbi/luci_statistics/rrdtool.lua:7
+msgid ""
+"The rrdtool plugin stores the collected data in rrd database files, the "
+"foundation of the diagrams.<br /><br /><strong>Warning: Setting the wrong "
+"values will result in a very high memory consumption in the temporary "
+"directory. This can render the device unusable!</strong>"
+msgstr ""
+"Plugin-ul rrdtool stochează datele colectate în fișiere de baze de date rrd, "
+"baza diagramelor.<br /><br /><strong>Atenție: Setarea unor valori greșite va "
+"duce la un consum foarte mare de memorie în directorul temporar. Acest lucru "
+"poate face ca dispozitivul să devină inutilizabil!</strong>"
+
+#: applications/luci-app-statistics/luasrc/model/cbi/luci_statistics/sensors.lua:65
+msgid ""
+"The sensors plugin uses the Linux Sensors framework to gather environmental "
+"statistics."
+msgstr ""
+"Plugin-ul de senzori utilizează cadrul Linux Sensors pentru a colecta "
+"statistici de mediu."
+
+#: applications/luci-app-statistics/luasrc/model/cbi/luci_statistics/splash_leases.lua:6
+msgid ""
+"The splash leases plugin uses libuci to collect statistics about splash "
+"leases."
+msgstr ""
+"Plugin-ul splash leases utilizează libuci pentru a colecta statistici despre "
+"splash leases."
+
+#: applications/luci-app-statistics/luasrc/view/admin_statistics/index.htm:11
+msgid ""
+"The statistics package uses <a href=\"https://collectd.org/\">Collectd</a> "
+"to gather data and <a href=\"http://oss.oetiker.ch/rrdtool/\">RRDtool</a> to "
+"render diagram images."
+msgstr ""
+
+#: applications/luci-app-statistics/luasrc/model/cbi/luci_statistics/tcpconns.lua:7
+msgid ""
+"The tcpconns plugin collects information about open tcp connections on "
+"selected ports."
+msgstr ""
+"Plugin-ul tcpconns colectează informații despre conexiunile tcp deschise pe "
+"porturile selectate."
+
+#: applications/luci-app-statistics/luasrc/model/cbi/luci_statistics/thermal.lua:5
+msgid ""
+"The thermal plugin will monitor temperature of the system. Data is typically "
+"read from /sys/class/thermal/*/temp ( '*' denotes the thermal device to be "
+"read, e.g. thermal_zone1 )"
+msgstr ""
+"Conectorul termic va monitoriza temperatura sistemului. Datele sunt citite "
+"de obicei din /sys/class/thermal/*/temp (\"*\" indică dispozitivul termic "
+"care trebuie citit, de exemplu, thermal_zone1)"
+
+#: applications/luci-app-statistics/luasrc/model/cbi/luci_statistics/unixsock.lua:7
+msgid ""
+"The unixsock plugin creates a unix socket which can be used to read "
+"collected data from a running collectd instance."
+msgstr ""
+"Plugin-ul unixsock creează un socket unix care poate fi utilizat pentru a "
+"citi datele colectate de la o instanță collectd care rulează."
+
+#: applications/luci-app-statistics/luasrc/model/cbi/luci_statistics/uptime.lua:6
+msgid "The uptime plugin collects statistics about the uptime of the system."
+msgstr ""
+"Plugin-ul uptime colectează statistici despre timpul de funcționare a "
+"sistemului."
+
+#: applications/luci-app-statistics/luasrc/statistics/plugins/thermal.lua:7
+#: applications/luci-app-statistics/luasrc/statistics/rrdtool/definitions/thermal.lua:6
+msgid "Thermal"
+msgstr "Termal"
+
+#: applications/luci-app-statistics/luasrc/model/cbi/luci_statistics/thermal.lua:4
+msgid "Thermal Plugin Configuration"
+msgstr "Configurarea Plugin-ului termal"
+
+#: applications/luci-app-statistics/luasrc/model/cbi/luci_statistics/contextswitch.lua:5
+msgid "This plugin collects statistics about the processor context switches."
+msgstr ""
+"Acest plugin colectează statistici despre schimbările de context ale "
+"procesorului."
+
+#: applications/luci-app-statistics/luasrc/model/cbi/luci_statistics/cpufreq.lua:5
+msgid "This plugin collects statistics about the processor frequency scaling."
+msgstr ""
+"Acest plugin colectează statistici despre scalarea frecvenței procesorului."
+
+#: applications/luci-app-statistics/luasrc/model/cbi/luci_statistics/network.lua:26
+msgid ""
+"This section defines on which interfaces collectd will wait for incoming "
+"connections."
+msgstr ""
+"Această secțiune definește pe ce interfețe collectd va aștepta conexiunile "
+"primite."
+
+#: applications/luci-app-statistics/luasrc/model/cbi/luci_statistics/network.lua:47
+msgid ""
+"This section defines to which servers the locally collected data is sent to."
+msgstr ""
+"Această secțiune definește către ce servere sunt trimise datele colectate la "
+"nivel local."
+
+#: applications/luci-app-statistics/luasrc/model/cbi/luci_statistics/collectd.lua:54
+msgid "Try to lookup fully qualified hostname"
+msgstr "Incearca sa rezolvi numele de domeniu complet"
+
+#: applications/luci-app-statistics/luasrc/model/cbi/luci_statistics/nut.lua:12
+#: applications/luci-app-statistics/luasrc/statistics/plugins/nut.lua:7
+#: applications/luci-app-statistics/luasrc/statistics/rrdtool/definitions/nut.lua:6
+msgid "UPS"
+msgstr "UPS"
+
+#: applications/luci-app-statistics/luasrc/model/cbi/luci_statistics/nut.lua:4
+msgid "UPS Plugin Configuration"
+msgstr "Configurație UPS Plugin"
+
+#: applications/luci-app-statistics/luasrc/model/cbi/luci_statistics/nut.lua:12
+msgid "UPS name in NUT ups@host format"
+msgstr "Numele UPS în format NUT ups@host"
+
+#: applications/luci-app-statistics/luasrc/model/cbi/luci_statistics/curl.lua:22
+msgid "URL"
+msgstr "URL"
+
+#: applications/luci-app-statistics/luasrc/statistics/plugins/unixsock.lua:7
+msgid "UnixSock"
+msgstr "UnixSock"
+
+#: applications/luci-app-statistics/luasrc/model/cbi/luci_statistics/unixsock.lua:5
+msgid "Unixsock Plugin Configuration"
+msgstr "Configurarea Plugin-ului Unixsock"
+
+#: applications/luci-app-statistics/luasrc/statistics/plugins/uptime.lua:7
+#: applications/luci-app-statistics/luasrc/statistics/rrdtool/definitions/uptime.lua:15
+msgid "Uptime"
+msgstr "Timp de funcționare"
+
+#: applications/luci-app-statistics/luasrc/model/cbi/luci_statistics/uptime.lua:5
+msgid "Uptime Plugin Configuration"
+msgstr "Configurarea Plugin-ului Uptime"
+
+#: applications/luci-app-statistics/luasrc/model/cbi/luci_statistics/openvpn.lua:35
+msgid "Use improved naming schema"
+msgstr "Utilizarea unei scheme de denumire îmbunătățite"
+
+#: applications/luci-app-statistics/luasrc/model/cbi/luci_statistics/collectd.lua:36
+msgid "Used PID file"
+msgstr "Fisierul pentru PID folosit"
+
+#: applications/luci-app-statistics/luasrc/model/cbi/luci_statistics/exec.lua:36
+#: applications/luci-app-statistics/luasrc/model/cbi/luci_statistics/exec.lua:65
+msgid "User"
+msgstr "Utilizator"
+
+#: applications/luci-app-statistics/luasrc/model/cbi/luci_statistics/netlink.lua:35
+msgid "Verbose monitoring"
+msgstr "Monitorizarea verbală"
+
+#: applications/luci-app-statistics/luasrc/model/cbi/luci_statistics/cpu.lua:26
+msgid "When set to true, reports per-state metric (system, user, idle)"
+msgstr ""
+"Atunci când este setat la true, raportează metrica per stare (sistem, "
+"utilizator, inactivitate)"
+
+#: applications/luci-app-statistics/luasrc/model/cbi/luci_statistics/memory.lua:16
+msgid "When set to true, we request absolute values"
+msgstr "Atunci când este setat la true, se solicită valori absolute"
+
+#: applications/luci-app-statistics/luasrc/model/cbi/luci_statistics/cpu.lua:34
+#: applications/luci-app-statistics/luasrc/model/cbi/luci_statistics/memory.lua:24
+msgid "When set to true, we request percentage values"
+msgstr "Atunci când este setat la true, solicităm valori procentuale"
+
+#: applications/luci-app-statistics/luasrc/statistics/plugins/iwinfo.lua:7
+#: applications/luci-app-statistics/luasrc/statistics/rrdtool/definitions/iwinfo.lua:7
+msgid "Wireless"
+msgstr "Fără fir"
+
+#: applications/luci-app-statistics/luasrc/model/cbi/luci_statistics/iwinfo.lua:7
+msgid "Wireless iwinfo Plugin Configuration"
+msgstr "Configurarea plugin-ului iwinfo Wireless"
+
+#: applications/luci-app-statistics/luasrc/view/admin_statistics/index.htm:15
+msgid ""
+"You can install additional collectd-mod-* plugins to enable more statistics."
+msgstr ""
+
+#: applications/luci-app-statistics/luasrc/statistics/plugins/curl.lua:2
+#: applications/luci-app-statistics/luasrc/statistics/rrdtool/definitions/curl.lua:7
+msgid "cUrl"
+msgstr "cUrl"
+
+#: applications/luci-app-statistics/luasrc/model/cbi/luci_statistics/curl.lua:5
+msgid "cUrl Plugin Configuration"
+msgstr "Configurarea plugin-ului cUrl"
+
+#: applications/luci-app-statistics/luasrc/model/cbi/luci_statistics/iptables.lua:109
+msgid "e.g. br-ff"
+msgstr ""
+
+#: applications/luci-app-statistics/luasrc/model/cbi/luci_statistics/iptables.lua:103
+msgid "e.g. br-lan"
+msgstr ""
+
+#: applications/luci-app-statistics/luasrc/model/cbi/luci_statistics/iptables.lua:115
+msgid "e.g. reject-with tcp-reset"
+msgstr ""
+
+#: applications/luci-app-statistics/luasrc/model/cbi/luci_statistics/iptables.lua:45
+msgid "max. 16 chars"
+msgstr ""
+
+#: applications/luci-app-statistics/luasrc/model/cbi/luci_statistics/rrdtool.lua:53
+msgid "reduces rrd size"
+msgstr "reduce dimensiunea rrd"
+
+#: applications/luci-app-statistics/luasrc/model/cbi/luci_statistics/rrdtool.lua:67
+msgid "seconds; multiple separated by space"
+msgstr ""
+
+#: applications/luci-app-statistics/luasrc/model/cbi/luci_statistics/network.lua:45
+msgid "server interfaces"
+msgstr ""

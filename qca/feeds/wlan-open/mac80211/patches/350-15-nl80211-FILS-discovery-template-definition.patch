@@ -1,0 +1,31 @@
+From b3c2ae75668a62a9759b168dea61649bc2ba5bbd Mon Sep 17 00:00:00 2001
+From: Aloka Dixit <quic_alokad@quicinc.com>
+Date: Thu, 17 Feb 2022 15:31:37 -0800
+Subject: [PATCH] nl80211: FILS discovery template attribute missing
+
+Add definition for the attribute NL80211_FILS_DISCOVERY_ATTR_TMPL
+which is missing from the kernel backports in case of versions older
+than 5.10.0.
+
+Signed-off-by: Aloka Dixit <quic_alokad@quicinc.com>
+---
+ net/wireless/nl80211.c | 3 +++
+ 1 file changed, 3 insertions(+)
+
+diff --git a/net/wireless/nl80211.c b/net/wireless/nl80211.c
+index 1181beaef18f..25e5654f6299 100644
+--- a/net/wireless/nl80211.c
++++ b/net/wireless/nl80211.c
+@@ -419,6 +419,9 @@ nl80211_fils_discovery_policy[NL80211_FILS_DISCOVERY_ATTR_MAX + 1] = {
+ 			NLA_POLICY_RANGE(NLA_BINARY,
+ 					 NL80211_FILS_DISCOVERY_TMPL_MIN_LEN,
+ 					 IEEE80211_MAX_DATA_LEN),
++#else
++	[NL80211_FILS_DISCOVERY_ATTR_TMPL] = { .type = NLA_BINARY,
++					       .len = IEEE80211_MAX_DATA_LEN },
+ #endif
+ };
+ 
+-- 
+2.31.1
+
