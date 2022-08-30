@@ -3987,15 +3987,11 @@ static int qcom_nandc_probe(struct platform_device *pdev)
 
 	ret = clk_prepare_enable(nandc->core_clk);
 	if (ret)
-		return ret
+		goto err_core_clk;
 
 	ret = clk_prepare_enable(nandc->aon_clk);
 	if (ret)
 		goto err_aon_clk;
-
-	ret = qcom_nandc_alloc(nandc);
-	if (ret)
-		goto err_alloc;
 
 	if (nandc->props->is_serial_nand) {
 		ret = clk_prepare_enable(nandc->iomacro_clk);
@@ -4005,7 +4001,7 @@ static int qcom_nandc_probe(struct platform_device *pdev)
 
 	ret = qcom_nandc_setup(nandc);
 	if (ret)
-		goto err_alloc;
+		goto err_setup;
 
 	ret = qcom_probe_nand_devices(nandc);
 	if (ret)
@@ -4027,11 +4023,12 @@ static int qcom_nandc_probe(struct platform_device *pdev)
 
 	return 0;
 
-err_alloc:
-	qcom_nandc_unalloc(nandc);
+err_setup:
 	clk_disable_unprepare(nandc->aon_clk);
 err_aon_clk:
 	clk_disable_unprepare(nandc->core_clk);
+err_core_clk:
+	qcom_nandc_unalloc(nandc);
 err_nandc_alloc:
 	dma_unmap_resource(dev, res->start, resource_size(res),
 			   DMA_BIDIRECTIONAL, 0);
