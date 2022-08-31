@@ -4,6 +4,7 @@
 .*.swp
 /env
 /dl
+/target/linux/ipq60xx/image/tmp/
 /.config
 /.config.old
 /bin
