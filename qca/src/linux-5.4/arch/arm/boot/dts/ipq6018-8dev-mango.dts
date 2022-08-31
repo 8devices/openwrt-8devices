@@ -14,5 +14,5 @@
  * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  */
 
-#include "../../../arm64/boot/dts/qcom/qcom-ipq6018-8dev-mango.dts"
-#include "qcom-ipq6018.dtsi"
+#include "../../../arm64/boot/dts/qcom/ipq6018-8dev-mango.dts"
+#include "ipq6018.dtsi"
