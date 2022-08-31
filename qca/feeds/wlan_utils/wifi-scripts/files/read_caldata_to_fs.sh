@@ -19,7 +19,7 @@
 do_load_ipq4019_board_bin()
 {
 
-    local board=ap$(echo $(board_name) | awk -F 'ap' '{print$2}')
+    local board=$(board_name)
     local mtdblock=$(find_mtd_part 0:ART)
 
     local apdk="/tmp"
