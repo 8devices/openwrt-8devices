@@ -395,6 +395,7 @@ platform_do_upgrade() {
 	qcom,ipq6018-ap-cp01-c4 |\
 	qcom,ipq6018-ap-cp01-c5 |\
 	qcom,ipq6018-ap-cp02-c1 |\
+	8devices,mango |\
 	qcom,ipq6018-ap-cp03-c1 |\
 	qcom,ipq6018-db-cp01 |\
 	qcom,ipq6018-db-cp02)
