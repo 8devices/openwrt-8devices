@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2018 UAB 8Devices. All rights reserved.
+# Copyright (C) 2022 UAB 8Devices. All rights reserved.
 # Copyright (c) 2014 The Linux Foundation. All rights reserved.
 #
 include $(TOPDIR)/rules.mk

@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2020 UAB 8Devices. All rights reserved.
+# Copyright (C) 2022 UAB 8Devices. All rights reserved.
 #
 
 KERNEL_LOADADDR := 0x41008000
