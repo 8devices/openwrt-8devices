@@ -1,0 +1,56 @@
+--- a/drivers/net/wireless/ath/ath11k/dp_rx.c
++++ b/drivers/net/wireless/ath/ath11k/dp_rx.c
+@@ -1358,8 +1358,6 @@ static int ath11k_htt_tlv_ppdu_stats_par
+ 	switch (tag) {
+ 	case HTT_PPDU_STATS_TAG_COMMON:
+ 		if (len < sizeof(struct htt_ppdu_stats_common)) {
+-			ath11k_warn(ab, "Invalid len %d for the tag 0x%x\n",
+-				    len, tag);
+ 			return -EINVAL;
+ 		}
+ 		memcpy((void *)&ppdu_info->ppdu_stats.common, ptr,
+@@ -1387,8 +1385,6 @@ static int ath11k_htt_tlv_ppdu_stats_par
+ 		break;
+ 	case HTT_PPDU_STATS_TAG_USR_RATE:
+ 		if (len < sizeof(struct htt_ppdu_stats_user_rate)) {
+-			ath11k_warn(ab, "Invalid len %d for the tag 0x%x\n",
+-				    len, tag);
+ 			return -EINVAL;
+ 		}
+ 
+@@ -1406,8 +1402,6 @@ static int ath11k_htt_tlv_ppdu_stats_par
+ 		break;
+ 	case HTT_PPDU_STATS_TAG_USR_COMPLTN_COMMON:
+ 		if (len < sizeof(struct htt_ppdu_stats_usr_cmpltn_cmn)) {
+-			ath11k_warn(ab, "Invalid len %d for the tag 0x%x\n",
+-				    len, tag);
+ 			return -EINVAL;
+ 		}
+ 
+@@ -1428,8 +1422,6 @@ static int ath11k_htt_tlv_ppdu_stats_par
+ 	case HTT_PPDU_STATS_TAG_USR_COMPLTN_ACK_BA_STATUS:
+ 		if (len <
+ 		    sizeof(struct htt_ppdu_stats_usr_cmpltn_ack_ba_status)) {
+-			ath11k_warn(ab, "Invalid len %d for the tag 0x%x\n",
+-				    len, tag);
+ 			return -EINVAL;
+ 		}
+ 
+@@ -1448,8 +1440,6 @@ static int ath11k_htt_tlv_ppdu_stats_par
+ 		break;
+ 	case HTT_PPDU_STATS_TAG_USR_COMMON:
+ 		if (len < sizeof(struct htt_ppdu_stats_user_common)) {
+-			ath11k_warn(ab, "Invalid len %d for the tag 0x%x\n",
+-				    len, tag);
+ 			return -EINVAL;
+ 		}
+ 		peer_id = ((struct htt_ppdu_stats_user_common *)ptr)->sw_peer_id;
+@@ -1534,8 +1524,6 @@ static int ath11k_htt_tlv_ppdu_soc_stats
+ 	switch (tag) {
+ 	case HTT_PPDU_STATS_TAG_USR_COMPLTN_FLUSH:
+ 		if (len < sizeof(struct htt_ppdu_stats_cmpltn_flush)) {
+-			ath11k_warn(ab, "Invalid len %d for the tag 0x%x\n",
+-				    len, tag);
+ 			return -EINVAL;
+ 		}
+ 		ath11k_dp_ppdu_stats_flush_tlv_parse(ab, ptr);
