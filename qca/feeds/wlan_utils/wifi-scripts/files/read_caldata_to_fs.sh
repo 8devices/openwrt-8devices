@@ -259,6 +259,7 @@ do_load_ipq4019_board_bin()
                     dd if=${mtdblock} of=${apdk}/IPQ6018/caldata.bin bs=1 count=$FILESIZE skip=4096
                     [ -L /lib/firmware/IPQ6018/caldata.bin ] || \
                     ln -s ${apdk}/IPQ6018/caldata.bin /lib/firmware/IPQ6018/caldata.bin
+		    ln -s ${apdk}/IPQ6018/caldata.bin /lib/firmware/ath11k/IPQ6018/hw1.0/caldata.bin
             ;;
             ap-al02*)
                     AL_BD_FILENAME=/lib/firmware/IPQ9574/bdwlan.bin
