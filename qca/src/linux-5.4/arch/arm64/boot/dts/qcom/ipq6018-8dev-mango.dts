@@ -23,7 +23,7 @@
 	#address-cells = <0x2>;
 	#size-cells = <0x2>;
 	model = "8devices Mango DVK";
-	compatible = "8dev,mango", "qcom,ipq6018";
+	compatible = "8devices,mango", "qcom,ipq6018";
 	interrupt-parent = <&intc>;
 	qcom,msm-id = <0x192 0x0>, <0x193 0x0>;
 
