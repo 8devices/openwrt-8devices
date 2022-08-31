@@ -16,7 +16,7 @@ sudo apt-get install git git-doc subversion build-essential flex wget gawk unzip
 Get latest sources from 8devices OpenWrt branch:
 
 ```
-git clone --branch qsdk-11.3-ipq60xx-4.4 https://github.com/8devices/openwrt-8devices.git
+git clone --branch qsdk-12.0-ipq60xx-5.4 https://github.com/8devices/openwrt-8devices.git
 cd openwrt-8devices
 ```
 
