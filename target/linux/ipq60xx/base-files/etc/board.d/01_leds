@@ -17,7 +17,7 @@ ipq60xx_setup_leds()
 		ucidef_set_led_wlan "wlan_5g" "WLAN_5G" "led_5g" "phy0radio"
 		;;
         *)
-                echo "Unsupported hardware. Network interfaces not intialized"
+                echo "Unsupported hardware."
                 ;;
 	esac
 }
