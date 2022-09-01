@@ -180,8 +180,9 @@ define Build/InstallDev
 	$(INSTALL_DIR) $(1)/usr/include
 	$(CP) $(PKG_BUILD_DIR)/lib/mosquitto.h $(1)/usr/include
 	$(INSTALL_DIR) $(1)/usr/lib
-	$(CP) $(PKG_BUILD_DIR)/lib/libmosquitto.so.1 $(1)/usr/lib/
-	$(LN) libmosquitto.so.1 $(1)/usr/lib/libmosquitto.so
+	$(CP) $(PKG_BUILD_DIR)/lib/libmosquitto.so.1 $(1)/usr/lib/libmosquitto-$(BUILD_VARIANT).so.1
+	$(CP) $(PKG_BUILD_DIR)/lib/libmosquitto.a $(1)/usr/lib/libmosquitto-$(BUILD_VARIANT).a
+	$(LN) libmosquitto.so.1 $(1)/usr/lib/libmosquitto-$(BUILD_VARIANT).so
 endef
 
 # This installs files on the target.  Compare with Build/InstallDev
@@ -193,9 +194,9 @@ endef
 Package/libmosquitto-nossl/install = $(Package/libmosquitto/install)
 
 # Applies to all...
-MAKE_FLAGS += WITH_DOCS=no
+MAKE_FLAGS += WITH_DOCS=no WITH_STATIC_LIBRARIES=yes
 ifeq ($(BUILD_VARIANT),nossl)
-	MAKE_FLAGS += WITH_TLS=no WITH_WEBSOCKETS=no
+	MAKE_FLAGS += WITH_TLS=no WITH_WEBSOCKETS=no 
 else
 	MAKE_FLAGS += WITH_WEBSOCKETS=$(if $(CONFIG_MOSQUITTO_LWS),"yes","no")
 endif
