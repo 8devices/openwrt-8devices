@@ -50,7 +50,7 @@ update_config(){
 
 compile(){
 	$RUN "make defconfig"
-	$RUN "make -j4"
+	$RUN "make -j$(nproc)"
 }
 
 clean(){

@@ -1,0 +1,249 @@
+diff '--color=auto' -aur a/lib/luks2/luks2_internal.h b/lib/luks2/luks2_internal.h
+--- a/lib/luks2/luks2_internal.h	2019-01-31 15:37:12.000000000 -0500
++++ b/lib/luks2/luks2_internal.h	2022-09-06 16:27:20.608245999 -0400
+@@ -60,9 +60,9 @@
+ 
+ json_object *parse_json_len(struct crypt_device *cd, const char *json_area,
+ 			    uint64_t max_length, int *json_len);
+-uint64_t json_object_get_uint64(json_object *jobj);
+-uint32_t json_object_get_uint32(json_object *jobj);
+-json_object *json_object_new_uint64(uint64_t value);
++uint64_t crypt_jobj_get_uint64(json_object *jobj);
++uint32_t crypt_jobj_get_uint32(json_object *jobj);
++json_object *crypt_jobj_new_uint64(uint64_t value);
+ int json_object_object_add_by_uint(json_object *jobj, unsigned key, json_object *jobj_val);
+ void json_object_object_del_by_uint(json_object *jobj, unsigned key);
+ 
+diff '--color=auto' -aur a/lib/luks2/luks2_json_metadata.c b/lib/luks2/luks2_json_metadata.c
+--- a/lib/luks2/luks2_json_metadata.c	2019-01-31 15:37:12.000000000 -0500
++++ b/lib/luks2/luks2_json_metadata.c	2022-09-06 16:49:01.460053403 -0400
+@@ -191,9 +191,9 @@
+  * json_type_int needs to be validated first.
+  * See validate_json_uint32()
+  */
+-uint32_t json_object_get_uint32(json_object *jobj)
++uint32_t crypt_jobj_get_uint32(json_object *jobj)
+ {
+-	return json_object_get_int64(jobj);
++	return crypt_jobj_get_uint64(jobj);
+ }
+ 
+ /* jobj has to be json_type_string and numbered */
+@@ -206,20 +206,20 @@
+ 	tmp = strtoull(json_object_get_string(jobj), &endptr, 10);
+ 	if (*endptr || errno) {
+ 		*value = 0;
+-		return FALSE;
++		return 0;
+ 	}
+ 
+ 	*value = tmp;
+-	return TRUE;
++	return 1;
+ }
+ 
+-uint64_t json_object_get_uint64(json_object *jobj)
++uint64_t crypt_jobj_get_uint64(json_object *jobj)
+ {
+ 	uint64_t r;
+ 	return json_str_to_uint64(jobj, &r) ? r : 0;
+ }
+ 
+-json_object *json_object_new_uint64(uint64_t value)
++json_object *crypt_jobj_new_uint64(uint64_t value)
+ {
+ 	/* 18446744073709551615 */
+ 	char num[21];
+@@ -244,9 +244,9 @@
+ 	for (i = 0; key[i]; i++)
+ 		if (!isdigit(key[i])) {
+ 			log_dbg(cd, "%s \"%s\" is not in numbered form.", name, key);
+-			return FALSE;
++			return 0;
+ 		}
+-	return TRUE;
++	return 1;
+ }
+ 
+ json_object *json_contains(struct crypt_device *cd, json_object *jobj, const char *name,
+@@ -280,7 +280,7 @@
+ 		}
+ 
+ 		json_object_object_get_ex(val, "offset", &jobj_offset);
+-		tmp = json_object_get_uint64(jobj_offset);
++		tmp = crypt_jobj_get_uint64(jobj_offset);
+ 
+ 		if (!tmp)
+ 			return tmp;
+@@ -299,7 +299,7 @@
+ 	errno = 0;
+ 	tmp = json_object_get_int64(jobj);
+ 
+-	return (errno || tmp < 0 || tmp > UINT32_MAX) ? FALSE : TRUE;
++	return (errno || tmp < 0 || tmp > UINT32_MAX) ? 0 : 1;
+ }
+ 
+ static json_bool validate_keyslots_array(struct crypt_device *cd,
+@@ -312,17 +312,17 @@
+ 		jobj = json_object_array_get_idx(jarr, i);
+ 		if (!json_object_is_type(jobj, json_type_string)) {
+ 			log_dbg(cd, "Illegal value type in keyslots array at index %d.", i);
+-			return FALSE;
++			return 0;
+ 		}
+ 
+ 		if (!json_contains(cd, jobj_keys, "", "Keyslots section",
+ 				   json_object_get_string(jobj), json_type_object))
+-			return FALSE;
++			return 0;
+ 
+ 		i++;
+ 	}
+ 
+-	return TRUE;
++	return 1;
+ }
+ 
+ static json_bool validate_segments_array(struct crypt_device *cd,
+@@ -335,17 +335,17 @@
+ 		jobj = json_object_array_get_idx(jarr, i);
+ 		if (!json_object_is_type(jobj, json_type_string)) {
+ 			log_dbg(cd, "Illegal value type in segments array at index %d.", i);
+-			return FALSE;
++			return 0;
+ 		}
+ 
+ 		if (!json_contains(cd, jobj_segments, "", "Segments section",
+ 				   json_object_get_string(jobj), json_type_object))
+-			return FALSE;
++			return 0;
+ 
+ 		i++;
+ 	}
+ 
+-	return TRUE;
++	return 1;
+ }
+ 
+ static json_bool segment_has_digest(const char *segment_name, json_object *jobj_digests)
+@@ -356,10 +356,10 @@
+ 		UNUSED(key);
+ 		json_object_object_get_ex(val, "segments", &jobj_segments);
+ 		if (LUKS2_array_jobj(jobj_segments, segment_name))
+-			return TRUE;
++			return 1;
+ 	}
+ 
+-	return FALSE;
++	return 0;
+ }
+ 
+ static json_bool validate_intervals(struct crypt_device *cd,
+@@ -371,18 +371,18 @@
+ 	while (i < length) {
+ 		if (ix[i].offset < 2 * metadata_size) {
+ 			log_dbg(cd, "Illegal area offset: %" PRIu64 ".", ix[i].offset);
+-			return FALSE;
++			return 0;
+ 		}
+ 
+ 		if (!ix[i].length) {
+ 			log_dbg(cd, "Area length must be greater than zero.");
+-			return FALSE;
++			return 0;
+ 		}
+ 
+ 		if ((ix[i].offset + ix[i].length) > keyslots_area_end) {
+ 			log_dbg(cd, "Area [%" PRIu64 ", %" PRIu64 "] overflows binary keyslots area (ends at offset: %" PRIu64 ").",
+ 				ix[i].offset, ix[i].offset + ix[i].length, keyslots_area_end);
+-			return FALSE;
++			return 0;
+ 		}
+ 
+ 		for (j = 0; j < length; j++) {
+@@ -392,14 +392,14 @@
+ 				log_dbg(cd, "Overlapping areas [%" PRIu64 ",%" PRIu64 "] and [%" PRIu64 ",%" PRIu64 "].",
+ 					ix[i].offset, ix[i].offset + ix[i].length,
+ 					ix[j].offset, ix[j].offset + ix[j].length);
+-				return FALSE;
++				return 0;
+ 			}
+ 		}
+ 
+ 		i++;
+ 	}
+ 
+-	return TRUE;
++	return 1;
+ }
+ 
+ int LUKS2_keyslot_validate(struct crypt_device *cd, json_object *hdr_jobj, json_object *hdr_keyslot, const char *key)
+@@ -454,7 +454,7 @@
+ 
+ 	json = json_object_to_json_string_ext(hdr_jobj,
+ 		JSON_C_TO_STRING_PLAIN | JSON_C_TO_STRING_NOSLASHESCAPE);
+-	json_area_size = json_object_get_uint64(jobj1);
++	json_area_size = crypt_jobj_get_uint64(jobj1);
+ 	json_size = (uint64_t)strlen(json);
+ 
+ 	if (hdr_json_size != json_area_size) {
+@@ -542,7 +542,7 @@
+ 		return 1;
+ 	}
+ 
+-	sector_size = json_object_get_uint32(jobj_sector_size);
++	sector_size = crypt_jobj_get_uint32(jobj_sector_size);
+ 	if (!sector_size || MISALIGNED_512(sector_size)) {
+ 		log_dbg(cd, "Illegal sector size: %" PRIu32, sector_size);
+ 		return 1;
+@@ -1476,7 +1476,7 @@
+ 		log_std(cd, "  %s: %s%s\n", slot, tmps, r == -ENOENT ? " (unbound)" : "");
+ 
+ 		if (json_object_object_get_ex(val, "key_size", &jobj2))
+-			log_std(cd, "\tKey:        %u bits\n", json_object_get_uint32(jobj2) * 8);
++			log_std(cd, "\tKey:        %u bits\n", crypt_jobj_get_uint32(jobj2) * 8);
+ 
+ 		log_std(cd, "\tPriority:   %s\n", get_priority_desc(val));
+ 
+@@ -1559,7 +1559,7 @@
+ 			log_std(cd, "\tcipher: %s\n", json_object_get_string(jobj1));
+ 
+ 		if (json_object_object_get_ex(jobj_segment, "sector_size", &jobj1))
+-			log_std(cd, "\tsector: %" PRIu32 " [bytes]\n", json_object_get_uint32(jobj1));
++			log_std(cd, "\tsector: %" PRIu32 " [bytes]\n", crypt_jobj_get_uint32(jobj1));
+ 
+ 		if (json_object_object_get_ex(jobj_segment, "integrity", &jobj1) &&
+ 		    json_object_object_get_ex(jobj1, "type", &jobj2))
+diff '--color=auto' -aur a/lib/luks2/luks2_keyslot_luks2.c b/lib/luks2/luks2_keyslot_luks2.c
+--- a/lib/luks2/luks2_keyslot_luks2.c	2019-01-31 15:37:12.000000000 -0500
++++ b/lib/luks2/luks2_keyslot_luks2.c	2022-09-06 16:53:03.014321241 -0400
+@@ -607,7 +607,7 @@
+ 	log_std(cd, "\tCipher:     %s\n", json_object_get_string(jobj1));
+ 
+ 	json_object_object_get_ex(jobj_area, "key_size", &jobj1);
+-	log_std(cd, "\tCipher key: %u bits\n", json_object_get_uint32(jobj1) * 8);
++	log_std(cd, "\tCipher key: %u bits\n", crypt_jobj_get_uint32(jobj1) * 8);
+ 
+ 	json_object_object_get_ex(jobj_kdf, "type", &jobj1);
+ 	log_std(cd, "\tPBKDF:      %s\n", json_object_get_string(jobj1));
+diff '--color=auto' -aur a/lib/luks2/luks2_luks1_convert.c b/lib/luks2/luks2_luks1_convert.c
+--- a/lib/luks2/luks2_luks1_convert.c	2019-02-06 10:19:08.000000000 -0500
++++ b/lib/luks2/luks2_luks1_convert.c	2022-09-06 16:53:05.574686318 -0400
+@@ -763,7 +763,7 @@
+ 
+ 		if (!json_object_object_get_ex(jobj_kdf, "iterations", &jobj1))
+ 			continue;
+-		hdr1->keyblock[i].passwordIterations = json_object_get_uint32(jobj1);
++		hdr1->keyblock[i].passwordIterations = crypt_jobj_get_uint32(jobj1);
+ 
+ 		if (!json_object_object_get_ex(jobj_kdf, "salt", &jobj1))
+ 			continue;
+@@ -804,7 +804,7 @@
+ 
+ 	if (!json_object_object_get_ex(jobj_digest, "iterations", &jobj1))
+ 		return -EINVAL;
+-	hdr1->mkDigestIterations = json_object_get_uint32(jobj1);
++	hdr1->mkDigestIterations = crypt_jobj_get_uint32(jobj1);
+ 
+ 	if (!json_object_object_get_ex(jobj_digest, "digest", &jobj1))
+ 		return -EINVAL;

@@ -8,8 +8,18 @@
 				],
 				[
 					[ "if",
+						[ "eq", "DEVNAME", "null" ],
+						[
+							[ "makedev", "/dev/%DEVNAME%", "0666" ],
+							[ "exec", "/bin/ln", "-s", "/proc/self/fd/0", "/dev/stdin" ],
+							[ "exec", "/bin/ln", "-s", "/proc/self/fd/1", "/dev/stdout" ],
+							[ "exec", "/bin/ln", "-s", "/proc/self/fd/2", "/dev/stderr" ],
+							[ "return" ]
+						]
+					],
+					[ "if",
 						[ "eq", "DEVNAME",
-							[ "null", "full", "ptmx", "zero", "tty", "net", "random", "urandom" ]
+							[ "full", "ptmx", "zero", "tty", "net", "random", "urandom" ]
 						],
 						[
 							[ "makedev", "/dev/%DEVNAME%", "0666" ],
@@ -37,6 +47,10 @@
 					[ "load-firmware", "/lib/firmware" ],
 					[ "return" ]
 				]
+			],
+			[ "if",
+				[ "regex", "DEVNAME", "^ttyGS" ],
+				[ "start-console", "%DEVNAME%" ]
 			]
 		],
 		"remove" : [
@@ -57,12 +71,6 @@
 		],
 		[ "button", "/etc/rc.button/%BUTTON%" ]
 	],
-	[ "if",
-                [ "eq", "SUBSYSTEM",
-                        [ "devcoredump", "minidump" ]
-                ],
-                [ "exec", "/sbin/hotplug-call", "%SUBSYSTEM%" ]
-        ],
 	[ "if",
 		[ "and",
 			[ "eq", "SUBSYSTEM", "usb-serial" ],

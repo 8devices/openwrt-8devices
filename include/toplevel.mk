@@ -66,6 +66,7 @@ endif
 
 SCAN_COOKIE?=$(shell echo $$$$)
 export SCAN_COOKIE
+export STAGING_DIR_HOST=$(TOPDIR)/staging_dir/host
 
 SUBMAKE:=umask 022; $(SUBMAKE)
 
