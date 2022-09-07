@@ -16,7 +16,7 @@ config OPENSSL_OPTIMIZE_SPEED
 
 config OPENSSL_WITH_ASM
 	bool
-	default y if !SMALL_FLASH && !LOWMEM_FLASH || !arm
+	default y if !SMALL_FLASH || !arm
 	prompt "Compile with optimized assembly code"
 	depends on !arc
 	help
@@ -292,16 +292,5 @@ config OPENSSL_WITH_ASYNC
 		Enables async-aware applications to be able to use OpenSSL to
 		initiate crypto operations asynchronously. In order to work
 		this will require the presence of an async capable engine.
-
-config OPENSSL_WITH_GOST
-	bool
-	prompt "Prepare library for GOST engine"
-	depends on OPENSSL_ENGINE
-	help
-		This option prepares the library to accept engine support
-		for Russian GOST crypto algorithms.
-		The gost engine is not included in standard openwrt feeds.
-		To build such engine yourself, see:
-		https://github.com/gost-engine/engine
 
 endif
