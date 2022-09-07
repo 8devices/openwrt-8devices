@@ -21,10 +21,10 @@ PKG_HASH:=6cdb97871f2930530c97deb7cf5c8fa4be5a0b02c7cea6e7c7667672a39d6852
 PKG_FIXUP:=autoreconf
 PKG_INSTALL:=1
 
-include $(INCLUDE_DIR)/package.mk
+CMAKE_INSTALL:=1
 
-TARGET_CPPFLAGS += $(filter -D%,$(TARGET_CFLAGS))
-TARGET_CFLAGS := $(filter-out -D%,$(TARGET_CFLAGS))
+include $(INCLUDE_DIR)/package.mk
+include $(INCLUDE_DIR)/cmake.mk
 
 define Package/libcares
   SECTION:=libs
@@ -42,6 +42,13 @@ Netware, Android and many more operating systems.
 
 endef
 
+CMAKE_OPTIONS += \
+	-DCARES_STATIC=OFF \
+	-DCARES_SHARED=ON \
+	-DCARES_STATIC_PIC=ON \
+	-DCARES_BUILD_TESTS=OFF \
+	-DCARES_BUILD_TOOLS=OFF
+
 define Package/libcares/install
 	$(INSTALL_DIR) $(1)/usr/lib
 	$(CP) $(PKG_INSTALL_DIR)/usr/lib/*.so.* $(1)/usr/lib/
@@ -53,3 +60,4 @@ define Build/InstallDev
 endef
 
 $(eval $(call BuildPackage,libcares))
+
