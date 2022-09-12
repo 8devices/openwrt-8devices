@@ -7,6 +7,9 @@ KERNEL_ENTRY := $(KERNEL_LOADADDR)
 
 INFO_IMG_PATH = $(TMP_DIR)/info.tmp
 INFO_IMG_SIZE = 152
+ifeq ($(ARCH),aarch64)
+	ARCH = arm64
+endif 
 
 define Build/fit-dummy-info
 	dd if=/dev/zero of=$(INFO_IMG_PATH) bs=1 count=$(INFO_IMG_SIZE)
@@ -26,30 +29,28 @@ define Build/insert-info
 		--version $(BOARDNAME)
 endef
 
-DEVICE_NAME := mango
 
 define Device/8devices-mango-dvk
-  DEVICE_TITLE := 8Devices Mango DVK
-  DEVICE_DTS := ipq6018-8dev-mango
-  BOARDNAME := mango
-  IMAGE_SIZE := 27776k
+  DEVICE_NAME = mango
+  DEVICE_TITLE = 8Devices Mango DVK
+  DEVICE_DTS = ipq6018-8dev-mango
+  BOARDNAME = mango
+  IMAGE_SIZE = 27776k
   BLOCKSIZE = 64k
-  KERNEL = kernel-bin | lzma | fit-dummy-info lzma $$(DEVICE_DTS_DIR)/$$(DEVICE_DTS).dtb
-  IMAGE/sysupgrade.bin := insert-info | append-kernel $$$$(BLOCKSIZE) | append-rootfs | pad-rootfs | check-size $$$$(IMAGE_SIZE)
+  KERNEL = kernel-bin | gzip | fit-dummy-info gzip $$(DEVICE_DTS_DIR)/$$(DEVICE_DTS).dtb
+  IMAGE/sysupgrade.bin = insert-info | append-kernel $$$$(BLOCKSIZE) | append-rootfs | pad-rootfs | check-size $$$$(IMAGE_SIZE)
 endef
 TARGET_DEVICES += 8devices-mango-dvk
 
-DEVICE_NAME := yuncore-ax840
 
 define Device/yuncore-ax840
-  DEVICE_TITLE := Yuncore ax840
-  DEVICE_DTS := ipq6018-8dev-mango
-  BOARDNAME := yuncore-ax840
-	DEVICE_VENDOR := yuncore
-	DEVICE_MODEL := ax840
-  IMAGE_SIZE := 27776k
+  DEVICE_NAME = yuncore
+  DEVICE_TITLE = yuncore ax840
+  DEVICE_DTS = yuncore-ax840
+  BOARDNAME = ax-840-ax840
+  IMAGE_SIZE = 27776k
   BLOCKSIZE = 64k
   KERNEL = kernel-bin | gzip | fit-dummy-info gzip $$(DEVICE_DTS_DIR)/$$(DEVICE_DTS).dtb
-  IMAGE/sysupgrade.bin := insert-info | append-kernel $$$$(BLOCKSIZE) | append-rootfs | pad-rootfs | check-size $$$$(IMAGE_SIZE)
+  IMAGE/sysupgrade.bin = insert-info | append-kernel $$$$(BLOCKSIZE) | append-rootfs | pad-rootfs | check-size $$$$(IMAGE_SIZE)
 endef
 TARGET_DEVICES += yuncore-ax840

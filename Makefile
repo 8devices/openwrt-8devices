@@ -134,6 +134,15 @@ world: prepare $(target/stamp-compile) $(package/stamp-compile) $(package/stamp-
 	$(_SINGLE)$(SUBMAKE) -r json_overview_image_info
 	$(_SINGLE)$(SUBMAKE) -r checksum
 
+
+include $(TOPDIR)/rules.mk
+include $(TOPDIR)/include/image.mk
+dts: 
+	$(call Image/BuildDTB,$(DTS_DIR)/$(dts).dts,$(DTS_DIR)/$(dts).dtb)
+
+
+
+
 .PHONY: clean dirclean prereq prepare world package/symlinks package/symlinks-install package/symlinks-clean
 
 endif
