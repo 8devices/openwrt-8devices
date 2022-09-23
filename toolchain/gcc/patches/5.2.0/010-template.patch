@@ -1,0 +1,89 @@
+--- a/gcc/wide-int.h	2022-08-20 07:07:02.893459542 -0400
++++ b/gcc/wide-int.h	2022-08-20 07:32:37.525321075 -0400
+@@ -365,21 +365,21 @@
+      inputs.  Note that CONST_PRECISION and VAR_PRECISION cannot be
+      mixed, in order to give stronger type checking.  When both inputs
+      are CONST_PRECISION, they must have the same precision.  */
+-  template <>
++  
+   template <typename T1, typename T2>
+   struct binary_traits <T1, T2, FLEXIBLE_PRECISION, FLEXIBLE_PRECISION>
+   {
+     typedef widest_int result_type;
+   };
+ 
+-  template <>
++
+   template <typename T1, typename T2>
+   struct binary_traits <T1, T2, FLEXIBLE_PRECISION, VAR_PRECISION>
+   {
+     typedef wide_int result_type;
+   };
+ 
+-  template <>
++
+   template <typename T1, typename T2>
+   struct binary_traits <T1, T2, FLEXIBLE_PRECISION, CONST_PRECISION>
+   {
+@@ -389,14 +389,14 @@
+ 			       <int_traits <T2>::precision> > result_type;
+   };
+ 
+-  template <>
++
+   template <typename T1, typename T2>
+   struct binary_traits <T1, T2, VAR_PRECISION, FLEXIBLE_PRECISION>
+   {
+     typedef wide_int result_type;
+   };
+ 
+-  template <>
++
+   template <typename T1, typename T2>
+   struct binary_traits <T1, T2, CONST_PRECISION, FLEXIBLE_PRECISION>
+   {
+@@ -406,7 +406,7 @@
+ 			       <int_traits <T1>::precision> > result_type;
+   };
+ 
+-  template <>
++
+   template <typename T1, typename T2>
+   struct binary_traits <T1, T2, CONST_PRECISION, CONST_PRECISION>
+   {
+@@ -417,7 +417,7 @@
+ 			       <int_traits <T1>::precision> > result_type;
+   };
+ 
+-  template <>
++
+   template <typename T1, typename T2>
+   struct binary_traits <T1, T2, VAR_PRECISION, VAR_PRECISION>
+   {
+@@ -881,7 +881,7 @@
+ 
+ namespace wi
+ {
+-  template <>
++
+   template <typename storage>
+   struct int_traits < generic_wide_int <storage> >
+     : public wi::int_traits <storage>
+@@ -960,7 +960,7 @@
+ 
+ namespace wi
+ {
+-  template <>
++
+   template <bool SE>
+   struct int_traits <wide_int_ref_storage <SE> >
+   {
+@@ -1147,7 +1147,7 @@
+ 
+ namespace wi
+ {
+-  template <>
++
+   template <int N>
+   struct int_traits < fixed_wide_int_storage <N> >
+   {

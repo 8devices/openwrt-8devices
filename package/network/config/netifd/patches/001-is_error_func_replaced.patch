@@ -1,0 +1,12 @@
+diff -aur a/handler.c b/handler.c
+--- a/handler.c	2022-09-07 20:55:07.966501377 +0300
++++ b/handler.c	2022-09-07 21:14:06.713596580 +0300
+@@ -105,7 +105,7 @@
+ 			tok = json_tokener_new();
+ 
+ 		obj = json_tokener_parse_ex(tok, start, len);
+-		if (!is_error(obj)) {
++		if (obj != NULL) {
+ 			netifd_init_script_handler(name, obj, cb);
+ 			json_object_put(obj);
+ 			json_tokener_free(tok);

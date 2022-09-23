@@ -19,7 +19,7 @@ PKG_VERSION:=$(LINUX_VERSION)
 PKG_SOURCE:=$(LINUX_SOURCE)
 PKG_SOURCE_URL:=$(LINUX_SITE)
 HOST_BUILD_DIR:=$(KERNEL_BUILD_DIR)/linux-$(LINUX_VERSION)
-PKG_MD5SUM:=$(LINUX_KERNEL_MD5SUM)
+PKG_HASH:=$(LINUX_KERNEL_HASH)
 LINUX_DIR := $(HOST_BUILD_DIR)
 FILES_DIR := 
 PATCH_DIR := ./patches$(if $(wildcard ./patches-$(LINUX_VERSION)),-$(LINUX_VERSION))
@@ -57,7 +57,7 @@ ifneq ($(CONFIG_mips)$(CONFIG_mipsel),)
 	$(CP) \
 		$(HOST_BUILD_DIR)/arch/mips/include/asm/asm.h \
 		$(HOST_BUILD_DIR)/arch/mips/include/asm/regdef.h \
-		$(if $(call kernel_patchver_ge,3.15.0),$(HOST_BUILD_DIR)/arch/mips/include/asm/asm-eva.h) \
+		$(HOST_BUILD_DIR)/arch/mips/include/asm/asm-eva.h \
 		$(BUILD_DIR_TOOLCHAIN)/linux-dev/include/asm/
   endef
 endif
@@ -71,8 +71,10 @@ define Host/Configure/post/mipsel
 endef
 
 define Host/Prepare
+	rm -rf $(BUILD_DIR_TOOLCHAIN)/linux-*
 	$(call Kernel/Prepare/Default)
-	ln -sf linux-$(LINUX_VERSION) $(BUILD_DIR_TOOLCHAIN)/linux
+	rm -f $(BUILD_DIR_TOOLCHAIN)/linux
+	ln -s linux-$(LINUX_VERSION) $(BUILD_DIR_TOOLCHAIN)/linux
 	$(SED) 's/@expr length/@-expr length/' $(HOST_BUILD_DIR)/Makefile
 endef
 

@@ -8,6 +8,11 @@ KERNEL_ENTRY := $(KERNEL_LOADADDR)
 INFO_IMG_PATH = $(TMP_DIR)/info.tmp
 INFO_IMG_SIZE = 152
 
+define Build/gzip
+	gzip -f -9n -c $@ $(1) > $@.new
+	@mv $@.new $@
+endef
+
 define Build/fit-dummy-info
 	dd if=/dev/zero of=$(INFO_IMG_PATH) bs=1 count=$(INFO_IMG_SIZE)
 	$(TOPDIR)/scripts/mkits.sh \
@@ -27,14 +32,27 @@ define Build/insert-info
 endef
 
 DEVICE_NAME := mango
-
 define Device/8devices-mango-dvk
   DEVICE_TITLE := 8Devices Mango DVK
   DEVICE_DTS := qcom-ipq6018-8dev-mango
   BOARDNAME := mango
   IMAGE_SIZE := 27776k
   BLOCKSIZE = 64k
-  KERNEL = kernel-bin | lzma | fit-dummy-info lzma $$(DEVICE_DTS_DIR)/$$(DEVICE_DTS).dtb
+  KERNEL = kernel-bin | gzip | fit-dummy-info gzip $$(DEVICE_DTS_DIR)/$$(DEVICE_DTS).dtb
   IMAGE/sysupgrade.bin := insert-info | append-kernel $$$$(BLOCKSIZE) | append-rootfs | pad-rootfs | check-size $$$$(IMAGE_SIZE)
 endef
 TARGET_DEVICES += 8devices-mango-dvk
+
+
+#DEVICE_NAME := ax840
+#define Device/yuncore-ax840
+#  DEVICE_TITLE := Yuncore ax840
+#  DEVICE_DTS := qcom-ipq6018-ax840
+#  BOARDNAME := ax840
+#  IMAGE_SIZE := 27776k
+#  BLOCKSIZE = 64k
+#  KERNEL = kernel-bin | gzip | fit-dummy-info gzip $$(DEVICE_DTS_DIR)/$$(DEVICE_DTS).dtb
+#  IMAGE/sysupgrade.bin := insert-info | append-kernel $$$$(BLOCKSIZE) | append-rootfs | pad-rootfs | check-size $$$$(IMAGE_SIZE)
+#endef
+#TARGET_DEVICES += yuncore-ax840
+

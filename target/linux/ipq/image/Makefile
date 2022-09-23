@@ -20,7 +20,7 @@ define Device/Default
 endef
 DEVICE_VARS += DEVICE_DTS DEVICE_DTS_DIR
 
-ifeq ($(SUBTARGET),ipq60xx)
+ifeq ($(SUBTARGET), $(filter $(SUBTARGET), ipq60xx ipq60xx_64))
 include ipq60xx.mk
 endif
 

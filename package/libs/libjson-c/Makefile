@@ -8,35 +8,33 @@
 include $(TOPDIR)/rules.mk
 
 PKG_NAME:=json-c
-PKG_VERSION:=0.12
-PKG_RELEASE:=1
+PKG_VERSION:=0.15
+PKG_RELEASE:=2
 
-PKG_SOURCE:=$(PKG_NAME)-$(PKG_VERSION).tar.gz
+PKG_SOURCE:=$(PKG_NAME)-$(PKG_VERSION)-nodoc.tar.gz
 PKG_SOURCE_URL:=https://s3.amazonaws.com/json-c_releases/releases/
-PKG_MD5SUM:=3ca4bbb881dfc4017e8021b5e0a8c491
+PKG_HASH:=99bca4f944b8ced8ae0bbc6310d6a3528ca715e69541793a1ef51f8c5b4b0878
 
+PKG_MAINTAINER:=Felix Fietkau <nbd@nbd.name>
 PKG_LICENSE:=MIT
 PKG_LICENSE_FILES:=COPYING
+PKG_CPE_ID:=cpe:/a:json-c_project:json-c
 
-PKG_FIXUP:=autoreconf
-PKG_INSTALL:=1
-
-PKG_MAINTAINER:=Felix Fietkau <nbd@openwrt.org>
+HOST_BUILD_PREFIX:=$(STAGING_DIR_HOST)
 
 include $(INCLUDE_DIR)/package.mk
+include $(INCLUDE_DIR)/host-build.mk
+include $(INCLUDE_DIR)/cmake.mk
 
-TARGET_CFLAGS += $(FPIC)
-
-CONFIGURE_ARGS += \
-	ac_cv_func_strdup=yes \
-	ac_cv_func_strncasecmp=yes \
-	ac_cv_func_snprintf=yes
+CMAKE_HOST_OPTIONS += \
+	-DBUILD_SHARED_LIBS=FALSE
 
 define Package/libjson-c
   SECTION:=libs
   CATEGORY:=Libraries
   TITLE:=javascript object notation
-  URL:=http://oss.metaparadigm.com/json-c/
+  URL:=https://json-c.github.io/json-c/
+  ABI_VERSION:=5
 endef
 
 define Package/libjson-c/description
@@ -44,12 +42,9 @@ define Package/libjson-c/description
 endef
 
 define Build/InstallDev
-	$(INSTALL_DIR) $(1)/usr/include
-	$(CP) $(PKG_INSTALL_DIR)/usr/include/json-c $(1)/usr/include/
-	$(INSTALL_DIR) $(1)/usr/lib
-	$(CP) $(PKG_INSTALL_DIR)/usr/lib/libjson-c.{a,so*} $(1)/usr/lib/
-	$(INSTALL_DIR) $(1)/usr/lib/pkgconfig
-	$(CP) $(PKG_INSTALL_DIR)/usr/lib/pkgconfig/json-c.pc $(1)/usr/lib/pkgconfig/
+	$(call Build/InstallDev/cmake,$(1))
+	$(SED) 's,/usr/include,$$$${prefix}/include,g' $(1)/usr/lib/pkgconfig/json-c.pc
+	$(SED) 's,/usr/lib,$$$${exec_prefix}/lib,g' $(1)/usr/lib/pkgconfig/json-c.pc
 endef
 
 define Package/libjson-c/install
@@ -58,3 +53,4 @@ define Package/libjson-c/install
 endef
 
 $(eval $(call BuildPackage,libjson-c))
+$(eval $(call HostBuild))

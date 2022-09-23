@@ -1,0 +1,75 @@
+/*
+ * Copyright (c) 2014-2019, The Linux Foundation. All rights reserved.
+ * Permission to use, copy, modify, and/or distribute this software for
+ * any purpose with or without fee is hereby granted, provided that the
+ * above copyright notice and this permission notice appear in all copies.
+ * THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
+ * WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF
+ * MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR
+ * ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES
+ * WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN
+ * ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT
+ * OF OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
+ */
+
+
+#ifndef _SW_IOCTL_H_
+#define _SW_IOCTL_H_
+
+#ifdef __cplusplus
+extern "C" {
+#endif                          /* __cplusplus */
+
+    /*init*/
+#define SW_API_INIT_OFFSET         10
+#define SW_API_SWITCH_INIT         (0  + SW_API_INIT_OFFSET)
+#define SW_API_SWITCH_RESET        (1  + SW_API_INIT_OFFSET)
+#define SW_API_SSDK_CFG            (2  + SW_API_INIT_OFFSET)
+#define SW_API_MODULE_FUNC_CTRL_SET   (3  + SW_API_INIT_OFFSET)
+#define SW_API_MODULE_FUNC_CTRL_GET   (4  + SW_API_INIT_OFFSET)
+
+    /*port ctrl*/
+#define SW_API_PORT_OFFSET          30
+#define SW_API_PT_DUPLEX_GET        (0  + SW_API_PORT_OFFSET)
+#define SW_API_PT_DUPLEX_SET        (1  + SW_API_PORT_OFFSET)
+#define SW_API_PT_SPEED_GET         (2  + SW_API_PORT_OFFSET)
+#define SW_API_PT_SPEED_SET         (3  + SW_API_PORT_OFFSET)
+#define SW_API_PT_AN_ADV_GET        (4  + SW_API_PORT_OFFSET)
+#define SW_API_PT_AN_ADV_SET        (5  + SW_API_PORT_OFFSET)
+#define SW_API_PT_AN_GET            (6  + SW_API_PORT_OFFSET)
+#define SW_API_PT_AN_ENABLE         (7  + SW_API_PORT_OFFSET)
+#define SW_API_PT_AN_RESTART        (8  + SW_API_PORT_OFFSET)
+#define SW_API_PT_HIBERNATE_SET     (17 + SW_API_PORT_OFFSET)
+#define SW_API_PT_HIBERNATE_GET     (18 + SW_API_PORT_OFFSET)
+#define SW_API_PT_CDT               (19 + SW_API_PORT_OFFSET)
+#define SW_API_PT_LINK_STATUS_GET   (38 + SW_API_PORT_OFFSET)
+#define SW_API_PT_8023AZ_SET     (46 + SW_API_PORT_OFFSET)
+#define SW_API_PT_8023AZ_GET     (47 + SW_API_PORT_OFFSET)
+#define SW_API_PT_MDIX_SET  (48 + SW_API_PORT_OFFSET)
+#define SW_API_PT_MDIX_GET  (49 + SW_API_PORT_OFFSET)
+#define SW_API_PT_MDIX_STATUS_GET  (50 + SW_API_PORT_OFFSET)
+#define SW_API_PT_LOCAL_LOOPBACK_SET  (56 + SW_API_PORT_OFFSET)
+#define SW_API_PT_LOCAL_LOOPBACK_GET  (57 + SW_API_PORT_OFFSET)
+#define SW_API_PT_REMOTE_LOOPBACK_SET  (58 + SW_API_PORT_OFFSET)
+#define SW_API_PT_REMOTE_LOOPBACK_GET  (59 + SW_API_PORT_OFFSET)
+#define SW_API_PT_RESET  (60 + SW_API_PORT_OFFSET)
+#define SW_API_PT_POWER_OFF  (61 + SW_API_PORT_OFFSET)
+#define SW_API_PT_POWER_ON  (62 + SW_API_PORT_OFFSET)
+#define SW_API_PT_MAGIC_FRAME_MAC_SET  (63 + SW_API_PORT_OFFSET)
+#define SW_API_PT_MAGIC_FRAME_MAC_GET  (64 + SW_API_PORT_OFFSET)
+#define SW_API_PT_PHY_ID_GET  (65 + SW_API_PORT_OFFSET)
+#define SW_API_PT_WOL_STATUS_SET  (66 + SW_API_PORT_OFFSET)
+#define SW_API_PT_WOL_STATUS_GET  (67 + SW_API_PORT_OFFSET)
+#define SW_API_PT_INTERFACE_MODE_STATUS_GET  (70 + SW_API_PORT_OFFSET)
+#define SW_API_DEBUG_PHYCOUNTER_SET  (71 + SW_API_PORT_OFFSET)
+#define SW_API_DEBUG_PHYCOUNTER_GET  (72 + SW_API_PORT_OFFSET)
+#define SW_API_DEBUG_PHYCOUNTER_SHOW  (73 + SW_API_PORT_OFFSET)
+    /*debug*/
+#define SW_API_DEBUG_OFFSET        10000
+#define SW_API_PHY_GET             (0  + SW_API_DEBUG_OFFSET)
+#define SW_API_PHY_SET             (1  + SW_API_DEBUG_OFFSET)
+#define SW_API_MAX                 0xffff
+#ifdef __cplusplus
+}
+#endif                          /* __cplusplus */
+#endif                          /* _SW_IOCTL_H_ */

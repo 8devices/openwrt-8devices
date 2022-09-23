@@ -4,6 +4,7 @@
 # Copyright (C) 2011 OpenWrt.org
 
 . /lib/ipq806x.sh
+. /lib/functions.sh
 
 do_load_ipq4019_board_bin()
 {
