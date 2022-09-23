@@ -559,6 +559,7 @@ dtb-$(CONFIG_ARCH_QCOM) += \
 	qcom-ipq6018-cp01-c4.dtb \
 	qcom-ipq6018-cp02-c1.dtb \
 	qcom-ipq6018-cp03-c1.dtb \
+	qcom-ipq6018-ax840.dtb \
 	qcom-ipq6018-8dev-mango.dtb \
 	qcom-ipq807x-hk01.dtb \
 	qcom-ipq807x-hk01.c2.dtb \

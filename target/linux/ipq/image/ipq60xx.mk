@@ -47,7 +47,7 @@ TARGET_DEVICES += 8devices-mango-dvk
 
 define Device/Yuncore-ax840
   DEVICE_TITLE := Yuncore ax840
-  DEVICE_DTS := qcom-ipq6018-8dev-mango
+  DEVICE_DTS := qcom-ipq6018-ax840
   BOARDNAME := ax840
   IMAGE_SIZE := 27776k
   BLOCKSIZE = 64k
