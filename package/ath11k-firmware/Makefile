@@ -28,12 +28,21 @@ $(Package/ath11k-firmware-default)
   DEPENDS:=@TARGET_ipq807x
 endef
 
+define Package/ath11k-firmware-qcn90xx
+$(Package/ath11k-firmware-default)
+  TITLE:=ath11k firmware for QCN90xx devices
+endef
+
 define Package/ath11k-firmware-ipq60xx/description
 Standard ath11k firmware for IPQ60xx from QCA
 endef
 
 define Package/ath11k-firmware-ipq807x/description
 Standard ath11k firmware for IPQ807x from QCA
+endef
+
+define Package/ath11k-firmware-qcn90xx/description
+Standard ath11k firmware for QCN90xx from QCA
 endef
 
 define Build/Compile
@@ -61,5 +70,14 @@ define Package/ath11k-firmware-ipq807x/install
 #		$(1)/lib/firmware/IPQ8074
 endef
 
+define Package/ath11k-firmware-qcn90xx/install
+	$(INSTALL_DIR) $(1)/lib/firmware/ath11k/QCN9074/hw1.0
+	$(INSTALL_DATA) $(PKG_BUILD_DIR)/QCN9074/hw1.0/2.5.0.1/WLAN.HK.2.5.0.1-01208-QCAHKSWPL_SILICONZ-1/* \
+		$(1)/lib/firmware/ath11k/QCN9074/hw1.0
+	$(INSTALL_DATA) $(PKG_BUILD_DIR)/QCN9074/hw1.0/board-2.bin \
+		$(1)/lib/firmware/ath11k/QCN9074/hw1.0/
+endef
+
 $(eval $(call BuildPackage,ath11k-firmware-ipq60xx))
 $(eval $(call BuildPackage,ath11k-firmware-ipq807x))
+$(eval $(call BuildPackage,ath11k-firmware-qcn90xx))
