@@ -45,6 +45,13 @@ define Package/ath11k-firmware-qcn90xx/description
 Standard ath11k firmware for QCN90xx from QCA
 endef
 
+define Package/ath11k-firmware-qcn90xx/config
+	config FORCE_6G_PINEAPPLE_BOARDDATA
+		bool "Force 6GHz board data for 8devices Pineapple"
+		depends on PACKAGE_ath11k-firmware-qcn90xx
+		default n
+endef
+
 define Build/Compile
 
 endef
@@ -76,6 +83,9 @@ define Package/ath11k-firmware-qcn90xx/install
 		$(1)/lib/firmware/ath11k/QCN9074/hw1.0
 	$(INSTALL_DATA) $(PKG_BUILD_DIR)/QCN9074/hw1.0/board-2.bin \
 		$(1)/lib/firmware/ath11k/QCN9074/hw1.0/
+
+	[ $(CONFIG_FORCE_6G_PINEAPPLE_BOARDDATA) == "y" ] && $(INSTALL_DATA) ./files/board-2-pineapple-6g.bin \
+		$(1)/lib/firmware/ath11k/QCN9074/hw1.0/board-2.bin
 endef
 
 $(eval $(call BuildPackage,ath11k-firmware-ipq60xx))
