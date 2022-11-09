@@ -5,7 +5,7 @@ PKG_SOURCE_PROTO:=git
 PKG_SOURCE_URL=https://github.com/kvalo/ath11k-firmware.git
 PKG_SOURCE_VERSION:=0497fb0c84eeb90182e729aedf6f741c26b878ce
 PKG_SOURCE_DATE:=2022-05-06
-
+PKG_CONFIG_DEPENDS := CONFIG_FORCE_6G_PINEAPPLE_BOARDDATA
 PKG_MAINTAINER:=John Crispin <john@phrozen.org>
 
 include $(INCLUDE_DIR)/package.mk
@@ -84,8 +84,8 @@ define Package/ath11k-firmware-qcn90xx/install
 	$(INSTALL_DATA) $(PKG_BUILD_DIR)/QCN9074/hw1.0/board-2.bin \
 		$(1)/lib/firmware/ath11k/QCN9074/hw1.0/
 
-	[ $(CONFIG_FORCE_6G_PINEAPPLE_BOARDDATA) == "y" ] && $(INSTALL_DATA) ./files/board-2-pineapple-6g.bin \
-		$(1)/lib/firmware/ath11k/QCN9074/hw1.0/board-2.bin
+	[ "x$(CONFIG_FORCE_6G_PINEAPPLE_BOARDDATA)" == "xy" ] && $(INSTALL_DATA) ./files/board-2-pineapple-6g.bin \
+		$(1)/lib/firmware/ath11k/QCN9074/hw1.0/board-2.bin || true
 endef
 
 $(eval $(call BuildPackage,ath11k-firmware-ipq60xx))
