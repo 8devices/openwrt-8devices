@@ -3417,6 +3417,14 @@ static bool config_buf_bit(struct mtd_info *mtd, struct qcom_nand_host *host, u8
 	}
 }
 
+#define SPI_FLASH_BLOCK_PROT_REG	0xA0
+#define BLOCK_PROTECTION_ENABLE		0x78
+#define BLOCK_PROTECTION_DISABLE	0x00
+
+#define SPI_FLASH_ECC_ENABLE		(1 << 4)
+#define SPI_FLASH_ECC_DISABLE          	0x00
+#define SPI_CFG_ENABLED			0xff
+
 static int qspi_nand_device_config(struct qcom_nand_controller *nandc,
 				   struct qcom_nand_host *host, struct mtd_info *mtd)
 {
@@ -3424,6 +3432,74 @@ static int qspi_nand_device_config(struct qcom_nand_controller *nandc,
 	u8 buf_bit_pos = 0;
 	nandc->buf_count = 4;
 	memset(nandc->reg_read_buf, 0x0, nandc->buf_count);
+
+	/* Get the Block protection status of device. On power on serial
+	 * nand device all block will be protected and we acn not erased
+	 * a protected block. To check the device feature issue get feature
+	 * command. To set a feature issue set feature command to device.
+	 */
+	status = qcom_serial_get_feature(nandc, host, SPI_FLASH_BLOCK_PROT_REG);
+	if (status < 0) {
+		dev_err(nandc->dev,"Error in getting feature block protection.");
+		return status;
+	}
+
+	if ((status >> 8) & BLOCK_PROTECTION_ENABLE) {
+
+		/* Call set feature function to disable block protection
+		 */
+		status = qcom_serial_set_feature(nandc, host, SPI_FLASH_BLOCK_PROT_REG,
+				BLOCK_PROTECTION_DISABLE);
+		if (status < 0) {
+			 dev_err(nandc->dev,"Error in setting feature block protection.");
+			 return status;
+		}
+		/* After disabling the block protection again issue the get feature
+		 * command to read the status
+		 */
+		status = qcom_serial_get_feature(nandc, host, SPI_FLASH_BLOCK_PROT_REG);
+		if (status < 0) {
+			dev_err(nandc->dev,"Error in getting feature block protection.");
+			return status;
+		}
+		if ((status >> 8) & BLOCK_PROTECTION_ENABLE) {
+			dev_err(nandc->dev,"Block protection enabled");
+			return -EIO;
+		}
+	}
+	/* Get device internal ECC status. if device internal ECC is enabled then
+	 * issue set feature command to disable it.
+	 */
+	status = qcom_serial_get_feature(nandc, host, SPI_FLASH_FEATURE_REG);
+	if (status < 0) {
+		dev_err(nandc->dev,"Error in getting feature Internal ECC.");
+		return status;
+	}
+
+	if (((status >> 8) & SPI_FLASH_ECC_ENABLE) || ((status >> 8) & SPI_CFG_ENABLED)) {
+		/* Device Internal ECC enabled call set feature command to
+		 * disable internal ECC
+		 */
+		status = qcom_serial_set_feature(nandc, host, SPI_FLASH_FEATURE_REG,
+				((status >> 8) & ~SPI_FLASH_ECC_ENABLE) & 0xff);
+		if (status < 0) {
+			dev_err(nandc->dev,"Error in setting feature internal ecc disable.");
+			return status;
+		}
+		/* Again check if internal ecc is disabled or not using get feature command
+		 */
+
+		status = qcom_serial_get_feature(nandc, host, SPI_FLASH_FEATURE_REG);
+		if (status < 0) {
+			dev_err(nandc->dev,"Error in getting feature Internal ECC.");
+			return status;
+		}
+		if ((status >> 8) & SPI_FLASH_ECC_ENABLE) {
+			dev_err(nandc->dev,"Device Internal ecc is enabled.");
+			return -EIO;
+		}
+	}
+
 	/* Configure BUF bit for SPI Nand device
 	 * Read the id and compare for device id
 	 */
