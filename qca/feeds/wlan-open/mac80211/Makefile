@@ -179,9 +179,88 @@ define KernelPackage/mac80211-nonss
 	CONFIG_AVERAGE=y
   FILES:= $(PKG_BUILD_DIR)/net/mac80211/mac80211.ko
   VARIANT:=nonss
+  MENU:=1
 endef
 
-define KernelPackage/mac80211i-nonss/description
+define KernelPackage/mac80211-nonss/config
+  if PACKAGE_kmod-mac80211-nonss
+
+	config PACKAGE_MAC80211_DEBUGFS
+		bool "Export mac80211 internals in DebugFS"
+		select KERNEL_DEBUG_FS
+		select KERNEL_RELAY if PACKAGE_kmod-ath9k-common
+		default y
+		help
+		  Select this to see extensive information about
+		  the internal state of mac80211 in debugfs.
+
+	config PACKAGE_MAC80211_MESH
+		bool "Enable 802.11s mesh support"
+		default y
+
+	config PACKAGE_MAC80211_MESSAGE_TRACING
+		bool "Enable mac80211 message tracing"
+		default n
+		help
+		  Select this option to enable tracing.
+
+	config PACKAGE_MAC80211_DEBUG_MENU
+		bool "Select mac80211 debugging features"
+		default n
+		help
+		  This option collects various mac80211 debug settings.
+
+	menu "mac80211 debugging features"
+		depends on PACKAGE_MAC80211_DEBUG_MENU
+
+	config PACKAGE_MAC80211_VERBOSE_DEBUG
+		bool "Verbose debugging output"
+		default n
+		help
+		  Selecting this option causes mac80211 to print out
+		  many debugging messages.
+
+	config PACKAGE_MAC80211_MLME_DEBUG
+		bool "Verbose managed MLME output"
+		default n
+		help
+		  Selecting this option causes mac80211 to print out
+		  debugging messages for the managed-mode MLME.
+
+	config PACKAGE_MAC80211_STA_DEBUG
+		bool "Verbose station debugging"
+		default n
+		help
+		  Selecting this option causes mac80211 to print out
+		  debugging messages for station addition/removal.
+
+	config PACKAGE_MAC80211_HT_DEBUG
+		bool "Verbose HT debugging"
+		default n
+		help
+		  This option enables 802.11n High Throughput features
+		  debug tracing output.
+
+	config PACKAGE_MAC80211_IBSS_DEBUG
+		bool "Verbose IBSS debugging"
+		default n
+		help
+		  Selecting this option causes mac80211 to print out
+		  very verbose IBSS debugging messages.
+
+	config PACKAGE_MAC80211_PS_DEBUG
+		bool "Verbose powersave mode debugging"
+		default n
+		help
+		  Selecting this option causes mac80211 to print out very
+		  verbose power save mode debugging messages (when mac80211
+		  is an AP and has power saving stations.)
+
+	endmenu
+  endif
+endef
+
+define KernelPackage/mac80211-nonss/description
 Generic IEEE 802.11 Networking Stack (mac80211) nonss
 endef
 
@@ -315,6 +394,27 @@ endef
 
 define KernelPackage/ath/description
  This module contains some common parts needed by QCA Wireless drivers.
+endef
+
+define KernelPackage/ath-nonss/config
+  if PACKAGE_kmod-ath-nonss
+	config ATH_USER_REGD
+		bool "Force Atheros drivers to respect the user's regdomain settings"
+		help
+		  Atheros' idea of regulatory handling is that the EEPROM of the card defines
+		  the regulatory limits and the user is only allowed to restrict the settings
+		  even further, even if the country allows frequencies or power levels that
+		  are forbidden by the EEPROM settings.
+
+		  Select this option if you want the driver to respect the user's decision about
+		  regulatory settings.
+
+	config PACKAGE_ATH_DEBUG
+		bool "Atheros wireless debugging"
+		help
+		  Say Y, if you want to debug atheros wireless drivers.
+		  Right now only ath9k makes use of this.
+  endif
 endef
 
 define KernelPackage/ath-nonss
@@ -468,6 +568,7 @@ config-y:= \
 config-$(call config_package,cfg80211) += CFG80211
 
 config-$(call config_package,mac80211) += MAC80211
+config-$(call config_package,mac80211-nonss) += MAC80211
 config-$(CONFIG_PACKAGE_MAC80211_MESH) += MAC80211_MESH
 ifdef CONFIG_PACKAGE_MAC80211_DEBUGFS
   config-y += \
@@ -505,6 +606,7 @@ config-$(CONFIG_ATH_USER_REGD) += ATH_USER_REGD \
 config-$(call config_package,ath9k-htc) += ATH9K_HTC
 config-$(call config_package,ath10k) += ATH10K ATH10K_PCI
 config-$(call config_package,ath11k) += ATH11K ATH11K_PCI ATH11K_AHB
+config-$(call config_package,ath11k-nonss) += ATH11K ATH11K_PCI ATH11K_AHB
 config-$(call config_package,wil6210) += ATH_CARDS WIL6210
 
 config-$(CONFIG_PACKAGE_WIL6210_NSS_SUPPORT) += WIL6210_NSS_SUPPORT
@@ -513,6 +615,7 @@ config-$(CONFIG_PACKAGE_kmod-ath9k) += ATH9K_CHANNEL_CONTEXT
 config-$(CONFIG_PACKAGE_kmod-ath10k) += ATH10K_DFS_CERTIFIED ATH10K_SMART_ANT_ALG \
 					ATH10K_AHB ATH10K_SPECTRAL
 config-$(CONFIG_PACKAGE_kmod-ath11k) += ATH11K_SPECTRAL ATH11K_CFR
+config-$(CONFIG_PACKAGE_kmod-ath11k-nonss) += ATH11K_SPECTRAL ATH11K_CFR
 
 ifeq ($(CONFIG_KERNEL_IPQ_MEM_PROFILE),512)
 config-y += ATH11K_MEM_PROFILE_512M
