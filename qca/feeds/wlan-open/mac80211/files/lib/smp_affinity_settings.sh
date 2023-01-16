@@ -343,6 +343,9 @@ enable_smp_affinity_wifi() {
 					#case for rdp418
 					enable_affinity_al02_c1
 					;;
+			8dev-cherry)
+					enable_affinity_mpc1
+					;;
 			*)
 					#no affinity settings
 					;;
