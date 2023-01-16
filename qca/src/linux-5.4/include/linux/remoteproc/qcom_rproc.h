@@ -1,6 +1,8 @@
 #ifndef __QCOM_RPROC_H__
 #define __QCOM_RPROC_H__
 
+#include <linux/device.h>
+
 struct notifier_block;
 
 #if IS_ENABLED(CONFIG_QCOM_RPROC_COMMON)
