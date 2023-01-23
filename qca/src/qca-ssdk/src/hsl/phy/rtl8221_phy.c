@@ -5,6 +5,7 @@
 #include "hsl_phy.h"
 #include "ssdk_plat.h"
 #include "rtl8221_phy.h"
+#include "rtl8221.h"
 
 #define PHY_INVALID_DATA 0xffff
 #define PHY_RTN_ON_READ_ERROR(phy_data) \
@@ -390,6 +391,7 @@ static sw_error_t rtl8221_phy_api_ops_init(void)
 */
 int rtl8221_phy_init(a_uint32_t dev_id, a_uint32_t port_bmp)
 {
+	a_uint32_t port_id = 0;
 	a_int32_t ret = 0;
 
 	if(phy_ops_flag == A_FALSE &&
@@ -397,6 +399,15 @@ int rtl8221_phy_init(a_uint32_t dev_id, a_uint32_t port_bmp)
 		phy_ops_flag = A_TRUE;
 	}
 	rtl8221_phy_hw_init(dev_id, port_bmp);
+
+	for (port_id = SSDK_PHYSICAL_PORT0; port_id < SW_MAX_NR_PORT; port_id ++)
+	{
+		if (port_bmp & (0x1 << port_id))
+		{
+			rtl8221_phydev_init(dev_id, port_id);
+		}
+	}
+	ret = rtl8221_phy_driver_register();
 
 	return ret;
 }

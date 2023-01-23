@@ -81,6 +81,7 @@ ifeq (TRUE, $(IN_SFP_PHY))
 endif
 
 SRC_LIST += rtl8221_phy.c
+SRC_LIST += rtl8221.c
 
 SRC_LIST += hsl_phy.c
 
