@@ -37,7 +37,12 @@ extern "C"
 #define BIT_2                    2
 #define BIT_1                    1
 #define BIT_0                    0
+#define MALIBU_PHYID_MASK 0x07
 #define PSGMII_ID 5
+#define MALIBU_PHYAD_TO_PHYID(addr) ((addr) & MALIBU_PHYID_MASK)
+#define MALIBU_PHYID_TO_PORT(id) ((id) < PSGMII_ID ? (id) : PSGMII_ID - 1)
+#define MALIBU_PHYAD_TO_PORT(addr) \
+	        (MALIBU_PHYID_TO_PORT(MALIBU_PHYAD_TO_PHYID((addr))))
 
 #define MALIBU_COMMON_CTRL  0x1040
 #define MALIBU_10M_LOOPBACK  0x4100

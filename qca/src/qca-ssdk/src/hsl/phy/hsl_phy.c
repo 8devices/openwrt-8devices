@@ -972,3 +972,13 @@ sw_error_t ssdk_phy_driver_cleanup(a_uint32_t dev_id)
 	return SW_OK;
 }
 /*qca808x_end*/
+
+a_uint32_t
+hsl_port_phy_port_get(a_uint32_t dev_id, a_uint32_t port_id)
+{
+#ifdef IN_MALIBU_PHY
+	if (phy_info[dev_id]->phy_type[port_id] == MALIBU_PHY_CHIP)
+		return MALIBU_PHYAD_TO_PORT(phy_info[dev_id]->phy_address[port_id]);
+#endif
+	return SSDK_PHY_PORT0;
+}

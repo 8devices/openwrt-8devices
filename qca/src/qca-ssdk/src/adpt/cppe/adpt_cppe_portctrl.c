@@ -60,8 +60,8 @@ _adpt_cppe_port_mux_mac_set(a_uint32_t dev_id, fal_port_t port_id,
 		case SSDK_PHYSICAL_PORT3:
 		case SSDK_PHYSICAL_PORT4:
 			if (mode0 == PORT_WRAPPER_PSGMII) {
-				if (hsl_port_phyid_get(dev_id,
-					SSDK_PHYSICAL_PORT3) == MALIBU2PORT_PHY) {
+				if (hsl_port_phy_port_get(dev_id,
+					SSDK_PHYSICAL_PORT3) == SSDK_PHY_PORT4) {
 					cppe_port_mux_ctrl.bf.port3_pcs_sel =
 						CPPE_PORT3_PCS_SEL_PCS0_CHANNEL4;
 					cppe_port_mux_ctrl.bf.port4_pcs_sel =
@@ -115,8 +115,8 @@ _adpt_cppe_port_mux_mac_set(a_uint32_t dev_id, fal_port_t port_id,
 			break;
 		case SSDK_PHYSICAL_PORT5:
 			if (mode0 == PORT_WRAPPER_PSGMII) {
-				if (hsl_port_phyid_get(dev_id,
-					SSDK_PHYSICAL_PORT3) != MALIBU2PORT_PHY) {
+				if (hsl_port_phy_port_get(dev_id,
+					SSDK_PHYSICAL_PORT3) != SSDK_PHY_PORT4) {
 					cppe_port_mux_ctrl.bf.port5_pcs_sel =
 						CPPE_PORT5_PCS_SEL_PCS0_CHANNEL4;
 					cppe_port_mux_ctrl.bf.port5_gmac_sel =
@@ -249,8 +249,8 @@ adpt_cppe_port_to_channel_convert(a_uint32_t dev_id, a_uint32_t port_id,
 	*channel_id = port_id;
 
 	if (port_id == SSDK_PHYSICAL_PORT3) {
-		if (hsl_port_phyid_get(dev_id,
-				port_id) == MALIBU2PORT_PHY) {
+		if (hsl_port_phy_port_get(dev_id,
+				port_id) == SSDK_PHY_PORT4) {
 			*channel_id = SSDK_PHYSICAL_PORT5;
 		}
 	}

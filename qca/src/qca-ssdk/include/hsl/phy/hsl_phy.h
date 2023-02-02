@@ -736,6 +736,8 @@ hsl_phy_phydev_autoneg_update(a_uint32_t dev_id, a_uint32_t phy_addr,
 a_uint32_t
 hsl_phy_speed_duplex_to_auto_adv(a_uint32_t dev_id, fal_port_speed_t speed,
 	fal_port_duplex_t duplex);
+a_uint32_t
+hsl_port_phy_port_get(a_uint32_t dev_id, a_uint32_t port_id);
 /*qca808x_start*/
 #ifdef __cplusplus
 }

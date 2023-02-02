@@ -206,6 +206,12 @@ enum {
 #define SSDK_UNIPHY_CHANNEL3            3
 #define SSDK_UNIPHY_CHANNEL4            4
 
+#define SSDK_PHY_PORT0                  0
+#define SSDK_PHY_PORT1                  1
+#define SSDK_PHY_PORT2                  2
+#define SSDK_PHY_PORT3                  3
+#define SSDK_PHY_PORT4                  4
+
 /*qca808x_start*/
 #define SSDK_PHYSICAL_PORT0             0
 #define SSDK_PHYSICAL_PORT1             1
