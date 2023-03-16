@@ -220,6 +220,7 @@ jffs2_copy_config() {
 # $(2): (optional) pipe command to extract firmware, e.g. dd bs=n skip=m
 default_do_upgrade() {
 	sync
+	echo 3 > /proc/sys/vm/drop_caches
 	if [ "$SAVE_CONFIG" -eq 1 ]; then
 		get_image "$1" "$2" | mtd $MTD_CONFIG_ARGS -j "$CONF_TAR" write - "${PART_NAME:-image}"
 	else
