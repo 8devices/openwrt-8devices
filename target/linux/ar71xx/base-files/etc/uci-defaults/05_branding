@@ -19,6 +19,11 @@ carambola2)
 	echo "i2c-gpio-custom bus0=0,18,19" >> /etc/modules.d/50-i2c-gpio-custom
 	;;
 
+carambola3)
+	uci set system.@system[0].hostname=Carambola3
+	uci set wireless.@wifi-iface[0].ssid=Carambola3
+	;;
+
 centipede)
 	uci set system.@system[0].hostname=Centipede
 	uci set wireless.@wifi-iface[0].ssid=Centipede

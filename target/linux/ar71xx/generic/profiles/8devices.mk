@@ -16,6 +16,17 @@ endef
 
 $(eval $(call Profile,CARAMBOLA2))
 
+define Profile/CARAMBOLA3
+        NAME:=Carambola3 board from 8Devices
+        PACKAGES:=kmod-usb-core kmod-usb2
+endef
+
+define Profile/CARAMBOLA3/Description
+        Package set optimized for the 8devices Carambola3 board.
+endef
+
+$(eval $(call Profile,CARAMBOLA3))
+
 define Profile/CENTIPEDE
         NAME:=Centipede board from 8Devices
         PACKAGES:=kmod-usb-core kmod-usb2
