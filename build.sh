@@ -4,7 +4,7 @@
 #
 help(){
     echo "Usage: $0 [board-name] <config_full>"
-    echo "valid board names: carambola2 centipede lima rambutan"
+    echo "valid board names: carambola2 carambola3 centipede lima rambutan"
     exit
 }
 
@@ -17,7 +17,7 @@ if [ $# -eq 1 ]; then
         rambutan)
             config=config_rambutan_minimal
             ;;
-        carambola2|centipede|lima)
+        carambola2|carambola3|centipede|lima)
             config=config_minimal
             ;;
         help|--help|-h|*)
@@ -29,7 +29,7 @@ else
         rambutan)
             config=config_rambutan_full
             ;;
-        carambola2|centipede|lima)
+        carambola2|carambola3|centipede|lima)
             config=config_full
             ;;
     esac

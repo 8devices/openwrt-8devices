@@ -168,6 +168,16 @@ define Device/carambola2
 endef
 TARGET_DEVICES += carambola2
 
+define Device/carambola3
+  DEVICE_TITLE := 8devices Carambola3
+  DEVICE_PACKAGES := kmod-usb-core kmod-usb2
+  DEVICE_PROFILE := 8DEV
+  BOARDNAME := CARAMBOLA3
+  IMAGE_SIZE := 15616k
+  MTDPARTS := spi0.0:256k(u-boot)ro,256k(u-boot-env)ro,256k(art)ro,-(firmware)
+endef
+TARGET_DEVICES += carambola3
+
 define Device/centipede
   DEVICE_TITLE := 8devices Centipede
   DEVICE_PROFILE := 8DEV

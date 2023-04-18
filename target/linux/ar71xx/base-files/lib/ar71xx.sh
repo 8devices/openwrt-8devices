@@ -716,6 +716,9 @@ ar71xx_board_detect() {
 	*"Carambola2"*)
 		name="carambola2"
 		;;
+	*"Carambola3"*)
+		name="carambola3"
+		;;
 	*"Centipede"*)
 		name="centipede"
 		;;
