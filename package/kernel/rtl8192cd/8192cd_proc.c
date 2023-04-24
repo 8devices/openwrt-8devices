@@ -8788,7 +8788,12 @@ void /*__devexit*/MDL_EXIT rtl8192cd_proc_remove (struct net_device *dev)
 		remove_proc_entry( "btinfo_evt", rtl8192cd_proc_root );
 #endif /* CONFIG_BT_COEXIST */
 
+        remove_proc_entry( "debug_statistic", rtl8192cd_proc_root );
+        remove_proc_entry( "wmm", rtl8192cd_proc_root );
+        remove_proc_entry( "mib_txbf", rtl8192cd_proc_root );
+        remove_proc_entry( "mib_veriwave", rtl8192cd_proc_root );
         remove_proc_entry( "thermal", rtl8192cd_proc_root );
+        remove_proc_entry( "ccx", rtl8192cd_proc_root );
         remove_proc_entry( dev->name, NULL );
         rtl8192cd_proc_root = NULL;
     }
