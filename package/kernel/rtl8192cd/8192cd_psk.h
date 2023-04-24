@@ -181,10 +181,12 @@ typedef struct _wpa_global_info {
 	OCTET_STRING		AuthInfoElement;
 	unsigned char		AuthInfoBuf[INFO_ELEMENT_SIZE];
 	unsigned char		MulticastCipher;
-	int					NumOfUnicastCipher;
+	int			NumOfUnicastCipher;
 	unsigned char		UnicastCipher[MAX_UNICAST_CIPHER];
+	unsigned char		GTK[NumGroupKey][GTK_LEN];
+	int			GN;
 #ifdef RTL_WPA2
-	int					NumOfUnicastCipherWPA2;
+	int			NumOfUnicastCipherWPA2;
 	unsigned char		UnicastCipherWPA2[MAX_UNICAST_CIPHER];
 #endif
 } WPA_GLOBAL_INFO;

@@ -192,9 +192,10 @@ u32 if_priv_stactrl[NUM_WLAN_IFACE];
 #include <linux/proc_fs.h> 
 #endif
 #endif
+
+#ifdef BR_SHORTCUT
 #if defined(CONFIG_WIRELESS_LAN_MODULE) && !defined(NOT_RTK_BSP)
 extern int (*wirelessnet_hook)(void);
-#ifdef BR_SHORTCUT
 extern struct net_device* (*wirelessnet_hook_shortcut)(unsigned char *da);
 #endif
 #ifdef PERF_DUMP
@@ -14079,6 +14080,9 @@ void rtl8192cd_deinit_one(struct rtl8192cd_priv *priv)
 #ifdef MBSSID
 	struct rtl8192cd_priv *vap_priv = NULL;
 #endif
+
+	printk(KERN_ERR "Entering rtl8192cd_deinit_one()\n");
+
 	if (NULL == priv) {
 		panic_printk("%s: priv should NOT be a NULL pointer!\n", __func__);
 		return;
@@ -14928,18 +14932,18 @@ int MDL_INIT __rtl8192cd_init(unsigned long base_addr)
 //------------------------------------
 #endif
 
-#if defined(CONFIG_WIRELESS_LAN_MODULE) && !defined(NOT_RTK_BSP)
-////	wirelessnet_hook = GetCpuCanSuspend;
 #ifdef BR_SHORTCUT
-////	wirelessnet_hook_shortcut = get_shortcut_dev;
+#if defined(CONFIG_WIRELESS_LAN_MODULE) && !defined(NOT_RTK_BSP)
+	wirelessnet_hook = GetCpuCanSuspend;
+	wirelessnet_hook_shortcut = get_shortcut_dev;
 #endif
 #ifdef PERF_DUMP
 	Fn_rtl8651_romeperfEnterPoint = rtl8651_romeperfEnterPoint;
 	Fn_rtl8651_romeperfExitPoint = rtl8651_romeperfExitPoint;
 #endif
 #ifdef CONFIG_RTL8190_PRIV_SKB
-////	wirelessnet_hook_is_priv_buf = is_rtl8190_priv_buf;
-////	wirelessnet_hook_free_priv_buf = free_rtl8190_priv_buf;
+	wirelessnet_hook_is_priv_buf = is_rtl8190_priv_buf;
+	wirelessnet_hook_free_priv_buf = free_rtl8190_priv_buf;
 #endif
 #endif // CONFIG_WIRELESS_LAN_MODULE && !NOT_RTK_BSP
 #endif // __KERNEL__
@@ -15205,18 +15209,18 @@ void MDL_EXIT rtl8192cd_exit (void)
 	misc_deregister(&cma_dev_misc);
 #endif
 
-#if defined(CONFIG_WIRELESS_LAN_MODULE) && !defined(NOT_RTK_BSP)
-////	wirelessnet_hook = NULL;
 #ifdef BR_SHORTCUT
-////	wirelessnet_hook_shortcut = NULL;
+#if defined(CONFIG_WIRELESS_LAN_MODULE) && !defined(NOT_RTK_BSP)
+	wirelessnet_hook = NULL;
+	wirelessnet_hook_shortcut = NULL;
 #endif
 #ifdef PERF_DUMP
 	Fn_rtl8651_romeperfEnterPoint = NULL;
 	Fn_rtl8651_romeperfExitPoint = NULL;
  #endif
 #ifdef CONFIG_RTL8190_PRIV_SKB
-////	wirelessnet_hook_is_priv_buf = NULL;
-////	wirelessnet_hook_free_priv_buf = NULL;
+	wirelessnet_hook_is_priv_buf = NULL;
+	wirelessnet_hook_free_priv_buf = NULL;
 #endif
 #endif // CONFIG_WIRELESS_LAN_MODULE && !NOT_RTK_BSP
 
