@@ -514,14 +514,30 @@ define KernelPackage/ath11k-nonss
   DEPENDS+= +kmod-ath-nonss +@DRIVER_11N_SUPPORT +@DRIVER_11W_SUPPORT
   FILES:= \
 	$(PKG_BUILD_DIR)/drivers/net/wireless/ath/ath11k/ath11k.ko \
-	$(PKG_BUILD_DIR)/drivers/net/wireless/ath/ath11k/ath11k_ahb.ko \
-	$(PKG_BUILD_DIR)/drivers/net/wireless/ath/ath11k/ath11k_pci.ko
-  AUTOLOAD:=$(call AutoProbe,ath11k ath11k_ahb ath11k_pci)
+	$(PKG_BUILD_DIR)/drivers/net/wireless/ath/ath11k/ath11k_ahb.ko
+  AUTOLOAD:=$(call AutoProbe,ath11k ath11k_ahb)
   VARIANT:=nonss
 endef
 
 define KernelPackage/ath11k-nonss/description
 This module adds support for wireless adapters based on
+QCA IEEE 802.11ax family of chipsets. For now only
+AHB is supported.
+endef
+
+define KernelPackage/ath11k-pci-nonss
+  $(call KernelPackage/mac80211/Default)
+  TITLE:=QCA 802.11ax wireless PCIe cards support
+  URL:=http://wireless.kernel.org/en/users/Drivers/ath11k
+  DEPENDS+= +kmod-ath11k-nonss
+  FILES:= \
+	$(PKG_BUILD_DIR)/drivers/net/wireless/ath/ath11k/ath11k_pci.ko
+  AUTOLOAD:=$(call AutoProbe,ath11k ath11k_pci)
+  VARIANT:=nonss
+endef
+
+define KernelPackage/ath11k-pci-nonss/description
+This module adds support for wireless PCIe adapters based on
 QCA IEEE 802.11ax family of chipsets. For now only
 AHB is supported.
 endef
@@ -755,6 +771,7 @@ $(eval $(call KernelPackage,ath9k-htc))
 $(eval $(call KernelPackage,ath10k))
 $(eval $(call KernelPackage,ath11k))
 $(eval $(call KernelPackage,ath11k-nonss))
+$(eval $(call KernelPackage,ath11k-pci-nonss))
 $(eval $(call KernelPackage,ath))
 $(eval $(call KernelPackage,ath-nonss))
 $(eval $(call KernelPackage,wil6210))
