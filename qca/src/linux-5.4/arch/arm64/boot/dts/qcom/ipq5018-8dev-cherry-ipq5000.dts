@@ -20,6 +20,7 @@
 
 
 &pcie_x1 {
+	perst-gpio = <&tlmm 15 GPIO_ACTIVE_LOW>;
 	status = "ok";
 };
 
