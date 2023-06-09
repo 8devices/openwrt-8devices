@@ -430,10 +430,71 @@ CONFIG_VERSION_FILENAMES=y
 CONFIG_VERSION_CODE_FILENAMES=y
 CONFIG_PER_FEED_REPO=y
 CONFIG_FEED_packages=y
+CONFIG_FEED_networking=y
 CONFIG_FEED_luci=y
 CONFIG_FEED_routing=y
-# CONFIG_FEED_telephony is not set
-# CONFIG_FEED_freifunk is not set
+CONFIG_FEED_nss=y
+CONFIG_FEED_nss_prop=y
+CONFIG_FEED_nss_host=y
+CONFIG_FEED_nss_cust=y
+CONFIG_FEED_nss_userspace=y
+CONFIG_FEED_nss_sap=y
+CONFIG_FEED_wlan_open=y
+CONFIG_FEED_wlan_hostapd=y
+CONFIG_FEED_wlan_iw=y
+CONFIG_FEED_sigma_dut_open=y
+CONFIG_FEED_ath10k_firmware=y
+CONFIG_FEED_wlan=y
+CONFIG_FEED_qca=y
+CONFIG_FEED_athdiag=y
+CONFIG_FEED_art2=y
+CONFIG_FEED_athtestcmd=y
+CONFIG_FEED_wapid=y
+CONFIG_FEED_qcom_utils_internal=y
+CONFIG_FEED_qca_platform_utils=y
+CONFIG_FEED_shortcut_fe=y
+CONFIG_FEED_qca_mcs=y
+CONFIG_FEED_qca_lib=y
+CONFIG_FEED_apple_homekit=y
+CONFIG_FEED_ieee1905_security=y
+CONFIG_FEED_hyfi=y
+CONFIG_FEED_qca_plc=y
+CONFIG_FEED_whc=y
+CONFIG_FEED_bluetopia=y
+CONFIG_FEED_wigig_utils=y
+CONFIG_FEED_wigig_utils_oss=y
+CONFIG_FEED_wigig_firmware=y
+CONFIG_FEED_ssdk=y
+CONFIG_FEED_bluetooth=y
+CONFIG_FEED_thread=y
+CONFIG_FEED_ioe_bridges=y
+CONFIG_FEED_qca_hk=y
+CONFIG_FEED_qca_cp=y
+CONFIG_FEED_qca_np=y
+CONFIG_FEED_qca_lit=y
+CONFIG_FEED_csrmesh=y
+CONFIG_FEED_sigma_dut=y
+CONFIG_FEED_qca_wapi=y
+CONFIG_FEED_qca_IOT=y
+CONFIG_FEED_bootloader=y
+CONFIG_FEED_platform_utils=y
+CONFIG_FEED_lte_data_oss=y
+CONFIG_FEED_lte_data_prop=y
+CONFIG_FEED_snpe=y
+CONFIG_FEED_data_modem_monitor=y
+CONFIG_FEED_wlan_utils=y
+CONFIG_FEED_afc=y
+CONFIG_FEED_qca_mad=y
+CONFIG_FEED_qca_son_mem_debug=y
+CONFIG_FEED_healthmonitor=y
+CONFIG_FEED_minidump=y
+CONFIG_FEED_btdaemon=y
+CONFIG_FEED_kickstart=y
+CONFIG_FEED_qca_ezmesh=y
+CONFIG_FEED_qtip_server=y
+CONFIG_FEED_wifi_fw_headers=y
+CONFIG_FEED_odd=y
+CONFIG_FEED_wifi_debug_tools=y
 
 #
 # Base system
@@ -3399,6 +3460,7 @@ CONFIG_PACKAGE_kmod-ath-nonss=y
 # CONFIG_PACKAGE_kmod-ath10k-ct-smallbuffers is not set
 # CONFIG_PACKAGE_kmod-ath11k is not set
 CONFIG_PACKAGE_kmod-ath11k-nonss=y
+# CONFIG_PACKAGE_kmod-ath11k-pci-nonss is not set
 # CONFIG_PACKAGE_kmod-ath9k is not set
 # CONFIG_PACKAGE_kmod-ath9k-common is not set
 # CONFIG_PACKAGE_kmod-ath9k-htc is not set
