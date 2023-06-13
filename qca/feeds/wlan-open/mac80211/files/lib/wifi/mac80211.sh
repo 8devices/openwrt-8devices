@@ -187,6 +187,7 @@ config wifi-device  radio$devidx
 	option hwmode	11${mode_11n}${mode_band}
 $dev_id
 $ht_capab
+	option phy ${dev}
 	# REMOVE THIS LINE TO ENABLE WIFI:
 	option disabled 1
 
