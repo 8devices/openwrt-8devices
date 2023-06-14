@@ -5,16 +5,17 @@ PKG_RELEASE:=1
 
 PKG_SOURCE_PROTO:=git
 PKG_SOURCE_URL=$(PROJECT_GIT)/project/ubus.git
-PKG_SOURCE_DATE:=2022-02-21
-PKG_SOURCE_VERSION:=b32a0e17b37847e8357b53a358d1311bfc3ad5d2
-PKG_MIRROR_HASH:=fddf17b1faeb2ab09a3bed2e301a9cc83cb6ceb69af57cd58dc2132b58276f8b
-PKG_ABI_VERSION:=20210603
+PKG_SOURCE_DATE:=2022-06-01
+PKG_SOURCE_VERSION:=2bebf93cd3343fe49f22a05ef935e460d2d44f67
+PKG_MIRROR_HASH:=4efd873928089c086bbac02f3ca5bae55904500b6e6f1c4c377181a00b67147f
+PKG_ABI_VERSION:=$(call abi_version_str,$(PKG_SOURCE_DATE))
 CMAKE_INSTALL:=1
 
 PKG_LICENSE:=LGPL-2.1
 PKG_LICENSE_FILES:=
-
 PKG_MAINTAINER:=Felix Fietkau <nbd@nbd.name>
+
+PKG_ASLR_PIE_REGULAR:=1
 
 include $(INCLUDE_DIR)/package.mk
 include $(INCLUDE_DIR)/cmake.mk
@@ -31,6 +32,7 @@ define Package/ubusd
   CATEGORY:=Base system
   TITLE:=OpenWrt RPC daemon
   DEPENDS:=+libubox +libblobmsg-json
+  USERID:=ubus=81:ubus=81
 endef
 
 define Package/libubus
@@ -51,7 +53,7 @@ endef
 TARGET_CFLAGS += -I$(STAGING_DIR)/usr/include -flto
 TARGET_LDFLAGS += -flto
 
-CMAKE_OPTIONS = \
+CMAKE_OPTIONS += \
 	-DLUAPATH=/usr/lib/lua \
 	-DABIVERSION="$(PKG_ABI_VERSION)"
 

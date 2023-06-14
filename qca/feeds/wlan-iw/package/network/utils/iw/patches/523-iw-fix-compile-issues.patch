@@ -8,9 +8,8 @@ This patch fixes compilation issues identified locally for this iw-5.16
 Signed-off-by: Karthikeyan Kathirvel <quic_kathirve@quicinc.com>
 ---
  Makefile | 20 ++++++++++----------
- sar.c    |  9 +++++++++
  scan.c   |  2 +-
- 3 files changed, 20 insertions(+), 11 deletions(-)
+ 2 files changed, 20 insertions(+), 11 deletions(-)
 
 diff --git a/Makefile b/Makefile
 index 2fb8db89c556..8bd5457279df 100644
@@ -66,26 +65,6 @@ index 2fb8db89c556..8bd5457279df 100644
  endif # NO_PKG_CONFIG
  
  ifeq ($(V),1)
-diff --git a/sar.c b/sar.c
-index 5ab54ec59a4b..95e36e43eb0a 100644
---- a/sar.c
-+++ b/sar.c
-@@ -8,6 +8,15 @@
- #include "nl80211.h"
- #include "iw.h"
- 
-+/**
-+ * Add 16 bit integer attribute to netlink message.
-+ * @arg msg		Netlink message.
-+ * @arg attrtype	Attribute type.
-+ * @arg value		Numeric value.
-+ */
-+#define NLA_PUT_S32(msg, attrtype, value) \
-+	NLA_PUT_TYPE(msg, uint16_t, attrtype, value)
-+
- static int set_sar_specs(struct nl80211_state *state,
- 			 struct nl_msg *msg,
- 			 int argc, char **argv,
 diff --git a/scan.c b/scan.c
 index 8eddf486d0ea..8cd6d1f7dc0c 100644
 --- a/scan.c

@@ -8,7 +8,7 @@ include $(INCLUDE_DIR)/image.mk
 UBIFS_OPTS = -m 2048 -e 124KiB -c 4096 -U -F
 
 define Device/Default
-  KERNEL = kernel-bin | lzma | fit lzma $$(DEVICE_DTS_DIR)/$$(DEVICE_DTS).dtb
+  KERNEL = kernel-bin | gzip | fit gzip $$(DEVICE_DTS_DIR)/$$(DEVICE_DTS).dtb
   KERNEL_IN_UBI := 1
   IMAGES := sysupgrade.bin
   IMAGE/sysupgrade.bin := append-ubi
