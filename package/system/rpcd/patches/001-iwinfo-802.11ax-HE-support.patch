@@ -1,0 +1,55 @@
+--- a/iwinfo.c
++++ b/iwinfo.c
+@@ -257,6 +257,21 @@ rpc_iwinfo_call_htmodes(const char *name
+ 		if (modes & IWINFO_HTMODE_VHT160)
+ 			blobmsg_add_string(&buf, NULL, "VHT160");
+ 
++		if (modes & IWINFO_HTMODE_HE20)
++			blobmsg_add_string(&buf, NULL, "HE20");
++
++		if (modes & IWINFO_HTMODE_HE40)
++			blobmsg_add_string(&buf, NULL, "HE40");
++
++		if (modes & IWINFO_HTMODE_HE80)
++			blobmsg_add_string(&buf, NULL, "HE80");
++
++		if (modes & IWINFO_HTMODE_HE80_80)
++			blobmsg_add_string(&buf, NULL, "HE80+80");
++
++		if (modes & IWINFO_HTMODE_HE160)
++			blobmsg_add_string(&buf, NULL, "HE160");
++
+ 		blobmsg_close_array(&buf, c);
+ 	}
+ }
+@@ -274,6 +289,9 @@ rpc_iwinfo_call_hwmodes(const char *name
+ 		if (modes & IWINFO_80211_AC)
+ 			blobmsg_add_string(&buf, NULL, "ac");
+ 
++		if (modes & IWINFO_80211_AX)
++			blobmsg_add_string(&buf, NULL, "ax");
++
+ 		if (modes & IWINFO_80211_A)
+ 			blobmsg_add_string(&buf, NULL, "a");
+ 
+@@ -417,6 +435,7 @@ rpc_iwinfo_add_rateinfo(struct iwinfo_ra
+ {
+ 	blobmsg_add_u8(&buf, "ht", r->is_ht);
+ 	blobmsg_add_u8(&buf, "vht", r->is_vht);
++	blobmsg_add_u8(&buf, "he", r->is_he);
+ 	blobmsg_add_u32(&buf, "mhz", r->mhz);
+ 	blobmsg_add_u32(&buf, "rate", r->rate);
+ 
+@@ -430,6 +449,12 @@ rpc_iwinfo_add_rateinfo(struct iwinfo_ra
+ 		blobmsg_add_u32(&buf, "nss", r->nss);
+ 		blobmsg_add_u8(&buf, "short_gi", r->is_short_gi);
+ 	}
++	else if (r->is_he) {
++		blobmsg_add_u32(&buf, "mcs", r->mcs);
++		blobmsg_add_u32(&buf, "nss", r->nss);
++		blobmsg_add_u32(&buf, "he_gi", r->he_gi);
++		blobmsg_add_u32(&buf, "he_dcm", r->he_dcm);
++	}
+ }
+ 
+ static int
