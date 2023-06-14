@@ -1,0 +1,63 @@
+--- a/iwinfo_cli.c
++++ b/iwinfo_cli.c
+@@ -861,6 +861,29 @@ static void print_htmodelist(const struc
+ 	printf("\n");
+ }
+ 
++static void print_hwmodelist(const struct iwinfo_ops *iw, const char *ifname)
++{
++        int modes;
++        static char buf[20];
++
++        if (iw->hwmodelist(ifname, &modes))
++                modes = -1;
++
++        if (modes <= 0)
++                snprintf(buf, sizeof(buf), "unknown");
++        else
++                snprintf(buf, sizeof(buf), "%s %s %s %s %s %s %s",
++                        (modes & IWINFO_80211_A) ? "a" : "",
++                        (modes & IWINFO_80211_B) ? "b" : "",
++                        (modes & IWINFO_80211_G) ? "g" : "",
++                        (modes & IWINFO_80211_N) ? "n" : "",
++                        (modes & IWINFO_80211_AC) ? "ac" : "",
++                        (modes & IWINFO_80211_AD) ? "ad" : "",
++                        (modes & IWINFO_80211_AX) ? "ax" : "");
++
++         printf("%s\n", buf);
++}
++
+ static void lookup_phy(const struct iwinfo_ops *iw, const char *section)
+ {
+ 	char buf[IWINFO_BUFSIZE];
+@@ -909,6 +932,7 @@ int main(int argc, char **argv)
+ 			"	iwinfo <device> assoclist\n"
+ 			"	iwinfo <device> countrylist\n"
+ 			"	iwinfo <device> htmodelist\n"
++			"	iwinfo <device> hwmodelist\n"
+ 			"	iwinfo <backend> phyname <section>\n"
+ 		);
+ 
+@@ -1004,11 +1028,17 @@ int main(int argc, char **argv)
+ 				case 'c':
+ 					print_countrylist(iw, argv[1]);
+ 					break;
+-
+-				case 'h':
+-					print_htmodelist(iw, argv[1]);
+-					break;
+-
++				case 'h':
++					switch(argv[i][1])
++					{
++					case 't':
++						print_htmodelist(iw, argv[1]);
++						break;
++					case 'w':
++						print_hwmodelist(iw, argv[1]);
++						break;
++					}
++					break;
+ 				default:
+ 					fprintf(stderr, "Unknown command: %s\n", argv[i]);
+ 					rv = 1;
