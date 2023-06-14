@@ -1,0 +1,65 @@
+--- a/iwinfo.c
++++ b/iwinfo.c
+@@ -371,6 +371,53 @@ rpc_iwinfo_info(struct ubus_context *ctx
+ 	return UBUS_STATUS_OK;
+ }
+ 
++
++static int
++rpc_iwinfo_hwmodes(struct ubus_context *ctx, struct ubus_object *obj,
++                struct ubus_request_data *req, const char *method,
++                struct blob_attr *msg)
++{
++        int rv;
++
++        rv = rpc_iwinfo_open(msg);
++
++        if (rv)
++                return rv;
++
++        blob_buf_init(&buf, 0);
++
++        rpc_iwinfo_call_hwmodes("hwmodes");
++
++        ubus_send_reply(ctx, req, buf.head);
++
++        rpc_iwinfo_close();
++
++        return UBUS_STATUS_OK;
++}
++
++static int
++rpc_iwinfo_htmodes(struct ubus_context *ctx, struct ubus_object *obj,
++                struct ubus_request_data *req, const char *method,
++                struct blob_attr *msg)
++{
++        int rv;
++
++        rv = rpc_iwinfo_open(msg);
++
++        if (rv)
++                return rv;
++
++        blob_buf_init(&buf, 0);
++
++        rpc_iwinfo_call_hwmodes("htmodes");
++
++        ubus_send_reply(ctx, req, buf.head);
++
++        rpc_iwinfo_close();
++
++        return UBUS_STATUS_OK;
++}
++
+ static int
+ rpc_iwinfo_scan(struct ubus_context *ctx, struct ubus_object *obj,
+                 struct ubus_request_data *req, const char *method,
+@@ -878,6 +931,8 @@ rpc_iwinfo_api_init(const struct rpc_dae
+ 		UBUS_METHOD("countrylist", rpc_iwinfo_countrylist, rpc_device_policy),
+ 		UBUS_METHOD("survey",      rpc_iwinfo_survey,      rpc_device_policy),
+ 		UBUS_METHOD("phyname",     rpc_iwinfo_phyname,     rpc_uci_policy),
++		UBUS_METHOD("hwmodes",     rpc_iwinfo_hwmodes,     rpc_device_policy),
++		UBUS_METHOD("htmodes",     rpc_iwinfo_htmodes,     rpc_device_policy),
+ 	};
+ 
+ 	static struct ubus_object_type iwinfo_type =
