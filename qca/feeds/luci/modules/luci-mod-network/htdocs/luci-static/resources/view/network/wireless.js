@@ -314,11 +314,12 @@ var CBIWifiFrequencyValue = form.Value.extend({
 
 			var hwmodelist = L.toArray(data[0] ? data[0].getHWModes() : null)
 				.reduce(function(o, v) { o[v] = true; return o }, {});
-
+			console.log(hwmodelist);
 			this.modes = [
 				'', 'Legacy', true,
-				'n', 'N', hwmodelist.n,
-				'ac', 'AC', hwmodelist.ac
+				'n', 'N', true,
+				'ac', 'AC', true,
+				'ax', 'AX', true
 			];
 
 			var htmodelist = L.toArray(data[0] ? data[0].getHTModes() : null)
@@ -327,15 +328,22 @@ var CBIWifiFrequencyValue = form.Value.extend({
 			this.htmodes = {
 				'': [ '', '-', true ],
 				'n': [
-					'HT20', '20 MHz', htmodelist.HT20,
-					'HT40', '40 MHz', htmodelist.HT40
+					'HT20', '20 MHz', true,
+					'HT40', '40 MHz', true
 				],
 				'ac': [
-					'VHT20', '20 MHz', htmodelist.VHT20,
-					'VHT40', '40 MHz', htmodelist.VHT40,
-					'VHT80', '80 MHz', htmodelist.VHT80,
-					'VHT160', '160 MHz', htmodelist.VHT160
+					'VHT20', '20 MHz', true,
+					'VHT40', '40 MHz', true,
+					'VHT80', '80 MHz', true,
+					'VHT160', '160 MHz', true
+				],
+				'ax': [
+					'HE20', '20 MHz', true,
+					'HE40', '40 MHz', true,
+					'HE80', '80 MHz', true,
+					'HE160', '160 MHz', true
 				]
+
 			};
 
 			this.bands = {
@@ -348,6 +356,9 @@ var CBIWifiFrequencyValue = form.Value.extend({
 					'11a', '5 GHz', this.channels['11a'].length > 3
 				],
 				'ac': [
+					'11a', '5 GHz', true
+				],
+				'ax': [
 					'11a', '5 GHz', true
 				]
 			};
@@ -412,6 +423,8 @@ var CBIWifiFrequencyValue = form.Value.extend({
 
 		if (/VHT20|VHT40|VHT80|VHT160/.test(htval))
 			mode.value = 'ac';
+		if (/HE20|HE40|HE80|HE80_80|HE160/.test(htval))
+			mode.value = 'ax';
 		else if (/HT20|HT40/.test(htval))
 			mode.value = 'n';
 		else
