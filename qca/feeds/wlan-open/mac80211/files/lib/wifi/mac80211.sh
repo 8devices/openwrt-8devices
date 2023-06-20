@@ -191,7 +191,7 @@ $ht_capab
 	# REMOVE THIS LINE TO ENABLE WIFI:
 	option disabled 1
 
-config wifi-iface
+config wifi-iface   wifinet$devidx
 	option device   radio$devidx
 	option network  lan
 	option mode     ap
