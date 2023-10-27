@@ -21,7 +21,7 @@ echo "Building image using config: '$config'"
 
 ./scripts/feeds update -a
 ./scripts/feeds install -a
-cp .config .config_save`date +%F_%T.%N`
+#cp .config .config_save`date +%F_%T.%N`
 cp $config .config
 make defconfig
 make -j4 IGNORE_ERRORS='m n y'
