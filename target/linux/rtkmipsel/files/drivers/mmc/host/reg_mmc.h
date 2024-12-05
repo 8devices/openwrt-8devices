@@ -40,7 +40,7 @@
 #define CR_PLL_SD1                    (0x01C0) //97F REG_SD30_1
 #define CR_PLL_SD2                    (0x01C4) //97F REG_SD30_2
 #define CR_PLL_SD3                    (0x01C8) //97F REG_SD30_3
-#define CR_PLL_SD4                    (0x01CC) //97F REG_SD30_4
+#define CR_PLL_SD4                    (0x01CC) //97F REG_SD30_4 
 #define SYS_PLL_EMMC3           (SYSREG_BASE_ADDR + CR_PLL_SD3)
 
 //sd wrapper (base = 0x18010400)

@@ -18,10 +18,10 @@
 //#define CR_PLL_SD4                    (0x01EC)
 #define CR_PFUNC_CR                   (0x0380)
 
-#define CR_PLL_SD1                    (0x01C0) //97F REG_SD30_1
-#define CR_PLL_SD2                    (0x01C4) //97F REG_SD30_2
-#define CR_PLL_SD3                    (0x01C8) //97F REG_SD30_3
-#define CR_PLL_SD4                    (0x01CC) //97F REG_SD30_4
+#define CR_PLL_SD1                    (0x01C0)	//97F REG_SD30_1
+#define CR_PLL_SD2                    (0x01C4)	//97F REG_SD30_2
+#define CR_PLL_SD3                    (0x01C8)	//97F REG_SD30_3
+#define CR_PLL_SD4                    (0x01CC)	//97F REG_SD30_4
 
 #define SDIO_NORML_INT_STA            (0x0030)
 #define EMMC_DMA_CTL3                 (0x000C)
@@ -208,13 +208,13 @@
 /* CR_IP_CARD_INT_EN */
 
 /* CR_SD_ISR */
-#define ISRSTA_INT1                   (0x01 << 1) //card end
-#define ISRSTA_INT2                   (0x01 << 2) //card error
-#define ISRSTA_INT4                   (0x01 << 4) //DMA done
+#define ISRSTA_INT1                   (0x01 << 1)	//card end
+#define ISRSTA_INT2                   (0x01 << 2)	//card error
+#define ISRSTA_INT4                   (0x01 << 4)	//DMA done
 
 /* CR_SD_ISREN */
-#define ISRSTA_INT1EN                 (0x01 << 1) //card end
-#define ISRSTA_INT2EN                 (0x01 << 2) //card error
-#define ISRSTA_INT4EN                 (0x01 << 4) //DMA done
+#define ISRSTA_INT1EN                 (0x01 << 1)	//card end
+#define ISRSTA_INT2EN                 (0x01 << 2)	//card error
+#define ISRSTA_INT4EN                 (0x01 << 4)	//DMA done
 
 #endif /* DRIVERS_MMC_HOST_RTK_SDMMC_REG_H_ */
